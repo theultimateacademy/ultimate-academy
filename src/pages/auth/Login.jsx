@@ -80,7 +80,7 @@ export default function Login() {
   const [mode, setMode]       = useState(null)
   const [form, setForm]       = useState({ email: '', password: '' })
   const [error, setError]     = useState('')
-  const [loading, setLoading] = useState(false)
+  const [submitting, setSubmitting] = useState(false)
   const [creating, setCreating] = useState(false)
   const [createMsg, setCreateMsg] = useState('')
   const [resetSent, setResetSent] = useState(false)
@@ -130,7 +130,7 @@ export default function Login() {
   }
 
   const handleSubmit = async (e) => {
-    e.preventDefault(); setError(''); setLoading(true)
+    e.preventDefault(); setError(''); setSubmitting(true)
     try {
       const email = mode === 'coach' ? COACH_EMAIL : form.email
       if (mode === 'coach' && form.email && form.email !== COACH_EMAIL) {
@@ -140,7 +140,7 @@ export default function Login() {
     } catch (err) {
       setError(err.message || 'Identifiants incorrects')
     } finally {
-      setLoading(false)
+      setSubmitting(false)
     }
   }
 
