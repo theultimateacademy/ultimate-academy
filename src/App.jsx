@@ -4,6 +4,7 @@ import LoadingSpinner from './components/UI/LoadingSpinner'
 import AthleteLayout from './components/Layout/AthleteLayout'
 import AdminLayout   from './components/Layout/AdminLayout'
 import CookieBanner  from './components/UI/CookieBanner'
+import ScrollToTop   from './components/ScrollToTop'
 
 // Pages
 import Landing        from './pages/Landing'
@@ -119,6 +120,7 @@ function AppRoutes() {
 export default function App() {
   return (
     <BrowserRouter>
+      <ScrollToTop />
       <AuthProvider>
         <AppRoutes />
         <CookieBanner />
