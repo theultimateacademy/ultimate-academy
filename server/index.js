@@ -87,9 +87,11 @@ cron.schedule('0 18 * * 0', async () => {
 
 // ─── Auto-reply to athlete messages ─────────────────────────────────────────
 
+const WebSocket = require('ws');
 const supabaseRT = createClient(
   process.env.SUPABASE_URL,
-  process.env.SUPABASE_SERVICE_KEY
+  process.env.SUPABASE_SERVICE_KEY,
+  { realtime: { transport: WebSocket } }
 );
 const anthropicAI = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
 
