@@ -15,6 +15,8 @@ const mobileMenuStyle = `
   }
   @media (max-width: 680px) {
     .landing-hamburger { display: flex; align-items: center; justify-content: center; }
+    .landing-nav-auth-desktop { display: flex !important; gap: .35rem; }
+    .landing-nav-auth-desktop .btn { font-size: .75rem !important; padding: .35rem .65rem !important; }
     .landing-mobile-menu {
       position: fixed;
       top: 72px;

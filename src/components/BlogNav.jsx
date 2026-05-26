@@ -167,6 +167,14 @@ export default function BlogNav() {
               ))}
             </div>
           )}
+          {!user ? (
+            <>
+              <Link to="/login"    className="blognav-mobile-link" onClick={() => setMobileMenu(false)}>Connexion</Link>
+              <Link to="/register" className="blognav-mobile-link accent" onClick={() => setMobileMenu(false)}>Rejoindre →</Link>
+            </>
+          ) : (
+            <button className="blognav-mobile-link accent" onClick={() => { handleCTA(); setMobileMenu(false) }}>Mon espace →</button>
+          )}
         </div>
       )}
     </>

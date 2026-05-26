@@ -3,11 +3,11 @@ import { Link, useNavigate, useLocation } from 'react-router-dom'
 import { useAuth } from '../../contexts/AuthContext'
 
 const TOOLS = [
-  { label: '⏱ Temps de passage course',    path: '/calculateur' },
-  { label: '⚡ Calculateur de VMA',         path: '/calculateur/vma' },
-  { label: '🫁 Test Cooper & VO2max',       path: '/calculateur/vo2max' },
-  { label: '🏃 Allures running & zones FC', path: '/calculateur/allures' },
-  { label: '🎯 Prédicteur de chrono',       path: '/calculateur/predicteur' },
+  { label: 'Temps de passage course',    path: '/calculateur' },
+  { label: 'Calculateur de VMA',         path: '/calculateur/vma' },
+  { label: 'Test Cooper & VO2max',       path: '/calculateur/vo2max' },
+  { label: 'Allures running & zones FC', path: '/calculateur/allures' },
+  { label: 'Prédicteur de chrono',       path: '/calculateur/predicteur' },
 ]
 
 const mobileToolsNavStyle = `
@@ -164,6 +164,7 @@ export default function ToolsNav() {
 
       {mobileMenu && (
         <div className="tools-mobile-menu">
+          <Link to="/blog" className="tools-mobile-link active-tool" onClick={() => setMobileMenu(false)}>Blog</Link>
           {TOOLS.map(t => (
             <Link key={t.path} to={t.path}
               className={`tools-mobile-link${location.pathname === t.path ? ' active-tool' : ''}`}
@@ -171,15 +172,14 @@ export default function ToolsNav() {
               {t.label}
             </Link>
           ))}
-          <a href="/#coach"    className="tools-mobile-link" onClick={() => setMobileMenu(false)}>Mon coach</a>
-          <a href="/#tarifs"   className="tools-mobile-link" onClick={() => setMobileMenu(false)}>Tarifs</a>
-          {!user && (
+          <a href="/#coach"   className="tools-mobile-link" onClick={() => setMobileMenu(false)}>Mon coach</a>
+          <a href="/#tarifs"  className="tools-mobile-link" onClick={() => setMobileMenu(false)}>Tarifs</a>
+          {!user ? (
             <>
               <Link to="/login"    className="tools-mobile-link" onClick={() => setMobileMenu(false)}>Connexion</Link>
               <Link to="/register" className="tools-mobile-link active-tool" onClick={() => setMobileMenu(false)}>Rejoindre →</Link>
             </>
-          )}
-          {user && (
+          ) : (
             <button className="tools-mobile-link active-tool" onClick={() => { handleCTA(); setMobileMenu(false) }}>Mon espace →</button>
           )}
         </div>

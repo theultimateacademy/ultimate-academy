@@ -567,8 +567,7 @@ tr:hover td { background: rgba(255,255,255,.04); }
 @media (max-width: 680px) {
   .landing-nav { display: flex; justify-content: space-between; align-items: center; padding: 0 1rem; }
   .landing-nav-links { display: none; }
-  .landing-nav-auth-desktop { display: flex !important; gap: .35rem; }
-  .landing-nav-auth-desktop .btn { font-size: .75rem !important; padding: .35rem .65rem !important; }
+  .landing-nav-auth-desktop { display: none !important; }
 }
 
 /* ── Landing — bento grid ────────────────────────────────── */
