@@ -17,85 +17,112 @@ function getReadingTime(html) {
   return Math.max(2, Math.ceil(words / 200))
 }
 
+function cleanContent(html) {
+  return html
+    .replace(/—/g, ' ')
+    .replace(/–/g, '-')
+}
+
+const RUNNING_IMAGES = [
+  'https://images.unsplash.com/photo-1571008887538-b36bb32f4571?w=900&fit=crop&q=75',
+  'https://images.unsplash.com/photo-1461896836934-ffe607ba8211?w=900&fit=crop&q=75',
+  'https://images.unsplash.com/photo-1486218119243-13301bc7d365?w=900&fit=crop&q=75',
+  'https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?w=900&fit=crop&q=75',
+]
+
 const TOOL_CTAS = [
   {
     icon: '⚡',
-    label: 'Calculateur de VMA',
-    description: 'Découvre ta vitesse maximale aérobie et adapte tes séances.',
-    href: '/outils/vma',
-    gradient: 'linear-gradient(135deg, rgba(139,47,201,.18), rgba(139,47,201,.06))',
-    border: 'rgba(139,47,201,.35)',
-    accent: '#C084FC',
+    label: 'Calcule ta VMA',
+    description: 'Découvre ta vitesse maximale aérobie et calibre tes séances.',
+    href: '/calculateur/vma',
+    color: '#C084FC',
+    bg: 'rgba(139,47,201,.12)',
+    border: 'rgba(139,47,201,.28)',
   },
   {
     icon: '🏃',
-    label: 'Calculateur d\'allures',
-    description: 'Trouve tes allures d\'entraînement idéales selon ton niveau.',
-    href: '/outils/allures',
-    gradient: 'linear-gradient(135deg, rgba(232,35,122,.18), rgba(232,35,122,.06))',
-    border: 'rgba(232,35,122,.35)',
-    accent: '#F472B6',
+    label: 'Tes allures d\'entraînement',
+    description: 'Allures endurance, tempo, VMA selon ton niveau en quelques secondes.',
+    href: '/calculateur/allures',
+    color: '#F472B6',
+    bg: 'rgba(232,35,122,.12)',
+    border: 'rgba(232,35,122,.28)',
   },
   {
     icon: '🎯',
-    label: 'Prédicteur de performance',
+    label: 'Prédicteur de chrono',
     description: 'Estime ton temps sur marathon ou semi à partir d\'un résultat récent.',
-    href: '/outils/predicteur',
-    gradient: 'linear-gradient(135deg, rgba(59,130,246,.18), rgba(59,130,246,.06))',
-    border: 'rgba(59,130,246,.35)',
-    accent: '#60A5FA',
+    href: '/calculateur/predicteur',
+    color: '#60A5FA',
+    bg: 'rgba(59,130,246,.12)',
+    border: 'rgba(59,130,246,.28)',
   },
   {
     icon: '⏱',
-    label: 'Temps de passage',
+    label: 'Temps de passage au km',
     description: 'Calcule tes splits kilomètre par kilomètre pour tenir ton allure cible.',
-    href: '/outils/temps-de-passage',
-    gradient: 'linear-gradient(135deg, rgba(20,184,166,.18), rgba(20,184,166,.06))',
-    border: 'rgba(20,184,166,.35)',
-    accent: '#2DD4BF',
+    href: '/calculateur',
+    color: '#2DD4BF',
+    bg: 'rgba(20,184,166,.12)',
+    border: 'rgba(20,184,166,.28)',
   },
 ]
 
 function ToolCta({ index }) {
   const tool = TOOL_CTAS[index % TOOL_CTAS.length]
   return (
-    <Link to={tool.href} style={{ textDecoration: 'none', display: 'block', margin: '2.5rem 0' }}>
+    <Link to={tool.href} style={{ textDecoration: 'none', display: 'block', margin: '3rem 0' }}>
       <div style={{
-        background: tool.gradient,
+        background: tool.bg,
         border: `1px solid ${tool.border}`,
-        borderRadius: 16,
-        padding: '1.5rem 1.75rem',
+        borderRadius: 18,
+        padding: '1.4rem 1.75rem',
         display: 'flex',
         alignItems: 'center',
-        gap: '1.25rem',
-        transition: 'transform .15s, box-shadow .15s',
+        gap: '1.1rem',
       }}
-      onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.boxShadow = `0 8px 30px ${tool.border}` }}
-      onMouseLeave={e => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = 'none' }}>
-        <div style={{ fontSize: '2rem', flexShrink: 0 }}>{tool.icon}</div>
+      className="tool-cta-inner">
+        <div style={{ fontSize: '1.8rem', flexShrink: 0 }}>{tool.icon}</div>
         <div style={{ flex: 1 }}>
-          <div style={{ fontWeight: 700, color: '#fff', fontSize: '.95rem', marginBottom: '.2rem' }}>{tool.label}</div>
-          <div style={{ color: 'rgba(255,255,255,.5)', fontSize: '.83rem', lineHeight: 1.5 }}>{tool.description}</div>
+          <div style={{ fontWeight: 700, color: '#fff', fontSize: '.92rem', marginBottom: '.2rem' }}>{tool.label}</div>
+          <div style={{ color: 'rgba(255,255,255,.45)', fontSize: '.8rem', lineHeight: 1.5 }}>{tool.description}</div>
         </div>
-        <div style={{ color: tool.accent, fontSize: '1.1rem', flexShrink: 0 }}>→</div>
+        <div style={{ color: tool.color, fontSize: '1.1rem', fontWeight: 700, flexShrink: 0 }}>→</div>
       </div>
     </Link>
   )
 }
 
+function SectionImage({ index }) {
+  const [failed, setFailed] = useState(false)
+  const src = RUNNING_IMAGES[index % RUNNING_IMAGES.length]
+  if (failed) return null
+  return (
+    <div style={{ borderRadius: 16, overflow: 'hidden', margin: '2.5rem 0', boxShadow: '0 12px 40px rgba(0,0,0,.4)' }}>
+      <img
+        src={src}
+        alt="course à pied"
+        onError={() => setFailed(true)}
+        style={{ width: '100%', maxHeight: 340, objectFit: 'cover', display: 'block' }}
+      />
+    </div>
+  )
+}
+
 function ArticleContent({ html }) {
-  const sections = html.split(/(?=<h2)/)
+  const cleaned = cleanContent(html)
+  const sections = cleaned.split(/(?=<h2)/)
 
   return (
     <>
       {sections.map((section, i) => (
         <div key={i}>
-          <div
-            className="article-content"
-            dangerouslySetInnerHTML={{ __html: section }}
-          />
-          {i < sections.length - 1 && i % 2 === 1 && (
-            <ToolCta index={Math.floor(i / 2)} />
+          <div className="article-content" dangerouslySetInnerHTML={{ __html: section }} />
+          {i < sections.length - 1 && (
+            i % 2 === 0
+              ? <ToolCta index={Math.floor(i / 2)} />
+              : <SectionImage index={i} />
           )}
         </div>
       ))}
@@ -127,7 +154,7 @@ export default function BlogArticle() {
 
   if (loading) return (
     <div style={{ background: '#000', minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-      <div style={{ color: 'rgba(255,255,255,.4)' }}>Chargement…</div>
+      <div style={{ color: 'rgba(255,255,255,.35)' }}>Chargement…</div>
     </div>
   )
 
@@ -139,67 +166,61 @@ export default function BlogArticle() {
     <div style={{ background: '#000', minHeight: '100vh', color: '#fff' }}>
 
       {/* Nav */}
-      <nav style={{ padding: '1rem 1.25rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid rgba(255,255,255,.08)' }}>
-        <Link to="/"><img src="/Logo.png" alt="The Ultimate Academy" style={{ height: 48 }} /></Link>
-        <div style={{ display: 'flex', gap: '.75rem', alignItems: 'center' }}>
-          <Link to="/blog" style={{ color: 'rgba(255,255,255,.6)', fontSize: '.9rem', textDecoration: 'none', minHeight: 44, display: 'flex', alignItems: 'center' }}>← Blog</Link>
-          <Link to="/register" style={{ background: 'linear-gradient(135deg,#8B2FC9,#E8237A)', color: '#fff', padding: '.55rem 1.1rem', borderRadius: 8, fontSize: '.9rem', textDecoration: 'none', fontWeight: 600, minHeight: 44, display: 'flex', alignItems: 'center' }}>Rejoindre</Link>
+      <nav style={{ padding: '1rem 1.5rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid rgba(255,255,255,.07)', position: 'sticky', top: 0, background: 'rgba(0,0,0,.85)', backdropFilter: 'blur(20px)', zIndex: 50 }}>
+        <Link to="/"><img src="/Logo.png" alt="The Ultimate Academy" style={{ height: 60, width: 'auto', flexShrink: 0 }} /></Link>
+        <div style={{ display: 'flex', gap: '.5rem', alignItems: 'center' }}>
+          <Link to="/blog" style={navLink}>← Blog</Link>
+          <Link to="/calculateur" style={{ ...navLink, display: 'none' }} className="nav-outils">Outils gratuits</Link>
+          <Link to="/register" style={navCta}>Rejoindre</Link>
         </div>
       </nav>
 
-      <article style={{ maxWidth: 760, margin: '0 auto', padding: '3rem 1.25rem 6rem', wordBreak: 'break-word', overflowWrap: 'break-word' }}>
+      <article style={{ maxWidth: 740, margin: '0 auto', padding: '3.5rem 1.25rem 7rem', wordBreak: 'break-word', overflowWrap: 'break-word' }}>
 
         {/* Tags */}
         {article.tags?.length > 0 && (
           <div style={{ display: 'flex', gap: '.4rem', flexWrap: 'wrap', marginBottom: '1.5rem' }}>
             {article.tags.map(tag => (
-              <span key={tag} style={{ background: 'rgba(139,47,201,.15)', border: '1px solid rgba(139,47,201,.25)', borderRadius: 100, padding: '.28rem .75rem', fontSize: '.74rem', color: '#C084FC', fontWeight: 600 }}>
-                {capitalizeTag(tag)}
-              </span>
+              <span key={tag} style={tagStyle}>{capitalizeTag(tag)}</span>
             ))}
           </div>
         )}
 
         {/* Title */}
-        <h1 style={{ fontSize: 'clamp(1.9rem,4.5vw,3rem)', fontWeight: 800, letterSpacing: '-0.025em', lineHeight: 1.15, marginBottom: '1.25rem' }}>
+        <h1 style={{ fontSize: 'clamp(1.9rem,4.5vw,3rem)', fontWeight: 800, letterSpacing: '-0.028em', lineHeight: 1.12, marginBottom: '1.25rem' }}>
           {article.title}
         </h1>
 
         {/* Meta row */}
-        <div style={{ display: 'flex', gap: '1rem', alignItems: 'center', flexWrap: 'wrap', color: 'rgba(255,255,255,.35)', fontSize: '.85rem', marginBottom: '2.5rem', paddingBottom: '1.5rem', borderBottom: '1px solid rgba(255,255,255,.07)' }}>
-          <span>Par le coach Alexis</span>
-          <span style={{ opacity: .4 }}>·</span>
+        <div style={{ display: 'flex', gap: '.5rem', alignItems: 'center', flexWrap: 'wrap', color: 'rgba(255,255,255,.3)', fontSize: '.83rem', marginBottom: '2.5rem', paddingBottom: '1.75rem', borderBottom: '1px solid rgba(255,255,255,.07)' }}>
           <span>{formatDate(article.published_at)}</span>
-          <span style={{ opacity: .4 }}>·</span>
+          <span style={{ width: 3, height: 3, borderRadius: '50%', background: 'rgba(255,255,255,.18)', flexShrink: 0 }} />
           <span>⏱ {readingTime} min de lecture</span>
         </div>
 
         {/* Hero image */}
         {article.image_url && (
-          <div style={{ borderRadius: 20, overflow: 'hidden', marginBottom: '3rem', boxShadow: '0 20px 60px rgba(0,0,0,.5)' }}>
+          <div style={{ borderRadius: 22, overflow: 'hidden', marginBottom: '3rem', boxShadow: '0 24px 64px rgba(0,0,0,.55)' }}>
             <img src={article.image_url} alt={article.image_alt || article.title}
-              style={{ width: '100%', maxHeight: 480, objectFit: 'cover', display: 'block' }} />
+              style={{ width: '100%', maxHeight: 460, objectFit: 'cover', display: 'block' }} />
           </div>
         )}
 
         {/* Excerpt */}
-        <p style={{ fontSize: '1.15rem', color: 'rgba(255,255,255,.7)', lineHeight: 1.85, marginBottom: '2.5rem', fontStyle: 'italic', borderLeft: '3px solid #8B2FC9', paddingLeft: '1.4rem' }}>
+        <p style={{ fontSize: '1.12rem', color: 'rgba(255,255,255,.65)', lineHeight: 1.9, marginBottom: '3rem', fontStyle: 'italic', borderLeft: '3px solid #8B2FC9', paddingLeft: '1.4rem' }}>
           {article.excerpt}
         </p>
 
-        {/* Content with tool CTAs injected */}
+        {/* Content with tool CTAs and images injected */}
         <ArticleContent html={article.content} />
 
-        {/* Final tool CTA — always show one last one */}
-        <div style={{ margin: '3rem 0' }}>
-          <ToolCta index={2} />
-        </div>
-
-        {/* CTA */}
-        <div style={{ marginTop: '1.5rem', padding: '2.5rem 2rem', background: 'linear-gradient(135deg, rgba(139,47,201,.15), rgba(232,35,122,.1))', border: '1px solid rgba(139,47,201,.3)', borderRadius: 20, textAlign: 'center' }}>
-          <div style={{ fontSize: '1.6rem', marginBottom: '.75rem' }}>🎯</div>
-          <p style={{ fontWeight: 700, fontSize: '1.15rem', marginBottom: '.6rem' }}>Prêt à progresser ?</p>
-          <p style={{ color: 'rgba(255,255,255,.5)', fontSize: '.9rem', marginBottom: '1.5rem', maxWidth: 400, margin: '0 auto 1.5rem' }}>Rejoins The Ultimate Academy et reçois ton programme personnalisé directement par le coach Alexis.</p>
+        {/* Bottom signup CTA */}
+        <div style={{ marginTop: '3.5rem', padding: '2.5rem 2rem', background: 'linear-gradient(135deg, rgba(139,47,201,.13), rgba(232,35,122,.08))', border: '1px solid rgba(139,47,201,.25)', borderRadius: 22, textAlign: 'center' }}>
+          <div style={{ fontSize: '1.75rem', marginBottom: '.75rem' }}>🎯</div>
+          <p style={{ fontWeight: 800, fontSize: '1.15rem', marginBottom: '.6rem', letterSpacing: '-0.01em' }}>Prêt à progresser ?</p>
+          <p style={{ color: 'rgba(255,255,255,.45)', fontSize: '.88rem', marginBottom: '1.5rem', maxWidth: 380, margin: '0 auto 1.5rem' }}>
+            Rejoins The Ultimate Academy et reçois ton programme personnalisé.
+          </p>
           <Link to="/register" style={{ display: 'inline-block', background: 'linear-gradient(135deg,#8B2FC9,#E8237A)', color: '#fff', padding: '.9rem 2.25rem', borderRadius: 14, fontWeight: 700, textDecoration: 'none', fontSize: '1rem' }}>
             Démarrer mon programme →
           </Link>
@@ -211,25 +232,70 @@ export default function BlogArticle() {
         .article-content h2 {
           font-size: 1.45rem;
           font-weight: 800;
-          margin: 3rem 0 1.1rem;
+          margin: 3.25rem 0 1.1rem;
           color: #fff;
-          letter-spacing: -0.01em;
-          line-height: 1.3;
+          letter-spacing: -0.015em;
+          line-height: 1.25;
         }
         .article-content h2:first-child { margin-top: 0; }
-        .article-content p  { margin-bottom: 1.4rem; line-height: 1.9; color: rgba(255,255,255,.78); }
-        .article-content ul, .article-content ol { padding-left: 1.5rem; margin-bottom: 1.4rem; }
-        .article-content li { margin-bottom: .65rem; line-height: 1.75; color: rgba(255,255,255,.78); }
-        .article-content strong { color: #fff; font-weight: 700; }
-        .article-content a { color: #C084FC; text-decoration: underline; }
+        .article-content p { margin-bottom: 1.5rem; line-height: 1.9; color: rgba(255,255,255,.72); }
+        .article-content ul, .article-content ol { padding-left: 1.5rem; margin-bottom: 1.5rem; }
+        .article-content li { margin-bottom: .7rem; line-height: 1.8; color: rgba(255,255,255,.72); }
+        .article-content strong {
+          font-weight: 700;
+          background: linear-gradient(135deg, #C084FC, #F472B6);
+          -webkit-background-clip: text;
+          -webkit-text-fill-color: transparent;
+          background-clip: text;
+        }
+        .article-content a { color: #C084FC; }
         .article-content blockquote {
           border-left: 3px solid #8B2FC9;
-          margin: 1.5rem 0;
-          padding: .75rem 1.25rem;
-          color: rgba(255,255,255,.6);
+          margin: 2rem 0;
+          padding: .85rem 1.4rem;
+          color: rgba(255,255,255,.55);
           font-style: italic;
+          background: rgba(139,47,201,.06);
+          border-radius: 0 12px 12px 0;
         }
+        .tool-cta-inner { transition: transform .15s, box-shadow .15s; }
+        .tool-cta-inner:hover { transform: translateY(-2px); box-shadow: 0 8px 28px rgba(0,0,0,.3); }
+        @media (min-width: 640px) { .nav-outils { display: flex !important; } }
       `}</style>
     </div>
   )
+}
+
+const navLink = {
+  color: 'rgba(255,255,255,.55)',
+  fontSize: '.88rem',
+  textDecoration: 'none',
+  padding: '.4rem .6rem',
+  borderRadius: 8,
+  minHeight: 44,
+  display: 'flex',
+  alignItems: 'center',
+}
+
+const navCta = {
+  background: 'linear-gradient(135deg,#8B2FC9,#E8237A)',
+  color: '#fff',
+  padding: '.5rem 1.1rem',
+  borderRadius: 10,
+  fontSize: '.88rem',
+  textDecoration: 'none',
+  fontWeight: 700,
+  minHeight: 44,
+  display: 'flex',
+  alignItems: 'center',
+}
+
+const tagStyle = {
+  background: 'rgba(139,47,201,.15)',
+  border: '1px solid rgba(139,47,201,.22)',
+  borderRadius: 100,
+  padding: '.25rem .72rem',
+  fontSize: '.73rem',
+  color: '#C084FC',
+  fontWeight: 600,
 }

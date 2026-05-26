@@ -76,6 +76,7 @@ Règles :
 - Mentionne The Ultimate Academy naturellement 1 seule fois maximum (jamais en début d'article)
 - Terminer par un appel à l'action subtil
 - Langue : français
+- N'utilise JAMAIS le tiret long (—) ni le tiret demi-long (–) dans le texte, utilise des virgules ou reformule
 
 Retourne UNIQUEMENT un JSON valide (sans markdown, sans \`\`\`) avec exactement ces champs :
 {
