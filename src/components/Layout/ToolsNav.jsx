@@ -61,8 +61,9 @@ export default function ToolsNav() {
   const { user, isCoach } = useAuth()
   const navigate = useNavigate()
   const location = useLocation()
-  const [open,       setOpen]       = useState(false)
-  const [mobileMenu, setMobileMenu] = useState(false)
+  const [open,        setOpen]        = useState(false)
+  const [mobileMenu,  setMobileMenu]  = useState(false)
+  const [mobileTools, setMobileTools] = useState(false)
   const dropRef = useRef()
 
   useEffect(() => {
@@ -79,7 +80,7 @@ export default function ToolsNav() {
       <style>{mobileToolsNavStyle}</style>
       <nav className="landing-nav">
         <Link to="/" style={{ lineHeight: 0, flexShrink: 0 }}>
-          <img src="/Logo.png" alt="The Ultimate Academy" style={{ height: 60, width: 'auto', flexShrink: 0 }} />
+          <img src="/Logo.png" alt="The Ultimate Academy" className="nav-logo" />
         </Link>
 
         <div className="landing-nav-links">
@@ -165,22 +166,27 @@ export default function ToolsNav() {
       {mobileMenu && (
         <div className="tools-mobile-menu">
           <Link to="/blog" className="tools-mobile-link active-tool" onClick={() => setMobileMenu(false)}>Blog</Link>
-          {TOOLS.map(t => (
-            <Link key={t.path} to={t.path}
-              className={`tools-mobile-link${location.pathname === t.path ? ' active-tool' : ''}`}
-              onClick={() => setMobileMenu(false)}>
-              {t.label}
-            </Link>
-          ))}
-          <a href="/#coach"   className="tools-mobile-link" onClick={() => setMobileMenu(false)}>Mon coach</a>
-          <a href="/#tarifs"  className="tools-mobile-link" onClick={() => setMobileMenu(false)}>Tarifs</a>
-          {!user ? (
-            <>
-              <Link to="/login"    className="tools-mobile-link" onClick={() => setMobileMenu(false)}>Connexion</Link>
-              <Link to="/register" className="tools-mobile-link active-tool" onClick={() => setMobileMenu(false)}>Rejoindre →</Link>
-            </>
-          ) : (
-            <button className="tools-mobile-link active-tool" onClick={() => { handleCTA(); setMobileMenu(false) }}>Mon espace →</button>
+          <a href="/#coach"     className="tools-mobile-link" onClick={() => setMobileMenu(false)}>Mon coach</a>
+          <a href="/#features"  className="tools-mobile-link" onClick={() => setMobileMenu(false)}>Programme</a>
+          <a href="/#resultats" className="tools-mobile-link" onClick={() => setMobileMenu(false)}>Résultats</a>
+          <a href="/#tarifs"    className="tools-mobile-link" onClick={() => setMobileMenu(false)}>Tarifs</a>
+          <a href="/#faq"       className="tools-mobile-link" onClick={() => setMobileMenu(false)}>FAQ</a>
+          <button className="tools-mobile-link active-tool"
+            onClick={e => { e.stopPropagation(); setMobileTools(v => !v) }}>
+            Outils gratuits {mobileTools ? '▴' : '▾'}
+          </button>
+          {mobileTools && (
+            <div style={{ paddingLeft: '1rem', display: 'flex', flexDirection: 'column' }}
+              onClick={e => e.stopPropagation()}>
+              {TOOLS.map(t => (
+                <Link key={t.path} to={t.path}
+                  className={`tools-mobile-link${location.pathname === t.path ? ' active-tool' : ''}`}
+                  style={{ fontSize: '.9rem', color: location.pathname === t.path ? '#C084FC' : 'rgba(255,255,255,.55)' }}
+                  onClick={() => setMobileMenu(false)}>
+                  {t.label}
+                </Link>
+              ))}
+            </div>
           )}
         </div>
       )}

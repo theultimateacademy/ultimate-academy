@@ -15,8 +15,6 @@ const mobileMenuStyle = `
   }
   @media (max-width: 680px) {
     .landing-hamburger { display: flex; align-items: center; justify-content: center; }
-    .landing-nav-auth-desktop { display: flex !important; gap: .35rem; }
-    .landing-nav-auth-desktop .btn { font-size: .75rem !important; padding: .35rem .65rem !important; }
     .landing-mobile-menu {
       position: fixed;
       top: 72px;
@@ -170,7 +168,7 @@ export default function Landing() {
 
       {/* ── NAV ─────────────────────────────────────────────── */}
       <nav className="landing-nav">
-        <Link to="/"><img src="/Logo.png" alt="The Ultimate Academy" style={{ height: 60, width: 'auto', flexShrink: 0 }} /></Link>
+        <Link to="/"><img src="/Logo.png" alt="The Ultimate Academy" className="nav-logo" /></Link>
 
         <div className="landing-nav-links">
           {[['Mon coach','coach'],['Programme','features'],['Résultats','resultats'],['Tarifs','tarifs'],['FAQ','faq']].map(([l,id]) => (
@@ -242,10 +240,10 @@ export default function Landing() {
       {/* ── MOBILE MENU ────────────────────────────────────── */}
       {mobileMenu && (
         <div className="landing-mobile-menu" onClick={() => setMobileMenu(false)}>
+          <Link to="/blog" className="landing-mobile-link tools-link" onClick={() => setMobileMenu(false)}>Blog</Link>
           {[['Mon coach','coach'],['Programme','features'],['Résultats','resultats'],['Tarifs','tarifs'],['FAQ','faq']].map(([l,id]) => (
             <button key={id} className="landing-mobile-link" onClick={() => { scrollTo(id); setMobileMenu(false) }}>{l}</button>
           ))}
-          <Link to="/blog" className="landing-mobile-link" onClick={() => setMobileMenu(false)}>Blog</Link>
           <button className="landing-mobile-link tools-link"
             onClick={e => { e.stopPropagation(); setMobileTools(v => !v) }}>
             Outils gratuits {mobileTools ? '▴' : '▾'}

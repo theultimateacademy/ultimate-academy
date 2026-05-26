@@ -76,7 +76,7 @@ export default function BlogNav() {
       <nav className="landing-nav">
         {/* Logo */}
         <Link to="/" style={{ lineHeight: 0, flexShrink: 0 }}>
-          <img src="/Logo.png" alt="The Ultimate Academy" style={{ height: 60, width: 'auto', display: 'block' }} />
+          <img src="/Logo.png" alt="The Ultimate Academy" className="nav-logo" />
         </Link>
 
         {/* Desktop links — centered */}
@@ -166,14 +166,6 @@ export default function BlogNav() {
                 <Link key={t.path} to={t.path} onClick={() => setMobileMenu(false)}>{t.label}</Link>
               ))}
             </div>
-          )}
-          {!user ? (
-            <>
-              <Link to="/login"    className="blognav-mobile-link" onClick={() => setMobileMenu(false)}>Connexion</Link>
-              <Link to="/register" className="blognav-mobile-link accent" onClick={() => setMobileMenu(false)}>Rejoindre →</Link>
-            </>
-          ) : (
-            <button className="blognav-mobile-link accent" onClick={() => { handleCTA(); setMobileMenu(false) }}>Mon espace →</button>
           )}
         </div>
       )}
