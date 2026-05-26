@@ -28,7 +28,8 @@ export function AuthProvider({ children }) {
 
   async function loadProfile(userId) {
     try {
-      const { profile: data } = await api.getProfile(userId)
+      const { data, error } = await supabase.from('profiles').select('*').eq('id', userId).single()
+      if (error) throw error
       setProfile(data)
     } catch (err) {
       console.error('Profile load error:', err)
