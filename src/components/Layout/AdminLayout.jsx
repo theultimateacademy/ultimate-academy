@@ -1,4 +1,4 @@
-import { NavLink, Outlet, useNavigate, useLocation } from 'react-router-dom'
+import { NavLink, Link, Outlet, useNavigate, useLocation } from 'react-router-dom'
 import { useAuth } from '../../contexts/AuthContext'
 import { BadgesProvider, useBadges } from '../../contexts/BadgesContext'
 
@@ -114,6 +114,23 @@ function AdminShell() {
         <div className="main-content admin-shell-mobile">
           <Outlet />
         </div>
+      </div>
+
+      {/* Mobile top bar — logo + logout */}
+      <div className="mobile-topbar">
+        <Link to="/admin">
+          <img src="/Logo.png" alt="The Ultimate Academy" style={{ height: 32, width: 'auto' }} />
+        </Link>
+        <button
+          onClick={async () => { await signOut(); navigate('/') }}
+          style={{
+            background: 'none', border: '1px solid rgba(139,47,201,.3)',
+            borderRadius: 8, padding: '.3rem .75rem',
+            color: 'rgba(255,255,255,.55)', fontSize: '.75rem', fontWeight: 600,
+            cursor: 'pointer', fontFamily: 'inherit',
+          }}>
+          Déconnexion
+        </button>
       </div>
 
       {/* Mobile bottom nav for admin */}

@@ -1,25 +1,26 @@
 /* ── Variables ───────────────────────────────────────────── */
 :root {
-  --primary:       #E8237A;
-  --secondary:     #8B2FC9;
-  --gradient:      linear-gradient(135deg, #8B2FC9 0%, #E8237A 100%);
-  --gradient-h:    linear-gradient(90deg,  #8B2FC9 0%, #E8237A 100%);
-  --bg:            #0C0A18;
-  --surface:       #16132A;
-  --surface-2:     #1E1B32;
-  --text:          rgba(255,255,255,.92);
-  --text-muted:    rgba(255,255,255,.42);
-  --border:        rgba(139,47,201,.22);
-  --success:       #10B981;
-  --error:         #EF4444;
-  --warning:       #F59E0B;
-  --info:          #3B82F6;
-  --radius:        12px;
-  --radius-lg:     20px;
-  --shadow:        0 4px 24px rgba(0,0,0,.4);
-  --shadow-lg:     0 12px 40px rgba(0,0,0,.55);
-  --nav-h:         64px;
-  --bottom-nav-h:  68px;
+  --primary:          #E8237A;
+  --secondary:        #8B2FC9;
+  --gradient:         linear-gradient(135deg, #8B2FC9 0%, #E8237A 100%);
+  --gradient-h:       linear-gradient(90deg,  #8B2FC9 0%, #E8237A 100%);
+  --bg:               #0C0A18;
+  --surface:          #16132A;
+  --surface-2:        #1E1B32;
+  --text:             rgba(255,255,255,.92);
+  --text-muted:       rgba(255,255,255,.42);
+  --border:           rgba(139,47,201,.22);
+  --success:          #10B981;
+  --error:            #EF4444;
+  --warning:          #F59E0B;
+  --info:             #3B82F6;
+  --radius:           12px;
+  --radius-lg:        20px;
+  --shadow:           0 4px 24px rgba(0,0,0,.4);
+  --shadow-lg:        0 12px 40px rgba(0,0,0,.55);
+  --nav-h:            64px;
+  --bottom-nav-h:     68px;
+  --mobile-topbar-h:  52px;
 }
 
 /* ── Reset ───────────────────────────────────────────────── */
@@ -433,10 +434,19 @@ td { padding: .75rem 1rem; border-bottom: 1px solid var(--border); }
 tr:last-child td { border-bottom: none; }
 tr:hover td { background: rgba(255,255,255,.04); }
 
+/* Mobile top bar — hidden on desktop, shown on mobile */
+.mobile-topbar { display: none; }
+
 /* ── Mobile global fixes ────────────────────────────────── */
 @media (max-width: 767px) {
   .card { padding: 1rem; }
-  .page { padding: 1rem 1rem; padding-bottom: calc(var(--bottom-nav-h) + 1rem); }
+  /* Account for fixed top bar + bottom nav */
+  .page {
+    padding-top:    calc(var(--mobile-topbar-h) + 1rem) !important;
+    padding-bottom: calc(var(--bottom-nav-h)    + 1rem) !important;
+    padding-left:   1rem !important;
+    padding-right:  1rem !important;
+  }
   .stat-value { font-size: 1.3rem; }
   h1 { font-size: clamp(1.5rem, 5vw, 2.5rem); }
   h2 { font-size: clamp(1.25rem, 4vw, 2rem); }
@@ -444,9 +454,32 @@ tr:hover td { background: rgba(255,255,255,.04); }
   .bottom-nav-item { min-height: 44px; }
   .table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
 
-  /* Chat plein-écran : retire la hauteur occupée par la bottom nav fixe */
-  .chat-screen       { height: calc(100dvh - var(--bottom-nav-h)) !important; }
-  .admin-chat-screen { height: calc(100vh  - 68px)               !important; }
+  /* Mobile fixed top bar */
+  .mobile-topbar {
+    display: flex;
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    height: var(--mobile-topbar-h);
+    z-index: 150;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 1rem;
+    background: #09090F;
+    border-bottom: 1px solid rgba(139,47,201,.18);
+  }
+
+  /* Page headings hidden on mobile — bottom nav tab labels give context */
+  .page-heading { display: none !important; }
+
+  /* Chat plein-écran : retire la hauteur des deux navs fixes, décale sous la top bar */
+  .chat-screen {
+    height: calc(100dvh - var(--bottom-nav-h) - var(--mobile-topbar-h)) !important;
+    margin-top: var(--mobile-topbar-h);
+  }
+  .admin-chat-screen {
+    height: calc(100vh - 68px - var(--mobile-topbar-h)) !important;
+    margin-top: var(--mobile-topbar-h);
+  }
 
   /* Scroll horizontal pour les tables des outils */
   .tbl-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; border-radius: 20px; }

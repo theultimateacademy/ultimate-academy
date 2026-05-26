@@ -424,9 +424,7 @@ export default function AdminAthletes() {
 
   return (
     <div className="page">
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
-        <h2>Athlètes ({athletes.length})</h2>
-      </div>
+      <h2 className="page-heading" style={{ marginBottom: '1.5rem' }}>Athlètes ({athletes.length})</h2>
 
       {/* Filters */}
       <div style={{ display: 'flex', gap: '.5rem', marginBottom: '1rem', flexWrap: 'wrap' }}>

@@ -134,7 +134,7 @@ export default function AdminAnalyses() {
 
   return (
     <div className="page">
-      <h2 style={{ marginBottom: '1.5rem' }}>Analyses hebdomadaires</h2>
+      <h2 className="page-heading" style={{ marginBottom: '1.5rem' }}>Analyses hebdomadaires</h2>
 
       <div style={{ display: 'flex', gap: '.5rem', marginBottom: '1.25rem', flexWrap: 'wrap' }}>
         {[

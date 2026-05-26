@@ -142,7 +142,7 @@ export default function AthleticDrills() {
 
   return (
     <div className="page">
-      <h2 style={{ marginBottom: '.35rem' }}>Gammes athlétiques</h2>
+      <h2 className="page-heading" style={{ marginBottom: '.35rem' }}>Gammes athlétiques</h2>
       <p style={{ color: 'var(--text-muted)', fontSize: '.875rem', marginBottom: '1.5rem', lineHeight: 1.6 }}>
         À réaliser avant chaque séance intensive (fractionné, tempo, côtes). Sélectionne les gammes que tu veux inclure — elles s'afficheront dans l'ordre recommandé ci-dessous.
       </p>

@@ -920,7 +920,7 @@ export default function AthleteNutrition() {
 
   return (
     <div className="page">
-      <h2 style={{ marginBottom: '.35rem' }}>Nutrition du coureur</h2>
+      <h2 className="page-heading" style={{ marginBottom: '.35rem' }}>Nutrition du coureur</h2>
       <p className="text-muted text-sm" style={{ marginBottom: '1.25rem' }}>
         Bien manger pour mieux courir, mes conseils. Clique sur une recette pour les détails.
       </p>

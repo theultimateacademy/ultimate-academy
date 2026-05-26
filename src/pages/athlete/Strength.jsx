@@ -661,7 +661,7 @@ export default function AthleteStrength() {
     <div className="page">
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1rem' }}>
         <div>
-          <h2>Renforcement musculaire</h2>
+          <h2 className="page-heading">Renforcement musculaire</h2>
           <p className="text-muted text-sm" style={{ marginTop: '.25rem' }}>
             Clique sur une séance puis sur un exercice pour les détails.
           </p>

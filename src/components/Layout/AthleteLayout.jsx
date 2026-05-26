@@ -111,6 +111,23 @@ export default function AthleteLayout() {
         <Outlet />
       </div>
 
+      {/* Mobile top bar — logo + logout */}
+      <div className="mobile-topbar">
+        <Link to="/app/home">
+          <img src="/Logo.png" alt="The Ultimate Academy" style={{ height: 32, width: 'auto' }} />
+        </Link>
+        <button
+          onClick={handleSignOut}
+          style={{
+            background: 'none', border: '1px solid rgba(139,47,201,.3)',
+            borderRadius: 8, padding: '.3rem .75rem',
+            color: 'rgba(255,255,255,.55)', fontSize: '.75rem', fontWeight: 600,
+            cursor: 'pointer', fontFamily: 'inherit',
+          }}>
+          Déconnexion
+        </button>
+      </div>
+
       {/* Mobile bottom nav */}
       <nav className="bottom-nav">
         {NAV.map(item => (

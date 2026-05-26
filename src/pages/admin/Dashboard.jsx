@@ -415,7 +415,7 @@ export default function AdminDashboard() {
 
   return (
     <div className="page">
-      <h2 style={{ marginBottom: '1.5rem' }}>Tableau de bord</h2>
+      <h2 className="page-heading" style={{ marginBottom: '1.5rem' }}>Tableau de bord</h2>
 
       {(stats.pending > 0 || stats.analyses > 0 || badges.messages > 0) && (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '.75rem', marginBottom: '1.5rem' }}>

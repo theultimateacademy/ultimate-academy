@@ -371,7 +371,7 @@ export default function AthleteProfile() {
         </div>
       )}
 
-      <h2 style={{ marginBottom: '1.5rem' }}>Mon profil</h2>
+      <h2 className="page-heading" style={{ marginBottom: '1.5rem' }}>Mon profil</h2>
 
       {stravaStatus === 'connected' && <div className="alert alert-success" style={{ marginBottom:'1rem' }}>✅ Strava connecté avec succès !</div>}
       {stravaStatus === 'error'     && <div className="alert alert-error"   style={{ marginBottom:'1rem' }}>⚠️ La connexion Strava a échoué.</div>}

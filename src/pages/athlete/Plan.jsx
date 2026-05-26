@@ -748,7 +748,7 @@ export default function AthletePlan() {
 
   return (
     <div className="page">
-      <h2 style={{ marginBottom: '1.5rem' }}>Mon plan</h2>
+      <h2 className="page-heading" style={{ marginBottom: '1.5rem' }}>Mon plan</h2>
 
       {/* Week selector */}
       <div style={{ display: 'flex', gap: '.5rem', overflowX: 'auto', paddingBottom: '.5rem', marginBottom: '1.5rem' }}>

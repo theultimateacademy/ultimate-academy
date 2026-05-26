@@ -250,7 +250,7 @@ export default function AdminPlans() {
   return (
     <div className="page">
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
-        <h2>Plans d'entraînement</h2>
+        <h2 className="page-heading">Plans d'entraînement</h2>
         <button className="btn btn-primary btn-sm" onClick={() => setShowGenForm(v => !v)}>
           + Générer un plan
         </button>
