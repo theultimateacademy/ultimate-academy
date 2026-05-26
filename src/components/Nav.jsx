@@ -57,9 +57,10 @@ export default function Nav() {
   const { user, isCoach } = useAuth()
   const navigate = useNavigate()
   const location = useLocation()
-  const [openTools,   setOpenTools]   = useState(false)
-  const [mobileMenu,  setMobileMenu]  = useState(false)
-  const [mobileTools, setMobileTools] = useState(false)
+  const [openTools,    setOpenTools]    = useState(false)
+  const [mobileMenu,   setMobileMenu]   = useState(false)
+  const [mobileTools,  setMobileTools]  = useState(false)
+  const [activeSection, setActiveSection] = useState(null)
   const toolsRef = useRef()
   const isHome = location.pathname === '/'
 
@@ -69,13 +70,36 @@ export default function Nav() {
     return () => document.removeEventListener('mousedown', onDown)
   }, [])
 
-  // Close mobile menu on route change
-  useEffect(() => { setMobileMenu(false); setMobileTools(false) }, [location.pathname])
+  // Close mobile menu on route change, reset active section when leaving home
+  useEffect(() => {
+    setMobileMenu(false)
+    setMobileTools(false)
+    if (!isHome) setActiveSection(null)
+  }, [location.pathname])
+
+  // IntersectionObserver: highlight the section currently in view on home page
+  useEffect(() => {
+    if (!isHome) return
+    const ids = SECTIONS.map(s => s.id)
+    const observers = []
+    ids.forEach(id => {
+      const el = document.getElementById(id)
+      if (!el) return
+      const obs = new IntersectionObserver(
+        ([entry]) => { if (entry.isIntersecting) setActiveSection(id) },
+        { threshold: 0.3 }
+      )
+      obs.observe(el)
+      observers.push(obs)
+    })
+    return () => observers.forEach(o => o.disconnect())
+  }, [isHome])
 
   const handleCTA = () => navigate(isCoach ? '/admin' : user ? '/app/home' : '/register')
 
   const goToSection = (id) => {
     setMobileMenu(false)
+    setActiveSection(id)
     if (isHome) {
       document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' })
     } else {
@@ -104,7 +128,10 @@ export default function Nav() {
             Blog
           </Link>
           {SECTIONS.map(({ label, id }) => (
-            <button key={id} className="landing-nav-link" onClick={() => goToSection(id)}>{label}</button>
+            <button key={id} className="landing-nav-link" onClick={() => goToSection(id)}
+              style={{ color: activeSection === id ? '#C084FC' : undefined, fontWeight: activeSection === id ? 600 : undefined }}>
+              {label}
+            </button>
           ))}
           <div ref={toolsRef} style={{ position: 'relative' }}>
             <button className="landing-nav-link"
