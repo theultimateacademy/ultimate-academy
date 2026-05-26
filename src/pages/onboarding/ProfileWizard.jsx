@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../../contexts/AuthContext'
+import { supabase } from '../../lib/supabase'
 import { api } from '../../lib/api'
 
 const DAYS_CARDS = [
@@ -190,27 +191,27 @@ export default function ProfileWizard() {
       coach_message:     data.coach_message,
       profile_completed: true
     }
-    // Retry up to 6 times — Render free tier can take ~60s to wake from sleep
-    const MAX = 6
-    for (let attempt = 1; attempt <= MAX; attempt++) {
-      setSubmitAttempt(attempt)
-      try {
-        const result = await api.updateProfile({ userId: user.id, fields })
-        api.generatePlan({ userId: user.id, profile: result.profile }).catch(err =>
-          console.error('[Plan] Background error:', err.message)
-        )
-        await refreshProfile()
-        setDone(true)
-        return
-      } catch (err) {
-        if (attempt === MAX) {
-          setError('Connexion impossible. Appuie à nouveau sur le bouton pour réessayer.')
-          setSubmitting(false)
-          setSubmitAttempt(0)
-        } else {
-          await new Promise(r => setTimeout(r, 8000))
-        }
-      }
+    try {
+      // Write profile directly to Supabase — no server needed for this step
+      const { data: savedProfile, error: dbError } = await supabase
+        .from('profiles')
+        .update(fields)
+        .eq('id', user.id)
+        .select()
+        .single()
+      if (dbError) throw dbError
+
+      // Plan generation goes through Render (fire-and-forget — server may be sleeping)
+      api.generatePlan({ userId: user.id, profile: savedProfile }).catch(err =>
+        console.error('[Plan] Background error:', err.message)
+      )
+
+      await refreshProfile()
+      setDone(true)
+    } catch (err) {
+      setError(err.message || 'Une erreur est survenue. Réessaie.')
+      setSubmitting(false)
+      setSubmitAttempt(0)
     }
   }
 
