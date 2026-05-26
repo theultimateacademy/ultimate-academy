@@ -177,4 +177,29 @@ router.get('/articles/:slug', async (req, res) => {
   }
 });
 
+// POST /api/blog/fix-reading-time — one-time backfill for old articles
+router.post('/fix-reading-time', async (req, res) => {
+  const secret = req.headers['x-blog-secret'] || req.body?.secret;
+  if (process.env.BLOG_SECRET && secret !== process.env.BLOG_SECRET) {
+    return res.status(401).json({ error: 'Unauthorized' });
+  }
+  try {
+    const { data: articles, error } = await supabase
+      .from('articles')
+      .select('id, content')
+      .is('reading_time', null);
+    if (error) throw error;
+
+    let updated = 0;
+    for (const article of articles) {
+      const rt = calcReadingTime(article.content);
+      await supabase.from('articles').update({ reading_time: rt }).eq('id', article.id);
+      updated++;
+    }
+    res.json({ success: true, updated });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 module.exports = { router, generateAndPublish };
