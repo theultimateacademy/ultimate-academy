@@ -54,7 +54,7 @@ const SECTIONS = [
 ]
 
 export default function Nav() {
-  const { user, isCoach, isActive } = useAuth()
+  const { } = useAuth()
   const navigate = useNavigate()
   const location = useLocation()
   const [openTools,    setOpenTools]    = useState(false)
@@ -95,7 +95,7 @@ export default function Nav() {
     return () => observers.forEach(o => o.disconnect())
   }, [isHome])
 
-  const handleCTA = () => navigate(isCoach ? '/admin' : !user ? '/register' : isActive ? '/app/home' : '/welcome')
+  const handleCTA = () => navigate('/register')
 
   const goToSection = (id) => {
     setMobileMenu(false)
@@ -169,24 +169,15 @@ export default function Nav() {
         {/* Right: auth + hamburger */}
         <div style={{ display: 'flex', gap: '.6rem', alignItems: 'center', flexShrink: 0 }}>
           <div className="landing-nav-auth-desktop" style={{ display: 'flex', gap: '.6rem', alignItems: 'center' }}>
-            {user ? (
-              <button className="btn btn-sm" onClick={handleCTA}
-                style={{ background: 'rgba(255,255,255,.1)', color: '#fff', border: '1px solid rgba(255,255,255,.2)' }}>
-                Mon espace
-              </button>
-            ) : (
-              <>
-                <Link to="/login" className="btn btn-sm"
-                  style={{ background: 'transparent', color: 'rgba(255,255,255,.7)', border: '1px solid rgba(255,255,255,.18)' }}>
-                  Connexion
-                </Link>
-                <Link to="/register" className="btn btn-sm"
-                  style={{ background: 'linear-gradient(135deg,#8B2FC9,#E8237A)', color: '#fff', border: 'none',
-                    fontWeight: 700, boxShadow: '0 3px 14px rgba(232,35,122,.45)' }}>
-                  Rejoindre
-                </Link>
-              </>
-            )}
+            <Link to="/login" className="btn btn-sm"
+              style={{ background: 'transparent', color: 'rgba(255,255,255,.7)', border: '1px solid rgba(255,255,255,.18)' }}>
+              Connexion
+            </Link>
+            <Link to="/register" className="btn btn-sm"
+              style={{ background: 'linear-gradient(135deg,#8B2FC9,#E8237A)', color: '#fff', border: 'none',
+                fontWeight: 700, boxShadow: '0 3px 14px rgba(232,35,122,.45)' }}>
+              Rejoindre
+            </Link>
           </div>
 
           {/* Hamburger — mobile only */}
@@ -219,6 +210,18 @@ export default function Nav() {
               ))}
             </div>
           )}
+          <div style={{ display: 'flex', gap: '.75rem', padding: '.75rem .5rem .25rem', borderTop: '1px solid rgba(255,255,255,.08)', marginTop: '.25rem' }}>
+            <Link to="/login" onClick={() => setMobileMenu(false)}
+              style={{ flex: 1, padding: '.75rem', borderRadius: 10, textAlign: 'center', fontWeight: 600, fontSize: '.9rem',
+                background: 'rgba(255,255,255,.07)', border: '1px solid rgba(255,255,255,.15)', color: 'rgba(255,255,255,.8)', textDecoration: 'none' }}>
+              Connexion
+            </Link>
+            <Link to="/register" onClick={() => setMobileMenu(false)}
+              style={{ flex: 1, padding: '.75rem', borderRadius: 10, textAlign: 'center', fontWeight: 700, fontSize: '.9rem',
+                background: 'linear-gradient(135deg,#8B2FC9,#E8237A)', color: '#fff', textDecoration: 'none' }}>
+              Rejoindre
+            </Link>
+          </div>
         </div>
       )}
     </>

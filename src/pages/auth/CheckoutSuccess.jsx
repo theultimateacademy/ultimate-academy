@@ -1,7 +1,7 @@
 import { useEffect } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import { useAuth } from '../../contexts/AuthContext'
-import { api } from '../../lib/api'
+import { supabase } from '../../lib/supabase'
 
 const FREE_EMAILS = ['anouklothe@gmail.com']
 
@@ -11,20 +11,21 @@ export default function CheckoutSuccess() {
   const [params] = useSearchParams()
   const sessionId = params.get('session_id')
 
-  // Retry free activation for whitelisted accounts (server may have been sleeping at registration)
+  // Free accounts: activate directly in Supabase (no Render needed)
   useEffect(() => {
     if (!user?.id || !user?.email) return
     if (!FREE_EMAILS.includes(user.email.toLowerCase())) return
     if (['active', 'trialing'].includes(profile?.subscription_status)) return
-    api.freeActivate({ userId: user.id, email: user.email.toLowerCase() })
+    supabase.from('profiles')
+      .update({ subscription_status: 'active' })
+      .eq('id', user.id)
       .then(() => refreshProfile())
       .catch(() => {})
   }, [user?.id])
 
+  // Paid accounts: poll until Stripe webhook activates the profile
   useEffect(() => {
     if (['active', 'trialing'].includes(profile?.subscription_status)) return
-
-    // Poll until active/trialing
     let attempts = 0
     const interval = setInterval(async () => {
       await refreshProfile()
@@ -39,7 +40,6 @@ export default function CheckoutSuccess() {
       navigate(profile.profile_completed ? '/app/home' : '/onboarding', { replace: true })
     }
   }, [profile?.subscription_status])
-
 
   return (
     <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'var(--bg)', padding: '1.5rem' }}>

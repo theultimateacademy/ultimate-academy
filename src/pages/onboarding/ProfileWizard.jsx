@@ -229,6 +229,15 @@ export default function ProfileWizard() {
       return
     }
 
+    // Ensure free accounts are activated directly in Supabase (bypasses Render)
+    const FREE_EMAILS = ['anouklothe@gmail.com']
+    if (user.email && FREE_EMAILS.includes(user.email.toLowerCase())) {
+      await supabase.from('profiles')
+        .update({ subscription_status: 'active' })
+        .eq('id', user.id)
+        .catch(() => {})
+    }
+
     api.generatePlan({ userId: user.id, profile: savedProfile }).catch(err =>
       console.error('[Plan] Background error:', err.message)
     )
