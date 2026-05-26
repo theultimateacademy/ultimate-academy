@@ -150,6 +150,11 @@ export default function Landing() {
     return () => document.removeEventListener('mousedown', onDown)
   }, [])
 
+  useEffect(() => {
+    const hash = window.location.hash.replace('#', '')
+    if (hash) setTimeout(() => document.getElementById(hash)?.scrollIntoView({ behavior: 'smooth' }), 120)
+  }, [])
+
   const handleCTA = () => {
     if (!user) { navigate('/register'); return }
     navigate(isCoach ? '/admin' : '/app/home')
@@ -562,6 +567,13 @@ export default function Landing() {
               {TOOLS.map(t => (
                 <Link key={t.path} to={t.path} style={{ display: 'block', color: 'rgba(255,255,255,.38)', fontSize: '.82rem', textDecoration: 'none', marginBottom: '.5rem' }}>{t.label}</Link>
               ))}
+            </div>
+            <div>
+              <p style={{ fontSize: '.72rem', fontWeight: 700, letterSpacing: '.12em', textTransform: 'uppercase', color: 'rgba(255,255,255,.25)', marginBottom: '.85rem' }}>Blog</p>
+              <Link to="/blog" style={{ display: 'block', color: 'rgba(255,255,255,.38)', fontSize: '.82rem', textDecoration: 'none', marginBottom: '.5rem' }}>Tous les articles</Link>
+              <Link to="/blog" style={{ display: 'block', color: 'rgba(255,255,255,.38)', fontSize: '.82rem', textDecoration: 'none', marginBottom: '.5rem' }}>Plans d'entraînement</Link>
+              <Link to="/blog" style={{ display: 'block', color: 'rgba(255,255,255,.38)', fontSize: '.82rem', textDecoration: 'none', marginBottom: '.5rem' }}>Nutrition</Link>
+              <Link to="/blog" style={{ display: 'block', color: 'rgba(255,255,255,.38)', fontSize: '.82rem', textDecoration: 'none', marginBottom: '.5rem' }}>Trail & Marathon</Link>
             </div>
             <div>
               <p style={{ fontSize: '.72rem', fontWeight: 700, letterSpacing: '.12em', textTransform: 'uppercase', color: 'rgba(255,255,255,.25)', marginBottom: '.85rem' }}>Légal</p>

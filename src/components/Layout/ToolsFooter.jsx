@@ -35,6 +35,13 @@ export default function ToolsFooter() {
           </div>
 
           <div>
+            <p style={colHead}>Blog</p>
+            <Link to="/blog" style={colLink}>Tous les articles</Link>
+            <Link to="/blog" style={colLink}>Plans d'entraînement</Link>
+            <Link to="/blog" style={colLink}>Nutrition</Link>
+            <Link to="/blog" style={colLink}>Trail & Marathon</Link>
+          </div>
+          <div>
             <p style={colHead}>Légal</p>
             <Link to="/privacy" style={colLink}>Politique de confidentialité</Link>
             <Link to="/terms"   style={colLink}>CGV</Link>
