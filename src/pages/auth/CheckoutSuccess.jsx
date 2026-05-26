@@ -1,17 +1,30 @@
 import { useEffect } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import { useAuth } from '../../contexts/AuthContext'
+import { api } from '../../lib/api'
+
+const FREE_EMAILS = ['anouklothe@gmail.com']
 
 export default function CheckoutSuccess() {
-  const { profile, refreshProfile } = useAuth()
+  const { profile, refreshProfile, user } = useAuth()
   const navigate = useNavigate()
   const [params] = useSearchParams()
   const sessionId = params.get('session_id')
 
+  // Retry free activation for whitelisted accounts (server may have been sleeping at registration)
   useEffect(() => {
-    if (profile?.subscription_status === 'active') return // handled by second effect
+    if (!user?.id || !user?.email) return
+    if (!FREE_EMAILS.includes(user.email.toLowerCase())) return
+    if (['active', 'trialing'].includes(profile?.subscription_status)) return
+    api.freeActivate({ userId: user.id, email: user.email.toLowerCase() })
+      .then(() => refreshProfile())
+      .catch(() => {})
+  }, [user?.id])
 
-    // Poll in all cases (with or without sessionId) until active
+  useEffect(() => {
+    if (['active', 'trialing'].includes(profile?.subscription_status)) return
+
+    // Poll until active/trialing
     let attempts = 0
     const interval = setInterval(async () => {
       await refreshProfile()
@@ -22,7 +35,7 @@ export default function CheckoutSuccess() {
   }, [sessionId])
 
   useEffect(() => {
-    if (profile?.subscription_status === 'active') {
+    if (['active', 'trialing'].includes(profile?.subscription_status)) {
       navigate(profile.profile_completed ? '/app/home' : '/onboarding', { replace: true })
     }
   }, [profile?.subscription_status])

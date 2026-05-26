@@ -55,7 +55,7 @@ function RequireActive({ children }) {
   if (loading)  return <LoadingSpinner fullPage />
   if (!user)    return <Navigate to="/login" state={{ from: loc }} replace />
   if (profile?.role === 'coach') return <Navigate to="/admin" replace />
-  if (profile?.subscription_status !== 'active')
+  if (!['active', 'trialing'].includes(profile?.subscription_status))
     return <Navigate to="/welcome" replace />
   if (!profile?.profile_completed)
     return <Navigate to="/onboarding" replace />

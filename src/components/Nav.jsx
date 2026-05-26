@@ -54,7 +54,7 @@ const SECTIONS = [
 ]
 
 export default function Nav() {
-  const { user, isCoach } = useAuth()
+  const { user, isCoach, isActive } = useAuth()
   const navigate = useNavigate()
   const location = useLocation()
   const [openTools,    setOpenTools]    = useState(false)
@@ -95,7 +95,7 @@ export default function Nav() {
     return () => observers.forEach(o => o.disconnect())
   }, [isHome])
 
-  const handleCTA = () => navigate(isCoach ? '/admin' : user ? '/app/home' : '/register')
+  const handleCTA = () => navigate(isCoach ? '/admin' : !user ? '/register' : isActive ? '/app/home' : '/welcome')
 
   const goToSection = (id) => {
     setMobileMenu(false)
