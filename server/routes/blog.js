@@ -186,8 +186,7 @@ router.post('/fix-reading-time', async (req, res) => {
   try {
     const { data: articles, error } = await supabase
       .from('articles')
-      .select('id, content')
-      .is('reading_time', null);
+      .select('id, content');
     if (error) throw error;
 
     let updated = 0;
