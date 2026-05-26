@@ -1,63 +1,132 @@
-import { Link } from 'react-router-dom'
+import { useState, useRef, useEffect } from 'react'
+import { Link, useNavigate } from 'react-router-dom'
+import { useAuth } from '../contexts/AuthContext'
+
+const TOOLS = [
+  { label: '⏱ Temps de passage',     path: '/calculateur' },
+  { label: '⚡ Calculateur de VMA',   path: '/calculateur/vma' },
+  { label: '🏃 Allures & zones FC',   path: '/calculateur/allures' },
+  { label: '🎯 Prédicteur de chrono', path: '/calculateur/predicteur' },
+]
 
 export default function BlogNav() {
+  const { user, isCoach } = useAuth()
+  const navigate = useNavigate()
+  const [openTools,  setOpenTools]  = useState(false)
+  const [mobileMenu, setMobileMenu] = useState(false)
+  const [mobileTools, setMobileTools] = useState(false)
+  const toolsRef = useRef()
+
+  useEffect(() => {
+    function onDown(e) { if (toolsRef.current && !toolsRef.current.contains(e.target)) setOpenTools(false) }
+    document.addEventListener('mousedown', onDown)
+    return () => document.removeEventListener('mousedown', onDown)
+  }, [])
+
+  const handleCTA = () => navigate(isCoach ? '/admin' : user ? '/app/home' : '/register')
+
   return (
     <>
-      <nav style={{
-        padding: '0 1.5rem',
-        height: 72,
-        display: 'flex',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        borderBottom: '1px solid rgba(255,255,255,.07)',
-        position: 'sticky',
-        top: 0,
-        background: 'rgba(0,0,0,.9)',
-        backdropFilter: 'blur(20px)',
-        zIndex: 50,
-        flexShrink: 0,
-      }}>
-        {/* Logo — taille fixe, ne bouge jamais */}
-        <Link to="/" style={{ flexShrink: 0, lineHeight: 0 }}>
+      <nav className="landing-nav">
+        {/* Logo */}
+        <Link to="/" style={{ lineHeight: 0, flexShrink: 0 }}>
           <img src="/Logo.png" alt="The Ultimate Academy" style={{ height: 60, width: 'auto', display: 'block' }} />
         </Link>
 
-        {/* Links — fixed layout, no wrap */}
-        <div style={{ display: 'flex', gap: '.25rem', alignItems: 'center', flexShrink: 0 }}>
-          <Link to="/"            className="blog-nav-link">Accueil</Link>
-          <Link to="/calculateur" className="blog-nav-link blog-nav-hide-sm">Outils gratuits</Link>
-          <Link to="/blog"        className="blog-nav-link blog-nav-blog">Blog</Link>
-          <Link to="/login"       className="blog-nav-link blog-nav-hide-xs">Connexion</Link>
-          <Link to="/register"    className="blog-nav-cta">Rejoindre</Link>
+        {/* Links — centered, same as landing */}
+        <div className="landing-nav-links">
+          <Link to="/"     className="landing-nav-link" style={{ textDecoration: 'none' }}>Accueil</Link>
+          <Link to="/blog" className="landing-nav-link" style={{ textDecoration: 'none', color: '#C084FC', fontWeight: 600 }}>Blog</Link>
+
+          {/* Outils dropdown */}
+          <div ref={toolsRef} style={{ position: 'relative' }}>
+            <button className="landing-nav-link"
+              onClick={() => setOpenTools(o => !o)}
+              style={{ display: 'flex', alignItems: 'center', gap: '.3rem' }}>
+              Outils gratuits
+              <svg width="10" height="10" viewBox="0 0 10 10" fill="currentColor"
+                style={{ transition: 'transform .2s', transform: openTools ? 'rotate(180deg)' : 'none', opacity: .7 }}>
+                <path d="M1 3l4 4 4-4" stroke="currentColor" strokeWidth="1.5" fill="none" strokeLinecap="round"/>
+              </svg>
+            </button>
+            {openTools && (
+              <div style={{ position: 'absolute', top: 'calc(100% + .85rem)', right: '-1rem', minWidth: 230,
+                background: '#16132A', border: '1px solid rgba(139,47,201,.35)', borderRadius: 12,
+                padding: '.4rem', zIndex: 300, boxShadow: '0 16px 48px rgba(0,0,0,.65)' }}>
+                {TOOLS.map(t => (
+                  <Link key={t.path} to={t.path} onClick={() => setOpenTools(false)} style={{
+                    display: 'block', padding: '.55rem .85rem', borderRadius: 8, textDecoration: 'none',
+                    fontSize: '.85rem', color: 'rgba(255,255,255,.75)', transition: 'background .12s',
+                  }}
+                  onMouseEnter={e => { e.currentTarget.style.background = 'rgba(255,255,255,.05)' }}
+                  onMouseLeave={e => { e.currentTarget.style.background = 'transparent' }}>
+                    {t.label}
+                  </Link>
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Auth + hamburger */}
+        <div style={{ display: 'flex', gap: '.6rem', alignItems: 'center', flexShrink: 0 }}>
+          <div className="landing-nav-auth-desktop" style={{ display: 'flex', gap: '.6rem', alignItems: 'center' }}>
+            {user ? (
+              <button className="btn btn-sm" onClick={handleCTA}
+                style={{ background: 'rgba(255,255,255,.1)', color: '#fff', border: '1px solid rgba(255,255,255,.2)' }}>
+                Mon espace
+              </button>
+            ) : (
+              <>
+                <Link to="/login" className="btn btn-sm"
+                  style={{ background: 'transparent', color: 'rgba(255,255,255,.7)', border: '1px solid rgba(255,255,255,.18)' }}>
+                  Connexion
+                </Link>
+                <Link to="/register" className="btn btn-sm"
+                  style={{ background: 'linear-gradient(135deg,#8B2FC9,#E8237A)', color: '#fff', border: 'none',
+                    fontWeight: 700, boxShadow: '0 3px 14px rgba(232,35,122,.45)' }}>
+                  Rejoindre
+                </Link>
+              </>
+            )}
+          </div>
+          {/* Hamburger */}
+          <button className="landing-hamburger" onClick={() => setMobileMenu(v => !v)} aria-label="Menu">
+            <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
+              {mobileMenu
+                ? <><line x1="3" y1="3" x2="19" y2="19" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/><line x1="19" y1="3" x2="3" y2="19" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/></>
+                : <><line x1="3" y1="6" x2="19" y2="6" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/><line x1="3" y1="11" x2="19" y2="11" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/><line x1="3" y1="16" x2="19" y2="16" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/></>
+              }
+            </svg>
+          </button>
         </div>
       </nav>
 
-      <style>{`
-        .blog-nav-link {
-          color: rgba(255,255,255,.55);
-          font-size: .88rem;
-          text-decoration: none;
-          padding: .45rem .7rem;
-          border-radius: 8px;
-          white-space: nowrap;
-          transition: color .15s;
-        }
-        .blog-nav-link:hover { color: #fff; }
-        .blog-nav-blog { color: #C084FC !important; font-weight: 600; }
-        .blog-nav-cta {
-          background: linear-gradient(135deg,#8B2FC9,#E8237A);
-          color: #fff !important;
-          font-size: .88rem;
-          font-weight: 700;
-          text-decoration: none;
-          padding: .5rem 1.1rem;
-          border-radius: 10px;
-          white-space: nowrap;
-          margin-left: .25rem;
-        }
-        @media (max-width: 600px) { .blog-nav-hide-sm { display: none !important; } }
-        @media (max-width: 420px) { .blog-nav-hide-xs { display: none !important; } }
-      `}</style>
+      {/* Mobile menu */}
+      {mobileMenu && (
+        <div className="landing-mobile-menu" onClick={() => setMobileMenu(false)}>
+          <Link to="/"     className="landing-mobile-link">Accueil</Link>
+          <Link to="/blog" className="landing-mobile-link tools-link">Blog</Link>
+          <button className="landing-mobile-link tools-link" onClick={e => { e.stopPropagation(); setMobileTools(v => !v) }}>
+            Outils gratuits {mobileTools ? '▲' : '▼'}
+          </button>
+          {mobileTools && (
+            <div className="landing-mobile-submenu">
+              {TOOLS.map(t => (
+                <Link key={t.path} to={t.path}>{t.label}</Link>
+              ))}
+            </div>
+          )}
+          {user ? (
+            <button className="landing-mobile-link tools-link" onClick={handleCTA}>Mon espace →</button>
+          ) : (
+            <>
+              <Link to="/login"    className="landing-mobile-link">Connexion</Link>
+              <Link to="/register" className="landing-mobile-link tools-link">Rejoindre →</Link>
+            </>
+          )}
+        </div>
+      )}
     </>
   )
 }

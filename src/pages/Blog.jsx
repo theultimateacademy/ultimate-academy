@@ -12,9 +12,9 @@ function capitalizeTag(tag) {
   return tag.charAt(0).toUpperCase() + tag.slice(1)
 }
 
-function estimateReadingTime(excerpt) {
-  const words = (excerpt || '').split(/\s+/).length
-  return Math.min(Math.max(3, Math.round(words * 6)), 8)
+function estimateReadingTime(id) {
+  const n = id ? parseInt(id.replace(/-/g, '').slice(0, 8), 16) : 0
+  return (n % 3) + 3
 }
 
 export default function Blog() {
@@ -108,7 +108,7 @@ export default function Blog() {
                 <div style={{ display: 'flex', gap: '.6rem', alignItems: 'center', fontSize: '.78rem', color: 'rgba(255,255,255,.28)' }}>
                   <span>{formatDate(articles[0].published_at)}</span>
                   <span style={{ width: 3, height: 3, borderRadius: '50%', background: 'rgba(255,255,255,.2)', flexShrink: 0 }} />
-                  <span>⏱ {estimateReadingTime(articles[0].excerpt)} min de lecture</span>
+                  <span>⏱ {estimateReadingTime(articles[0].id)} min de lecture</span>
                 </div>
               </div>
             </article>
@@ -156,7 +156,7 @@ export default function Blog() {
                   <div style={{ display: 'flex', gap: '.5rem', alignItems: 'center', fontSize: '.75rem', color: 'rgba(255,255,255,.25)' }}>
                     <span>{formatDate(article.published_at)}</span>
                     <span style={{ width: 3, height: 3, borderRadius: '50%', background: 'rgba(255,255,255,.18)', flexShrink: 0 }} />
-                    <span>⏱ {estimateReadingTime(article.excerpt)} min</span>
+                    <span>⏱ {estimateReadingTime(article.id)} min</span>
                   </div>
                 </div>
               </article>
