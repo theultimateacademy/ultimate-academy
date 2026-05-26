@@ -14,6 +14,7 @@ async function request(path, options = {}) {
 }
 
 export const api = {
+  health:             ()       => request('/health'),
   createCheckout:     (body)   => request('/api/stripe/create-checkout',      { method: 'POST', body }),
   freeActivate:       (body)   => request('/api/stripe/free-activate',        { method: 'POST', body }),
   cancelSubscription: (body)   => request('/api/stripe/cancel-subscription',  { method: 'POST', body }),

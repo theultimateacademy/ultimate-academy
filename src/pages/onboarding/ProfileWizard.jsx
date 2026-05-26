@@ -107,6 +107,7 @@ export default function ProfileWizard() {
   const [direction, setDirection]   = useState('forward')
   const [animKey, setAnimKey]        = useState(0)
   const [submitting, setSubmitting]  = useState(false)
+  const [submitAttempt, setSubmitAttempt] = useState(0)
   const [done, setDone]              = useState(false)
   const [error, setError]            = useState('')
 
@@ -115,10 +116,10 @@ export default function ProfileWizard() {
   const total    = steps.length
   const progress = Math.round(((currentIdx) / (total - 1)) * 100)
 
-  // Wake the server early so it's ready when the user hits submit
+  // Wake the server early — ping /health from step 5 onward so it's ready at submit
   useEffect(() => {
-    if (currentIdx >= total - 3 && user?.id) {
-      api.getProfile(user.id).catch(() => {})
+    if (currentIdx >= 4) {
+      api.health().catch(() => {})
     }
   }, [currentIdx])
 
@@ -189,8 +190,10 @@ export default function ProfileWizard() {
       coach_message:     data.coach_message,
       profile_completed: true
     }
-    // Retry up to 3 times — server may be waking from sleep
-    for (let attempt = 1; attempt <= 3; attempt++) {
+    // Retry up to 6 times — Render free tier can take ~60s to wake from sleep
+    const MAX = 6
+    for (let attempt = 1; attempt <= MAX; attempt++) {
+      setSubmitAttempt(attempt)
       try {
         const result = await api.updateProfile({ userId: user.id, fields })
         api.generatePlan({ userId: user.id, profile: result.profile }).catch(err =>
@@ -200,11 +203,12 @@ export default function ProfileWizard() {
         setDone(true)
         return
       } catch (err) {
-        if (attempt === 3) {
-          setError('Connexion impossible. Réessaie dans quelques secondes.')
+        if (attempt === MAX) {
+          setError('Connexion impossible. Appuie à nouveau sur le bouton pour réessayer.')
           setSubmitting(false)
+          setSubmitAttempt(0)
         } else {
-          await new Promise(r => setTimeout(r, 3000))
+          await new Promise(r => setTimeout(r, 8000))
         }
       }
     }
@@ -593,7 +597,9 @@ export default function ProfileWizard() {
               Rien n'est obligatoire — tu peux aussi passer cette étape.
             </p>
             <ContinueBtn onClick={advance} disabled={submitting}
-              label={submitting ? <><SpinnerInline /> Création de ton plan…</> : 'Terminer et créer mon plan →'} />
+              label={submitting
+                ? <><SpinnerInline /> {submitAttempt > 1 ? `Connexion… (${submitAttempt}/6)` : 'Création de ton plan…'}</>
+                : 'Terminer et créer mon plan →'} />
           </>}
 
         </div>
