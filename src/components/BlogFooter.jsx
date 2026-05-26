@@ -1,11 +1,10 @@
 import { Link } from 'react-router-dom'
 
 const TOOLS = [
-  { label: 'Calculateur temps de passage',  path: '/calculateur' },
-  { label: 'Calculateur de VMA',            path: '/calculateur/vma' },
-  { label: 'Test de Cooper & VO2max',       path: '/calculateur/vo2max' },
-  { label: 'Allures running & zones FC',    path: '/calculateur/allures' },
-  { label: 'Prédicteur de chrono running',  path: '/calculateur/predicteur' },
+  { label: 'Temps de passage',    path: '/calculateur' },
+  { label: 'Calculateur de VMA',  path: '/calculateur/vma' },
+  { label: 'Allures & zones FC',  path: '/calculateur/allures' },
+  { label: 'Prédicteur de chrono', path: '/calculateur/predicteur' },
 ]
 
 const colHead = {
@@ -17,23 +16,28 @@ const colLink = {
   textDecoration: 'none', marginBottom: '.5rem', lineHeight: 1.4,
 }
 
-export default function ToolsFooter() {
+export default function BlogFooter() {
   return (
     <footer style={{ borderTop: '1px solid rgba(255,255,255,.06)', background: '#000', padding: '3rem 1.5rem 2rem' }}>
-      <div style={{ maxWidth: 900, margin: '0 auto' }}>
+      <div style={{ maxWidth: 1140, margin: '0 auto' }}>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px,1fr))', gap: '2.5rem', marginBottom: '2rem' }}>
           <div>
-            <p style={{ color: 'rgba(255,255,255,.55)', fontSize: '.9rem', fontWeight: 700, marginBottom: '.4rem' }}>The Ultimate Academy</p>
+            <Link to="/"><img src="/Logo.png" alt="The Ultimate Academy" style={{ height: 60, width: 'auto', opacity: .8, marginBottom: '.85rem' }} /></Link>
             <p style={{ color: 'rgba(255,255,255,.2)', fontSize: '.78rem', margin: 0 }}>
               © 2026 The Ultimate Academy<br />Tous droits réservés.
             </p>
           </div>
-
+          <div>
+            <p style={colHead}>Blog</p>
+            <Link to="/blog" style={colLink}>Tous les articles</Link>
+            <Link to="/blog" style={colLink}>Plans d'entraînement</Link>
+            <Link to="/blog" style={colLink}>Nutrition</Link>
+            <Link to="/blog" style={colLink}>Trail & Marathon</Link>
+          </div>
           <div>
             <p style={colHead}>Outils gratuits</p>
             {TOOLS.map(t => <Link key={t.path} to={t.path} style={colLink}>{t.label}</Link>)}
           </div>
-
           <div>
             <p style={colHead}>Légal</p>
             <Link to="/privacy" style={colLink}>Politique de confidentialité</Link>

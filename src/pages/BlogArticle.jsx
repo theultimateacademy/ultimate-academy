@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { Link, useParams, Navigate } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
 import BlogNav from '../components/BlogNav'
+import BlogFooter from '../components/BlogFooter'
 
 function formatDate(iso) {
   return new Date(iso).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })
@@ -185,18 +186,41 @@ export default function BlogArticle() {
         <ArticleContent html={article.content} />
 
         {/* Bottom signup CTA */}
-        <div style={{ marginTop: '3.5rem', padding: '2.5rem 2rem', background: 'linear-gradient(135deg, rgba(139,47,201,.13), rgba(232,35,122,.08))', border: '1px solid rgba(139,47,201,.25)', borderRadius: 22, textAlign: 'center' }}>
-          <div style={{ fontSize: '1.75rem', marginBottom: '.75rem' }}>🎯</div>
-          <p style={{ fontWeight: 800, fontSize: '1.15rem', marginBottom: '.6rem', letterSpacing: '-0.01em' }}>Prêt à progresser ?</p>
-          <p style={{ color: 'rgba(255,255,255,.45)', fontSize: '.88rem', marginBottom: '1.5rem', maxWidth: 380, margin: '0 auto 1.5rem' }}>
-            Rejoins The Ultimate Academy et reçois ton programme personnalisé.
+        <div style={{ marginTop: '4rem', padding: '3rem 2rem 2.5rem', background: 'linear-gradient(135deg, rgba(139,47,201,.14), rgba(232,35,122,.09))', border: '1px solid rgba(139,47,201,.28)', borderRadius: 24, textAlign: 'center' }}>
+          <div style={{ display: 'inline-block', background: 'linear-gradient(135deg,#8B2FC9,#E8237A)', borderRadius: 100, padding: '.3rem 1rem', fontSize: '.75rem', color: '#fff', fontWeight: 700, marginBottom: '1.25rem', letterSpacing: '.04em' }}>
+            THE ULTIMATE ACADEMY
+          </div>
+          <h3 style={{ fontSize: 'clamp(1.3rem,3vw,1.9rem)', fontWeight: 800, letterSpacing: '-0.025em', marginBottom: '.75rem', lineHeight: 1.2 }}>
+            Passe à l'action.<br />Ton programme t'attend.
+          </h3>
+          <p style={{ color: 'rgba(255,255,255,.5)', fontSize: '.92rem', marginBottom: '2rem', maxWidth: 400, margin: '0 auto 2rem', lineHeight: 1.7 }}>
+            Arrête de t'entraîner au hasard. Reçois un plan construit pour toi, suivi semaine après semaine.
           </p>
-          <Link to="/register" style={{ display: 'inline-block', background: 'linear-gradient(135deg,#8B2FC9,#E8237A)', color: '#fff', padding: '.9rem 2.25rem', borderRadius: 14, fontWeight: 700, textDecoration: 'none', fontSize: '1rem' }}>
+
+          {/* 3 benefits */}
+          <div style={{ display: 'flex', justifyContent: 'center', gap: '1.5rem', flexWrap: 'wrap', marginBottom: '2rem' }}>
+            {[
+              { icon: '🎯', text: 'Plan 100 % sur-mesure' },
+              { icon: '💬', text: 'Suivi direct par le coach' },
+              { icon: '⚡', text: 'Résultats dès 4 semaines' },
+            ].map(({ icon, text }) => (
+              <div key={text} style={{ display: 'flex', alignItems: 'center', gap: '.5rem', fontSize: '.85rem', color: 'rgba(255,255,255,.7)' }}>
+                <span>{icon}</span><span>{text}</span>
+              </div>
+            ))}
+          </div>
+
+          <Link to="/register" style={{ display: 'inline-block', background: 'linear-gradient(135deg,#8B2FC9,#E8237A)', color: '#fff', padding: '1rem 2.5rem', borderRadius: 14, fontWeight: 800, textDecoration: 'none', fontSize: '1rem', boxShadow: '0 6px 24px rgba(232,35,122,.4)' }}>
             Démarrer mon programme →
           </Link>
+          <p style={{ color: 'rgba(255,255,255,.25)', fontSize: '.78rem', marginTop: '.9rem' }}>
+            Sans engagement · 25 €/mois · Résiliable à tout moment
+          </p>
         </div>
 
       </article>
+
+      <BlogFooter />
 
       <style>{`
         .article-content h2 {

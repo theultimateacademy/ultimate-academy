@@ -78,8 +78,8 @@ export default function ToolsNav() {
     <>
       <style>{mobileToolsNavStyle}</style>
       <nav className="landing-nav">
-        <Link to="/" style={{ display: 'flex', alignItems: 'center' }}>
-          <img src="/Logo.png" alt="The Ultimate Academy" style={{ height: 60, width: 'auto', flexShrink: 0 }} />
+        <Link to="/" style={{ display: 'flex', alignItems: 'center', textDecoration: 'none' }}>
+          <span style={{ fontSize: '.9rem', fontWeight: 700, color: 'rgba(255,255,255,.8)', letterSpacing: '.01em' }}>The Ultimate Academy</span>
         </Link>
 
         <div className="landing-nav-links">

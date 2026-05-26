@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
 import BlogNav from '../components/BlogNav'
+import BlogFooter from '../components/BlogFooter'
 
 function formatDate(iso) {
   return new Date(iso).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })
@@ -215,13 +216,7 @@ export default function Blog() {
 
       </main>
 
-      {/* Footer CTA */}
-      <section style={{ borderTop: '1px solid rgba(255,255,255,.07)', padding: '5rem 1.5rem', textAlign: 'center' }}>
-        <p style={{ color: 'rgba(255,255,255,.4)', marginBottom: '1.5rem', fontSize: '1rem' }}>Prêt à passer à l'action ?</p>
-        <Link to="/register" style={{ display: 'inline-block', background: 'linear-gradient(135deg,#8B2FC9,#E8237A)', color: '#fff', padding: '.9rem 2.25rem', borderRadius: 14, fontWeight: 700, textDecoration: 'none', fontSize: '1rem' }}>
-          Démarrer mon programme →
-        </Link>
-      </section>
+      <BlogFooter />
 
       <style>{`
         .featured-card { transition: border-color .2s, transform .15s; }
