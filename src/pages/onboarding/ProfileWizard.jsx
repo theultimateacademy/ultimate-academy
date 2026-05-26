@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../../contexts/AuthContext'
 import { api } from '../../lib/api'
@@ -115,6 +115,13 @@ export default function ProfileWizard() {
   const total    = steps.length
   const progress = Math.round(((currentIdx) / (total - 1)) * 100)
 
+  // Wake the server early so it's ready when the user hits submit
+  useEffect(() => {
+    if (currentIdx >= total - 3 && user?.id) {
+      api.getProfile(user.id).catch(() => {})
+    }
+  }, [currentIdx])
+
   function set(key, val) { setData(d => ({ ...d, [key]: val })) }
 
   function toggleDay(d) {
@@ -162,36 +169,44 @@ export default function ProfileWizard() {
   async function handleSubmit() {
     setSubmitting(true)
     setError('')
-    try {
-      const fields = {
-        first_name:        data.first_name,
-        gender:            data.gender,
-        objective:         OBJECTIVE_MAP[data.objective] || data.objective,
-        race_date:         data.race_date || null,
-        level:             data.level,
-        vma_known:         data.vma_known,
-        vma:               data.vma_known ? parseFloat(data.vma) || null : null,
-        chrono_goal_known: data.chrono_goal_known,
-        chrono_goal:       data.chrono_goal_known ? data.chrono_goal : '',
-        days_per_week:     data.days_per_week,
-        preferred_days:    data.preferred_days,
-        gps_watch:         data.gps_watch,
-        injuries:          data.injuries === 'none' ? '' : `${data.injuries}${data.injury_detail ? ' — ' + data.injury_detail : ''}`,
-        current_form:      data.current_form,
-        period_pain:       data.period_pain,
-        period_pain_days:  data.period_pain_days ? parseInt(data.period_pain_days) : null,
-        coach_message:     data.coach_message,
-        profile_completed: true
+    const fields = {
+      first_name:        data.first_name,
+      gender:            data.gender,
+      objective:         OBJECTIVE_MAP[data.objective] || data.objective,
+      race_date:         data.race_date || null,
+      level:             data.level,
+      vma_known:         data.vma_known,
+      vma:               data.vma_known ? parseFloat(data.vma) || null : null,
+      chrono_goal_known: data.chrono_goal_known,
+      chrono_goal:       data.chrono_goal_known ? data.chrono_goal : '',
+      days_per_week:     data.days_per_week,
+      preferred_days:    data.preferred_days,
+      gps_watch:         data.gps_watch,
+      injuries:          data.injuries === 'none' ? '' : `${data.injuries}${data.injury_detail ? ' — ' + data.injury_detail : ''}`,
+      current_form:      data.current_form,
+      period_pain:       data.period_pain,
+      period_pain_days:  data.period_pain_days ? parseInt(data.period_pain_days) : null,
+      coach_message:     data.coach_message,
+      profile_completed: true
+    }
+    // Retry up to 3 times — server may be waking from sleep
+    for (let attempt = 1; attempt <= 3; attempt++) {
+      try {
+        const result = await api.updateProfile({ userId: user.id, fields })
+        api.generatePlan({ userId: user.id, profile: result.profile }).catch(err =>
+          console.error('[Plan] Background error:', err.message)
+        )
+        await refreshProfile()
+        setDone(true)
+        return
+      } catch (err) {
+        if (attempt === 3) {
+          setError('Connexion impossible. Réessaie dans quelques secondes.')
+          setSubmitting(false)
+        } else {
+          await new Promise(r => setTimeout(r, 3000))
+        }
       }
-      const result = await api.updateProfile({ userId: user.id, fields })
-      api.generatePlan({ userId: user.id, profile: result.profile }).catch(err =>
-        console.error('[Plan] Background error:', err.message)
-      )
-      await refreshProfile()
-      setDone(true)
-    } catch (err) {
-      setError(err.message || 'Une erreur est survenue.')
-      setSubmitting(false)
     }
   }
 
