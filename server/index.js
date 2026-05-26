@@ -16,6 +16,8 @@ const REQUIRED_ENV = [
   'STRIPE_WEBHOOK_SECRET',
   'ANTHROPIC_API_KEY',
 ];
+console.log('[DEBUG] Service:', process.env.RAILWAY_SERVICE_NAME, '| Env:', process.env.RAILWAY_ENVIRONMENT_NAME);
+
 const missing = REQUIRED_ENV.filter(k => !process.env[k]);
 if (missing.length) {
   console.error('[STARTUP] Missing environment variables:', missing.join(', '));
