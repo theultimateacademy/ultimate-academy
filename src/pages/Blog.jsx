@@ -228,9 +228,6 @@ export default function Blog() {
           .featured-card { grid-template-columns: 1fr !important; }
           .featured-card img { height: 220px; position: static !important; }
         }
-        @media (max-width: 480px) {
-          nav a[href="/"], nav a[href="/calculateur"] { display: none; }
-        }
       `}</style>
     </div>
   )
