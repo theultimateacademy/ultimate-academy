@@ -114,7 +114,7 @@ export default function AthleteLayout() {
       {/* Mobile top bar — logo + logout */}
       <div className="mobile-topbar">
         <Link to="/app/home">
-          <img src="/Logo.png" alt="The Ultimate Academy" style={{ height: 44, width: 'auto' }} />
+          <img src="/Logo.png" alt="The Ultimate Academy" style={{ height: 52, width: 'auto' }} />
         </Link>
         <button
           onClick={handleSignOut}
