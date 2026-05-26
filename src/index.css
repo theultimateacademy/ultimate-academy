@@ -439,6 +439,9 @@ tr:hover td { background: rgba(255,255,255,.04); }
 
 /* ── Mobile global fixes ────────────────────────────────── */
 @media (max-width: 767px) {
+  /* ── Critical: hide desktop sidebar ── */
+  .sidebar { display: none !important; }
+
   .card { padding: 1rem; }
   /* Account for fixed top bar + bottom nav */
   .page {
@@ -492,6 +495,10 @@ tr:hover td { background: rgba(255,255,255,.04); }
 
   /* Bouton suggestion : texte masqué sur mobile */
   .suggest-btn-label { display: none; }
+
+  /* Admin athletes: hide table, show cards on mobile */
+  .athletes-table-desktop { display: none !important; }
+  .athletes-mobile-list   { display: flex !important; flex-direction: column; gap: .5rem; }
 }
 
 /* ── Misc helpers ────────────────────────────────────────── */

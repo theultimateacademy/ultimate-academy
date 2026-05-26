@@ -300,14 +300,14 @@ export default function AdminPlans() {
             <div key={plan.id} className="card"
               style={{ borderLeft: plan.status === 'pending' ? '4px solid var(--warning)' : '4px solid var(--success)' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '1rem' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-                  <div className="chat-avatar">{athlete?.first_name?.[0]?.toUpperCase()}</div>
-                  <div>
-                    <div style={{ fontWeight: 700 }}>{athlete?.first_name} {athlete?.last_name}</div>
-                    <div style={{ fontSize: '.8rem', color: 'var(--text-muted)' }}>{athlete?.email}</div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', minWidth: 0 }}>
+                  <div className="chat-avatar" style={{ flexShrink: 0 }}>{athlete?.first_name?.[0]?.toUpperCase()}</div>
+                  <div style={{ minWidth: 0 }}>
+                    <div style={{ fontWeight: 700, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{athlete?.first_name} {athlete?.last_name}</div>
+                    <div style={{ fontSize: '.8rem', color: 'var(--text-muted)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{athlete?.email}</div>
                   </div>
                 </div>
-                <div style={{ display: 'flex', gap: '.5rem', alignItems: 'center', flexWrap: 'wrap' }}>
+                <div style={{ display: 'flex', gap: '.5rem', alignItems: 'center', flexWrap: 'wrap', flexShrink: 0 }}>
                   <span className="badge badge-info">{weeks} semaines</span>
                   <span className={`badge ${plan.status === 'pending' ? 'badge-warning' : plan.status === 'active' ? 'badge-success' : 'badge-info'}`}>
                     {plan.status === 'pending' ? '⏳ En attente' : plan.status === 'active' ? '✅ Actif' : plan.status}

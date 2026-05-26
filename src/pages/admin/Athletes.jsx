@@ -444,8 +444,8 @@ export default function AdminAthletes() {
           onChange={e => setSearch(e.target.value)} />
       </div>
 
-      {/* Table */}
-      <div className="card" style={{ padding: 0, overflow: 'hidden' }}>
+      {/* Desktop table */}
+      <div className="card athletes-table-desktop" style={{ padding: 0, overflow: 'hidden' }}>
         <div className="table-wrap">
           <table>
             <thead>
@@ -510,6 +510,57 @@ export default function AdminAthletes() {
             </tbody>
           </table>
         </div>
+      </div>
+
+      {/* Mobile card list */}
+      <div className="athletes-mobile-list" style={{ display: 'none' }}>
+        {filtered.map(a => (
+          <div key={a.id} className="card"
+            style={{ display: 'flex', alignItems: 'center', gap: '.875rem', padding: '.875rem 1rem', cursor: 'pointer' }}
+            onClick={() => setSelected(a)}>
+            <div style={{ position: 'relative', flexShrink: 0 }}>
+              <div className="chat-avatar" style={{ width: 42, height: 42, fontSize: '1rem' }}>
+                {a.first_name?.[0]?.toUpperCase()}
+              </div>
+              {alertsMap[a.id] && (
+                <div style={{ position: 'absolute', top: -2, right: -2,
+                  width: 10, height: 10, borderRadius: '50%', background: '#EF4444',
+                  border: '2px solid var(--bg)' }} />
+              )}
+            </div>
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <div style={{ fontWeight: 600, fontSize: '.9rem', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                {a.first_name} {a.last_name}
+              </div>
+              <div style={{ fontSize: '.75rem', color: 'var(--text-muted)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                {a.email}
+              </div>
+              <div style={{ fontSize: '.72rem', color: 'var(--text-muted)', marginTop: '.15rem' }}>
+                {OBJECTIVE_LABELS[a.objective] || ''}
+                {a.level ? ` · ${LEVEL_LABELS[a.level]}` : ''}
+              </div>
+            </div>
+            <div style={{ flexShrink: 0, display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '.35rem' }}>
+              <span className={`badge ${a.subscription_status === 'active' ? 'badge-success' : 'badge-warning'}`}
+                style={{ fontSize: '.65rem' }}>
+                {a.subscription_status === 'active' ? '✓ Actif' : 'Inactif'}
+              </span>
+              <div style={{ display: 'flex', gap: '.3rem' }}>
+                <button className="btn btn-ghost btn-sm"
+                  style={{ fontSize: '.7rem', padding: '.2rem .55rem' }}
+                  onClick={e => { e.stopPropagation(); setSelected(a) }}>Voir</button>
+                <button className="btn btn-sm"
+                  style={{ background: 'var(--error)', color: '#fff', border: 'none', fontSize: '.7rem', padding: '.2rem .45rem' }}
+                  onClick={e => { e.stopPropagation(); setConfirmDel(a) }}>🗑</button>
+              </div>
+            </div>
+          </div>
+        ))}
+        {filtered.length === 0 && (
+          <div className="card" style={{ textAlign: 'center', padding: '2rem' }}>
+            <p className="text-muted">Aucun athlète trouvé.</p>
+          </div>
+        )}
       </div>
 
       {selected && (
