@@ -41,17 +41,17 @@ async function getNextTopic() {
 }
 
 async function fetchImage(query) {
-  if (!process.env.PEXELS_API_KEY) return { url: null, alt: null };
+  if (!process.env.UNSPLASH_ACCESS_KEY) return { url: null, alt: null };
   try {
-    const res = await axios.get('https://api.pexels.com/v1/search', {
-      headers: { Authorization: process.env.PEXELS_API_KEY },
+    const res = await axios.get('https://api.unsplash.com/search/photos', {
+      headers: { Authorization: `Client-ID ${process.env.UNSPLASH_ACCESS_KEY}` },
       params: { query, per_page: 3, orientation: 'landscape' },
       timeout: 8000,
     });
-    const photos = res.data.photos;
-    if (!photos?.length) return { url: null, alt: null };
-    const photo = photos[Math.floor(Math.random() * photos.length)];
-    return { url: photo.src.large2x || photo.src.large, alt: photo.alt || query };
+    const results = res.data.results;
+    if (!results?.length) return { url: null, alt: null };
+    const photo = results[Math.floor(Math.random() * results.length)];
+    return { url: photo.urls.regular, alt: photo.alt_description || query };
   } catch {
     return { url: null, alt: null };
   }
