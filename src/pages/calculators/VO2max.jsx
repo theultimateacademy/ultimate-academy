@@ -291,7 +291,7 @@ export default function VO2maxCalculator() {
             <H2L>Comment réaliser le Test de Cooper ?</H2L>
             <p style={{ color: 'rgba(26,18,48,.55)', maxWidth: 520, margin: '0 auto' }}>4 étapes simples pour un résultat fiable en 12 minutes</p>
           </div>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: '1.25rem', marginBottom: '1.25rem' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(min(260px,100%),1fr))', gap: '1.25rem', marginBottom: '1.25rem' }}>
             {[
               { n: '1', icon: '🏟️', title: 'Trouve un terrain plat', desc: "L'idéal est une piste d'athlétisme de 400m. Sinon, un terrain plat mesuré où tu peux courir sans t'arrêter : pas de feux ni d'obstacles." },
               { n: '2', icon: '🔥', title: 'Échauffe-toi bien', desc: "15 à 20 min de footing progressif à 63-65% de ta VMA estimée. Ne néglige pas l'échauffement, il influence directement ton résultat." },
@@ -474,8 +474,8 @@ export default function VO2maxCalculator() {
             ))}
           </div>
 
-          <div style={{ background: '#fff', borderRadius: 20, overflow: 'hidden', boxShadow: '0 8px 40px rgba(139,47,201,.1)', border: '1px solid rgba(139,47,201,.12)' }}>
-            <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '.875rem' }}>
+          <div className="tbl-scroll" style={{ background: '#fff', borderRadius: 20, boxShadow: '0 8px 40px rgba(139,47,201,.1)', border: '1px solid rgba(139,47,201,.12)' }}>
+            <table style={{ width: '100%', minWidth: 480, borderCollapse: 'collapse', fontSize: '.875rem' }}>
               <thead>
                 <tr style={{ background: 'rgba(139,47,201,.06)' }}>
                   {['Niveau', 'Distance', 'VO2max estimée'].map(h => (
@@ -608,8 +608,8 @@ export default function VO2maxCalculator() {
             <H2D>VO2max et VMA : quelle différence ?</H2D>
             <p style={{ color: 'rgba(255,255,255,.5)', maxWidth: 460, margin: '0 auto' }}>Deux indicateurs complémentaires, souvent confondus</p>
           </div>
-          <div style={{ background: 'rgba(255,255,255,.04)', borderRadius: 20, overflow: 'hidden', border: '1px solid rgba(255,255,255,.08)' }}>
-            <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '.9rem' }}>
+          <div className="tbl-scroll" style={{ background: 'rgba(255,255,255,.04)', borderRadius: 20, border: '1px solid rgba(255,255,255,.08)' }}>
+            <table style={{ width: '100%', minWidth: 400, borderCollapse: 'collapse', fontSize: '.9rem' }}>
               <thead>
                 <tr style={{ background: 'rgba(139,47,201,.18)' }}>
                   {['', 'VO2max', 'VMA'].map(h => (

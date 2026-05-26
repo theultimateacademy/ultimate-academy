@@ -75,7 +75,7 @@ export default function AthleteMessages() {
   if (loading) return <LoadingSpinner fullPage text="Chargement des messages…" />
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', height: '100dvh' }}>
+    <div className="chat-screen" style={{ display: 'flex', flexDirection: 'column', height: '100dvh' }}>
       {/* Header */}
       <div style={{ padding: '1rem 1.25rem', background: 'var(--surface)', borderBottom: '1px solid var(--border)',
         display: 'flex', alignItems: 'center', gap: '.875rem', flexShrink: 0 }}>

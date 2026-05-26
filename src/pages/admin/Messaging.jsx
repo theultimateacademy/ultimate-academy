@@ -84,7 +84,7 @@ function Conversation({ athlete, onBack }) {
         </div>
         <div style={{ marginLeft: 'auto' }}>
           <button className="btn btn-secondary btn-sm" disabled={generating} onClick={generateSuggestion}>
-            {generating ? <><div className="spinner spinner-sm" /> Génération…</> : '✨ Suggérer une réponse'}
+            {generating ? <><div className="spinner spinner-sm" /> <span className="suggest-btn-label">Génération…</span></> : <>✨ <span className="suggest-btn-label">Suggérer une réponse</span></>}
           </button>
         </div>
       </div>
@@ -202,7 +202,7 @@ export default function AdminMessaging() {
   if (loading) return <LoadingSpinner fullPage />
 
   return (
-    <div style={{ height: '100vh', display: 'flex', overflow: 'hidden' }}>
+    <div className="admin-chat-screen" style={{ height: '100vh', display: 'flex', overflow: 'hidden' }}>
       {/* Sidebar list */}
       <div style={{ width: 280, flexShrink: 0, borderRight: '1px solid var(--border)',
         overflowY: 'auto', background: 'var(--surface)', display: selected ? 'none' : 'block' }}

@@ -164,7 +164,7 @@ export default function AthleteHome() {
 
       {/* Stats row */}
       {plan && (
-        <div className="grid-3" style={{ marginBottom: '1.5rem' }}>
+        <div className="grid-3 stat-cards-3" style={{ marginBottom: '1.5rem' }}>
           <div className="stat-card stat-card--dark">
             <div className="stat-value">{weekProgress.done}/{weekProgress.total}</div>
             <div className="stat-label">Séances cette semaine</div>
@@ -205,11 +205,11 @@ export default function AthleteHome() {
               const icon   = status === 'done' ? '✅' : status === 'missed' ? '❌' : '⏳'
               const color  = status === 'done' ? 'rgba(255,255,255,.85)' : status === 'missed' ? 'rgba(255,255,255,.35)' : 'rgba(255,255,255,.6)'
               return (
-                <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '.6rem', fontSize: '.85rem' }}>
-                  <span>{icon}</span>
-                  <span style={{ fontWeight: 600, color, minWidth: 60 }}>{s.jour}</span>
-                  <span style={{ color: 'var(--text-muted)' }}>{s.titre}</span>
-                  <span style={{ marginLeft: 'auto', fontSize: '.75rem', color: 'var(--text-muted)' }}>{s.duree_min}min</span>
+                <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '.5rem', fontSize: '.85rem', minWidth: 0 }}>
+                  <span style={{ flexShrink: 0 }}>{icon}</span>
+                  <span style={{ fontWeight: 600, color, flexShrink: 0, minWidth: 52 }}>{s.jour}</span>
+                  <span style={{ color: 'var(--text-muted)', flex: 1, minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{s.titre}</span>
+                  <span style={{ flexShrink: 0, fontSize: '.75rem', color: 'var(--text-muted)' }}>{s.duree_min}min</span>
                 </div>
               )
             })}
