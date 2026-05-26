@@ -238,9 +238,9 @@ export default function BlogArticle() {
           line-height: 1.25;
         }
         .article-content h2:first-child { margin-top: 0; }
-        .article-content p { margin-bottom: 1.5rem; line-height: 1.9; color: rgba(255,255,255,.72); }
+        .article-content p { margin-bottom: 1.5rem; line-height: 1.9; color: rgba(255,255,255,.72); text-align: justify; hyphens: auto; }
         .article-content ul, .article-content ol { padding-left: 1.5rem; margin-bottom: 1.5rem; }
-        .article-content li { margin-bottom: .7rem; line-height: 1.8; color: rgba(255,255,255,.72); }
+        .article-content li { margin-bottom: .7rem; line-height: 1.8; color: rgba(255,255,255,.72); text-align: justify; hyphens: auto; }
         .article-content strong {
           font-weight: 700;
           background: linear-gradient(135deg, #C084FC, #F472B6);
