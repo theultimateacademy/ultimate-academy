@@ -114,6 +114,7 @@ Retourne UNIQUEMENT un JSON valide (sans markdown, sans \`\`\`) avec exactement 
     image_url:    imageUrl,
     image_alt:    imageAlt || topic.image_query,
     tags:         article.tags || [],
+    reading_time: calcReadingTime(article.content),
     published_at: overrideDate || new Date().toISOString(),
   }).select().single();
 
