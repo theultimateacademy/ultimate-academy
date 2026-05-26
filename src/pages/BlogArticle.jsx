@@ -214,7 +214,7 @@ export default function BlogArticle() {
             Démarrer mon programme →
           </Link>
           <p style={{ color: 'rgba(255,255,255,.25)', fontSize: '.78rem', marginTop: '.9rem' }}>
-            Sans engagement · 25 €/mois · Résiliable à tout moment
+            Sans engagement · 30 €/mois · Résiliable à tout moment
           </p>
         </div>
 
