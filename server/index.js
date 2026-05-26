@@ -16,16 +16,11 @@ const REQUIRED_ENV = [
   'STRIPE_WEBHOOK_SECRET',
   'ANTHROPIC_API_KEY',
 ];
-console.log('[DEBUG] All env keys:', Object.keys(process.env).join(', '));
-
 const missing = REQUIRED_ENV.filter(k => !process.env[k]);
 if (missing.length) {
   console.error('[STARTUP] Missing environment variables:', missing.join(', '));
   process.exit(1);
 }
-
-console.log('[DEBUG] SUPABASE_URL length:', process.env.SUPABASE_URL?.length, '| starts with:', process.env.SUPABASE_URL?.substring(0, 15));
-console.log('[DEBUG] SUPABASE_SERVICE_KEY length:', process.env.SUPABASE_SERVICE_KEY?.length, '| starts with:', process.env.SUPABASE_SERVICE_KEY?.substring(0, 10));
 
 const express    = require('express');
 const cors       = require('cors');
