@@ -36,6 +36,14 @@ export default function Register() {
         return
       }
 
+      // Whitelisted free accounts — bypass Stripe, activate directly
+      const FREE_EMAILS = ['anouklothe@gmail.com']
+      if (FREE_EMAILS.includes(form.email.toLowerCase())) {
+        await api.freeActivate({ userId, email: form.email.toLowerCase() })
+        navigate('/onboarding')
+        return
+      }
+
       setStep('redirecting')
       const { url } = await api.createCheckout({
         userId,

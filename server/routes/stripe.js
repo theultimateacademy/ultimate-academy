@@ -61,6 +61,29 @@ router.post('/create-checkout', async (req, res) => {
   }
 });
 
+// POST /api/stripe/free-activate — whitelist bypass (no Stripe)
+const FREE_EMAIL_WHITELIST = ['anouklothe@gmail.com'];
+
+router.post('/free-activate', async (req, res) => {
+  const { userId, email } = req.body;
+  if (!userId || !email) return res.status(400).json({ error: 'Missing userId or email' });
+
+  if (!FREE_EMAIL_WHITELIST.includes(email.toLowerCase())) {
+    return res.status(403).json({ error: 'Not authorized for free access' });
+  }
+
+  try {
+    await supabase.from('profiles').update({
+      subscription_status: 'active',
+    }).eq('id', userId);
+
+    res.json({ ok: true });
+  } catch (err) {
+    console.error('Free activate error:', err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
 // POST /api/stripe/dev-activate  — localhost dev bypass only
 router.post('/dev-activate', async (req, res) => {
   if (process.env.NODE_ENV === 'production') {
