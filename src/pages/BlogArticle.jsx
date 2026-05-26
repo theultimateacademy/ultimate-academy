@@ -137,7 +137,7 @@ export default function BlogArticle() {
 
   if (!article) return null
 
-  const readingTime = article.reading_time || getReadingTime(article.content)
+  const readingTime = getReadingTime(article.content)
 
   return (
     <div style={{ background: '#000', minHeight: '100vh', color: '#fff', paddingTop: 72 }}>

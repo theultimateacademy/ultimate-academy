@@ -25,7 +25,7 @@ export default function Blog() {
   useEffect(() => {
     supabase
       .from('articles')
-      .select('id, title, slug, excerpt, image_url, image_alt, tags, reading_time, published_at')
+      .select('id, title, slug, excerpt, image_url, image_alt, tags, published_at')
       .order('published_at', { ascending: false })
       .limit(12)
       .then(({ data, error }) => {
@@ -112,7 +112,7 @@ export default function Blog() {
                   <div style={{ display: 'flex', gap: '.6rem', alignItems: 'center', fontSize: '.78rem', color: 'rgba(255,255,255,.28)' }}>
                     <span>{formatDate(f.published_at)}</span>
                     <span style={{ width: 3, height: 3, borderRadius: '50%', background: 'rgba(255,255,255,.2)', flexShrink: 0 }} />
-                    <span>⏱ {f.reading_time || 4} min de lecture</span>
+                    <span>⏱ 4 min de lecture</span>
                   </div>
                 </div>
               </article>
@@ -161,7 +161,7 @@ export default function Blog() {
                   <div style={{ display: 'flex', gap: '.5rem', alignItems: 'center', fontSize: '.75rem', color: 'rgba(255,255,255,.25)' }}>
                     <span>{formatDate(article.published_at)}</span>
                     <span style={{ width: 3, height: 3, borderRadius: '50%', background: 'rgba(255,255,255,.18)', flexShrink: 0 }} />
-                    <span>⏱ {article.reading_time || 4} min</span>
+                    <span>⏱ 4 min</span>
                   </div>
                 </div>
               </article>
