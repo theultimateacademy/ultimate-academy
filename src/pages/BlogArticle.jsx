@@ -40,15 +40,15 @@ export default function BlogArticle() {
     <div style={{ background: '#000', minHeight: '100vh', color: '#fff' }}>
 
       {/* Nav */}
-      <nav style={{ padding: '1.5rem 2rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid rgba(255,255,255,.08)' }}>
+      <nav style={{ padding: '1rem 1.25rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid rgba(255,255,255,.08)' }}>
         <Link to="/"><img src="/Logo.png" alt="The Ultimate Academy" style={{ height: 48 }} /></Link>
-        <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
-          <Link to="/blog" style={{ color: 'rgba(255,255,255,.6)', fontSize: '.9rem', textDecoration: 'none' }}>← Blog</Link>
-          <Link to="/register" style={{ background: 'linear-gradient(135deg,#8B2FC9,#E8237A)', color: '#fff', padding: '.45rem 1.1rem', borderRadius: 8, fontSize: '.9rem', textDecoration: 'none', fontWeight: 600 }}>Rejoindre</Link>
+        <div style={{ display: 'flex', gap: '.75rem', alignItems: 'center' }}>
+          <Link to="/blog" style={{ color: 'rgba(255,255,255,.6)', fontSize: '.9rem', textDecoration: 'none', minHeight: 44, display: 'flex', alignItems: 'center' }}>← Blog</Link>
+          <Link to="/register" style={{ background: 'linear-gradient(135deg,#8B2FC9,#E8237A)', color: '#fff', padding: '.55rem 1.1rem', borderRadius: 8, fontSize: '.9rem', textDecoration: 'none', fontWeight: 600, minHeight: 44, display: 'flex', alignItems: 'center' }}>Rejoindre</Link>
         </div>
       </nav>
 
-      <article style={{ maxWidth: 780, margin: '0 auto', padding: '3rem 1.5rem 5rem' }}>
+      <article style={{ maxWidth: 780, margin: '0 auto', padding: '2rem 1rem 5rem', wordBreak: 'break-word', overflowWrap: 'break-word' }}>
 
         {/* Tags */}
         {article.tags?.length > 0 && (

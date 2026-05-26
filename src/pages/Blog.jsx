@@ -29,15 +29,15 @@ export default function Blog() {
     <div style={{ background: '#000', minHeight: '100vh', color: '#fff' }}>
 
       {/* Nav */}
-      <nav style={{ padding: '1.5rem 2rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid rgba(255,255,255,.08)' }}>
+      <nav style={{ padding: '1rem 1.25rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid rgba(255,255,255,.08)' }}>
         <Link to="/"><img src="/Logo.png" alt="The Ultimate Academy" style={{ height: 48 }} /></Link>
-        <div style={{ display: 'flex', gap: '1rem' }}>
-          <Link to="/login" style={{ color: 'rgba(255,255,255,.6)', fontSize: '.9rem', textDecoration: 'none' }}>Connexion</Link>
-          <Link to="/register" style={{ background: 'linear-gradient(135deg,#8B2FC9,#E8237A)', color: '#fff', padding: '.45rem 1.1rem', borderRadius: 8, fontSize: '.9rem', textDecoration: 'none', fontWeight: 600 }}>Rejoindre</Link>
+        <div style={{ display: 'flex', gap: '.75rem', alignItems: 'center', flexWrap: 'wrap' }}>
+          <Link to="/login" style={{ color: 'rgba(255,255,255,.6)', fontSize: '.9rem', textDecoration: 'none', minHeight: 44, display: 'flex', alignItems: 'center' }}>Connexion</Link>
+          <Link to="/register" style={{ background: 'linear-gradient(135deg,#8B2FC9,#E8237A)', color: '#fff', padding: '.55rem 1.1rem', borderRadius: 8, fontSize: '.9rem', textDecoration: 'none', fontWeight: 600, minHeight: 44, display: 'flex', alignItems: 'center' }}>Rejoindre</Link>
         </div>
       </nav>
 
-      <main style={{ maxWidth: 1100, margin: '0 auto', padding: '4rem 1.5rem' }}>
+      <main style={{ maxWidth: 1100, margin: '0 auto', padding: '3rem 1rem' }}>
 
         {/* Header */}
         <div style={{ textAlign: 'center', marginBottom: '3.5rem' }}>
@@ -69,7 +69,7 @@ export default function Blog() {
         )}
 
         {/* Grid */}
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: '1.5rem' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '1.5rem' }}>
           {articles.map(article => (
             <Link key={article.id} to={`/blog/${article.slug}`} style={{ textDecoration: 'none' }}>
               <article style={{

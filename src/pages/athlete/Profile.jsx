@@ -462,7 +462,7 @@ export default function AthleteProfile() {
         </div>
 
         {/* Editable grid */}
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1rem' }}>
 
           {/* Objectif */}
           <FieldCard

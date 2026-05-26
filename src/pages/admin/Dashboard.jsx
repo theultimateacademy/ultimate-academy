@@ -398,7 +398,7 @@ export default function AdminDashboard() {
       {/* Finance estimée */}
       <div className="card" style={{ marginBottom: '1.5rem', background: 'linear-gradient(135deg,#1A1A2E,#2D1B4E)', color: '#fff' }}>
         <h3 style={{ color: '#fff', marginBottom: '1.25rem', fontSize: '1rem' }}>💶 Performance financière</h3>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '1rem', textAlign: 'center' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(100px, 1fr))', gap: '1rem', textAlign: 'center' }}>
           <div>
             <div style={{ fontSize: '1.75rem', fontWeight: 800, color: '#A7F3D0' }}>{stats.mrr}€</div>
             <div style={{ fontSize: '.75rem', opacity: .7, marginTop: '.2rem' }}>MRR estimé</div>

@@ -368,7 +368,7 @@ function SessionDetailPage({ session, weekNum, sessionIdx, planId, vma, onClose,
             <div style={{ fontWeight: 700, marginBottom: '.75rem', color: '#FC4C02', display: 'flex', alignItems: 'center', gap: '.4rem', fontSize: '.82rem', textTransform: 'uppercase', letterSpacing: '.06em' }}>
               🔶 Données Strava
             </div>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '.5rem' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(80px, 1fr))', gap: '.5rem' }}>
               {[
                 { v: fmtDistance(stravaAct.distance),    l: 'Distance' },
                 { v: fmtDuration(stravaAct.moving_time), l: 'Durée' },
@@ -637,7 +637,7 @@ function WeeklyFeedbackCard({ weekNum, planId, userId, onSaved }) {
           <span>😴 Très facile</span><span>🔥 Très difficile</span>
         </div>
       </div>
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '.5rem', marginBottom: '1rem' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))', gap: '.5rem', marginBottom: '1rem' }}>
         {RESSENTIS.map(r => (
           <button key={r.v} onClick={() => setRessenti(r.v)}
             style={{

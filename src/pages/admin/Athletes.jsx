@@ -172,7 +172,7 @@ function AthleteDetailModal({ athlete, onClose, onUpdated }) {
           <>
             {tab === 'profile' && (
               <>
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '.65rem' }}>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '.65rem' }}>
                   {PROFILE_FIELDS.map(f => (
                     <div key={f.key}
                       style={{

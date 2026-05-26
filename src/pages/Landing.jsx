@@ -2,6 +2,69 @@ import { Link, useNavigate } from 'react-router-dom'
 import { useState, useRef, useEffect } from 'react'
 import { useAuth } from '../contexts/AuthContext'
 
+/* ── Mobile hamburger styles ────────────────────────────────── */
+const mobileMenuStyle = `
+  .landing-hamburger {
+    display: none;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: .4rem;
+    color: rgba(255,255,255,.85);
+    flex-shrink: 0;
+  }
+  @media (max-width: 680px) {
+    .landing-hamburger { display: flex; align-items: center; justify-content: center; }
+    .landing-mobile-menu {
+      position: fixed;
+      top: 72px;
+      left: 0;
+      right: 0;
+      background: rgba(0,0,0,.95);
+      backdrop-filter: blur(24px);
+      border-bottom: 1px solid rgba(255,255,255,.1);
+      padding: 1rem 1.5rem 1.5rem;
+      z-index: 199;
+      display: flex;
+      flex-direction: column;
+      gap: .25rem;
+    }
+    .landing-mobile-link {
+      display: block;
+      padding: .75rem .5rem;
+      font-size: 1rem;
+      font-weight: 500;
+      color: rgba(255,255,255,.75);
+      border: none;
+      background: none;
+      text-align: left;
+      cursor: pointer;
+      font-family: inherit;
+      border-bottom: 1px solid rgba(255,255,255,.06);
+      text-decoration: none;
+      min-height: 44px;
+    }
+    .landing-mobile-link:last-child { border-bottom: none; }
+    .landing-mobile-link.tools-link { color: #C084FC; font-weight: 600; }
+    .landing-mobile-submenu {
+      padding-left: 1rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+    }
+    .landing-mobile-submenu a {
+      display: block;
+      padding: .6rem .5rem;
+      font-size: .9rem;
+      color: rgba(255,255,255,.55);
+      text-decoration: none;
+      min-height: 44px;
+      display: flex;
+      align-items: center;
+    }
+  }
+`
+
 const TOOLS = [
   { label: '⏱ Temps de passage',    path: '/calculateur' },
   { label: '⚡ Calculateur de VMA',  path: '/calculateur/vma' },
@@ -74,8 +137,10 @@ const gd = (text) => ({
 export default function Landing() {
   const { user, isCoach } = useAuth()
   const navigate = useNavigate()
-  const [openFaq,   setOpenFaq]   = useState(null)
-  const [openTools, setOpenTools] = useState(false)
+  const [openFaq,    setOpenFaq]    = useState(null)
+  const [openTools,  setOpenTools]  = useState(false)
+  const [mobileMenu, setMobileMenu] = useState(false)
+  const [mobileTools, setMobileTools] = useState(false)
   const toolsRef = useRef()
 
   useEffect(() => {
@@ -93,10 +158,11 @@ export default function Landing() {
 
   return (
     <div style={{ background: '#000', color: '#fff', overflowX: 'hidden' }}>
+      <style>{mobileMenuStyle}</style>
 
       {/* ── NAV ─────────────────────────────────────────────── */}
       <nav className="landing-nav">
-        <Link to="/"><img src="/Logo.png" alt="The Ultimate Academy" style={{ height: 58, width: 'auto', flexShrink: 0 }} /></Link>
+        <Link to="/"><img src="/Logo.png" alt="The Ultimate Academy" style={{ height: 48, width: 'auto', flexShrink: 0 }} /></Link>
 
         <div className="landing-nav-links">
           {[['Mon coach','coach'],['Programme','features'],['Résultats','resultats'],['Tarifs','tarifs'],['FAQ','faq']].map(([l,id]) => (
@@ -133,26 +199,66 @@ export default function Landing() {
         </div>
 
         <div style={{ display: 'flex', gap: '.6rem', alignItems: 'center', flexShrink: 0 }}>
-          {user ? (
-            <button className="btn btn-sm" onClick={handleCTA}
-              style={{ background: 'rgba(255,255,255,.1)', color: '#fff', border: '1px solid rgba(255,255,255,.2)' }}>
-              Mon espace
-            </button>
-          ) : (
-            <>
-              <Link to="/login" className="btn btn-sm"
-                style={{ background: 'transparent', color: 'rgba(255,255,255,.7)', border: '1px solid rgba(255,255,255,.18)' }}>
-                Connexion
-              </Link>
-              <Link to="/register" className="btn btn-sm"
-                style={{ background: 'linear-gradient(135deg,#8B2FC9,#E8237A)', color: '#fff', border: 'none',
-                  fontWeight: 700, boxShadow: '0 3px 14px rgba(232,35,122,.45)' }}>
-                Rejoindre
-              </Link>
-            </>
-          )}
+          <div className="landing-nav-auth-desktop" style={{ display: 'flex', gap: '.6rem', alignItems: 'center' }}>
+            {user ? (
+              <button className="btn btn-sm" onClick={handleCTA}
+                style={{ background: 'rgba(255,255,255,.1)', color: '#fff', border: '1px solid rgba(255,255,255,.2)' }}>
+                Mon espace
+              </button>
+            ) : (
+              <>
+                <Link to="/login" className="btn btn-sm"
+                  style={{ background: 'transparent', color: 'rgba(255,255,255,.7)', border: '1px solid rgba(255,255,255,.18)' }}>
+                  Connexion
+                </Link>
+                <Link to="/register" className="btn btn-sm"
+                  style={{ background: 'linear-gradient(135deg,#8B2FC9,#E8237A)', color: '#fff', border: 'none',
+                    fontWeight: 700, boxShadow: '0 3px 14px rgba(232,35,122,.45)' }}>
+                  Rejoindre
+                </Link>
+              </>
+            )}
+          </div>
+          {/* Hamburger mobile */}
+          <button className="landing-hamburger" onClick={() => setMobileMenu(v => !v)} aria-label="Menu">
+            <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
+              {mobileMenu
+                ? <><line x1="3" y1="3" x2="19" y2="19" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/><line x1="19" y1="3" x2="3" y2="19" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/></>
+                : <><line x1="3" y1="6" x2="19" y2="6" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/><line x1="3" y1="11" x2="19" y2="11" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/><line x1="3" y1="16" x2="19" y2="16" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/></>
+              }
+            </svg>
+          </button>
         </div>
       </nav>
+
+      {/* ── MOBILE MENU ────────────────────────────────────── */}
+      {mobileMenu && (
+        <div className="landing-mobile-menu" onClick={() => setMobileMenu(false)}>
+          {[['Mon coach','coach'],['Programme','features'],['Résultats','resultats'],['Tarifs','tarifs'],['FAQ','faq']].map(([l,id]) => (
+            <button key={id} className="landing-mobile-link" onClick={() => { scrollTo(id); setMobileMenu(false) }}>{l}</button>
+          ))}
+          <Link to="/blog" className="landing-mobile-link" onClick={() => setMobileMenu(false)}>Blog</Link>
+          <button className="landing-mobile-link tools-link"
+            onClick={e => { e.stopPropagation(); setMobileTools(v => !v) }}>
+            Outils gratuits {mobileTools ? '▴' : '▾'}
+          </button>
+          {mobileTools && (
+            <div className="landing-mobile-submenu" onClick={e => e.stopPropagation()}>
+              {TOOLS.map(t => (
+                <Link key={t.path} to={t.path} onClick={() => setMobileMenu(false)}>{t.label}</Link>
+              ))}
+            </div>
+          )}
+          {!user ? (
+            <>
+              <Link to="/login"    className="landing-mobile-link" onClick={() => setMobileMenu(false)}>Connexion</Link>
+              <Link to="/register" className="landing-mobile-link tools-link" onClick={() => setMobileMenu(false)}>Rejoindre →</Link>
+            </>
+          ) : (
+            <button className="landing-mobile-link tools-link" onClick={() => { handleCTA(); setMobileMenu(false) }}>Mon espace →</button>
+          )}
+        </div>
+      )}
 
       {/* ── HERO ─────────────────────────────────────────────── */}
       <header style={{
@@ -211,7 +317,7 @@ export default function Landing() {
         background: '#0A0A0A', padding: '2.5rem 1.5rem',
         borderTop: '1px solid rgba(255,255,255,.06)', borderBottom: '1px solid rgba(255,255,255,.06)',
       }}>
-        <div style={{ maxWidth: 900, margin: '0 auto', display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: '1.5rem', textAlign: 'center' }}>
+        <div style={{ maxWidth: 900, margin: '0 auto', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))', gap: '1.5rem', textAlign: 'center' }}>
           {[['250+','Athlètes accompagnés'],['4.9/5','Satisfaction'],['93%','Objectifs atteints'],['12 sem.','Durée moyenne']].map(([val,lbl]) => (
             <div key={lbl}>
               <div style={{ fontSize: 'clamp(1.8rem,4vw,2.5rem)', fontWeight: 800, letterSpacing: '-0.02em', ...gd() }}>{val}</div>
@@ -230,7 +336,7 @@ export default function Landing() {
             </h2>
             <p style={{ color: 'rgba(255,255,255,.4)', fontSize: '1rem' }}>Un accompagnement complet pour progresser intelligemment</p>
           </div>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2,1fr)', gap: '.75rem' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '.75rem' }}>
             {FEATURES.map(f => (
               <div key={f.title} style={{
                 display: 'flex', alignItems: 'flex-start', gap: '1rem', padding: '1.1rem 1.25rem',
@@ -445,7 +551,7 @@ export default function Landing() {
         <div style={{ maxWidth: 900, margin: '0 auto' }}>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px,1fr))', gap: '2.5rem', marginBottom: '2rem' }}>
             <div>
-              <img src="/Logo.png" alt="The Ultimate Academy" style={{ height: 52, width: 'auto', opacity: .8, marginBottom: '.85rem' }} />
+              <img src="/Logo.png" alt="The Ultimate Academy" style={{ height: 48, width: 'auto', opacity: .8, marginBottom: '.85rem' }} />
               <p style={{ color: 'rgba(255,255,255,.2)', fontSize: '.78rem', margin: 0 }}>
                 © 2026 The Ultimate Academy<br />Tous droits réservés.
               </p>

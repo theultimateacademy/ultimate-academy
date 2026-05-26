@@ -426,12 +426,26 @@ input[type="range"]::-webkit-slider-thumb {
 }
 
 /* ── Tables ──────────────────────────────────────────────── */
-.table-wrap { overflow-x: auto; }
+.table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
 table { width: 100%; border-collapse: collapse; font-size: .9rem; }
 th { text-align: left; padding: .75rem 1rem; background: var(--surface-2); color: var(--text-muted); font-weight: 600; font-size: .8rem; text-transform: uppercase; letter-spacing: .03em; }
 td { padding: .75rem 1rem; border-bottom: 1px solid var(--border); }
 tr:last-child td { border-bottom: none; }
 tr:hover td { background: rgba(255,255,255,.04); }
+
+/* ── Mobile global fixes ────────────────────────────────── */
+@media (max-width: 767px) {
+  .card { padding: 1rem; }
+  .page { padding: 1rem 1rem; padding-bottom: calc(var(--bottom-nav-h) + 1rem); }
+  .stat-value { font-size: 1.3rem; }
+  h1 { font-size: clamp(1.5rem, 5vw, 2.5rem); }
+  h2 { font-size: clamp(1.25rem, 4vw, 2rem); }
+  p, li, td, th { word-break: break-word; overflow-wrap: break-word; }
+  /* Ensure bottom nav items are large enough for touch */
+  .bottom-nav-item { min-height: 44px; }
+  /* Table horizontal scroll */
+  .table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+}
 
 /* ── Misc helpers ────────────────────────────────────────── */
 .flex       { display: flex; }
@@ -459,7 +473,11 @@ tr:hover td { background: rgba(255,255,255,.04); }
 .grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem; }
 .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; }
 @media (max-width: 600px) {
+  .grid-2 { grid-template-columns: 1fr; }
   .grid-3 { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 400px) {
+  .grid-3 { grid-template-columns: 1fr; }
 }
 
 /* ── iOS 26 Liquid Glass — base mixin ───────────────────── */
@@ -547,8 +565,9 @@ tr:hover td { background: rgba(255,255,255,.04); }
 }
 .landing-nav-link:hover { color: #fff; }
 @media (max-width: 680px) {
-  .landing-nav { grid-template-columns: auto auto; }
+  .landing-nav { grid-template-columns: auto auto; gap: .75rem; padding: 0 1rem; }
   .landing-nav-links { display: none; }
+  .landing-nav-auth-desktop { display: none !important; }
 }
 
 /* ── Landing — bento grid ────────────────────────────────── */
