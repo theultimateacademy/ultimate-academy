@@ -63,6 +63,8 @@ app.use('/api/dev',     devRoutes);
 app.use('/api/admin',  adminRoutes);
 app.use('/api/blog',   blogRoutes);
 
+app.get('/health', (req, res) => res.json({ status: 'ok' }));
+
 // Blog auto-publish — Monday, Wednesday, Friday at 11:00
 cron.schedule('0 11 * * 1,3,5', async () => {
   console.log('[CRON] Blog auto-publish triggered…');
