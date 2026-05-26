@@ -39,7 +39,12 @@ export default function Register() {
       // Whitelisted free accounts — bypass Stripe, activate directly
       const FREE_EMAILS = ['anouklothe@gmail.com']
       if (FREE_EMAILS.includes(form.email.toLowerCase())) {
-        await api.freeActivate({ userId, email: form.email.toLowerCase() })
+        try {
+          await api.freeActivate({ userId, email: form.email.toLowerCase() })
+        } catch (err) {
+          console.warn('freeActivate failed (server may be deploying):', err.message)
+          // Continue anyway — server will activate on next request or manual retry
+        }
         navigate('/onboarding')
         return
       }
@@ -53,7 +58,23 @@ export default function Register() {
       })
       window.location.href = url
     } catch (err) {
-      setError(err.message || 'Une erreur est survenue.')
+      // If already registered, try to log them in (free email path)
+      const FREE_EMAILS = ['anouklothe@gmail.com']
+      if (
+        err.message?.toLowerCase().includes('already registered') &&
+        FREE_EMAILS.includes(form.email.toLowerCase())
+      ) {
+        try {
+          await signIn(form.email, form.password)
+          await api.freeActivate({ userId: (await supabase.auth.getUser()).data.user?.id, email: form.email.toLowerCase() }).catch(() => {})
+          navigate('/onboarding')
+          return
+        } catch {
+          setError('Compte déjà existant. Connecte-toi depuis la page de connexion.')
+        }
+      } else {
+        setError(err.message || 'Une erreur est survenue.')
+      }
       setStep('form')
       setLoading(false)
     }

@@ -9,31 +9,24 @@ export default function CheckoutSuccess() {
   const sessionId = params.get('session_id')
 
   useEffect(() => {
-    // If already active (no stripe session, e.g. race condition redirect), go straight to app
-    if (!sessionId) {
-      if (profile?.subscription_status === 'active') {
-        navigate(profile.profile_completed ? '/app/home' : '/onboarding', { replace: true })
-      } else {
-        navigate('/app/home', { replace: true })
-      }
-      return
-    }
+    if (profile?.subscription_status === 'active') return // handled by second effect
 
+    // Poll in all cases (with or without sessionId) until active
     let attempts = 0
     const interval = setInterval(async () => {
       await refreshProfile()
       attempts++
-      if (attempts > 15) clearInterval(interval)
+      if (attempts > 20) clearInterval(interval)
     }, 2000)
     return () => clearInterval(interval)
-  }, [sessionId, profile?.subscription_status])
+  }, [sessionId])
 
   useEffect(() => {
-    if (sessionId && profile?.subscription_status === 'active') {
-      if (!profile.profile_completed) navigate('/onboarding')
-      else navigate('/app/home')
+    if (profile?.subscription_status === 'active') {
+      navigate(profile.profile_completed ? '/app/home' : '/onboarding', { replace: true })
     }
   }, [profile?.subscription_status])
+
 
   return (
     <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'var(--bg)', padding: '1.5rem' }}>
