@@ -74,15 +74,15 @@ function Conversation({ athlete, onBack }) {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
       {/* Header */}
-      <div style={{ padding: '1rem 1.5rem', background: 'var(--surface)', borderBottom: '1px solid var(--border)',
-        display: 'flex', alignItems: 'center', gap: '1rem', flexShrink: 0 }}>
-        <button className="btn-icon" onClick={onBack}>←</button>
-        <div className="chat-avatar">{athlete.first_name?.[0]?.toUpperCase()}</div>
-        <div>
-          <div style={{ fontWeight: 700 }}>{athlete.first_name} {athlete.last_name}</div>
-          <div style={{ fontSize: '.75rem', color: 'var(--text-muted)' }}>{athlete.email}</div>
+      <div style={{ padding: '1rem', background: 'var(--surface)', borderBottom: '1px solid var(--border)',
+        display: 'flex', alignItems: 'center', gap: '.75rem', flexShrink: 0, overflow: 'hidden' }}>
+        <button className="btn-icon" onClick={onBack} style={{ flexShrink: 0 }}>←</button>
+        <div className="chat-avatar" style={{ flexShrink: 0 }}>{athlete.first_name?.[0]?.toUpperCase()}</div>
+        <div style={{ flex: 1, minWidth: 0 }}>
+          <div style={{ fontWeight: 700, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{athlete.first_name} {athlete.last_name}</div>
+          <div style={{ fontSize: '.75rem', color: 'var(--text-muted)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{athlete.email}</div>
         </div>
-        <div style={{ marginLeft: 'auto' }}>
+        <div style={{ flexShrink: 0 }}>
           <button className="btn btn-secondary btn-sm" disabled={generating} onClick={generateSuggestion}>
             {generating ? <><div className="spinner spinner-sm" /> <span className="suggest-btn-label">Génération…</span></> : <>✨ <span className="suggest-btn-label">Suggérer une réponse</span></>}
           </button>
@@ -90,7 +90,7 @@ function Conversation({ athlete, onBack }) {
       </div>
 
       {/* Messages */}
-      <div style={{ flex: 1, overflowY: 'auto', padding: '1rem 1.5rem' }}>
+      <div style={{ flex: 1, overflowY: 'auto', padding: '1rem' }}>
         <div className="chat-list">
           {messages.map(msg => (
             <div key={msg.id} style={{ display: 'flex', flexDirection: 'column',
@@ -119,7 +119,7 @@ function Conversation({ athlete, onBack }) {
       </div>
 
       {/* Input */}
-      <form onSubmit={send} style={{ padding: '1rem 1.5rem', background: 'var(--surface)',
+      <form onSubmit={send} style={{ padding: '1rem', background: 'var(--surface)',
         borderTop: '1px solid var(--border)', flexShrink: 0 }}>
         {suggestion && (
           <div style={{ background: 'rgba(139,47,201,.15)', border: '1px solid rgba(139,47,201,.3)', borderRadius: 'var(--radius)',

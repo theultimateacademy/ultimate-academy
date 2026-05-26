@@ -20,7 +20,7 @@
   --shadow-lg:        0 12px 40px rgba(0,0,0,.55);
   --nav-h:            64px;
   --bottom-nav-h:     68px;
-  --mobile-topbar-h:  52px;
+  --mobile-topbar-h:  60px;
 }
 
 /* ── Reset ───────────────────────────────────────────────── */
@@ -499,6 +499,14 @@ tr:hover td { background: rgba(255,255,255,.04); }
   /* Admin athletes: hide table, show cards on mobile */
   .athletes-table-desktop { display: none !important; }
   .athletes-mobile-list   { display: flex !important; flex-direction: column; gap: .5rem; }
+
+  /* Messagerie admin : liste pleine largeur sur mobile */
+  .messaging-list { width: 100% !important; }
+  .messaging-list .msg-header { padding: 1rem !important; }
+
+  /* Bottom nav : labels plus petits pour 7 items */
+  .bottom-nav-item        { font-size: .6rem; }
+  .bottom-nav-item .icon  { font-size: 1.2rem; }
 }
 
 /* ── Misc helpers ────────────────────────────────────────── */

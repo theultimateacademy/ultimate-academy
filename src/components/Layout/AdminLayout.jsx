@@ -119,7 +119,7 @@ function AdminShell() {
       {/* Mobile top bar — logo + logout */}
       <div className="mobile-topbar">
         <Link to="/admin">
-          <img src="/Logo.png" alt="The Ultimate Academy" style={{ height: 32, width: 'auto' }} />
+          <img src="/Logo.png" alt="The Ultimate Academy" style={{ height: 44, width: 'auto' }} />
         </Link>
         <button
           onClick={async () => { await signOut(); navigate('/') }}
