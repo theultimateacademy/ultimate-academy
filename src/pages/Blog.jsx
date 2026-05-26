@@ -6,6 +6,17 @@ function formatDate(iso) {
   return new Date(iso).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })
 }
 
+function capitalizeTag(tag) {
+  if (!tag) return tag
+  return tag.charAt(0).toUpperCase() + tag.slice(1)
+}
+
+function estimateReadingTime(excerpt) {
+  const words = (excerpt || '').split(/\s+/).length
+  const minutes = Math.max(3, Math.round(words * 6))
+  return Math.min(minutes, 8)
+}
+
 export default function Blog() {
   const [articles, setArticles] = useState([])
   const [loading, setLoading]   = useState(true)
@@ -68,37 +79,90 @@ export default function Blog() {
           </div>
         )}
 
-        {/* Grid */}
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '1.5rem' }}>
-          {articles.map(article => (
+        {/* Featured first article */}
+        {articles.length > 0 && (
+          <Link to={`/blog/${articles[0].slug}`} style={{ textDecoration: 'none', display: 'block', marginBottom: '2.5rem' }}>
+            <article style={{
+              background: 'rgba(255,255,255,.03)',
+              border: '1px solid rgba(255,255,255,.08)',
+              borderRadius: 20,
+              overflow: 'hidden',
+              display: 'grid',
+              gridTemplateColumns: articles[0].image_url ? '1fr 1fr' : '1fr',
+              transition: 'border-color .2s, transform .15s',
+            }}
+            onMouseEnter={e => { e.currentTarget.style.borderColor = 'rgba(139,47,201,.45)'; e.currentTarget.style.transform = 'translateY(-2px)' }}
+            onMouseLeave={e => { e.currentTarget.style.borderColor = 'rgba(255,255,255,.08)'; e.currentTarget.style.transform = 'translateY(0)' }}>
+
+              {articles[0].image_url && (
+                <div style={{ height: 320, overflow: 'hidden' }}>
+                  <img src={articles[0].image_url} alt={articles[0].image_alt || articles[0].title}
+                    style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                </div>
+              )}
+
+              <div style={{ padding: '2rem 2rem', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+                <div style={{ display: 'inline-block', background: 'rgba(139,47,201,.2)', border: '1px solid rgba(139,47,201,.3)', borderRadius: 100, padding: '.2rem .8rem', fontSize: '.72rem', color: '#C084FC', fontWeight: 700, marginBottom: '1rem', width: 'fit-content' }}>
+                  À la une
+                </div>
+
+                {articles[0].tags?.length > 0 && (
+                  <div style={{ display: 'flex', gap: '.4rem', flexWrap: 'wrap', marginBottom: '.9rem' }}>
+                    {articles[0].tags.slice(0, 3).map(tag => (
+                      <span key={tag} style={{ background: 'rgba(139,47,201,.15)', border: '1px solid rgba(139,47,201,.25)', borderRadius: 100, padding: '.25rem .7rem', fontSize: '.72rem', color: '#C084FC', fontWeight: 600 }}>
+                        {capitalizeTag(tag)}
+                      </span>
+                    ))}
+                  </div>
+                )}
+
+                <h2 style={{ fontSize: 'clamp(1.1rem,2.5vw,1.5rem)', fontWeight: 800, color: '#fff', marginBottom: '.75rem', lineHeight: 1.3 }}>
+                  {articles[0].title}
+                </h2>
+                <p style={{ fontSize: '.9rem', color: 'rgba(255,255,255,.5)', lineHeight: 1.7, marginBottom: '1.25rem' }}>
+                  {articles[0].excerpt}
+                </p>
+                <div style={{ display: 'flex', gap: '1rem', alignItems: 'center', fontSize: '.78rem', color: 'rgba(255,255,255,.3)' }}>
+                  <span>{formatDate(articles[0].published_at)}</span>
+                  <span>·</span>
+                  <span>⏱ {estimateReadingTime(articles[0].excerpt)} min de lecture</span>
+                </div>
+              </div>
+            </article>
+          </Link>
+        )}
+
+        {/* Grid — remaining articles */}
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '1.5rem' }}>
+          {articles.slice(1).map(article => (
             <Link key={article.id} to={`/blog/${article.slug}`} style={{ textDecoration: 'none' }}>
               <article style={{
                 background: 'rgba(255,255,255,.04)', border: '1px solid rgba(255,255,255,.08)',
-                borderRadius: 16, overflow: 'hidden',
+                borderRadius: 16, overflow: 'hidden', height: '100%',
                 transition: 'border-color .2s, transform .15s',
               }}
               onMouseEnter={e => { e.currentTarget.style.borderColor = 'rgba(139,47,201,.4)'; e.currentTarget.style.transform = 'translateY(-3px)' }}
               onMouseLeave={e => { e.currentTarget.style.borderColor = 'rgba(255,255,255,.08)'; e.currentTarget.style.transform = 'translateY(0)' }}>
 
-                {/* Image */}
                 {article.image_url ? (
-                  <div style={{ height: 200, overflow: 'hidden' }}>
+                  <div style={{ height: 190, overflow: 'hidden' }}>
                     <img src={article.image_url} alt={article.image_alt || article.title}
-                      style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                      style={{ width: '100%', height: '100%', objectFit: 'cover', transition: 'transform .3s' }}
+                      onMouseEnter={e => e.currentTarget.style.transform = 'scale(1.04)'}
+                      onMouseLeave={e => e.currentTarget.style.transform = 'scale(1)'} />
                   </div>
                 ) : (
-                  <div style={{ height: 200, background: 'linear-gradient(135deg, rgba(139,47,201,.3), rgba(232,35,122,.2))', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '3rem' }}>
+                  <div style={{ height: 190, background: 'linear-gradient(135deg, rgba(139,47,201,.3), rgba(232,35,122,.2))', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '3rem' }}>
                     🏃
                   </div>
                 )}
 
-                <div style={{ padding: '1.25rem' }}>
-                  {/* Tags */}
+                <div style={{ padding: '1.25rem 1.25rem 1.5rem' }}>
                   {article.tags?.length > 0 && (
                     <div style={{ display: 'flex', gap: '.4rem', flexWrap: 'wrap', marginBottom: '.75rem' }}>
                       {article.tags.slice(0, 2).map(tag => (
-                        <span key={tag} style={{ background: 'rgba(139,47,201,.15)', border: '1px solid rgba(139,47,201,.25)', borderRadius: 100, padding: '.2rem .6rem', fontSize: '.72rem', color: '#C084FC' }}>
-                          {tag}
+                        <span key={tag} style={{ background: 'rgba(139,47,201,.15)', border: '1px solid rgba(139,47,201,.25)', borderRadius: 100, padding: '.2rem .6rem', fontSize: '.72rem', color: '#C084FC', fontWeight: 600 }}>
+                          {capitalizeTag(tag)}
                         </span>
                       ))}
                     </div>
@@ -107,11 +171,13 @@ export default function Blog() {
                   <h2 style={{ fontSize: '1rem', fontWeight: 700, color: '#fff', marginBottom: '.5rem', lineHeight: 1.4 }}>
                     {article.title}
                   </h2>
-                  <p style={{ fontSize: '.83rem', color: 'rgba(255,255,255,.45)', lineHeight: 1.6, marginBottom: '.75rem' }}>
+                  <p style={{ fontSize: '.83rem', color: 'rgba(255,255,255,.45)', lineHeight: 1.6, marginBottom: '1rem' }}>
                     {article.excerpt}
                   </p>
-                  <div style={{ fontSize: '.78rem', color: 'rgba(255,255,255,.3)' }}>
-                    {formatDate(article.published_at)}
+                  <div style={{ display: 'flex', gap: '.75rem', alignItems: 'center', fontSize: '.75rem', color: 'rgba(255,255,255,.28)' }}>
+                    <span>{formatDate(article.published_at)}</span>
+                    <span>·</span>
+                    <span>⏱ {estimateReadingTime(article.excerpt)} min</span>
                   </div>
                 </div>
               </article>
@@ -128,6 +194,14 @@ export default function Blog() {
           Démarrer mon programme →
         </Link>
       </section>
+
+      <style>{`
+        @media (max-width: 640px) {
+          article[style*="grid-template-columns"] {
+            grid-template-columns: 1fr !important;
+          }
+        }
+      `}</style>
     </div>
   )
 }
