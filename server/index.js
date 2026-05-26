@@ -1,4 +1,30 @@
 require('dotenv').config();
+
+process.on('unhandledRejection', (reason) => {
+  console.error('[CRASH] Unhandled rejection:', reason);
+  process.exit(1);
+});
+process.on('uncaughtException', (err) => {
+  console.error('[CRASH] Uncaught exception:', err);
+  process.exit(1);
+});
+
+const REQUIRED_ENV = [
+  'SUPABASE_URL',
+  'SUPABASE_SERVICE_KEY',
+  'STRIPE_SECRET_KEY',
+  'STRIPE_WEBHOOK_SECRET',
+  'ANTHROPIC_API_KEY',
+];
+const missing = REQUIRED_ENV.filter(k => !process.env[k]);
+if (missing.length) {
+  console.error('[STARTUP] Missing environment variables:', missing.join(', '));
+  process.exit(1);
+}
+
+console.log('[DEBUG] SUPABASE_URL length:', process.env.SUPABASE_URL?.length, '| starts with:', process.env.SUPABASE_URL?.substring(0, 15));
+console.log('[DEBUG] SUPABASE_SERVICE_KEY length:', process.env.SUPABASE_SERVICE_KEY?.length, '| starts with:', process.env.SUPABASE_SERVICE_KEY?.substring(0, 10));
+
 const express    = require('express');
 const cors       = require('cors');
 const cron       = require('node-cron');
