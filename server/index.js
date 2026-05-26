@@ -1,3 +1,4 @@
+global.WebSocket = require('ws');
 require('dotenv').config();
 
 process.on('unhandledRejection', (reason) => {
