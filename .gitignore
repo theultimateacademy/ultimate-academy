@@ -1,0 +1,42 @@
+# Dependencies
+node_modules/
+
+# Environment variables — NEVER commit these
+.env
+.env.local
+.env.*.local
+
+# Build output
+dist/
+build/
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+Thumbs.db
+
+# Editor
+.vscode/
+.idea/
+*.swp
+*.swo
+*.suo
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-error.log*
+
+# Claude Code
+.claude/
+
+# Certificates / keys
+*.pem
+*.key
+*.cert
+
+# OS temp files
+*.tmp
+*.temp

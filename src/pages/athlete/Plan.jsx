@@ -1,0 +1,911 @@
+import { useState, useEffect, useRef } from 'react'
+import { useAuth } from '../../contexts/AuthContext'
+import { supabase } from '../../lib/supabase'
+import { parseAllutesPace, fmtDistance, fmtDuration, SESSION_TYPE_COLORS } from '../../lib/utils'
+import { api } from '../../lib/api'
+import { downloadFit, generateFitWorkout } from '../../lib/fitGenerator'
+import LoadingSpinner from '../../components/UI/LoadingSpinner'
+import PostSessionFlow from '../../components/PostSessionFlow'
+
+function ExportBtn({ session, suuntoConnected, garminConnected, userId }) {
+  const [open,    setOpen]    = useState(false)
+  const [info,    setInfo]    = useState('')
+  const [sending, setSending] = useState(false)
+  const ref = useRef(null)
+
+  useEffect(() => {
+    if (!open) return
+    const close = e => { if (ref.current && !ref.current.contains(e.target)) setOpen(false) }
+    document.addEventListener('mousedown', close)
+    return () => document.removeEventListener('mousedown', close)
+  }, [open])
+
+  async function doGarminApi(e) {
+    e.stopPropagation()
+    setOpen(false)
+    setSending(true)
+    try {
+      await api.garminSendWorkout({ userId, session })
+      setInfo('garmin_sent')
+    } catch {
+      setInfo('garmin_error')
+    } finally {
+      setSending(false)
+    }
+  }
+
+  function doGarminFit(e) {
+    e.stopPropagation()
+    downloadFit(session, 'garmin')
+    setInfo('garmin_fit')
+    setOpen(false)
+  }
+
+  function doCoros(e) {
+    e.stopPropagation()
+    const date = new Date().toISOString().split('T')[0].replace(/-/g, '')
+    const name = (session.titre || 'seance').replace(/[^a-zA-Z0-9À-ɏ]/g, '_').replace(/_+/g, '_').substring(0, 30)
+    downloadFit(session, 'coros', `TUA_${name}_${date}.fit`)
+    setInfo('coros')
+    setOpen(false)
+  }
+
+  function doSuunto(e) {
+    e.stopPropagation()
+    downloadFit(session, 'suunto')
+    setInfo('suunto')
+    setOpen(false)
+  }
+
+  const menuBtn = { width: '100%', textAlign: 'left', padding: '.6rem .875rem', borderRadius: 0, fontSize: '.82rem', whiteSpace: 'nowrap' }
+  const confirmStyle = { position: 'absolute', right: 0, bottom: 'calc(100% + .4rem)', zIndex: 60,
+    background: 'rgba(16,185,129,.15)', border: '1px solid rgba(16,185,129,.3)',
+    borderRadius: 'var(--radius)', padding: '.5rem .75rem', fontSize: '.75rem', color: '#6EE7B7', whiteSpace: 'nowrap' }
+
+  return (
+    <div ref={ref} style={{ position: 'relative' }} onClick={e => e.stopPropagation()}>
+      <button
+        className="btn btn-ghost btn-sm"
+        style={{ fontSize: '.75rem', padding: '.3rem .65rem', display: 'flex', alignItems: 'center', gap: '.3rem' }}
+        disabled={sending}
+        onClick={e => { e.stopPropagation(); setOpen(v => !v); setInfo('') }}>
+        {sending ? <div className="spinner spinner-sm" /> : <>⬇ <span style={{ fontSize: '.7rem' }}>Exporter</span></>}
+      </button>
+
+      {open && (
+        <div style={{ position: 'absolute', right: 0, bottom: 'calc(100% + .4rem)', zIndex: 60,
+          background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 'var(--radius)',
+          boxShadow: 'var(--shadow-lg)', overflow: 'hidden', minWidth: 185 }}>
+          {garminConnected ? (
+            <button className="btn btn-ghost" style={menuBtn} onClick={doGarminApi}>
+              🟦 Envoyer sur Garmin
+            </button>
+          ) : (
+            <button className="btn btn-ghost" style={menuBtn} onClick={doGarminFit}>
+              🟦 Garmin Connect (.FIT)
+            </button>
+          )}
+          <div style={{ height: 1, background: 'var(--border)' }} />
+          <button className="btn btn-ghost" style={menuBtn} onClick={doCoros}>
+            ⬛ Envoyer sur ma Coros
+          </button>
+          <div style={{ height: 1, background: 'var(--border)' }} />
+          <button className="btn btn-ghost" style={menuBtn} onClick={doSuunto}>
+            🔴 Suunto (.FIT)
+          </button>
+        </div>
+      )}
+
+      {info === 'garmin_sent' && (
+        <div style={confirmStyle}>✅ Envoyée sur Garmin Connect !</div>
+      )}
+      {info === 'garmin_error' && (
+        <div style={{ ...confirmStyle, background: 'rgba(239,68,68,.15)', borderColor: 'rgba(239,68,68,.3)', color: '#FCA5A5' }}>
+          ⚠️ Erreur envoi Garmin
+        </div>
+      )}
+      {info === 'coros' && (
+        <div style={{ ...confirmStyle, whiteSpace: 'normal', maxWidth: 220, lineHeight: 1.4 }}>
+          ✅ Fichier téléchargé — ouvre la séance pour les instructions
+        </div>
+      )}
+      {(info === 'garmin_fit' || info === 'suunto') && (
+        <div style={confirmStyle}>✅ .FIT téléchargé</div>
+      )}
+    </div>
+  )
+}
+
+function SessionDetailPage({ session, weekNum, sessionIdx, planId, vma, onClose, onDone, onStartFlow }) {
+  const { profile } = useAuth()
+  const [isDone,      setIsDone]      = useState(session._isDone || false)
+  const [stravaAct,   setStravaAct]   = useState(null)
+  const [exportInfo,  setExportInfo]  = useState('')
+  const [corosModal,  setCorosModal]  = useState(false)
+  const [corosCopied, setCorosCopied] = useState(false)
+
+  useEffect(() => {
+    document.body.style.overflow = 'hidden'
+    return () => { document.body.style.overflow = '' }
+  }, [])
+
+  useEffect(() => {
+    if (profile?.strava_connected) {
+      const today = new Date().toISOString().split('T')[0]
+      supabase.from('strava_activities').select('*').eq('user_id', profile.id)
+        .gte('start_date', today + 'T00:00:00Z').lte('start_date', today + 'T23:59:59Z').limit(1)
+        .then(({ data }) => { if (data?.[0]) setStravaAct(data[0]) })
+    }
+  }, [])
+
+  // Helpers
+  const typeColor  = SESSION_TYPE_COLORS[session.type] || '#8B5CF6'
+  const alluresOk  = (session.allures || []).filter(a => a?.allure_min_km && typeof a.allure_min_km === 'string' && !a.allure_min_km.includes('[object'))
+  const efPace     = alluresOk[0] || null
+  const spePace    = alluresOk.length > 1 ? alluresOk[alluresOk.length - 1] : efPace
+
+  function PaceChip({ allure, color }) {
+    if (!allure?.allure_min_km) return null
+    const pace = allure.allure_min_km.replace(/"/g, '')
+    const bg   = color ? color + '18' : 'rgba(255,255,255,.08)'
+    const border = color ? color + '35' : 'rgba(255,255,255,.14)'
+    const text   = color || 'rgba(255,255,255,.7)'
+    return (
+      <span style={{ background: bg, border: `1px solid ${border}`, borderRadius: 99,
+        padding: '.18rem .6rem', fontSize: '.75rem', fontWeight: 700, color: text, whiteSpace: 'nowrap' }}>
+        {pace}<span style={{ opacity: .6, fontWeight: 400 }}>/km</span>
+      </span>
+    )
+  }
+
+  function PhaseArrow() {
+    return (
+      <div style={{ display: 'flex', alignItems: 'center', padding: '0 1.25rem', height: 28 }}>
+        <div style={{ width: 1, height: '100%', background: 'var(--border)', margin: '0 auto' }} />
+      </div>
+    )
+  }
+
+  function MainSetVisual() {
+    const mainSet = session.corps || ''
+    const type    = (session.type || '').toLowerCase()
+    const isInterval = type.includes('fraction') || type.includes('côte') || type.includes('cote') || type.includes('vma') || /\d+\s*[xX×]/.test(mainSet)
+    const isProgressif = !isInterval && (mainSet.includes('→') || type.includes('progressif'))
+
+    const repMatch  = mainSet.match(/(\d+)\s*[xX×]\s*(\d+(?:[.,]\d+)?)\s*(m\b|km|min)/i)
+    const reps      = repMatch ? parseInt(repMatch[1]) : 0
+    const repVal    = repMatch ? `${repMatch[2].replace(',', '.')}${repMatch[3]}` : null
+
+    const recovMMin = mainSet.match(/(\d+(?:[.,]\d+)?)\s*min[^\w]*r[eé]cup/i) || mainSet.match(/r[eé]cup[^\w]*(\d+(?:[.,]\d+)?)\s*min/i)
+    const recovSec  = mainSet.match(/(\d+)\s*s(?:ec)?[^\w]*r[eé]cup/i) || mainSet.match(/r[eé]cup[^\w]*(\d+)\s*s(?:ec)?/i)
+    const recovText = recovMMin
+      ? `${recovMMin[1]} min`
+      : recovSec ? `${recovSec[1]}s`
+      : (session.recuperation?.description || session.recuperation || null)
+
+    if (isInterval && reps >= 2) {
+      return (
+        <div>
+          <div style={{ display: 'flex', alignItems: 'baseline', gap: '.4rem', marginBottom: '.625rem' }}>
+            <span style={{ fontSize: '2.5rem', fontWeight: 900, color: '#fff', lineHeight: 1 }}>{reps}</span>
+            <span style={{ fontSize: '1.3rem', color: 'rgba(255,255,255,.35)', lineHeight: 1 }}>×</span>
+            {repVal && <span style={{ fontSize: '1.6rem', fontWeight: 800, color: '#fff', lineHeight: 1 }}>{repVal}</span>}
+          </div>
+          <div style={{ display: 'flex', gap: 4, marginBottom: '.875rem' }}>
+            {Array.from({ length: Math.min(reps, 14) }).map((_, i) => (
+              <div key={i} style={{ flex: 1, height: 7, borderRadius: 99, background: typeColor, opacity: .55 + i * .02 }} />
+            ))}
+          </div>
+          <p style={{ fontSize: '.875rem', lineHeight: 1.65, color: 'rgba(255,255,255,.7)', marginBottom: recovText ? '.75rem' : 0 }}>{mainSet}</p>
+          {recovText && (
+            <div style={{ display: 'flex', alignItems: 'center', gap: '.5rem',
+              background: 'rgba(14,165,233,.1)', border: '1px solid rgba(14,165,233,.25)',
+              borderRadius: 10, padding: '.5rem .875rem' }}>
+              <span style={{ color: '#38BDF8', fontWeight: 700, fontSize: '.78rem' }}>⏸ Récup</span>
+              <span style={{ fontSize: '.82rem', color: 'rgba(255,255,255,.65)' }}>{recovText}</span>
+            </div>
+          )}
+        </div>
+      )
+    }
+
+    if (isProgressif && mainSet.includes('→')) {
+      const phases = mainSet.split('→').map(p => p.trim()).filter(Boolean)
+      const dotC   = ['#10B981', '#F59E0B', '#EF4444', '#8B5CF6']
+      return (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '.75rem' }}>
+          {phases.map((phase, i) => (
+            <div key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: '.75rem' }}>
+              <div style={{ width: 8, height: 8, borderRadius: '50%', flexShrink: 0, marginTop: '.55rem',
+                background: dotC[Math.min(i, dotC.length - 1)], boxShadow: `0 0 6px ${dotC[Math.min(i, dotC.length - 1)]}80` }} />
+              <p style={{ fontSize: '.875rem', lineHeight: 1.6, color: 'rgba(255,255,255,.8)' }}>{phase}</p>
+            </div>
+          ))}
+        </div>
+      )
+    }
+
+    return <p style={{ fontSize: '.9rem', lineHeight: 1.7, color: 'rgba(255,255,255,.8)' }}>{mainSet}</p>
+  }
+
+  return (
+    <div style={{
+      position: 'fixed', inset: 0, zIndex: 200,
+      background: 'var(--bg)', overflowY: 'auto',
+      animation: 'slideUpFull .35s cubic-bezier(0.32, 0.72, 0, 1)',
+    }}>
+      <style>{`
+        @keyframes slideUpFull { from { transform: translateY(100%); } to { transform: translateY(0); } }
+        @keyframes fadeInCard  { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes ctaPulse    { 0%,100% { box-shadow: 0 4px 20px rgba(139,47,201,.45); } 50% { box-shadow: 0 4px 32px rgba(139,47,201,.7); } }
+        .detail-card { animation: fadeInCard .38s ease both; }
+        .detail-card:nth-child(1){animation-delay:.05s}
+        .detail-card:nth-child(2){animation-delay:.1s}
+        .detail-card:nth-child(3){animation-delay:.15s}
+        .detail-card:nth-child(4){animation-delay:.2s}
+        .cta-pulse { animation: ctaPulse 2.5s ease-in-out infinite; }
+      `}</style>
+
+      {/* ── HEADER ── */}
+      <div style={{
+        padding: 'max(env(safe-area-inset-top, 0px), 1rem) 1.25rem 1.25rem',
+        borderBottom: '1px solid var(--border)',
+      }}>
+        {/* Nav row */}
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem' }}>
+          <button onClick={onClose} style={{
+            background: 'none', border: 'none', cursor: 'pointer',
+            color: 'var(--text-muted)', fontSize: '.9rem', fontFamily: 'inherit',
+            display: 'flex', alignItems: 'center', gap: '.3rem', padding: 0,
+          }}>‹ Retour</button>
+          {isDone && (
+            <span style={{ background: 'rgba(16,185,129,.15)', border: '1px solid rgba(16,185,129,.3)',
+              borderRadius: 99, padding: '.2rem .75rem', fontSize: '.72rem', fontWeight: 700, color: '#6EE7B7' }}>
+              ✅ Effectuée
+            </span>
+          )}
+        </div>
+
+        {/* Type badge */}
+        <span style={{
+          display: 'inline-block', marginBottom: '.625rem',
+          background: typeColor + '18', border: `1px solid ${typeColor}40`,
+          borderRadius: 99, padding: '.2rem .75rem',
+          fontSize: '.7rem', fontWeight: 800, color: typeColor,
+          letterSpacing: '.08em', textTransform: 'uppercase',
+        }}>{session.type || 'Séance'}</span>
+
+        {/* Title */}
+        <h2 style={{ fontSize: 'clamp(1.15rem, 4vw, 1.4rem)', lineHeight: 1.25, marginBottom: '.4rem' }}>
+          {session.titre}
+        </h2>
+
+        {/* Date */}
+        <p style={{ fontSize: '.82rem', color: 'var(--text-muted)', marginBottom: '1rem' }}>
+          📅 {session._dateLabel || session.jour}
+        </p>
+
+        {/* Stats chips */}
+        <div style={{ display: 'flex', gap: '.4rem', flexWrap: 'wrap' }}>
+          {[
+            { icon: '⏱', val: `${session.duree_min} min` },
+            session.distance_km ? { icon: '📍', val: `${session.distance_km} km` } : null,
+            { icon: '💪', val: `RPE ${session.rpe_cible}` },
+          ].filter(Boolean).map(({ icon, val }) => (
+            <div key={val} style={{
+              background: 'var(--surface-2)', border: '1px solid var(--border)',
+              borderRadius: 99, padding: '.28rem .75rem',
+              fontSize: '.8rem', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '.3rem',
+            }}>
+              <span>{icon}</span><span>{val}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* ── CONTENT ── */}
+      <div style={{ padding: '1rem 1rem 9rem', display: 'flex', flexDirection: 'column', gap: '.875rem' }}>
+
+        {/* Programme de séance — carte principale */}
+        <div className="detail-card" style={{ background: 'var(--surface)', borderRadius: 20, overflow: 'hidden', border: '1px solid var(--border)' }}>
+
+          {/* Échauffement */}
+          {session.echauffement && (
+            <div style={{ borderLeft: '3px solid #F59E0B', padding: '1rem 1.125rem 1rem 1rem' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '.5rem' }}>
+                <span style={{ fontWeight: 700, fontSize: '.72rem', color: '#FCD34D', letterSpacing: '.1em', textTransform: 'uppercase' }}>🔥 Échauffement</span>
+                <PaceChip allure={efPace} />
+              </div>
+              <p style={{ fontSize: '.875rem', lineHeight: 1.65, color: 'rgba(255,255,255,.72)' }}>{session.echauffement}</p>
+            </div>
+          )}
+
+          {session.echauffement && session.corps && <PhaseArrow />}
+
+          {/* Corps — élément central */}
+          {session.corps && (
+            <div style={{ borderLeft: `3px solid ${typeColor}`, padding: '1.125rem 1.125rem 1.125rem 1rem', background: typeColor + '06' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '.875rem' }}>
+                <span style={{ fontWeight: 800, fontSize: '.76rem', color: typeColor, letterSpacing: '.1em', textTransform: 'uppercase' }}>⚡ Séance principale</span>
+                <PaceChip allure={spePace} color={typeColor} />
+              </div>
+              <MainSetVisual />
+            </div>
+          )}
+
+          {session.corps && session.retour_au_calme && <PhaseArrow />}
+
+          {/* Retour au calme */}
+          {session.retour_au_calme && (
+            <div style={{ borderLeft: '3px solid #3B82F6', padding: '1rem 1.125rem 1rem 1rem' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '.5rem' }}>
+                <span style={{ fontWeight: 700, fontSize: '.72rem', color: '#93C5FD', letterSpacing: '.1em', textTransform: 'uppercase' }}>❄️ Retour au calme</span>
+                <PaceChip allure={efPace} color="#3B82F6" />
+              </div>
+              <p style={{ fontSize: '.875rem', lineHeight: 1.65, color: 'rgba(255,255,255,.72)' }}>{session.retour_au_calme}</p>
+            </div>
+          )}
+        </div>
+
+        {/* Note d'Alexis */}
+        {session.notes_coach && (
+          <div className="detail-card" style={{ background: 'var(--surface)', borderRadius: 20, padding: '1rem 1.125rem', border: '1px solid rgba(139,47,201,.25)' }}>
+            <div style={{ display: 'flex', gap: '.75rem', alignItems: 'flex-start' }}>
+              <div style={{ width: 34, height: 34, borderRadius: '50%', background: 'var(--gradient)', flexShrink: 0,
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                color: '#fff', fontWeight: 800, fontSize: '.875rem' }}>A</div>
+              <div>
+                <div style={{ fontWeight: 700, fontSize: '.75rem', marginBottom: '.4rem', color: '#C084FC', textTransform: 'uppercase', letterSpacing: '.06em' }}>Ma note</div>
+                <p style={{ fontSize: '.875rem', lineHeight: 1.7, fontStyle: 'italic', color: 'rgba(255,255,255,.82)' }}>"{session.notes_coach}"</p>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Données Strava */}
+        {stravaAct && (
+          <div className="detail-card" style={{ background: 'var(--surface)', borderRadius: 20, padding: '1rem 1.125rem', border: '1.5px solid rgba(252,76,2,.3)' }}>
+            <div style={{ fontWeight: 700, marginBottom: '.75rem', color: '#FC4C02', display: 'flex', alignItems: 'center', gap: '.4rem', fontSize: '.82rem', textTransform: 'uppercase', letterSpacing: '.06em' }}>
+              🔶 Données Strava
+            </div>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '.5rem' }}>
+              {[
+                { v: fmtDistance(stravaAct.distance),    l: 'Distance' },
+                { v: fmtDuration(stravaAct.moving_time), l: 'Durée' },
+                { v: stravaAct.average_heartrate ? `${Math.round(stravaAct.average_heartrate)} bpm` : '—', l: 'FC moy.' },
+              ].map(({ v, l }) => (
+                <div key={l} style={{ textAlign: 'center', background: 'var(--surface-2)', borderRadius: 12, padding: '.625rem .5rem' }}>
+                  <div style={{ fontWeight: 700, fontSize: '.95rem' }}>{v}</div>
+                  <div style={{ fontSize: '.7rem', color: 'var(--text-muted)', marginTop: '.15rem' }}>{l}</div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Export */}
+        <div className="detail-card" style={{ background: 'var(--surface)', borderRadius: 20, padding: '1.25rem', border: '1px solid var(--border)' }}>
+          <div style={{ fontWeight: 700, marginBottom: '.875rem', display: 'flex', alignItems: 'center', gap: '.5rem', fontSize: '.95rem' }}>
+            ⬇️ <span>Envoyer vers ma montre</span>
+          </div>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '.5rem' }}>
+
+            {/* Garmin — envoi direct si connecté, sinon .FIT */}
+            {profile?.garmin_connected ? (
+              <button className="btn btn-secondary"
+                style={{ width: '100%', textAlign: 'left', padding: '.75rem 1rem', borderRadius: 12 }}
+                disabled={exportInfo === 'garmin_sending'}
+                onClick={async () => {
+                  setExportInfo('garmin_sending')
+                  try {
+                    await api.garminSendWorkout({ userId: profile.id, session })
+                    setExportInfo('garmin_sent')
+                  } catch {
+                    setExportInfo('garmin_error')
+                  }
+                }}>
+                {exportInfo === 'garmin_sending'
+                  ? <><div className="spinner spinner-sm" /> Envoi en cours…</>
+                  : '🟦 Envoyer sur Garmin Connect'}
+              </button>
+            ) : (
+              <button className="btn btn-secondary"
+                style={{ width: '100%', textAlign: 'left', padding: '.75rem 1rem', borderRadius: 12 }}
+                onClick={() => { downloadFit(session, 'garmin'); setExportInfo('garmin_fit') }}>
+                🟦 Garmin Connect (.FIT)
+              </button>
+            )}
+
+            <button className="btn btn-secondary"
+              style={{ width: '100%', textAlign: 'left', padding: '.75rem 1rem', borderRadius: 12 }}
+              onClick={() => {
+                const date = new Date().toISOString().split('T')[0].replace(/-/g, '')
+                const name = (session.titre || 'seance').replace(/[^a-zA-Z0-9À-ɏ]/g, '_').replace(/_+/g, '_').substring(0, 30)
+                downloadFit(session, 'coros', `TUA_${name}_${date}.fit`)
+                setCorosModal(true)
+                setExportInfo('coros')
+              }}>
+              ⬛ Envoyer sur ma Coros
+            </button>
+            <button className="btn btn-secondary"
+              style={{ width: '100%', textAlign: 'left', padding: '.75rem 1rem', borderRadius: 12 }}
+              onClick={() => { downloadFit(session, 'suunto'); setExportInfo('suunto') }}>
+              🔴 Suunto (.FIT)
+            </button>
+          </div>
+
+          {exportInfo === 'garmin_sent' && (
+            <div style={{ marginTop: '.75rem', background: 'rgba(16,185,129,.12)', border: '1px solid rgba(16,185,129,.3)', borderRadius: 12, padding: '.875rem', fontSize: '.8rem', lineHeight: 1.7 }}>
+              <div style={{ fontWeight: 700, marginBottom: '.3rem', color: '#6EE7B7' }}>✅ Séance envoyée sur Garmin Connect</div>
+              Elle apparaîtra sur ta montre à la prochaine synchronisation — ouvre <strong>Garmin Connect</strong> sur ton téléphone.
+            </div>
+          )}
+          {exportInfo === 'garmin_error' && (
+            <div style={{ marginTop: '.75rem', background: 'rgba(239,68,68,.12)', border: '1px solid rgba(239,68,68,.25)', borderRadius: 12, padding: '.875rem', fontSize: '.8rem', lineHeight: 1.7, color: '#FCA5A5' }}>
+              ⚠️ L'envoi a échoué. Vérifie ta connexion Garmin dans ton profil.
+            </div>
+          )}
+          {exportInfo === 'garmin_fit' && (
+            <div style={{ marginTop: '.75rem', background: 'rgba(29,78,216,.12)', border: '1px solid rgba(29,78,216,.25)', borderRadius: 12, padding: '.875rem', fontSize: '.8rem', lineHeight: 1.7 }}>
+              <div style={{ fontWeight: 700, marginBottom: '.3rem', color: '#93C5FD' }}>📲 Importer dans Garmin Connect</div>
+              Ouvre <strong>Garmin Connect</strong> → <strong>Plus</strong> → <strong>Entraînements</strong> → icône <strong>⋮</strong> → <strong>Importer</strong>
+            </div>
+          )}
+          {exportInfo === 'coros' && !corosModal && (
+            <div style={{ marginTop: '.75rem', background: 'rgba(16,185,129,.1)', border: '1px solid rgba(16,185,129,.25)', borderRadius: 12, padding: '.875rem', fontSize: '.8rem', lineHeight: 1.7, cursor: 'pointer' }}
+              onClick={() => setCorosModal(true)}>
+              <div style={{ fontWeight: 700, marginBottom: '.25rem', color: '#6EE7B7' }}>✅ Fichier téléchargé !</div>
+              <span style={{ color: 'var(--text-muted)' }}>Appuie ici pour voir les instructions d'import →</span>
+            </div>
+          )}
+          {exportInfo === 'suunto' && (
+            <div style={{ marginTop: '.75rem', background: 'rgba(204,0,0,.12)', border: '1px solid rgba(204,0,0,.3)', borderRadius: 12, padding: '.875rem', fontSize: '.8rem', lineHeight: 1.7 }}>
+              <div style={{ fontWeight: 700, marginBottom: '.3rem', color: '#FF8080' }}>📲 Importer dans Suunto</div>
+              Ouvre l'app <strong>Suunto</strong> → <strong>Bibliothèque</strong> → <strong>Entraînements</strong> → <strong>Importer un fichier</strong>
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* ── MODAL COROS ── */}
+      {corosModal && (
+        <div style={{
+          position: 'fixed', inset: 0, zIndex: 200,
+          background: 'rgba(0,0,0,.75)', backdropFilter: 'blur(8px)',
+          display: 'flex', alignItems: 'flex-end', justifyContent: 'center',
+          padding: '0 0 env(safe-area-inset-bottom)',
+        }} onClick={() => setCorosModal(false)}>
+          <div style={{
+            width: '100%', maxWidth: 520,
+            background: 'var(--surface)',
+            borderRadius: '24px 24px 0 0',
+            border: '1px solid var(--border)',
+            padding: '1.5rem 1.25rem 2rem',
+            maxHeight: '88vh', overflowY: 'auto',
+          }} onClick={e => e.stopPropagation()}>
+
+            {/* Handle */}
+            <div style={{ width: 40, height: 4, background: 'rgba(255,255,255,.2)', borderRadius: 99, margin: '0 auto 1.5rem' }} />
+
+            {/* Header */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: '.75rem', marginBottom: '1.5rem' }}>
+              <div style={{ width: 44, height: 44, borderRadius: 12, background: 'rgba(255,255,255,.08)', border: '1px solid rgba(255,255,255,.12)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.4rem' }}>⬛</div>
+              <div>
+                <div style={{ fontWeight: 800, fontSize: '1.05rem' }}>Ta séance est prête pour ta Coros ✓</div>
+                <div style={{ fontSize: '.78rem', color: 'var(--text-muted)', marginTop: '.15rem' }}>Suis ces étapes pour l'importer</div>
+              </div>
+            </div>
+
+            {/* Steps */}
+            {[
+              { n: 1, text: 'Le fichier vient de se télécharger sur ton téléphone.' },
+              { n: 2, text: <>Depuis un <strong>ordinateur</strong>, connecte-toi sur <strong style={{ color: '#C084FC' }}>t.coros.com</strong></> },
+              { n: 3, text: <>Clique sur <strong>Workout</strong> dans le menu, puis <strong>Import Workout</strong></> },
+              { n: 4, text: <>Sélectionne le fichier <strong style={{ fontFamily: 'monospace', fontSize: '.78rem', background: 'rgba(255,255,255,.08)', padding: '.1rem .35rem', borderRadius: 4 }}>TUA_...</strong> téléchargé</> },
+              { n: 5, text: <>La séance apparaîtra sur ta montre à la prochaine synchronisation via l'<strong>app Coros</strong>.</> },
+            ].map(({ n, text }) => (
+              <div key={n} style={{ display: 'flex', gap: '.875rem', marginBottom: '1rem', alignItems: 'flex-start' }}>
+                <div style={{ width: 28, height: 28, borderRadius: '50%', background: 'var(--gradient)', flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 800, fontSize: '.8rem', color: '#fff' }}>{n}</div>
+                <p style={{ fontSize: '.875rem', lineHeight: 1.6, paddingTop: '.3rem' }}>{text}</p>
+              </div>
+            ))}
+
+            {/* Copy link button */}
+            <button
+              className="btn btn-secondary"
+              style={{ width: '100%', marginTop: '.5rem', marginBottom: '.875rem', justifyContent: 'center', gap: '.5rem' }}
+              onClick={() => {
+                navigator.clipboard?.writeText('https://t.coros.com').catch(() => {})
+                setCorosCopied(true)
+                setTimeout(() => setCorosCopied(false), 2500)
+              }}>
+              {corosCopied ? '✅ Lien copié !' : '🔗 Copier le lien t.coros.com'}
+            </button>
+
+            {/* Strava note */}
+            {profile?.strava_connected ? (
+              <div style={{ background: 'rgba(252,76,2,.1)', border: '1px solid rgba(252,76,2,.25)', borderRadius: 12, padding: '.875rem', fontSize: '.8rem', lineHeight: 1.6 }}>
+                <span style={{ fontWeight: 700, color: '#FFA07A' }}>🔶 Strava connecté</span>
+                <br />Tes données Coros (distance, FC, allure) seront <strong>importées automatiquement via Strava</strong> après ta séance.
+                <br /><span style={{ color: 'var(--text-muted)' }}>Affichées dans "Données importées depuis ta Coros via Strava ✓"</span>
+              </div>
+            ) : (
+              <div style={{ background: 'rgba(139,47,201,.1)', border: '1px solid rgba(139,47,201,.25)', borderRadius: 12, padding: '.875rem', fontSize: '.8rem', lineHeight: 1.6 }}>
+                <span style={{ fontWeight: 700, color: '#C084FC' }}>💡 Astuce</span>
+                <br />Connecte ton compte <strong>Strava</strong> pour que tes données Coros soient récupérées automatiquement après chaque séance.
+              </div>
+            )}
+
+            <button
+              className="btn btn-primary btn-full"
+              style={{ marginTop: '1.25rem' }}
+              onClick={() => setCorosModal(false)}>
+              J'ai compris
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* ── STICKY CTA ── */}
+      <div style={{
+        position: 'fixed', bottom: 0, left: 0, right: 0,
+        padding: '1rem 1.25rem 1.75rem',
+        background: 'linear-gradient(to top, #0D0D0D 70%, transparent)',
+        pointerEvents: isDone ? 'none' : 'auto',
+      }}>
+        {isDone ? (
+          <div className="alert alert-success" style={{ textAlign: 'center', borderRadius: 18 }}>✅ Séance enregistrée !</div>
+        ) : (
+          <button
+            className="cta-pulse"
+            onClick={() => { onClose(); onStartFlow?.() }}
+            style={{
+              width: '100%', background: 'linear-gradient(135deg, #6B21A8, #BE185D)',
+              border: 'none', borderRadius: 18, padding: '1.1rem',
+              color: '#fff', fontSize: '1rem', fontWeight: 800,
+              cursor: 'pointer', fontFamily: 'inherit', letterSpacing: '.02em',
+            }}>
+            ✅ Marquer comme effectuée
+          </button>
+        )}
+      </div>
+    </div>
+  )
+}
+
+const DAY_OFFSET = { Lundi: 0, Mardi: 1, Mercredi: 2, Jeudi: 3, Vendredi: 4, Samedi: 5, Dimanche: 6 }
+function sessionDate(planStart, weekNumber, jourName) {
+  const offset = DAY_OFFSET[jourName]
+  if (offset === undefined) return jourName
+  const d = new Date(planStart)
+  d.setDate(d.getDate() + (weekNumber - 1) * 7 + offset)
+  return `${jourName} ${d.toLocaleDateString('fr-FR', { day: 'numeric', month: 'long' })}`
+}
+
+function weekDateRange(planStart, weekNumber) {
+  const start = new Date(planStart)
+  start.setDate(start.getDate() + (weekNumber - 1) * 7)
+  const end = new Date(start)
+  end.setDate(end.getDate() + 6)
+  const fmt = (d) => d.toLocaleDateString('fr-FR', { day: 'numeric', month: 'long' })
+  return `${fmt(start)} – ${fmt(end)}`
+}
+
+function WeeklyFeedbackCard({ weekNum, planId, userId, onSaved }) {
+  const [rpe,       setRpe]       = useState(6)
+  const [ressenti,  setRessenti]  = useState('')
+  const [comment,   setComment]   = useState('')
+  const [saving,    setSaving]    = useState(false)
+  const [saved,     setSaved]     = useState(false)
+
+  async function submit() {
+    if (!ressenti) return
+    setSaving(true)
+    try {
+      await supabase.from('weekly_feedbacks').upsert({
+        user_id: userId, plan_id: planId, week_number: weekNum,
+        rpe_semaine: rpe, ressenti, commentaire: comment
+      }, { onConflict: 'user_id,plan_id,week_number' })
+      setSaved(true)
+      onSaved?.()
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  if (saved) return (
+    <div className="alert alert-success" style={{ marginTop: '1.5rem' }}>
+      ✅ Bilan de semaine enregistré, je l'utilise pour adapter la suite.
+    </div>
+  )
+
+  const RESSENTIS = [
+    { v: 'tres_bien', l: '😄 Très bien' },
+    { v: 'bien',      l: '😊 Bien' },
+    { v: 'moyen',     l: '😐 Moyen' },
+    { v: 'difficile', l: '😓 Difficile' },
+  ]
+
+  return (
+    <div style={{ marginTop: '1.5rem', background: 'rgba(139,47,201,.1)', border: '1px solid rgba(139,47,201,.25)',
+      borderRadius: 'var(--radius)', padding: '1.25rem' }}>
+      <h4 style={{ marginBottom: '1rem', color: '#fff' }}>📊 Bilan de la semaine</h4>
+      <div className="form-group" style={{ marginBottom: '1rem' }}>
+        <label className="form-label">RPE global de la semaine : {rpe}/10</label>
+        <input type="range" min={1} max={10} value={rpe} onChange={e => setRpe(parseInt(e.target.value))} />
+        <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '.75rem', color: 'var(--text-muted)' }}>
+          <span>😴 Très facile</span><span>🔥 Très difficile</span>
+        </div>
+      </div>
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '.5rem', marginBottom: '1rem' }}>
+        {RESSENTIS.map(r => (
+          <button key={r.v} onClick={() => setRessenti(r.v)}
+            style={{
+              padding: '.6rem', borderRadius: 'var(--radius)', cursor: 'pointer',
+              fontFamily: 'inherit', fontSize: '.875rem', fontWeight: 600,
+              border: `2px solid ${ressenti === r.v ? 'var(--primary)' : 'var(--border)'}`,
+              background: ressenti === r.v ? 'var(--primary)' : 'var(--surface)',
+              color: ressenti === r.v ? '#fff' : 'var(--text)'
+            }}>{r.l}</button>
+        ))}
+      </div>
+      <div className="form-group" style={{ marginBottom: '1rem' }}>
+        <label className="form-label">Commentaire libre (optionnel)</label>
+        <textarea className="form-textarea" placeholder="Comment s'est passée cette semaine ?"
+          value={comment} onChange={e => setComment(e.target.value)} style={{ minHeight: 70 }} />
+      </div>
+      <button className="btn btn-primary btn-sm btn-full" disabled={saving || !ressenti} onClick={submit}>
+        {saving ? 'Enregistrement…' : '✅ Envoyer mon bilan'}
+      </button>
+    </div>
+  )
+}
+
+export default function AthletePlan() {
+  const { profile } = useAuth()
+  const [plan,          setPlan]          = useState(null)
+  const [completions,   setCompletions]   = useState([])
+  const [weekFeedbacks, setWeekFeedbacks] = useState([])
+  const [activeWeek,    setActiveWeek]    = useState(1)
+  const [modal,         setModal]         = useState(null)
+  const [postFlow,      setPostFlow]      = useState(null)
+  const [loading,       setLoading]       = useState(true)
+
+  useEffect(() => {
+    if (!profile?.id) return
+    loadPlan()
+  }, [profile?.id])
+
+  async function loadPlan() {
+    setLoading(true)
+    try {
+      const { data: p } = await supabase
+        .from('training_plans').select('*')
+        .eq('user_id', profile.id).eq('status', 'active').single()
+      setPlan(p)
+      if (p) {
+        const weeksElapsed = Math.max(1, Math.floor((Date.now() - new Date(p.activated_at || p.created_at).getTime()) / (7 * 24 * 3600 * 1000)) + 1)
+        setActiveWeek(weeksElapsed)
+        const [{ data: c }, { data: fb }] = await Promise.all([
+          supabase.from('session_completions').select('*').eq('user_id', profile.id).eq('plan_id', p.id),
+          supabase.from('weekly_feedbacks').select('*').eq('user_id', profile.id).eq('plan_id', p.id)
+        ])
+        setCompletions(c || [])
+        setWeekFeedbacks(fb || [])
+      }
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  function isCompleted(weekNum, sessionIdx) {
+    return completions.some(c => c.week_number === weekNum && c.session_index === sessionIdx)
+  }
+
+  if (loading) return <LoadingSpinner fullPage text="Chargement du plan…" />
+
+  if (!plan) {
+    return (
+      <div className="page">
+        <div className="card" style={{ textAlign: 'center', padding: '3rem' }}>
+          <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>⏳</div>
+          <h3>Plan en cours de préparation</h3>
+          <p className="text-muted" style={{ marginTop: '.5rem' }}>
+            Je finalise ton programme personnalisé. Il sera disponible très bientôt.
+          </p>
+        </div>
+      </div>
+    )
+  }
+
+  const weeks      = plan.plan_data?.semaines || []
+  const totalWeeks = weeks.length
+  const planDone   = activeWeek > totalWeeks
+
+  if (planDone) {
+    return (
+      <div className="page">
+        <div className="card" style={{ textAlign: 'center', padding: '3rem 2rem' }}>
+          <div style={{ fontSize: '3.5rem', marginBottom: '1rem' }}>🏆</div>
+          <h3 style={{ marginBottom: '.75rem' }}>Plan terminé !</h3>
+          <p className="text-muted" style={{ marginBottom: '1.5rem', lineHeight: 1.7, maxWidth: 380, margin: '0 auto .75rem' }}>
+            Tu as terminé toutes les semaines de ton programme. Félicitations pour le travail accompli.
+          </p>
+          <p className="text-muted" style={{ fontSize: '.875rem', marginBottom: '2rem' }}>
+            Ton coach prépare la suite — tu seras notifié dès que le nouveau plan est disponible.
+          </p>
+          <button
+            className="btn btn-ghost btn-sm"
+            onClick={() => setActiveWeek(totalWeeks)}>
+            Revoir la dernière semaine
+          </button>
+        </div>
+      </div>
+    )
+  }
+
+  const currentWeekData = weeks.find(w => w.numero === activeWeek) || weeks[0]
+
+  return (
+    <div className="page">
+      <h2 style={{ marginBottom: '1.5rem' }}>Mon plan</h2>
+
+      {/* Week selector */}
+      <div style={{ display: 'flex', gap: '.5rem', overflowX: 'auto', paddingBottom: '.5rem', marginBottom: '1.5rem' }}>
+        {weeks.map(w => {
+          const doneInWeek  = completions.filter(c => c.week_number === w.numero).length
+          const totalInWeek = w.seances?.length || 0
+          const pct         = totalInWeek > 0 ? doneInWeek / totalInWeek : 0
+          const planStart   = plan.activated_at || plan.created_at
+          return (
+            <button key={w.numero}
+              onClick={() => setActiveWeek(w.numero)}
+              style={{
+                flexShrink: 0, padding: '.5rem .875rem',
+                borderRadius: 99, border: `2px solid ${activeWeek === w.numero ? 'var(--primary)' : 'var(--border)'}`,
+                background: activeWeek === w.numero ? 'linear-gradient(135deg,rgba(139,47,201,.35),rgba(232,35,122,.25))' : 'var(--surface)',
+                color: activeWeek === w.numero ? '#fff' : 'var(--text-muted)',
+                fontWeight: activeWeek === w.numero ? 700 : 500,
+                fontSize: '.8rem', cursor: 'pointer', fontFamily: 'inherit',
+                whiteSpace: 'nowrap'
+              }}>
+              {weekDateRange(planStart, w.numero)}
+              {pct === 1 && <span style={{ marginLeft: '.3rem' }}>✅</span>}
+            </button>
+          )
+        })}
+      </div>
+
+      {/* Current week header */}
+      {currentWeekData && (
+        <div className="card" style={{ marginBottom: '1.25rem', background: 'linear-gradient(135deg,#1A1A2E,#2D1B4E)', color: '#fff' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <div>
+              <div style={{ fontSize: '.8rem', opacity: .7, marginBottom: '.2rem' }}>
+                {weekDateRange(plan.activated_at || plan.created_at, currentWeekData.numero)}
+              </div>
+              <div style={{ fontWeight: 700, fontSize: '1.1rem' }}>{currentWeekData.phase}</div>
+              {(() => {
+                const courseCount = currentWeekData.seances?.filter(s => !String(s.type || '').toLowerCase().includes('renforcement')).length || 0
+                const renfoCount  = currentWeekData.seances?.filter(s =>  String(s.type || '').toLowerCase().includes('renforcement')).length || 0
+                return (
+                  <div style={{ fontSize: '.75rem', color: 'rgba(255,255,255,.55)', marginTop: '.2rem' }}>
+                    {courseCount} séance{courseCount > 1 ? 's' : ''} de course{renfoCount > 0 ? ` + ${renfoCount} renforcement` : ''}
+                  </div>
+                )
+              })()}
+            </div>
+            <span style={{ padding: '.3rem .75rem', borderRadius: 99,
+              background: 'rgba(255,255,255,.15)', fontSize: '.8rem', fontWeight: 600 }}>
+              {currentWeekData.charge}
+            </span>
+          </div>
+        </div>
+      )}
+
+      {/* Sessions */}
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+        {currentWeekData?.seances?.map((session, idx) => {
+          const done = isCompleted(currentWeekData.numero, idx)
+          const color = SESSION_TYPE_COLORS[session.type] || 'var(--primary)'
+          return (
+            <div key={idx} className="card"
+              style={{
+                borderLeft: `4px solid ${done ? 'var(--success)' : color}`,
+                opacity: done ? .75 : 1, cursor: 'pointer',
+                transition: 'transform .15s, box-shadow .15s'
+              }}
+              onClick={() => setModal({ session: { ...session, _isDone: done, _dateLabel: sessionDate(plan.activated_at || plan.created_at, currentWeekData.numero, session.jour) }, weekNum: currentWeekData.numero, sessionIdx: idx })}
+              onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.boxShadow = 'var(--shadow-lg)' }}
+              onMouseLeave={e => { e.currentTarget.style.transform = ''; e.currentTarget.style.boxShadow = '' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '.5rem', marginBottom: '.3rem' }}>
+                    <span style={{ fontSize: '.75rem', fontWeight: 600, color, background: color + '18', padding: '.15rem .5rem', borderRadius: 99 }}>
+                      {session.type}
+                    </span>
+                    {done && <span className="badge badge-success">✅ Effectué</span>}
+                  </div>
+                  <h4 style={{ marginBottom: '.2rem' }}>{session.titre}</h4>
+                  <div style={{ fontSize: '.8rem', color: 'var(--text-muted)' }}>
+                    {sessionDate(plan.activated_at || plan.created_at, currentWeekData.numero, session.jour)} · {session.duree_min} min
+                  </div>
+                </div>
+                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '.4rem', flexShrink: 0 }}>
+                  <div style={{ textAlign: 'right' }}>
+                    <div style={{ fontSize: '.75rem', color: 'var(--text-muted)' }}>RPE cible</div>
+                    <div style={{ fontWeight: 700, color: 'var(--primary)' }}>{session.rpe_cible}/10</div>
+                  </div>
+                  <ExportBtn
+                    session={session}
+                    suuntoConnected={profile?.suunto_connected}
+                    garminConnected={profile?.garmin_connected}
+                    userId={profile?.id}
+                  />
+                </div>
+              </div>
+              {session.notes_coach && (
+                <p style={{ marginTop: '.6rem', fontSize: '.8rem', color: 'var(--text-muted)', fontStyle: 'italic',
+                  overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                  💬 "{session.notes_coach}"
+                </p>
+              )}
+            </div>
+          )
+        })}
+      </div>
+
+      {/* Weekly feedback, appears when all sessions of active week are done */}
+      {(() => {
+        if (!currentWeekData) return null
+        const total = currentWeekData.seances?.length || 0
+        const done = completions.filter(c => c.week_number === currentWeekData.numero).length
+        const hasFeedback = weekFeedbacks.some(f => f.week_number === currentWeekData.numero)
+        if (total > 0 && done === total && !hasFeedback) {
+          return (
+            <WeeklyFeedbackCard
+              weekNum={currentWeekData.numero}
+              planId={plan.id}
+              userId={profile.id}
+              onSaved={loadPlan}
+            />
+          )
+        }
+        return null
+      })()}
+
+      {modal && (
+        <SessionDetailPage
+          session={modal.session}
+          weekNum={modal.weekNum}
+          sessionIdx={modal.sessionIdx}
+          planId={plan.id}
+          vma={profile?.vma}
+          onClose={() => setModal(null)}
+          onDone={() => { setModal(null); loadPlan() }}
+          onStartFlow={() => setPostFlow({
+            session:         modal.session,
+            weekNum:         modal.weekNum,
+            sessionIdx:      modal.sessionIdx,
+            weekSessions:    currentWeekData?.seances || [],
+            weekCompletions: completions.filter(c => c.week_number === modal.weekNum),
+          })}
+        />
+      )}
+
+
+      {postFlow && (
+        <PostSessionFlow
+          session={postFlow.session}
+          weekNum={postFlow.weekNum}
+          sessionIdx={postFlow.sessionIdx}
+          planId={plan.id}
+          weekSessions={postFlow.weekSessions}
+          weekCompletions={postFlow.weekCompletions}
+          onClose={() => setPostFlow(null)}
+          onDone={() => { loadPlan() }}
+        />
+      )}
+    </div>
+  )
+}
