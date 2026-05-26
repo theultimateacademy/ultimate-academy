@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react'
 import { Link, useParams, Navigate } from 'react-router-dom'
-
-const API = import.meta.env.VITE_API_URL || 'http://localhost:3001'
+import { supabase } from '../lib/supabase'
 
 function formatDate(iso) {
   return new Date(iso).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })
@@ -14,9 +13,15 @@ export default function BlogArticle() {
   const [notFound, setNotFound] = useState(false)
 
   useEffect(() => {
-    fetch(`${API}/api/blog/articles/${slug}`)
-      .then(r => { if (r.status === 404) { setNotFound(true); return null } return r.json() })
-      .then(d => { if (d) setArticle(d.article) })
+    supabase
+      .from('articles')
+      .select('*')
+      .eq('slug', slug)
+      .single()
+      .then(({ data, error }) => {
+        if (error || !data) { setNotFound(true); return }
+        setArticle(data)
+      })
       .catch(() => setNotFound(true))
       .finally(() => setLoading(false))
   }, [slug])

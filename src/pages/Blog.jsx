@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
-
-const API = import.meta.env.VITE_API_URL || 'http://localhost:3001'
+import { supabase } from '../lib/supabase'
 
 function formatDate(iso) {
   return new Date(iso).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })
@@ -13,9 +12,15 @@ export default function Blog() {
   const [error, setError]       = useState(null)
 
   useEffect(() => {
-    fetch(`${API}/api/blog/articles?limit=12`)
-      .then(r => r.json())
-      .then(d => setArticles(d.articles || []))
+    supabase
+      .from('articles')
+      .select('id, title, slug, excerpt, image_url, image_alt, tags, published_at')
+      .order('published_at', { ascending: false })
+      .limit(12)
+      .then(({ data, error }) => {
+        if (error) throw error
+        setArticles(data || [])
+      })
       .catch(() => setError('Impossible de charger les articles.'))
       .finally(() => setLoading(false))
   }, [])
