@@ -21,13 +21,14 @@ export default function Blog() {
   const [articles, setArticles] = useState([])
   const [loading, setLoading]   = useState(true)
   const [error, setError]       = useState(null)
+  const [query, setQuery]       = useState('')
 
   useEffect(() => {
     supabase
       .from('articles')
       .select('id, title, slug, excerpt, image_url, image_alt, tags, reading_time, published_at')
       .order('published_at', { ascending: false })
-      .limit(12)
+      .limit(50)
       .then(({ data, error }) => {
         if (error) throw error
         setArticles(data || [])
@@ -35,6 +36,15 @@ export default function Blog() {
       .catch(() => setError('Impossible de charger les articles.'))
       .finally(() => setLoading(false))
   }, [])
+
+  const q = query.trim().toLowerCase()
+  const filtered = q
+    ? articles.filter(a =>
+        a.title?.toLowerCase().includes(q) ||
+        a.excerpt?.toLowerCase().includes(q) ||
+        a.tags?.some(t => t.toLowerCase().includes(q))
+      )
+    : articles
 
   return (
     <div style={{ background: '#000', minHeight: '100vh', color: '#fff', paddingTop: 72 }}>
@@ -52,9 +62,43 @@ export default function Blog() {
           <h1 style={{ fontSize: 'clamp(2rem,5vw,3.2rem)', fontWeight: 800, letterSpacing: '-0.025em', marginBottom: '.75rem', lineHeight: 1.1 }}>
             Conseils &amp; <span style={{ background: 'linear-gradient(135deg,#8B2FC9,#E8237A)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>Programmes</span>
           </h1>
-          <p style={{ color: 'rgba(255,255,255,.4)', fontSize: '1rem', maxWidth: 460, margin: '0 auto' }}>
+          <p style={{ color: 'rgba(255,255,255,.4)', fontSize: '1rem', maxWidth: 460, margin: '0 auto .5rem' }}>
             Articles et plans d'entraînement pour progresser en course à pied.
           </p>
+        </div>
+
+        {/* Search bar */}
+        <div style={{ maxWidth: 560, margin: '0 auto 3.5rem', position: 'relative' }}>
+          <div style={{ position: 'absolute', left: '1.1rem', top: '50%', transform: 'translateY(-50%)', pointerEvents: 'none' }}>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,.35)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+            </svg>
+          </div>
+          <input
+            type="text"
+            value={query}
+            onChange={e => setQuery(e.target.value)}
+            placeholder="Rechercher un article, un mot-clé…"
+            style={{
+              width: '100%',
+              background: 'rgba(255,255,255,.06)',
+              border: '1px solid rgba(255,255,255,.12)',
+              borderRadius: 14,
+              padding: '.85rem 1.1rem .85rem 3rem',
+              color: '#fff',
+              fontSize: '.95rem',
+              outline: 'none',
+              boxSizing: 'border-box',
+              transition: 'border-color .2s',
+            }}
+            onFocus={e => e.target.style.borderColor = 'rgba(139,47,201,.6)'}
+            onBlur={e => e.target.style.borderColor = 'rgba(255,255,255,.12)'}
+          />
+          {query && (
+            <button onClick={() => setQuery('')} style={{ position: 'absolute', right: '1rem', top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', color: 'rgba(255,255,255,.35)', cursor: 'pointer', fontSize: '1.1rem', lineHeight: 1 }}>
+              ×
+            </button>
+          )}
         </div>
 
         {loading && (
@@ -65,14 +109,14 @@ export default function Blog() {
         {error && (
           <div style={{ textAlign: 'center', padding: '4rem', color: 'rgba(255,255,255,.35)' }}>{error}</div>
         )}
-        {!loading && articles.length === 0 && (
+        {!loading && filtered.length === 0 && (
           <div style={{ textAlign: 'center', padding: '4rem', color: 'rgba(255,255,255,.35)' }}>
-            Les premiers articles arrivent très bientôt…
+            {q ? `Aucun article trouvé pour "${query}".` : 'Les premiers articles arrivent très bientôt…'}
           </div>
         )}
 
-        {/* Featured article — rotates every week */}
-        {articles.length > 0 && (() => {
+        {/* Featured article — hidden during search, rotates every week */}
+        {!q && articles.length > 0 && (() => {
           const fi = currentWeekIndex(articles.length)
           const f  = articles[fi]
           return (
@@ -120,9 +164,9 @@ export default function Blog() {
           )
         })()}
 
-        {/* Grid — all articles except featured */}
+        {/* Grid */}
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(310px, 1fr))', gap: '1.5rem' }}>
-          {articles.filter((_, i) => i !== currentWeekIndex(articles.length)).map(article => (
+          {(q ? filtered : articles.filter((_, i) => i !== currentWeekIndex(articles.length))).map(article => (
             <Link key={article.id} to={`/blog/${article.slug}`} style={{ textDecoration: 'none' }}>
               <article className="article-card" style={{
                 background: 'rgba(255,255,255,.04)',
