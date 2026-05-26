@@ -74,7 +74,7 @@ const glowStyle = `
 `
 
 export default function Login() {
-  const { signIn, profile } = useAuth()
+  const { signIn, resetPassword, profile } = useAuth()
   const navigate  = useNavigate()
   const location  = useLocation()
   const [mode, setMode]       = useState(null)
@@ -83,6 +83,8 @@ export default function Login() {
   const [loading, setLoading] = useState(false)
   const [creating, setCreating] = useState(false)
   const [createMsg, setCreateMsg] = useState('')
+  const [resetSent, setResetSent] = useState(false)
+  const [resetLoading, setResetLoading] = useState(false)
 
   const handleCreateCoach = async () => {
     if (!form.password || form.password.length < 8) {
@@ -113,6 +115,18 @@ export default function Login() {
     if (profile.subscription_status !== 'active') { navigate('/welcome'); return null }
     if (!profile.profile_completed) { navigate('/onboarding'); return null }
     navigate(from || '/app/home'); return null
+  }
+
+  const handleReset = async (email) => {
+    setResetLoading(true); setError('')
+    try {
+      await resetPassword(email)
+      setResetSent(true)
+    } catch (err) {
+      setError(err.message || 'Erreur lors de l\'envoi.')
+    } finally {
+      setResetLoading(false)
+    }
   }
 
   const handleSubmit = async (e) => {
@@ -223,6 +237,13 @@ export default function Login() {
                     {creating ? <><div className="spinner spinner-sm" /> Création…</> : 'Première fois ? Créer mon compte coach'}
                   </button>
                 </form>
+                {resetSent
+                  ? <p style={{ textAlign: 'center', color: '#4ade80', fontSize: '.85rem', marginTop: '1rem' }}>✅ Email envoyé à {COACH_EMAIL}</p>
+                  : <button onClick={() => handleReset(COACH_EMAIL)} disabled={resetLoading}
+                      style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-muted)', fontSize: '.82rem', marginTop: '.75rem', display: 'block', width: '100%', textAlign: 'center' }}>
+                      {resetLoading ? 'Envoi…' : 'Mot de passe oublié ?'}
+                    </button>
+                }
               </>
             )}
 
@@ -256,6 +277,14 @@ export default function Login() {
                     {loading ? <><div className="spinner spinner-sm" /> Connexion…</> : 'Se connecter'}
                   </button>
                 </form>
+                {resetSent
+                  ? <p style={{ textAlign: 'center', color: '#4ade80', fontSize: '.85rem', marginTop: '1rem' }}>✅ Email de réinitialisation envoyé !</p>
+                  : <button onClick={() => form.email ? handleReset(form.email) : setError('Entre ton email puis clique sur "Mot de passe oublié ?".')}
+                      disabled={resetLoading}
+                      style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-muted)', fontSize: '.82rem', marginTop: '.75rem', display: 'block', width: '100%', textAlign: 'center' }}>
+                      {resetLoading ? 'Envoi…' : 'Mot de passe oublié ?'}
+                    </button>
+                }
 
                 <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', margin: '1.5rem 0 1.25rem' }}>
                   <div className="divider-line" />

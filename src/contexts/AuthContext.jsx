@@ -66,6 +66,13 @@ export function AuthProvider({ children }) {
     setProfile(null)
   }
 
+  async function resetPassword(email) {
+    const { error } = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: `${window.location.origin}/reset-password`
+    })
+    if (error) throw error
+  }
+
   const isCoach    = profile?.role === 'coach'
   const isActive   = ['active', 'trialing'].includes(profile?.subscription_status)
   const isTrialing = profile?.subscription_status === 'trialing'
@@ -74,7 +81,7 @@ export function AuthProvider({ children }) {
   return (
     <AuthContext.Provider value={{
       user, profile, loading,
-      signUp, signIn, signOut,
+      signUp, signIn, signOut, resetPassword,
       refreshProfile, updateProfile,
       isCoach, isActive, isTrialing, hasProfile
     }}>

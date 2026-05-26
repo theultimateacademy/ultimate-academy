@@ -9,6 +9,7 @@ import CookieBanner  from './components/UI/CookieBanner'
 import Landing        from './pages/Landing'
 import Login          from './pages/auth/Login'
 import Register       from './pages/auth/Register'
+import ResetPassword  from './pages/auth/ResetPassword'
 import CheckoutSuccess from './pages/auth/CheckoutSuccess'
 import ProfileWizard  from './pages/onboarding/ProfileWizard'
 import Privacy        from './pages/legal/Privacy'
@@ -70,8 +71,9 @@ function AppRoutes() {
   return (
     <Routes>
       <Route path="/"           element={<Landing />} />
-      <Route path="/login"      element={<Login />} />
-      <Route path="/register"   element={<Register />} />
+      <Route path="/login"          element={<Login />} />
+      <Route path="/register"       element={<Register />} />
+      <Route path="/reset-password" element={<ResetPassword />} />
       <Route path="/dev-login" element={<DevLogin />} />
       <Route path="/welcome"  element={<RequireAuth><CheckoutSuccess /></RequireAuth>} />
       <Route path="/onboarding" element={<RequireAuth><ProfileWizard /></RequireAuth>} />
