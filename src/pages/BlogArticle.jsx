@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { Link, useParams, Navigate } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
+import BlogNav from '../components/BlogNav'
 
 function formatDate(iso) {
   return new Date(iso).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })
@@ -23,12 +24,6 @@ function cleanContent(html) {
     .replace(/–/g, '-')
 }
 
-const RUNNING_IMAGES = [
-  'https://images.unsplash.com/photo-1571008887538-b36bb32f4571?w=900&fit=crop&q=75',
-  'https://images.unsplash.com/photo-1461896836934-ffe607ba8211?w=900&fit=crop&q=75',
-  'https://images.unsplash.com/photo-1486218119243-13301bc7d365?w=900&fit=crop&q=75',
-  'https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?w=900&fit=crop&q=75',
-]
 
 const TOOL_CTAS = [
   {
@@ -94,22 +89,6 @@ function ToolCta({ index }) {
   )
 }
 
-function SectionImage({ index }) {
-  const [failed, setFailed] = useState(false)
-  const src = RUNNING_IMAGES[index % RUNNING_IMAGES.length]
-  if (failed) return null
-  return (
-    <div style={{ borderRadius: 16, overflow: 'hidden', margin: '2.5rem 0', boxShadow: '0 12px 40px rgba(0,0,0,.4)' }}>
-      <img
-        src={src}
-        alt="course à pied"
-        onError={() => setFailed(true)}
-        style={{ width: '100%', maxHeight: 340, objectFit: 'cover', display: 'block' }}
-      />
-    </div>
-  )
-}
-
 function ArticleContent({ html }) {
   const cleaned = cleanContent(html)
   const sections = cleaned.split(/(?=<h2)/)
@@ -119,10 +98,8 @@ function ArticleContent({ html }) {
       {sections.map((section, i) => (
         <div key={i}>
           <div className="article-content" dangerouslySetInnerHTML={{ __html: section }} />
-          {i < sections.length - 1 && (
-            i % 2 === 0
-              ? <ToolCta index={Math.floor(i / 2)} />
-              : <SectionImage index={i} />
+          {i < sections.length - 1 && i % 2 === 1 && (
+            <ToolCta index={Math.floor(i / 2)} />
           )}
         </div>
       ))}
@@ -166,14 +143,7 @@ export default function BlogArticle() {
     <div style={{ background: '#000', minHeight: '100vh', color: '#fff' }}>
 
       {/* Nav */}
-      <nav style={{ padding: '1rem 1.5rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid rgba(255,255,255,.07)', position: 'sticky', top: 0, background: 'rgba(0,0,0,.85)', backdropFilter: 'blur(20px)', zIndex: 50 }}>
-        <Link to="/"><img src="/Logo.png" alt="The Ultimate Academy" style={{ height: 60, width: 'auto', flexShrink: 0 }} /></Link>
-        <div style={{ display: 'flex', gap: '.5rem', alignItems: 'center' }}>
-          <Link to="/blog" style={navLink}>← Blog</Link>
-          <Link to="/calculateur" style={{ ...navLink, display: 'none' }} className="nav-outils">Outils gratuits</Link>
-          <Link to="/register" style={navCta}>Rejoindre</Link>
-        </div>
-      </nav>
+      <BlogNav />
 
       <article style={{ maxWidth: 740, margin: '0 auto', padding: '3.5rem 1.25rem 7rem', wordBreak: 'break-word', overflowWrap: 'break-word' }}>
 
@@ -264,30 +234,6 @@ export default function BlogArticle() {
       `}</style>
     </div>
   )
-}
-
-const navLink = {
-  color: 'rgba(255,255,255,.55)',
-  fontSize: '.88rem',
-  textDecoration: 'none',
-  padding: '.4rem .6rem',
-  borderRadius: 8,
-  minHeight: 44,
-  display: 'flex',
-  alignItems: 'center',
-}
-
-const navCta = {
-  background: 'linear-gradient(135deg,#8B2FC9,#E8237A)',
-  color: '#fff',
-  padding: '.5rem 1.1rem',
-  borderRadius: 10,
-  fontSize: '.88rem',
-  textDecoration: 'none',
-  fontWeight: 700,
-  minHeight: 44,
-  display: 'flex',
-  alignItems: 'center',
 }
 
 const tagStyle = {
