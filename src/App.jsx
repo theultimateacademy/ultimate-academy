@@ -10,6 +10,8 @@ import Landing        from './pages/Landing'
 import Login          from './pages/auth/Login'
 import Register       from './pages/auth/Register'
 import ResetPassword  from './pages/auth/ResetPassword'
+import Blog           from './pages/Blog'
+import BlogArticle    from './pages/BlogArticle'
 import CheckoutSuccess from './pages/auth/CheckoutSuccess'
 import ProfileWizard  from './pages/onboarding/ProfileWizard'
 import Privacy        from './pages/legal/Privacy'
@@ -71,6 +73,8 @@ function AppRoutes() {
   return (
     <Routes>
       <Route path="/"           element={<Landing />} />
+      <Route path="/blog"            element={<Blog />} />
+      <Route path="/blog/:slug"     element={<BlogArticle />} />
       <Route path="/login"          element={<Login />} />
       <Route path="/register"       element={<Register />} />
       <Route path="/reset-password" element={<ResetPassword />} />

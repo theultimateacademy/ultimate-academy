@@ -102,6 +102,7 @@ export default function Landing() {
           {[['Mon coach','coach'],['Programme','features'],['Résultats','resultats'],['Tarifs','tarifs'],['FAQ','faq']].map(([l,id]) => (
             <button key={id} className="landing-nav-link" onClick={() => scrollTo(id)}>{l}</button>
           ))}
+          <Link to="/blog" className="landing-nav-link" style={{ textDecoration: 'none' }}>Blog</Link>
           <div ref={toolsRef} style={{ position: 'relative' }}>
             <button className="landing-nav-link"
               onClick={() => setOpenTools(o => !o)}

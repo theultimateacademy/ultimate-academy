@@ -17,7 +17,6 @@ const REQUIRED_ENV = [
   'STRIPE_WEBHOOK_SECRET',
   'ANTHROPIC_API_KEY',
 ];
-console.log('[DEBUG] Service:', process.env.RAILWAY_SERVICE_NAME, '| Env:', process.env.RAILWAY_ENVIRONMENT_NAME);
 
 const missing = REQUIRED_ENV.filter(k => !process.env[k]);
 if (missing.length) {
@@ -38,6 +37,7 @@ const suuntoRoutes    = require('./routes/suunto');
 const garminRoutes    = require('./routes/garmin');
 const devRoutes       = require('./routes/dev');
 const adminRoutes     = require('./routes/admin');
+const { router: blogRoutes, generateAndPublish } = require('./routes/blog');
 
 const app  = express();
 const PORT = process.env.PORT || 3001;
@@ -61,6 +61,17 @@ app.use('/auth/garmin', garminRoutes);
 app.use('/api/garmin',  garminRoutes);
 app.use('/api/dev',     devRoutes);
 app.use('/api/admin',  adminRoutes);
+app.use('/api/blog',   blogRoutes);
+
+// Blog auto-publish — Monday, Wednesday, Friday at 11:00
+cron.schedule('0 11 * * 1,3,5', async () => {
+  console.log('[CRON] Blog auto-publish triggered…');
+  try {
+    await generateAndPublish();
+  } catch (err) {
+    console.error('[CRON] Blog publish error:', err.message);
+  }
+});
 
 // Pre-race analysis — every day at 06:00 (J-7)
 cron.schedule('0 6 * * *', async () => {
