@@ -504,9 +504,11 @@ tr:hover td { background: rgba(255,255,255,.04); }
   .messaging-list { width: 100% !important; }
   .messaging-list .msg-header { padding: 1rem !important; }
 
-  /* Bottom nav : labels plus petits pour 7 items */
-  .bottom-nav-item        { font-size: .6rem; }
-  .bottom-nav-item .icon  { font-size: 1.2rem; }
+  /* Bottom nav scrollable horizontalement pour 7 items */
+  .bottom-nav                    { overflow-x: auto; overflow-y: hidden; scrollbar-width: none; }
+  .bottom-nav::-webkit-scrollbar { display: none; }
+  .bottom-nav-item               { flex: 0 0 68px; font-size: .68rem; }
+  .bottom-nav-item .icon         { font-size: 1.3rem; }
 }
 
 /* ── Misc helpers ────────────────────────────────────────── */
