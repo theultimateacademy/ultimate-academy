@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { Link, useParams, Navigate } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
-import BlogNav from '../components/BlogNav'
+import Nav from '../components/Nav'
 import BlogFooter from '../components/BlogFooter'
 
 function formatDate(iso) {
@@ -144,7 +144,7 @@ export default function BlogArticle() {
     <div style={{ background: '#000', minHeight: '100vh', color: '#fff', paddingTop: 72 }}>
 
       {/* Nav */}
-      <BlogNav />
+      <Nav />
 
       <article style={{ maxWidth: 740, margin: '0 auto', padding: '3.5rem 1.25rem 7rem', wordBreak: 'break-word', overflowWrap: 'break-word' }}>
 

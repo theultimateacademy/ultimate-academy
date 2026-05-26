@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react'
 import { useNavigate, useLocation, Link } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
-import ToolsNav from '../components/Layout/ToolsNav'
+import Nav from '../components/Nav'
 import ToolsFooter from '../components/Layout/ToolsFooter'
 import { TESTIMONIALS_CALCULATOR, FUEL_PLAN } from '../lib/toolsContent'
 import TestimonialsCarousel from '../components/TestimonialsCarousel'
@@ -171,7 +171,7 @@ export default function Calculator() {
 
   return (
     <div style={{ background:'#000', color:'#fff', overflowX:'hidden' }}>
-      <ToolsNav />
+      <Nav />
 
       {/* ── HERO ──────────────────────────────────────────────── */}
       <section style={{ position:'relative', minHeight:'100vh', display:'flex', flexDirection:'column', justifyContent:'center', alignItems:'center', textAlign:'center', background:'linear-gradient(135deg,#0C0A18 0%,#12102a 50%,#1a0d30 100%)', overflow:'hidden' }}>

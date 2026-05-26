@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
-import ToolsNav from '../../components/Layout/ToolsNav'
+import Nav from '../../components/Nav'
 import ToolsFooter from '../../components/Layout/ToolsFooter'
 import { kmhToPace, DIST_PRESETS, VMA_ZONES } from '../../lib/runCalc'
 import { TESTIMONIALS_VMA } from '../../lib/toolsContent'
@@ -73,7 +73,7 @@ export default function VMACalculator() {
 
   return (
     <div style={{ background:'#000', color:'#fff', overflowX:'hidden' }}>
-      <ToolsNav />
+      <Nav />
 
       {/* HERO */}
       <section style={{ position:'relative', minHeight:'100vh', display:'flex', flexDirection:'column', justifyContent:'center', alignItems:'center', textAlign:'center', background:'linear-gradient(135deg,#0C0A18 0%,#12102a 50%,#1a0d30 100%)', overflow:'hidden' }}>

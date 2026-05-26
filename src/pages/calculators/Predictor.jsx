@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
-import ToolsNav from '../../components/Layout/ToolsNav'
+import Nav from '../../components/Nav'
 import ToolsFooter from '../../components/Layout/ToolsFooter'
 import { fmtHMS, DIST_PRESETS } from '../../lib/runCalc'
 import { TESTIMONIALS_PREDICTOR, FUEL_PLAN, EQUIV_TABLE } from '../../lib/toolsContent'
@@ -108,7 +108,7 @@ export default function PredictorCalculator() {
 
   return (
     <div style={{ background: '#fff', color: '#1a1a2e', overflowX: 'hidden', minHeight: '100vh' }}>
-      <ToolsNav />
+      <Nav />
 
       {/* ── HERO ───────────────────────────────────────── */}
       <section style={{
