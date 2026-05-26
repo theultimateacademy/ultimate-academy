@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Link, useNavigate, useLocation } from 'react-router-dom'
+import { Link, useNavigate, useLocation, Navigate } from 'react-router-dom'
 import { useAuth } from '../../contexts/AuthContext'
 
 const COACH_EMAIL = 'alexiselie1912@gmail.com'
@@ -74,7 +74,7 @@ const glowStyle = `
 `
 
 export default function Login() {
-  const { signIn, resetPassword, profile } = useAuth()
+  const { signIn, resetPassword, profile, loading } = useAuth()
   const navigate  = useNavigate()
   const location  = useLocation()
   const [mode, setMode]       = useState(null)
@@ -110,11 +110,11 @@ export default function Login() {
 
   const from = location.state?.from?.pathname || null
 
-  if (profile) {
-    if (profile.role === 'coach') { navigate('/admin'); return null }
-    if (profile.subscription_status !== 'active') { navigate('/welcome'); return null }
-    if (!profile.profile_completed) { navigate('/onboarding'); return null }
-    navigate(from || '/app/home'); return null
+  if (!loading && profile) {
+    if (profile.role === 'coach') return <Navigate to="/admin" replace />
+    if (!['active', 'trialing'].includes(profile.subscription_status)) return <Navigate to="/welcome" replace />
+    if (!profile.profile_completed) return <Navigate to="/onboarding" replace />
+    return <Navigate to={from || '/app/home'} replace />
   }
 
   const handleReset = async (email) => {
