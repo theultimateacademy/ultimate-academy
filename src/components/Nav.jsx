@@ -46,10 +46,10 @@ const TOOLS = [
 ]
 
 const SECTIONS = [
-  { label: 'Mon coach',  id: 'coach' },
   { label: 'Programme',  id: 'features' },
-  { label: 'Résultats',  id: 'resultats' },
+  { label: 'Mon coach',  id: 'coach' },
   { label: 'Tarifs',     id: 'tarifs' },
+  { label: 'Résultats',  id: 'resultats' },
   { label: 'FAQ',        id: 'faq' },
 ]
 
