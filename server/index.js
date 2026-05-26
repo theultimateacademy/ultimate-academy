@@ -1,9 +1,13 @@
 const fs = require('fs');
-console.log('[DEBUG] .env exists:', fs.existsSync('.env'));
-if (fs.existsSync('.env')) {
-  console.log('[DEBUG] .env size:', fs.statSync('.env').size, 'bytes');
-}
-// require('dotenv').config(); // disabled to test Railway variable injection
+const envPaths = ['/etc/railway', '/run/railway', '/run/secrets', '/railway', '/etc/secrets'];
+envPaths.forEach(p => {
+  try {
+    if (fs.existsSync(p)) {
+      console.log('[DEBUG] Found path:', p, JSON.stringify(fs.readdirSync(p)));
+    }
+  } catch(e) {}
+});
+// require('dotenv').config();
 
 process.on('unhandledRejection', (reason) => {
   console.error('[CRASH] Unhandled rejection:', reason);
