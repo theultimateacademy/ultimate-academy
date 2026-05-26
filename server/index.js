@@ -1,13 +1,4 @@
-const fs = require('fs');
-const envPaths = ['/etc/railway', '/run/railway', '/run/secrets', '/railway', '/etc/secrets'];
-envPaths.forEach(p => {
-  try {
-    if (fs.existsSync(p)) {
-      console.log('[DEBUG] Found path:', p, JSON.stringify(fs.readdirSync(p)));
-    }
-  } catch(e) {}
-});
-// require('dotenv').config();
+require('dotenv').config();
 
 process.on('unhandledRejection', (reason) => {
   console.error('[CRASH] Unhandled rejection:', reason);
