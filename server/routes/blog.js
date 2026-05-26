@@ -57,7 +57,13 @@ async function fetchImage(query) {
   }
 }
 
-async function generateAndPublish(forceTopic) {
+function calcReadingTime(content) {
+  const text = (content || '').replace(/<[^>]*>/g, ' ')
+  const words = text.trim().split(/\s+/).filter(Boolean).length
+  return Math.max(2, Math.ceil(words / 200))
+}
+
+async function generateAndPublish(forceTopic, overrideDate) {
   const topic = forceTopic || await getNextTopic();
 
   const completion = await anthropic.messages.create({
@@ -108,7 +114,8 @@ Retourne UNIQUEMENT un JSON valide (sans markdown, sans \`\`\`) avec exactement 
     image_url:    imageUrl,
     image_alt:    imageAlt || topic.image_query,
     tags:         article.tags || [],
-    published_at: new Date().toISOString(),
+    reading_time: calcReadingTime(article.content),
+    published_at: overrideDate || new Date().toISOString(),
   }).select().single();
 
   if (error) throw error;
@@ -127,13 +134,12 @@ router.post('/generate', async (req, res) => {
       ? { subject: req.body.subject, image_query: req.body.image_query || 'running marathon' }
       : null;
 
-    // Optional: delete an existing article before regenerating
     if (req.body?.delete_slug) {
       await supabase.from('articles').delete().eq('slug', req.body.delete_slug);
       console.log(`[Blog] Deleted article: ${req.body.delete_slug}`);
     }
 
-    const article = await generateAndPublish(forceTopic);
+    const article = await generateAndPublish(forceTopic, req.body?.published_at || null);
     res.json({ success: true, title: article.title, slug: article.slug });
   } catch (err) {
     console.error('[Blog] Generate error:', err.message);

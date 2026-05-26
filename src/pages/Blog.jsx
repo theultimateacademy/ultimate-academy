@@ -12,9 +12,9 @@ function capitalizeTag(tag) {
   return tag.charAt(0).toUpperCase() + tag.slice(1)
 }
 
-function estimateReadingTime(id) {
-  const n = id ? parseInt(id.replace(/-/g, '').slice(0, 8), 16) : 0
-  return (n % 3) + 3
+function currentWeekIndex(count) {
+  const weekNum = Math.floor(Date.now() / (7 * 24 * 60 * 60 * 1000))
+  return count > 0 ? weekNum % count : 0
 }
 
 export default function Blog() {
@@ -25,7 +25,7 @@ export default function Blog() {
   useEffect(() => {
     supabase
       .from('articles')
-      .select('id, title, slug, excerpt, image_url, image_alt, tags, published_at')
+      .select('id, title, slug, excerpt, image_url, image_alt, tags, reading_time, published_at')
       .order('published_at', { ascending: false })
       .limit(12)
       .then(({ data, error }) => {
@@ -71,53 +71,58 @@ export default function Blog() {
           </div>
         )}
 
-        {/* Featured first article */}
-        {articles.length > 0 && (
-          <Link to={`/blog/${articles[0].slug}`} style={{ textDecoration: 'none', display: 'block', marginBottom: '3rem' }}>
-            <article className="featured-card" style={{
-              background: 'rgba(255,255,255,.03)',
-              border: '1px solid rgba(255,255,255,.07)',
-              borderRadius: 24,
-              overflow: 'hidden',
-              display: 'grid',
-              gridTemplateColumns: articles[0].image_url ? '1.1fr 1fr' : '1fr',
-            }}>
-              {articles[0].image_url && (
-                <div style={{ minHeight: 320, overflow: 'hidden', position: 'relative' }}>
-                  <img src={articles[0].image_url} alt={articles[0].image_alt || articles[0].title}
-                    style={{ width: '100%', height: '100%', objectFit: 'cover', position: 'absolute', inset: 0 }} />
-                </div>
-              )}
-              <div style={{ padding: '2.25rem 2rem', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
-                <div style={{ display: 'inline-flex', alignItems: 'center', gap: '.4rem', background: 'rgba(139,47,201,.2)', border: '1px solid rgba(139,47,201,.3)', borderRadius: 100, padding: '.22rem .85rem', fontSize: '.72rem', color: '#C084FC', fontWeight: 700, marginBottom: '1rem', width: 'fit-content' }}>
-                  À la une
-                </div>
-                {articles[0].tags?.length > 0 && (
-                  <div style={{ display: 'flex', gap: '.4rem', flexWrap: 'wrap', marginBottom: '1rem' }}>
-                    {articles[0].tags.slice(0, 3).map(tag => (
-                      <span key={tag} style={tagStyle}>{capitalizeTag(tag)}</span>
-                    ))}
+        {/* Featured article — rotates every week */}
+        {articles.length > 0 && (() => {
+          const fi = currentWeekIndex(articles.length)
+          const f  = articles[fi]
+          return (
+            <Link to={`/blog/${f.slug}`} style={{ textDecoration: 'none', display: 'block', marginBottom: '3rem' }}>
+              <article className="featured-card" style={{
+                background: 'rgba(255,255,255,.03)',
+                border: '1px solid rgba(255,255,255,.07)',
+                borderRadius: 24,
+                overflow: 'hidden',
+                display: 'grid',
+                gridTemplateColumns: f.image_url ? '1.1fr 1fr' : '1fr',
+              }}>
+                {f.image_url && (
+                  <div style={{ minHeight: 320, overflow: 'hidden', position: 'relative' }}>
+                    <img src={f.image_url} alt={f.image_alt || f.title}
+                      style={{ width: '100%', height: '100%', objectFit: 'cover', position: 'absolute', inset: 0 }} />
                   </div>
                 )}
-                <h2 style={{ fontSize: 'clamp(1.1rem,2.5vw,1.55rem)', fontWeight: 800, color: '#fff', marginBottom: '.8rem', lineHeight: 1.25, letterSpacing: '-0.01em' }}>
-                  {articles[0].title}
-                </h2>
-                <p style={{ fontSize: '.9rem', color: 'rgba(255,255,255,.45)', lineHeight: 1.75, marginBottom: '1.5rem' }}>
-                  {articles[0].excerpt}
-                </p>
-                <div style={{ display: 'flex', gap: '.6rem', alignItems: 'center', fontSize: '.78rem', color: 'rgba(255,255,255,.28)' }}>
-                  <span>{formatDate(articles[0].published_at)}</span>
-                  <span style={{ width: 3, height: 3, borderRadius: '50%', background: 'rgba(255,255,255,.2)', flexShrink: 0 }} />
-                  <span>⏱ {estimateReadingTime(articles[0].id)} min de lecture</span>
+                <div style={{ padding: '2.25rem 2rem', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+                  {/* Gradient badge */}
+                  <div style={{ display: 'inline-flex', alignItems: 'center', background: 'linear-gradient(135deg,#8B2FC9,#E8237A)', borderRadius: 100, padding: '.25rem .95rem', fontSize: '.72rem', color: '#fff', fontWeight: 700, marginBottom: '1rem', width: 'fit-content', boxShadow: '0 3px 12px rgba(232,35,122,.35)' }}>
+                    À la une
+                  </div>
+                  {f.tags?.length > 0 && (
+                    <div style={{ display: 'flex', gap: '.4rem', flexWrap: 'wrap', marginBottom: '1rem' }}>
+                      {f.tags.slice(0, 3).map(tag => (
+                        <span key={tag} style={tagStyle}>{capitalizeTag(tag)}</span>
+                      ))}
+                    </div>
+                  )}
+                  <h2 style={{ fontSize: 'clamp(1.1rem,2.5vw,1.55rem)', fontWeight: 800, color: '#fff', marginBottom: '.8rem', lineHeight: 1.25, letterSpacing: '-0.01em' }}>
+                    {f.title}
+                  </h2>
+                  <p style={{ fontSize: '.9rem', color: 'rgba(255,255,255,.45)', lineHeight: 1.75, marginBottom: '1.5rem' }}>
+                    {f.excerpt}
+                  </p>
+                  <div style={{ display: 'flex', gap: '.6rem', alignItems: 'center', fontSize: '.78rem', color: 'rgba(255,255,255,.28)' }}>
+                    <span>{formatDate(f.published_at)}</span>
+                    <span style={{ width: 3, height: 3, borderRadius: '50%', background: 'rgba(255,255,255,.2)', flexShrink: 0 }} />
+                    <span>⏱ {f.reading_time || 4} min de lecture</span>
+                  </div>
                 </div>
-              </div>
-            </article>
-          </Link>
-        )}
+              </article>
+            </Link>
+          )
+        })()}
 
-        {/* Grid */}
+        {/* Grid — all articles except featured */}
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(310px, 1fr))', gap: '1.5rem' }}>
-          {articles.slice(1).map(article => (
+          {articles.filter((_, i) => i !== currentWeekIndex(articles.length)).map(article => (
             <Link key={article.id} to={`/blog/${article.slug}`} style={{ textDecoration: 'none' }}>
               <article className="article-card" style={{
                 background: 'rgba(255,255,255,.04)',
@@ -156,7 +161,7 @@ export default function Blog() {
                   <div style={{ display: 'flex', gap: '.5rem', alignItems: 'center', fontSize: '.75rem', color: 'rgba(255,255,255,.25)' }}>
                     <span>{formatDate(article.published_at)}</span>
                     <span style={{ width: 3, height: 3, borderRadius: '50%', background: 'rgba(255,255,255,.18)', flexShrink: 0 }} />
-                    <span>⏱ {estimateReadingTime(article.id)} min</span>
+                    <span>⏱ {article.reading_time || 4} min</span>
                   </div>
                 </div>
               </article>
