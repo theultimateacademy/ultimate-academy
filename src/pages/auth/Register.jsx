@@ -119,7 +119,8 @@ export default function Register() {
               <div className="text-muted">Carte requise · Aucun débit pendant 14 jours · Annulable avant</div>
             </div>
 
-            <button type="submit" className="btn btn-primary btn-lg btn-full" disabled={loading}>
+            <button type="submit" className="btn btn-primary btn-full" disabled={loading}
+              style={{ whiteSpace: 'normal', lineHeight: 1.4, padding: '.9rem 1.25rem', fontSize: '1rem' }}>
               {loading ? <><div className="spinner spinner-sm" /> Création…</> : 'Créer mon compte et démarrer l\'essai'}
             </button>
 
