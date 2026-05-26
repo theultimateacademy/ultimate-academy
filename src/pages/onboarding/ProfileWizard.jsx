@@ -22,27 +22,34 @@ const WATCH_OPTIONS = [
   { v: 'aucune',  l: 'Aucune',  e: '📱', desc: "J'utilise mon téléphone" },
 ]
 
-const OBJECTIVE_OPTIONS = [
-  { v: 'route',      e: '🏃',  l: 'Course sur route',        desc: 'Du 5km au marathon, je veux performer' },
-  { v: 'trail',      e: '🏔️', l: 'Trail',                   desc: 'Sentiers et dénivelé, distance libre' },
-  { v: 'trail_20k',  e: '🏕️', l: 'Trail 20K',               desc: 'Un premier objectif trail accessible' },
-  { v: 'trail_50k',  e: '⛰️', l: 'Trail 50K',               desc: "L'ultra court — engagé et technique" },
-  { v: 'trail_100k', e: '🏔️', l: 'Trail 100K',              desc: "L'ultra long — une épreuve de fond" },
-  { v: 'trail_100m', e: '🌋', l: 'Trail 100M',              desc: '160km — l\'épreuve ultime de l\'endurance' },
-  { v: 'debutant',   e: '🌱', l: 'Commencer à courir',      desc: 'Je débute et veux progresser sans me blesser' },
-  { v: 'perf',       e: '⚡', l: 'Progresser et performer', desc: 'Je cours déjà et veux passer au niveau supérieur' },
+const ROAD_OPTIONS = [
+  { v: '5km',      e: '🏃', l: '5 km',          desc: 'Course courte et intense' },
+  { v: '10km',     e: '🏃', l: '10 km',         desc: 'Distance phare du running' },
+  { v: 'semi',     e: '🏃', l: 'Semi-marathon', desc: '21.1 km — le défi intermédiaire' },
+  { v: 'marathon', e: '🏃', l: 'Marathon',      desc: '42.2 km — le grand défi route' },
 ]
 
-// Map new objective values to the ones the backend knows
+const TRAIL_OPTIONS = [
+  { v: 'trail_20k',  e: '🏕️', l: 'Trail 20K',  desc: 'Un premier objectif trail accessible' },
+  { v: 'trail_50k',  e: '⛰️', l: 'Trail 50K',  desc: 'Défi technique et engagé' },
+  { v: 'trail_100k', e: '🏔️', l: 'Trail 100K', desc: "L'ultra long — une épreuve de fond" },
+  { v: 'trail_100m', e: '🌋', l: 'Trail 100M', desc: "160km — l'épreuve ultime de l'endurance" },
+]
+
+const TRAIL_VALUES = new Set(['trail_20k', 'trail_50k', 'trail_100k', 'trail_100m'])
+
 const OBJECTIVE_MAP = {
-  route:      '10km',
-  trail:      'marathon',
+  '5km':      '5km',
+  '10km':     '10km',
+  'semi':     'semi',
+  'marathon': 'marathon',
   trail_20k:  'trail_20k',
   trail_50k:  'trail_50k',
   trail_100k: 'trail_100k',
   trail_100m: 'trail_100m',
   debutant:   '5km',
   perf:       'semi',
+  route:      '10km',  // backward compat
 }
 
 const LEVEL_OPTIONS = [
@@ -101,6 +108,7 @@ export default function ProfileWizard() {
     injuries: '', injury_detail: '',
     current_form: '',
     period_pain: false, period_pain_days: '',
+    race_denivele: '',
     coach_message: ''
   })
 
@@ -188,6 +196,7 @@ export default function ProfileWizard() {
       current_form:      data.current_form,
       period_pain:       data.period_pain,
       period_pain_days:  data.period_pain_days ? parseInt(data.period_pain_days) : null,
+      race_denivele:     data.race_denivele ? parseInt(data.race_denivele) : null,
       coach_message:     data.coach_message,
       profile_completed: true
     }
@@ -367,36 +376,66 @@ export default function ProfileWizard() {
           {stepId === 'objective' && <>
             <StepLabel>Question {currentIdx + 1}</StepLabel>
             <StepTitle>Quel est ton objectif ?</StepTitle>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '.75rem' }}>
-              {OBJECTIVE_OPTIONS.map(o => (
-                <button key={o.v} onClick={() => selectCard('objective', o.v)} style={{ ...cardStyle(data.objective === o.v), flexDirection: 'row', alignItems: 'center', gap: '1rem', padding: '1rem 1.25rem' }}>
-                  <span style={{ fontSize: '1.8rem', flexShrink: 0 }}>{o.e}</span>
+
+            {/* Road */}
+            <div style={{ fontSize: '.72rem', fontWeight: 700, letterSpacing: '.08em', color: 'rgba(255,255,255,.35)', textTransform: 'uppercase', marginBottom: '.5rem' }}>Course sur route</div>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '.65rem', marginBottom: '1rem' }}>
+              {ROAD_OPTIONS.map(o => (
+                <button key={o.v} onClick={() => selectCard('objective', o.v)} style={{ ...cardStyle(data.objective === o.v), alignItems: 'flex-start', padding: '.9rem 1rem' }}>
+                  <div style={{ fontWeight: 700, fontSize: '.95rem' }}>{o.l}</div>
+                  <div style={{ fontSize: '.75rem', color: 'rgba(255,255,255,.45)', marginTop: '.15rem', lineHeight: 1.4 }}>{o.desc}</div>
+                </button>
+              ))}
+            </div>
+
+            {/* Trail */}
+            <div style={{ fontSize: '.72rem', fontWeight: 700, letterSpacing: '.08em', color: 'rgba(255,255,255,.35)', textTransform: 'uppercase', marginBottom: '.5rem' }}>Trail</div>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '.65rem', marginBottom: '1rem' }}>
+              {TRAIL_OPTIONS.map(o => (
+                <button key={o.v} onClick={() => set('objective', o.v)} style={{ ...cardStyle(data.objective === o.v), alignItems: 'flex-start', padding: '.9rem 1rem' }}>
+                  <span style={{ fontSize: '1.4rem' }}>{o.e}</span>
+                  <div style={{ fontWeight: 700, fontSize: '.95rem' }}>{o.l}</div>
+                  <div style={{ fontSize: '.75rem', color: 'rgba(255,255,255,.45)', marginTop: '.1rem', lineHeight: 1.4 }}>{o.desc}</div>
+                </button>
+              ))}
+            </div>
+
+            {/* Dénivelé — appears when trail selected */}
+            {TRAIL_VALUES.has(data.objective) && (
+              <div style={{ background: 'rgba(139,47,201,.08)', border: '1px solid rgba(139,47,201,.25)', borderRadius: 14, padding: '1rem 1.1rem', marginBottom: '.75rem' }}>
+                <div style={{ fontSize: '.875rem', fontWeight: 600, marginBottom: '.6rem', color: 'rgba(255,255,255,.8)' }}>
+                  Dénivelé positif total de la course
+                </div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '.75rem' }}>
+                  <input type="number" min={0} max={20000} step={100}
+                    style={{ width: 110, padding: '.7rem', background: 'rgba(255,255,255,.07)', border: '1.5px solid rgba(139,47,201,.35)', borderRadius: 10, color: '#fff', fontSize: '1.1rem', textAlign: 'center', outline: 'none', fontFamily: 'inherit' }}
+                    value={data.race_denivele}
+                    onChange={e => set('race_denivele', e.target.value)}
+                    placeholder="2500" />
+                  <span style={{ color: 'rgba(255,255,255,.5)', fontSize: '.9rem' }}>m+</span>
+                  <span style={{ fontSize: '.8rem', color: 'rgba(255,255,255,.35)' }}>optionnel</span>
+                </div>
+              </div>
+            )}
+
+            {/* General */}
+            <div style={{ fontSize: '.72rem', fontWeight: 700, letterSpacing: '.08em', color: 'rgba(255,255,255,.35)', textTransform: 'uppercase', marginBottom: '.5rem' }}>Général</div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '.6rem', marginBottom: '.5rem' }}>
+              {[
+                { v: 'debutant', e: '🌱', l: 'Commencer à courir',      desc: 'Je débute et veux progresser sans me blesser' },
+                { v: 'perf',     e: '⚡', l: 'Progresser et performer', desc: 'Je cours déjà et veux passer au niveau supérieur' },
+              ].map(o => (
+                <button key={o.v} onClick={() => selectCard('objective', o.v)} style={{ ...cardStyle(data.objective === o.v), flexDirection: 'row', alignItems: 'center', gap: '.9rem', padding: '.9rem 1rem' }}>
+                  <span style={{ fontSize: '1.4rem', flexShrink: 0 }}>{o.e}</span>
                   <div>
-                    <div style={{ fontWeight: 700, fontSize: '.975rem' }}>{o.l}</div>
-                    <div style={{ fontSize: '.82rem', color: 'rgba(255,255,255,.5)', marginTop: '.15rem' }}>{o.desc}</div>
+                    <div style={{ fontWeight: 700, fontSize: '.9rem' }}>{o.l}</div>
+                    <div style={{ fontSize: '.78rem', color: 'rgba(255,255,255,.45)', marginTop: '.1rem' }}>{o.desc}</div>
                   </div>
                 </button>
               ))}
-              {/* Autre */}
-              <button onClick={() => set('objective', data.objective === 'autre' ? '' : 'autre')}
-                style={{ ...cardStyle(data.objective === 'autre'), flexDirection: 'row', alignItems: 'center', gap: '1rem', padding: '1rem 1.25rem' }}>
-                <span style={{ fontSize: '1.8rem', flexShrink: 0 }}>✏️</span>
-                <span style={{ fontWeight: 600, fontSize: '.9rem' }}>Autre</span>
-              </button>
-              {data.objective === 'autre' && (
-                <input style={{ width: '100%', padding: '.9rem 1.1rem', background: 'rgba(255,255,255,.07)', border: '1.5px solid rgba(139,47,201,.35)', borderRadius: 12, color: '#fff', fontSize: '1rem', outline: 'none', fontFamily: 'inherit' }}
-                  placeholder="Décris ton objectif…"
-                  value={data.objective_other}
-                  onChange={e => set('objective_other', e.target.value)}
-                  autoFocus />
-              )}
             </div>
-            {data.objective && data.objective !== 'autre' && (
-              <ContinueBtn onClick={advance} />
-            )}
-            {data.objective === 'autre' && (
-              <ContinueBtn disabled={!data.objective_other.trim()} onClick={advance} />
-            )}
+
+            {TRAIL_VALUES.has(data.objective) && <ContinueBtn onClick={advance} />}
           </>}
 
           {/* ── race_date ── */}

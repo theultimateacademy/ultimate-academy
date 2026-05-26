@@ -103,14 +103,10 @@ export default function AthleteProfile() {
   async function savePeriodSettings() {
     setSavingPeriod(true)
     try {
-      const result = await api.updateProfile({
-        userId: profile.id,
-        fields: {
-          period_pain:      periodPain,
-          period_pain_days: periodPain ? periodDays : null,
-        },
-      })
-      updateProfile(result.profile)
+      const patch = { period_pain: periodPain, period_pain_days: periodPain ? periodDays : null }
+      const { data: updated, error: dbErr } = await supabase.from('profiles').update(patch).eq('id', profile.id).select().single()
+      if (dbErr) throw dbErr
+      updateProfile(updated)
       showToast('Paramètres cycle sauvegardés ✓')
     } catch {
       showToast('Erreur lors de la sauvegarde ✗', 'error')
@@ -188,12 +184,11 @@ export default function AthleteProfile() {
       if (coercedValue !== null && dbKey === 'days_per_week') coercedValue = parseInt(coercedValue, 10)
       if (coercedValue !== null && dbKey === 'vma') coercedValue = parseFloat(coercedValue)
 
-      const result = await api.updateProfile({
-        userId: profile.id,
-        fields: { [dbKey]: coercedValue },
-      }).catch(err => { throw new Error(err.message) })
+      const { data: updated, error: dbErr } = await supabase
+        .from('profiles').update({ [dbKey]: coercedValue }).eq('id', profile.id).select().single()
+      if (dbErr) throw dbErr
 
-      updateProfile(result.profile)
+      updateProfile(updated)
       setEditField(null)
 
       if (KEY_FIELDS[dbKey] && oldValue !== newValue && newValue) {
@@ -223,14 +218,10 @@ export default function AthleteProfile() {
   async function saveNameField() {
     setEditSaving(true)
     try {
-      const result = await api.updateProfile({
-        userId: profile.id,
-        fields: {
-          first_name: editVal.first_name || null,
-          last_name:  editVal.last_name  || null,
-        },
-      })
-      updateProfile(result.profile)
+      const patch = { first_name: editVal.first_name || null, last_name: editVal.last_name || null }
+      const { data: updated, error: dbErr } = await supabase.from('profiles').update(patch).eq('id', profile.id).select().single()
+      if (dbErr) throw dbErr
+      updateProfile(updated)
       setEditField(null)
       showToast('Profil mis à jour ✓')
     } catch {
