@@ -193,13 +193,31 @@ export default function ProfileWizard() {
     }
     try {
       // Write profile directly to Supabase — no server needed for this step
-      const { data: savedProfile, error: dbError } = await supabase
+      let { data: savedProfile, error: dbError } = await supabase
         .from('profiles')
         .update(fields)
         .eq('id', user.id)
         .select()
         .single()
-      if (dbError) throw dbError
+
+      // If some columns don't exist yet, retry with only the base fields
+      if (dbError && dbError.message?.includes('column')) {
+        const baseFields = {
+          first_name: fields.first_name, objective: fields.objective,
+          race_date: fields.race_date, level: fields.level,
+          vma_known: fields.vma_known, vma: fields.vma,
+          chrono_goal_known: fields.chrono_goal_known, chrono_goal: fields.chrono_goal,
+          days_per_week: fields.days_per_week, preferred_days: fields.preferred_days,
+          gps_watch: fields.gps_watch, injuries: fields.injuries,
+          current_form: fields.current_form, coach_message: fields.coach_message,
+          profile_completed: true,
+        }
+        const retry = await supabase.from('profiles').update(baseFields).eq('id', user.id).select().single()
+        if (retry.error) throw retry.error
+        savedProfile = retry.data
+      } else if (dbError) {
+        throw dbError
+      }
 
       // Plan generation goes through Render (fire-and-forget — server may be sleeping)
       api.generatePlan({ userId: user.id, profile: savedProfile }).catch(err =>

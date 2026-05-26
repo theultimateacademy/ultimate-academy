@@ -24,9 +24,13 @@ CREATE TABLE IF NOT EXISTS public.profiles (
   preferred_days       TEXT[],
   gps_watch            TEXT,
   best_recent_time     TEXT,
+  gender               TEXT,
   injuries             TEXT,
   current_form         TEXT,
   coach_message        TEXT,
+  period_pain          BOOLEAN DEFAULT FALSE,
+  period_pain_days     INTEGER,
+  avatar_url           TEXT,
   profile_completed    BOOLEAN DEFAULT FALSE,
   -- Subscription
   stripe_customer_id   TEXT,
