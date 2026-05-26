@@ -177,6 +177,27 @@ router.get('/articles/:slug', async (req, res) => {
   }
 });
 
+// POST /api/blog/update-image — set/replace image on an existing article
+router.post('/update-image', async (req, res) => {
+  const secret = req.headers['x-blog-secret'] || req.body?.secret;
+  if (process.env.BLOG_SECRET && secret !== process.env.BLOG_SECRET) {
+    return res.status(401).json({ error: 'Unauthorized' });
+  }
+  const { slug, image_query } = req.body || {};
+  if (!slug || !image_query) return res.status(400).json({ error: 'slug and image_query required' });
+  try {
+    const { url, alt } = await fetchImage(image_query);
+    if (!url) return res.status(404).json({ error: 'No image found on Unsplash' });
+    const { error } = await supabase.from('articles')
+      .update({ image_url: url, image_alt: alt || image_query })
+      .eq('slug', slug);
+    if (error) throw error;
+    res.json({ success: true, image_url: url });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 // POST /api/blog/fix-reading-time — one-time backfill for old articles
 router.post('/fix-reading-time', async (req, res) => {
   const secret = req.headers['x-blog-secret'] || req.body?.secret;
