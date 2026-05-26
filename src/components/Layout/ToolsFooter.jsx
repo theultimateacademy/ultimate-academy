@@ -23,7 +23,7 @@ export default function ToolsFooter() {
       <div style={{ maxWidth: 900, margin: '0 auto' }}>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px,1fr))', gap: '2.5rem', marginBottom: '2rem' }}>
           <div>
-            <img src="/Logo.png" alt="The Ultimate Academy" style={{ height: 48, width: 'auto', opacity: .8, marginBottom: '.85rem' }} />
+            <img src="/Logo.png" alt="The Ultimate Academy" style={{ height: 60, width: 'auto', opacity: .8, marginBottom: '.85rem' }} />
             <p style={{ color: 'rgba(255,255,255,.2)', fontSize: '.78rem', margin: 0 }}>
               © 2026 The Ultimate Academy<br />Tous droits réservés.
             </p>
