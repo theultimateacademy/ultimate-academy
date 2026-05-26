@@ -1,4 +1,9 @@
-require('dotenv').config();
+const fs = require('fs');
+console.log('[DEBUG] .env exists:', fs.existsSync('.env'));
+if (fs.existsSync('.env')) {
+  console.log('[DEBUG] .env size:', fs.statSync('.env').size, 'bytes');
+}
+// require('dotenv').config(); // disabled to test Railway variable injection
 
 process.on('unhandledRejection', (reason) => {
   console.error('[CRASH] Unhandled rejection:', reason);
