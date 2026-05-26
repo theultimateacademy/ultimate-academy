@@ -37,7 +37,7 @@ export default function Blog() {
   }, [])
 
   return (
-    <div style={{ background: '#000', minHeight: '100vh', color: '#fff' }}>
+    <div style={{ background: '#000', minHeight: '100vh', color: '#fff', paddingTop: 72 }}>
 
       {/* Nav */}
       <BlogNav />

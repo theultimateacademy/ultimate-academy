@@ -8,14 +8,14 @@ const supabase  = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SE
 const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
 
 const TOPICS = [
-  { subject: 'Les 10 meilleurs marathons de France en 2025', image_query: 'marathon running france crowd' },
+  { subject: 'Les 10 marathons de France incontournables à courir au moins une fois', image_query: 'marathon running france crowd' },
   { subject: 'Comment préparer son premier marathon : guide complet du débutant', image_query: 'marathon runner finish line' },
   { subject: 'Plan entraînement 10km : passer de zéro à 10km en 8 semaines', image_query: 'running training park' },
-  { subject: 'Marathon de Paris 2026 : tout ce qu\'il faut savoir pour se préparer', image_query: 'paris city running race' },
+  { subject: 'Marathon de Paris : tout ce qu\'il faut savoir pour bien se préparer', image_query: 'paris city running race' },
   { subject: 'Comment améliorer sa VMA en course à pied : méthodes et séances', image_query: 'track running speed athlete' },
   { subject: 'Nutrition du coureur : que manger avant, pendant et après une course', image_query: 'healthy food runner nutrition' },
   { subject: 'Récupération après un marathon : le protocole complet du coach', image_query: 'runner recovery stretching' },
-  { subject: 'Les meilleures chaussures de running 2025 : notre sélection', image_query: 'running shoes trail road' },
+  { subject: 'Comment choisir ses chaussures de running : le guide complet', image_query: 'running shoes trail road' },
   { subject: 'Courir un semi-marathon en moins de 2h : méthode et plan d\'entraînement', image_query: 'half marathon running race' },
   { subject: 'Renforcement musculaire pour coureurs : les exercices indispensables', image_query: 'runner strength training gym' },
   { subject: 'Comment éviter les blessures en course à pied : conseils du coach', image_query: 'runner injury prevention stretching' },
@@ -26,11 +26,11 @@ const TOPICS = [
   { subject: 'Plan marathon 16 semaines pour finisher : du canapé à la ligne d\'arrivée', image_query: 'marathon training long run' },
   { subject: 'Les étirements essentiels pour coureurs : quand et comment s\'étirer', image_query: 'runner stretching flexibility' },
   { subject: 'Courir un 5km sous les 25 minutes : programme et conseils', image_query: '5km run park morning' },
-  { subject: 'Marathon du Médoc 2025 : le guide du coureur déguisé', image_query: 'wine marathon medoc bordeaux' },
+  { subject: 'Marathon du Médoc : le guide du coureur déguisé', image_query: 'wine marathon medoc bordeaux' },
   { subject: 'Course à pied et perte de poids : ce que dit vraiment la science', image_query: 'running weight loss healthy lifestyle' },
   { subject: 'Le fractionné en course à pied : pourquoi et comment le pratiquer', image_query: 'interval training track sprint' },
   { subject: 'Courir après 50 ans : les conseils du coach pour progresser sans se blesser', image_query: 'mature runner fitness park' },
-  { subject: 'Les meilleurs événements running en France en 2025', image_query: 'running event race participants' },
+  { subject: 'Les événements running de France à ne pas manquer', image_query: 'running event race participants' },
   { subject: 'Préparation mentale pour la course à pied : la clé de la performance', image_query: 'runner focus mental strength' },
 ];
 
@@ -57,8 +57,8 @@ async function fetchImage(query) {
   }
 }
 
-async function generateAndPublish() {
-  const topic = await getNextTopic();
+async function generateAndPublish(forceTopic) {
+  const topic = forceTopic || await getNextTopic();
 
   const completion = await anthropic.messages.create({
     model: 'claude-sonnet-4-6',
@@ -123,8 +123,18 @@ router.post('/generate', async (req, res) => {
     return res.status(401).json({ error: 'Unauthorized' });
   }
   try {
-    const article = await generateAndPublish();
-    res.json({ success: true, title: article.title });
+    const forceTopic = req.body?.subject
+      ? { subject: req.body.subject, image_query: req.body.image_query || 'running marathon' }
+      : null;
+
+    // Optional: delete an existing article before regenerating
+    if (req.body?.delete_slug) {
+      await supabase.from('articles').delete().eq('slug', req.body.delete_slug);
+      console.log(`[Blog] Deleted article: ${req.body.delete_slug}`);
+    }
+
+    const article = await generateAndPublish(forceTopic);
+    res.json({ success: true, title: article.title, slug: article.slug });
   } catch (err) {
     console.error('[Blog] Generate error:', err.message);
     res.status(500).json({ error: err.message });
