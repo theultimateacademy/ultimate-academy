@@ -598,6 +598,9 @@ tr:hover td { background: rgba(255,255,255,.04); }
   gap: 1.25rem;
   align-items: stretch;
 }
+@media (max-width: 640px) {
+  .pricing-card--featured { padding: 2.5rem 1.25rem !important; }
+}
 @media (max-width: 900px) {
   .pricing-grid { grid-template-columns: 1fr; }
 }

@@ -418,7 +418,7 @@ export default function Landing() {
               14 jours d'essai gratuit
             </div>
 
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px,1fr))', gap: '3rem', alignItems: 'center', marginTop: '.5rem' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(260px,100%),1fr))', gap: '3rem', alignItems: 'center', marginTop: '.5rem' }}>
 
               <div style={{ textAlign: 'center' }}>
                 <div style={{ fontSize: '.78rem', fontWeight: 700, color: 'rgba(255,255,255,.55)', letterSpacing: '.12em', textTransform: 'uppercase', marginBottom: '1rem', textAlign: 'center', width: '100%' }}>
