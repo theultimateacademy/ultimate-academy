@@ -255,14 +255,6 @@ export default function Landing() {
               ))}
             </div>
           )}
-          {!user ? (
-            <>
-              <Link to="/login"    className="landing-mobile-link" onClick={() => setMobileMenu(false)}>Connexion</Link>
-              <Link to="/register" className="landing-mobile-link tools-link" onClick={() => setMobileMenu(false)}>Rejoindre →</Link>
-            </>
-          ) : (
-            <button className="landing-mobile-link tools-link" onClick={() => { handleCTA(); setMobileMenu(false) }}>Mon espace →</button>
-          )}
         </div>
       )}
 
