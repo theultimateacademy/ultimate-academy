@@ -313,6 +313,54 @@ function RevenueCard() {
   )
 }
 
+/* ─── Weekly analysis trigger card ─────────────────────────────────── */
+function WeeklyAnalysisCard() {
+  const [running, setRunning] = useState(false)
+  const [result,  setResult]  = useState(null)
+  const [error,   setError]   = useState(null)
+
+  async function run() {
+    setRunning(true)
+    setResult(null)
+    setError(null)
+    try {
+      const data = await api.runWeekly()
+      setResult(data.processed ?? 0)
+    } catch (err) {
+      setError(err.message)
+    } finally {
+      setRunning(false)
+    }
+  }
+
+  return (
+    <div className="card" style={{ marginBottom: '1.5rem' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem' }}>
+        <div>
+          <h3 style={{ marginBottom: '.15rem' }}>📈 Analyses hebdomadaires</h3>
+          <div style={{ fontSize: '.8rem', color: 'var(--text-muted)' }}>
+            Normalement auto chaque dimanche à 18h — relancer manuellement si besoin
+          </div>
+        </div>
+        <button className="btn btn-primary btn-sm" onClick={run} disabled={running}
+          style={{ flexShrink: 0 }}>
+          {running ? '⏳ En cours…' : '▶ Lancer l\'analyse'}
+        </button>
+      </div>
+      {result !== null && !error && (
+        <div className="alert alert-success" style={{ marginTop: '1rem' }}>
+          ✅ Analyse terminée — {result} athlète{result !== 1 ? 's' : ''} traité{result !== 1 ? 's' : ''}
+        </div>
+      )}
+      {error && (
+        <div className="alert alert-error" style={{ marginTop: '1rem' }}>
+          ❌ Erreur : {error}
+        </div>
+      )}
+    </div>
+  )
+}
+
 /* ─── Main dashboard ────────────────────────────────────────────────── */
 export default function AdminDashboard() {
   const navigate = useNavigate()
@@ -440,6 +488,9 @@ export default function AdminDashboard() {
           </div>
         ))}
       </div>
+
+      {/* Analyses hebdomadaires */}
+      <WeeklyAnalysisCard />
 
       {/* CA & Déclarations fiscales */}
       <RevenueCard />

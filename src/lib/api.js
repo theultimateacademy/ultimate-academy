@@ -22,6 +22,7 @@ export const api = {
   generateResponse:   (body)   => request('/api/messages/generate-response',  { method: 'POST', body }),
   periodAlert:        (body)   => request('/api/admin/period-alert',          { method: 'POST', body }),
   revenue:            ()       => request('/api/stripe/revenue'),
+  runWeekly:          ()       => request('/api/analyses/run-weekly',           { method: 'POST', body: {} }),
   stravaConnect:      (userId) => `${API_URL}/auth/strava?userId=${userId}`,
   stravaImport:       (body)   => request('/api/strava/import',               { method: 'POST', body }),
   stravaDisconnect:   (body)   => request('/api/strava/disconnect',           { method: 'POST', body }),
