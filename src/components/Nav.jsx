@@ -122,17 +122,17 @@ export default function Nav() {
           <img src="/Logo.png" alt="The Ultimate Academy" className="nav-logo" />
         </Link>
 
-        {/* Desktop centre links */}
+        {/* Desktop centre links — in scroll order */}
         <div className="landing-nav-links">
-          <Link to="/blog" className="landing-nav-link" style={{ textDecoration: 'none', color: location.pathname.startsWith('/blog') ? '#C084FC' : undefined, fontWeight: location.pathname.startsWith('/blog') ? 600 : undefined }}>
-            Blog
-          </Link>
           {SECTIONS.map(({ label, id }) => (
             <button key={id} className="landing-nav-link" onClick={() => goToSection(id)}
               style={{ color: activeSection === id ? '#C084FC' : undefined, fontWeight: activeSection === id ? 600 : undefined }}>
               {label}
             </button>
           ))}
+          <Link to="/blog" className="landing-nav-link" style={{ textDecoration: 'none', color: location.pathname.startsWith('/blog') ? '#C084FC' : undefined, fontWeight: location.pathname.startsWith('/blog') ? 600 : undefined }}>
+            Blog
+          </Link>
           <div ref={toolsRef} style={{ position: 'relative' }}>
             <button className="landing-nav-link"
               onClick={() => setOpenTools(o => !o)}
@@ -204,10 +204,10 @@ export default function Nav() {
       {/* Mobile dropdown — same order always */}
       {mobileMenu && (
         <div className="nav-mobile-menu">
-          <Link to="/blog" className="nav-mobile-link accent" onClick={() => setMobileMenu(false)}>Blog</Link>
           {SECTIONS.map(({ label, id }) => (
             <button key={id} className="nav-mobile-link" onClick={() => goToSection(id)}>{label}</button>
           ))}
+          <Link to="/blog" className="nav-mobile-link accent" onClick={() => setMobileMenu(false)}>Blog</Link>
           <button className="nav-mobile-link accent"
             onClick={e => { e.stopPropagation(); setMobileTools(v => !v) }}>
             Outils gratuits {mobileTools ? '▴' : '▾'}
