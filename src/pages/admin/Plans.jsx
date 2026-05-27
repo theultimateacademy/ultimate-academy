@@ -84,20 +84,33 @@ function PlanModal({ plan, athlete, onClose, onActivate }) {
           {weeks.map((w, i) => (
             <button key={i} onClick={() => setActiveWeek(i)}
               style={{ flexShrink: 0, padding: '.4rem .75rem', borderRadius: 99, border: 'none',
+                whiteSpace: 'nowrap',
                 background: activeWeek === i ? 'var(--gradient)' : 'var(--surface-2)',
                 color: activeWeek === i ? '#fff' : 'var(--text-muted)',
                 fontWeight: 600, fontSize: '.8rem', cursor: 'pointer', fontFamily: 'inherit' }}>
-              S{w.numero} · {w.phase}
+              S{w.numero}
             </button>
           ))}
         </div>
 
         {currentWeek && (
           <div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1rem' }}>
-              <span className="badge badge-primary">Semaine {currentWeek.numero}</span>
-              <span className="badge badge-info">{currentWeek.phase}</span>
-              <span className="badge badge-warning">{currentWeek.charge}</span>
+            <div style={{ marginBottom: '1rem' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '.5rem', flexWrap: 'wrap', marginBottom: '.35rem' }}>
+                <span className="badge badge-primary">Semaine {currentWeek.numero}</span>
+                <span className="badge badge-info" style={{ maxWidth: '100%', whiteSpace: 'normal', lineHeight: 1.3 }}>{currentWeek.phase}</span>
+              </div>
+              {currentWeek.charge && (() => {
+                const parenIdx = currentWeek.charge.indexOf('(')
+                const main = parenIdx > 0 ? currentWeek.charge.slice(0, parenIdx).trim() : currentWeek.charge
+                const sub  = parenIdx > 0 ? currentWeek.charge.slice(parenIdx) : null
+                return (
+                  <div>
+                    <span className="badge badge-warning">{main}</span>
+                    {sub && <span style={{ fontSize: '.75rem', color: 'var(--text-muted)', marginLeft: '.4rem' }}>{sub}</span>}
+                  </div>
+                )
+              })()}
             </div>
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: '.75rem', maxHeight: '50vh', overflowY: 'auto' }}>
