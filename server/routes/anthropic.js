@@ -221,6 +221,7 @@ Chaque id_seance doit être UNIQUE sur les 4 semaines : si FL-03 est utilisé se
 Varier obligatoirement : si un type de séance (ex: fractionné 1000m) apparaît plusieurs fois, utiliser des codes DIFFÉRENTS (FL-01 + FL-03, jamais FL-01 + FL-01).
 La bibliothèque contient suffisamment de codes pour garantir 4 semaines sans aucun doublon.
 Avant de soumettre : liste mentalement tous les id_seance utilisés et vérifie qu'il n'y a aucun doublon sur l'ensemble du plan.
+NOTE INTER-PLAN : un même id_seance PEUT être réutilisé dans un nouveau plan (mois suivant), à intervalle d'environ 1 mois, pour mesurer la progression — mais jamais de façon systématique.
 
 RÈGLE 7 — RÉCUPÉRATION VARIÉE
 Varier systématiquement les temps et modes de récupération selon la séance :
@@ -276,6 +277,31 @@ Fréquence maximale : 1 séance RA toutes les 4-5 semaines. JAMAIS deux fois dan
 La séance RA REMPLACE une séance EF prévue — elle ne s'ajoute JAMAIS en supplément.
 La séance RA COMPTE dans le total des séances de course (days_per_week).
 Si aucun signal de fatigue n'est fourni dans le contexte : NE PAS utiliser RA ni EF-04.
+
+RÈGLE 12 — PALETTE DE SÉANCES OBLIGATOIRE (VARIÉTÉ ET PROGRESSIVITÉ)
+Sur un plan de 4 semaines, proposer impérativement une palette variée parmi :
+• VMA courte (100-200m, 95-110% VMA) et/ou longue (1000-2000m, 85-90% VMA)
+• Seuil / Tempo en blocs continus (20-40 min à 82-88% VMA)
+• Allure spécifique course uniquement si l'objectif chrono est RÉALISTE pour le niveau et la VMA — ne pas forcer si hors-portée
+• Côtes (montées RPE 7-9, pas d'allure fixe)
+• Sorties longues EF avec alternance (EF pure S1/S3, EF + blocs tempo S2/S4)
+• Footings progressifs VRAIS : 3 phases décrites explicitement — phase 1 (65-68% VMA), phase 2 (72-75%), phase 3 (80-85% = seuil)
+• Footings EF simples (65-72% VMA) pour compléter le volume
+POUR 3 SÉANCES/SEMAINE : rendre l'entraînement ludique et complet — footing EF ou progressif + séance intensive (VMA semaines impaires, seuil semaines paires) + sortie longue. Ne jamais répéter le même type deux semaines de suite.
+
+RÈGLE 13 — TERRAIN D'ENTRAÎNEMENT (trail uniquement)
+Si training_terrain est fourni dans le profil :
+• montagne : côtes longues 200-400m à effort RPE 8-9, descentes techniques travaillées, sorties avec dénivelé positif cumulé, privilégier FL côtes et séances force montée
+• semi_montagne : mix côtes courtes 100-200m + sorties partiellement plat/pente, 1 séance avec D+ sur 2 semaines
+• ville_plat : escaliers répétés (cage d'escalier ou parking), marche nordique en côte, tapis incliné si disponible — mentionner ces alternatives dans le corps et notes_coach ; garder fractionnés sur piste/route
+Exception terrain Ultra Marin (Réunion) : course essentiellement sur route, pas besoin de D+ — préparer comme un marathon haute distance (volume, seuil, allure)
+
+RÈGLE 14 — COURSE INTERMÉDIAIRE (mini-affûtage)
+Si intermediate_race_date est fourni dans le profil et tombe dans la fenêtre du plan :
+• Identifier la semaine où se situe la course intermédiaire
+• La semaine PRÉCÉDANT cette course = mini-affûtage : volume réduit 30-40%, 1 séance légère à allure objectif race intermédiaire, aucune séance dure, charge "Légère (mini-affûtage)"
+• La semaine DE la course : 1 footing 25-30 min EF mardi ou mercredi, repos les 2 jours précédant la course, séance RENFO facultative
+• Mentionner la course intermédiaire dans le message_du_mois et dans les notes_coach de la semaine de mini-affûtage
 
 ═══════════════════════════════════════
 CALCUL DES ALLURES — RÈGLES ABSOLUES
@@ -516,6 +542,16 @@ Aujourd'hui : ${todayISO} (${todayDayName}, lundi).
 Le plan commence aujourd'hui, semaine 1 complète.
 Semaines 1-4 : ${profile.days_per_week} séances course + 1 RENFO par semaine.`;
 
+  // Intermediate race info
+  const hasIntermediateRace = profile.intermediate_race_date && profile.intermediate_race_name;
+  const intermediateRaceInfo = hasIntermediateRace
+    ? `Course intermédiaire : ${profile.intermediate_race_name} — ${new Date(profile.intermediate_race_date).toLocaleDateString('fr-FR')} (RÈGLE 14 : prévoir mini-affûtage la semaine précédente)`
+    : 'Aucune course intermédiaire prévue dans ce plan';
+
+  const terrainInfo = profile.training_terrain
+    ? `Terrain d'entraînement : ${profile.training_terrain === 'montagne' ? 'Montagne (D+/descentes disponibles — RÈGLE 13)' : profile.training_terrain === 'semi_montagne' ? 'Semi-montagne (mix plat et pente — RÈGLE 13)' : 'Ville/Plat (escaliers, tapis incliné — RÈGLE 13)'}`
+    : '';
+
   const userPrompt = `Génère un plan d'entraînement running de EXACTEMENT 4 SEMAINES pour :
 
 Prénom : ${profile.first_name}
@@ -532,6 +568,8 @@ Meilleur chrono récent : ${profile.best_recent_time || 'Non renseigné'}
 Blessures / douleurs : ${profile.injuries || 'Aucune'}
 Forme actuelle : ${profile.current_form || 'Non renseignée'}
 Message coach : ${profile.coach_message || 'Aucun'}
+${intermediateRaceInfo}
+${terrainInfo}
 
 ${calendarSection}
 
@@ -586,6 +624,86 @@ CONTRAINTES ABSOLUES — vérifie et documente dans auto_validation avant de sou
     res.json({ success: true, planId: plan.id });
   } catch (err) {
     console.error('Plan generation error:', err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// ─── POST /api/plans/adjust-heat ────────────────────────────────────────────
+
+router.post('/plans/adjust-heat', async (req, res) => {
+  const { userId, activate } = req.body;
+  if (!userId) return res.status(400).json({ error: 'Missing userId' });
+
+  try {
+    await supabase.from('profiles').update({ heat_mode: activate }).eq('id', userId);
+    const { data: profile } = await supabase.from('profiles').select('*').eq('id', userId).single();
+
+    if (!activate) {
+      await supabase.from('messages').insert({
+        user_id: userId, sender: 'coach',
+        content: `Mode canicule désactivé ✓ On reprend l'entraînement normal — ta prochaine séance est comme prévu.`,
+        read: false,
+      });
+      return res.json({ success: true, activated: false });
+    }
+
+    // Find current active plan and week
+    const { data: plan } = await supabase
+      .from('training_plans').select('*').eq('user_id', userId).eq('status', 'active').single();
+
+    if (!plan) return res.json({ success: true, activated: true });
+
+    const startDate    = new Date(plan.activated_at || plan.created_at);
+    const weeksElapsed = Math.max(1, Math.floor((Date.now() - startDate.getTime()) / (7 * 24 * 3600 * 1000)) + 1);
+    const currentWeek  = plan.plan_data?.semaines?.find(s => s.numero === weeksElapsed);
+
+    if (!currentWeek) return res.json({ success: true, activated: true });
+
+    const vma = resolveVma(profile);
+
+    const heatPrompt = `Mode canicule activé pour ${profile.first_name}. Adapte les séances de la semaine pour chaleur extrême.
+
+Séances actuelles :
+${JSON.stringify(currentWeek.seances, null, 2)}
+
+VMA : ${vma} km/h — Allures EF : ${calcPace(vma, 0.65)}/km – ${calcPace(vma, 0.70)}/km | Récup : ${calcPace(vma, 0.60)}/km – ${calcPace(vma, 0.63)}/km
+
+Règles strictes :
+- Remplace TOUTES les séances dures (fractionné, VMA, tempo, seuil, côtes) par des footings EF tranquilles
+- Réduis la durée de 20-25% sur toutes les séances course
+- Allure unique : EF 65-68% VMA, aucune intensité
+- Séances RENFO : garder identiques, sans changement
+- Séances ≤ 50 min maximum
+- Pour les EF : utilise EF-01 ou EF-02 selon la durée ; keep the same id_seance for RENFO
+
+Retourne UNIQUEMENT : {"seances": [...séances adaptées...]}`;
+
+    const message = await client.messages.create({
+      model: 'claude-sonnet-4-6', max_tokens: 2500,
+      messages: [{ role: 'user', content: heatPrompt }]
+    });
+
+    const raw      = message.content[0].text.trim();
+    const jsonText = raw.replace(/^```json\s*/i, '').replace(/^```\s*/i, '').replace(/\s*```$/i, '');
+    const { seances } = JSON.parse(jsonText);
+
+    const updatedPlan = JSON.parse(JSON.stringify(plan.plan_data));
+    const weekIdx = updatedPlan.semaines.findIndex(s => s.numero === weeksElapsed);
+    if (weekIdx !== -1) {
+      updatedPlan.semaines[weekIdx].seances = seances;
+      updatedPlan.semaines[weekIdx].charge  = 'Canicule — Allégé';
+      await supabase.from('training_plans').update({ plan_data: updatedPlan }).eq('id', plan.id);
+    }
+
+    await supabase.from('messages').insert({
+      user_id: userId, sender: 'coach',
+      content: `Mode canicule activé 🌡️ J'ai allégé ta semaine — que des footings tranquilles, on ne force pas par cette chaleur. Cours tôt le matin ou en soirée, hydrate-toi bien. On reprend l'intensité dès que ça se calme.`,
+      read: false,
+    });
+
+    res.json({ success: true, activated: true });
+  } catch (err) {
+    console.error('[AdjustHeat]', err.message);
     res.status(500).json({ error: err.message });
   }
 });
@@ -1277,6 +1395,7 @@ const ALLOWED_PROFILE_FIELDS = new Set([
   'injuries', 'current_form', 'coach_message',
   'period_pain', 'period_pain_days', 'avatar_url',
   'profile_completed',
+  'intermediate_race_date', 'intermediate_race_name', 'training_terrain', 'heat_mode',
 ]);
 
 router.post('/profile/update', async (req, res) => {

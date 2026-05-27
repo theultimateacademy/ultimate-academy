@@ -80,11 +80,15 @@ const GENDER_OPTIONS = [
 
 function getStepIds(data) {
   const base = [
-    'first_name', 'gender', 'objective', 'race_date',
+    'first_name', 'gender', 'objective', 'race_date', 'intermediate_race',
     'level', 'days_per_week', 'preferred_days',
     'gps_watch', 'vma', 'chrono_goal', 'current_form',
     'injuries', 'coach_message',
   ]
+  if (TRAIL_VALUES.has(data.objective)) {
+    const intermediateIdx = base.indexOf('intermediate_race')
+    base.splice(intermediateIdx + 1, 0, 'training_terrain')
+  }
   if (data.gender === 'femme') {
     const injIdx = base.indexOf('injuries')
     base.splice(injIdx + 1, 0, 'period')
@@ -100,7 +104,10 @@ export default function ProfileWizard() {
 
   const [data, setData] = useState({
     first_name: '', gender: '', objective: '', objective_other: '',
-    race_date: '', level: '',
+    race_date: '',
+    intermediate_race_date: '', intermediate_race_name: '',
+    training_terrain: '',
+    level: '',
     vma_known: false, vma: '',
     chrono_goal_known: false, chrono_goal: '',
     days_per_week: 4, preferred_days: [],
@@ -178,25 +185,28 @@ export default function ProfileWizard() {
     setSubmitting(true)
     setError('')
     const fields = {
-      first_name:        data.first_name,
-      gender:            data.gender,
-      objective:         OBJECTIVE_MAP[data.objective] || data.objective,
-      race_date:         data.race_date || null,
-      level:             data.level,
-      vma_known:         data.vma_known,
-      vma:               data.vma_known ? parseFloat(data.vma) || null : null,
-      chrono_goal_known: data.chrono_goal_known,
-      chrono_goal:       data.chrono_goal_known ? data.chrono_goal : '',
-      days_per_week:     data.days_per_week,
-      preferred_days:    data.preferred_days,
-      gps_watch:         data.gps_watch,
-      injuries:          data.injuries === 'none' ? '' : `${data.injuries}${data.injury_detail ? ' — ' + data.injury_detail : ''}`,
-      current_form:      data.current_form,
-      period_pain:       data.period_pain,
-      period_pain_days:  data.period_pain_days ? parseInt(data.period_pain_days) : null,
-      race_denivele:     data.race_denivele ? parseInt(data.race_denivele) : null,
-      coach_message:     data.coach_message,
-      profile_completed: true
+      first_name:             data.first_name,
+      gender:                 data.gender,
+      objective:              OBJECTIVE_MAP[data.objective] || data.objective,
+      race_date:              data.race_date || null,
+      intermediate_race_date: data.intermediate_race_date || null,
+      intermediate_race_name: data.intermediate_race_name || null,
+      training_terrain:       data.training_terrain || null,
+      level:                  data.level,
+      vma_known:              data.vma_known,
+      vma:                    data.vma_known ? parseFloat(data.vma) || null : null,
+      chrono_goal_known:      data.chrono_goal_known,
+      chrono_goal:            data.chrono_goal_known ? data.chrono_goal : '',
+      days_per_week:          data.days_per_week,
+      preferred_days:         data.preferred_days,
+      gps_watch:              data.gps_watch,
+      injuries:               data.injuries === 'none' ? '' : `${data.injuries}${data.injury_detail ? ' — ' + data.injury_detail : ''}`,
+      current_form:           data.current_form,
+      period_pain:            data.period_pain,
+      period_pain_days:       data.period_pain_days ? parseInt(data.period_pain_days) : null,
+      race_denivele:          data.race_denivele ? parseInt(data.race_denivele) : null,
+      coach_message:          data.coach_message,
+      profile_completed:      true
     }
     if (!user?.id) {
       setError('Session expirée — recharge la page et reconnecte-toi.')
@@ -213,6 +223,9 @@ export default function ProfileWizard() {
       days_per_week: fields.days_per_week, preferred_days: fields.preferred_days,
       gps_watch: fields.gps_watch, injuries: fields.injuries,
       current_form: fields.current_form, coach_message: fields.coach_message,
+      intermediate_race_date: fields.intermediate_race_date,
+      intermediate_race_name: fields.intermediate_race_name,
+      training_terrain: fields.training_terrain,
       profile_completed: true,
     }
 
@@ -462,6 +475,64 @@ export default function ProfileWizard() {
               </button>
             </div>
             <ContinueBtn disabled={!data.race_date} onClick={advance} label="Confirmer" />
+          </>}
+
+          {/* ── intermediate_race ── */}
+          {stepId === 'intermediate_race' && <>
+            <StepLabel>Question {currentIdx + 1}</StepLabel>
+            <StepTitle>As-tu une course intermédiaire ?</StepTitle>
+            <p style={{ textAlign: 'center', color: 'rgba(255,255,255,.4)', fontSize: '.875rem', marginBottom: '1.5rem', lineHeight: 1.6 }}>
+              Une course avant ton objectif principal ? Je planifie un mini-affûtage d'une semaine avant.
+            </p>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '.875rem', marginBottom: '.5rem' }}>
+              <input
+                type="text"
+                style={{ width: '100%', padding: '.9rem 1.1rem', background: 'rgba(255,255,255,.07)', border: '1.5px solid rgba(139,47,201,.3)', borderRadius: 12, color: '#fff', fontSize: '1rem', outline: 'none', fontFamily: 'inherit' }}
+                placeholder="Nom de la course (ex : Semi de Paris)"
+                value={data.intermediate_race_name}
+                onChange={e => set('intermediate_race_name', e.target.value)}
+              />
+              <input
+                type="date"
+                style={{ padding: '.9rem 1.25rem', background: 'rgba(255,255,255,.07)', border: '1.5px solid rgba(139,47,201,.3)', borderRadius: 14, color: '#fff', fontSize: '1rem', outline: 'none', fontFamily: 'inherit', colorScheme: 'dark', width: '100%' }}
+                value={data.intermediate_race_date}
+                onChange={e => set('intermediate_race_date', e.target.value)}
+                min={new Date().toISOString().split('T')[0]}
+              />
+            </div>
+            <button onClick={advance} style={{ background: 'none', border: 'none', color: 'rgba(255,255,255,.4)', cursor: 'pointer', fontSize: '.9rem', fontFamily: 'inherit', padding: '.5rem 1rem', display: 'block', margin: '0 auto' }}>
+              Pas de course intermédiaire →
+            </button>
+            <ContinueBtn
+              disabled={!!(data.intermediate_race_name && !data.intermediate_race_date)}
+              onClick={advance}
+              label="Confirmer"
+            />
+          </>}
+
+          {/* ── training_terrain (trail only) ── */}
+          {stepId === 'training_terrain' && <>
+            <StepLabel>Question {currentIdx + 1}</StepLabel>
+            <StepTitle>Où t'entraînes-tu ?</StepTitle>
+            <p style={{ textAlign: 'center', color: 'rgba(255,255,255,.4)', fontSize: '.875rem', marginBottom: '1.5rem', lineHeight: 1.6 }}>
+              Pour adapter tes séances trail à ton terrain disponible.
+            </p>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '.75rem' }}>
+              {[
+                { v: 'montagne',      e: '🏔️', l: 'Montagne',         desc: 'Accès direct à du vrai dénivelé — côtes, sentiers, D+' },
+                { v: 'semi_montagne', e: '⛰️',  l: 'Semi-montagne',   desc: 'Mix plat et relief — quelques côtes disponibles' },
+                { v: 'ville_plat',    e: '🏙️', l: 'Ville / Plat',    desc: 'Peu de dénivelé — escaliers, tapis incliné, marche nordique' },
+              ].map(o => (
+                <button key={o.v} onClick={() => selectCard('training_terrain', o.v)}
+                  style={{ ...cardStyle(data.training_terrain === o.v), flexDirection: 'row', alignItems: 'center', gap: '1rem', padding: '1.1rem 1.25rem' }}>
+                  <span style={{ fontSize: '1.8rem', flexShrink: 0 }}>{o.e}</span>
+                  <div>
+                    <div style={{ fontWeight: 700, fontSize: '.975rem' }}>{o.l}</div>
+                    <div style={{ fontSize: '.82rem', color: 'rgba(255,255,255,.5)', marginTop: '.1rem' }}>{o.desc}</div>
+                  </div>
+                </button>
+              ))}
+            </div>
           </>}
 
           {/* ── level ── */}

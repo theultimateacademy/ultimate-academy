@@ -18,6 +18,8 @@ export default function AthleteProfile() {
   const [suuntoStatus,   setSuuntoStatus]   = useState('')
   const [garminLoading,  setGarminLoading]  = useState(false)
   const [garminStatus,   setGarminStatus]   = useState('')
+  // Canicule
+  const [heatLoading,    setHeatLoading]    = useState(false)
   // Résiliation
   const [cancelConfirm,  setCancelConfirm]  = useState(false)
   const [cancelling,     setCancelling]     = useState(false)
@@ -230,6 +232,20 @@ export default function AthleteProfile() {
       showToast((err?.message || 'Erreur inconnue') + ' ✗', 'error')
     } finally {
       setEditSaving(false)
+    }
+  }
+
+  async function toggleHeat() {
+    setHeatLoading(true)
+    try {
+      const activate = !profile?.heat_mode
+      await api.adjustHeat({ userId: profile.id, activate })
+      await refreshProfile()
+      showToast(activate ? '🌡️ Mode canicule activé — plan allégé cette semaine' : '✅ Mode canicule désactivé')
+    } catch (err) {
+      showToast((err?.message || 'Erreur') + ' ✗', 'error')
+    } finally {
+      setHeatLoading(false)
     }
   }
 
@@ -591,6 +607,71 @@ export default function AthleteProfile() {
             </div>
           </FieldCard>
 
+          {/* Course intermédiaire — nom */}
+          <FieldCard
+            fieldKey="intermediate_race_name"
+            dbKey="intermediate_race_name"
+            label="Course intermédiaire"
+            displayValue={profile?.intermediate_race_name || 'Aucune'}
+          >
+            <input
+              type="text"
+              className="form-input"
+              style={{ width: '100%', fontSize: '.875rem' }}
+              placeholder="ex : Semi de Paris"
+              value={editVal.intermediate_race_name ?? ''}
+              onChange={e => setEditVal(prev => ({ ...prev, intermediate_race_name: e.target.value }))}
+              autoFocus
+            />
+          </FieldCard>
+
+          {/* Course intermédiaire — date */}
+          <FieldCard
+            fieldKey="intermediate_race_date"
+            dbKey="intermediate_race_date"
+            label="Date course intermédiaire"
+            displayValue={profile?.intermediate_race_date
+              ? new Date(profile.intermediate_race_date).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })
+              : 'Non définie'}
+          >
+            <input
+              type="date"
+              className="form-input"
+              style={{ width: '100%', fontSize: '.875rem' }}
+              value={editVal.intermediate_race_date ?? ''}
+              onChange={e => setEditVal(prev => ({ ...prev, intermediate_race_date: e.target.value }))}
+              autoFocus
+            />
+          </FieldCard>
+
+          {/* Terrain d'entraînement — visible si trail */}
+          {['trail_20k','trail_50k','trail_100k','trail_100m'].includes(profile?.objective) && (
+            <FieldCard
+              fieldKey="training_terrain"
+              dbKey="training_terrain"
+              label="Terrain d'entraînement"
+              displayValue={
+                profile?.training_terrain === 'montagne'      ? '🏔️ Montagne' :
+                profile?.training_terrain === 'semi_montagne' ? '⛰️ Semi-montagne' :
+                profile?.training_terrain === 'ville_plat'    ? '🏙️ Ville / Plat' :
+                'Non renseigné'
+              }
+            >
+              <select
+                className="form-input"
+                style={{ width: '100%', fontSize: '.875rem' }}
+                value={editVal.training_terrain ?? ''}
+                onChange={e => setEditVal(prev => ({ ...prev, training_terrain: e.target.value }))}
+                autoFocus
+              >
+                <option value="">— Choisir —</option>
+                <option value="montagne">🏔️ Montagne</option>
+                <option value="semi_montagne">⛰️ Semi-montagne</option>
+                <option value="ville_plat">🏙️ Ville / Plat</option>
+              </select>
+            </FieldCard>
+          )}
+
         </div>
       </div>
 
@@ -702,6 +783,34 @@ export default function AthleteProfile() {
           </p>
         </ServiceRow>
 
+      </div>
+
+      {/* Mode canicule — visible pour tous les athlètes */}
+      <div className="card" style={{ marginBottom: '1.25rem' }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '.75rem' }}>
+          <h4 style={{ margin: 0 }}>🌡️ Mode canicule</h4>
+          <button
+            onClick={toggleHeat}
+            disabled={heatLoading}
+            style={{
+              padding: '.4rem .9rem', borderRadius: 99, fontFamily: 'inherit',
+              border: profile?.heat_mode ? '1.5px solid rgba(251,146,60,.6)' : '1.5px solid var(--border)',
+              background: profile?.heat_mode ? 'rgba(251,146,60,.15)' : 'var(--surface-2)',
+              color: profile?.heat_mode ? '#FB923C' : 'var(--text-muted)',
+              fontWeight: 700, fontSize: '.82rem', cursor: heatLoading ? 'default' : 'pointer',
+              transition: 'all .2s',
+            }}>
+            {heatLoading ? '…' : profile?.heat_mode ? '✓ Actif — Désactiver' : 'Activer'}
+          </button>
+        </div>
+        <p className="text-sm text-muted" style={{ lineHeight: 1.6 }}>
+          Active ce mode quand il fait trop chaud pour s'entraîner normalement. Ton plan de la semaine en cours est automatiquement allégé — que des footings tranquilles, aucune séance dure. Désactive-le dès que la chaleur redescend.
+        </p>
+        {profile?.heat_mode && (
+          <div style={{ marginTop: '.75rem', background: 'rgba(251,146,60,.1)', border: '1px solid rgba(251,146,60,.3)', borderRadius: 10, padding: '.6rem .875rem', fontSize: '.82rem', color: '#FED7AA' }}>
+            🌡️ Actif — plan de cette semaine allégé. Va dans ton plan pour voir les séances adaptées.
+          </div>
+        )}
       </div>
 
       {/* Alerte règles — visible uniquement si gender = femme */}

@@ -141,7 +141,8 @@ function SessionDetailPage({ session, weekNum, sessionIdx, planId, vma, onClose,
   // Helpers
   const typeColor  = SESSION_TYPE_COLORS[session.type] || '#8B5CF6'
   const alluresOk  = (session.allures || []).filter(a => a?.allure_min_km && typeof a.allure_min_km === 'string' && !a.allure_min_km.includes('[object'))
-  const efPace     = alluresOk[0] || null
+  const efPace       = alluresOk[0] || null
+  const cooldownPace = alluresOk.find(a => /retour|calme|récup/i.test(a.zone || '')) || efPace
   // spePace = the main-set (corps) allure: prefer explicit "Corps" zone label, else highest intensity
   const spePace    = alluresOk.length > 1
     ? (alluresOk.find(a => /corps|principal/i.test(a.zone || ''))
@@ -344,7 +345,7 @@ function SessionDetailPage({ session, weekNum, sessionIdx, planId, vma, onClose,
             <div style={{ borderLeft: '3px solid #3B82F6', padding: '1rem 1.125rem 1rem 1rem' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '.5rem' }}>
                 <span style={{ fontWeight: 700, fontSize: '.72rem', color: '#93C5FD', letterSpacing: '.1em', textTransform: 'uppercase' }}>❄️ Retour au calme</span>
-                <PaceChip allure={efPace} color="#3B82F6" />
+                <PaceChip allure={cooldownPace} color="#3B82F6" />
               </div>
               <p style={{ fontSize: '.875rem', lineHeight: 1.65, color: 'rgba(255,255,255,.72)' }}>{session.retour_au_calme}</p>
             </div>
@@ -678,7 +679,7 @@ function WeeklyFeedbackCard({ weekNum, planId, userId, onSaved }) {
 }
 
 export default function AthletePlan() {
-  const { profile } = useAuth()
+  const { profile, refreshProfile } = useAuth()
   const [plan,          setPlan]          = useState(null)
   const [completions,   setCompletions]   = useState([])
   const [weekFeedbacks, setWeekFeedbacks] = useState([])
@@ -686,6 +687,7 @@ export default function AthletePlan() {
   const [modal,         setModal]         = useState(null)
   const [postFlow,      setPostFlow]      = useState(null)
   const [loading,       setLoading]       = useState(true)
+  const [heatLoading,   setHeatLoading]   = useState(false)
 
   useEffect(() => {
     if (!profile?.id) return
@@ -716,6 +718,20 @@ export default function AthletePlan() {
 
   function isCompleted(weekNum, sessionIdx) {
     return completions.some(c => c.week_number === weekNum && c.session_index === sessionIdx)
+  }
+
+  async function toggleHeat() {
+    setHeatLoading(true)
+    try {
+      const activate = !profile?.heat_mode
+      await api.adjustHeat({ userId: profile.id, activate })
+      await refreshProfile()
+      await loadPlan()
+    } catch (err) {
+      console.error('[toggleHeat]', err)
+    } finally {
+      setHeatLoading(false)
+    }
   }
 
   if (loading) return <LoadingSpinner fullPage text="Chargement du plan…" />
@@ -764,7 +780,33 @@ export default function AthletePlan() {
 
   return (
     <div className="page">
-      <h2 className="page-heading" style={{ marginBottom: '1.5rem' }}>Mon plan</h2>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1.5rem' }}>
+        <h2 className="page-heading" style={{ margin: 0 }}>Mon plan</h2>
+        <button
+          onClick={toggleHeat}
+          disabled={heatLoading}
+          style={{
+            display: 'flex', alignItems: 'center', gap: '.4rem',
+            padding: '.4rem .85rem', borderRadius: 99,
+            border: profile?.heat_mode ? '1.5px solid rgba(251,146,60,.6)' : '1.5px solid rgba(255,255,255,.15)',
+            background: profile?.heat_mode ? 'rgba(251,146,60,.15)' : 'rgba(255,255,255,.05)',
+            color: profile?.heat_mode ? '#FB923C' : 'rgba(255,255,255,.5)',
+            fontSize: '.78rem', fontWeight: 700, cursor: heatLoading ? 'default' : 'pointer',
+            fontFamily: 'inherit', transition: 'all .2s',
+          }}>
+          {heatLoading ? '…' : <>🌡️ {profile?.heat_mode ? 'Canicule ON' : 'Canicule'}</>}
+        </button>
+      </div>
+
+      {profile?.heat_mode && (
+        <div style={{
+          background: 'rgba(251,146,60,.1)', border: '1px solid rgba(251,146,60,.3)',
+          borderRadius: 'var(--radius)', padding: '.75rem 1rem', marginBottom: '1rem',
+          fontSize: '.82rem', lineHeight: 1.6, color: '#FED7AA',
+        }}>
+          🌡️ <strong>Mode canicule actif</strong> — Tes séances de cette semaine ont été allégées. On reprend l'intensité dès que la chaleur redescend.
+        </div>
+      )}
 
       {/* Week selector */}
       <div style={{ display: 'flex', gap: '.5rem', overflowX: 'auto', paddingBottom: '.5rem', marginBottom: '1.5rem' }}>
