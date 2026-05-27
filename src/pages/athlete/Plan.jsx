@@ -837,8 +837,7 @@ export default function AthletePlan() {
       {/* Current week header */}
       {currentWeekData && (
         <div className="card" style={{ marginBottom: '1.25rem', background: 'linear-gradient(135deg,#1A1A2E,#2D1B4E)', color: '#fff' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <div>
+          <div>
               <div style={{ fontSize: '.8rem', opacity: .7, marginBottom: '.2rem' }}>
                 {weekDateRange(plan.activated_at || plan.created_at, currentWeekData.numero, currentWeekData.dates)}
               </div>
@@ -863,12 +862,11 @@ export default function AthletePlan() {
                   </>
                 )
               })()}
+              <span style={{ display: 'inline-block', marginTop: '.5rem', padding: '.25rem .7rem', borderRadius: 99,
+                background: 'rgba(255,255,255,.15)', fontSize: '.75rem', fontWeight: 600 }}>
+                {currentWeekData.charge}
+              </span>
             </div>
-            <span style={{ padding: '.3rem .75rem', borderRadius: 99,
-              background: 'rgba(255,255,255,.15)', fontSize: '.8rem', fontWeight: 600 }}>
-              {currentWeekData.charge}
-            </span>
-          </div>
         </div>
       )}
 
