@@ -42,6 +42,7 @@ export const api = {
   getPostRaceAnalysis:     (userId) => request(`/api/analyses/post-race/${userId}`),
   recalculateVma:          (body)   => request('/api/plans/recalculate-vma',          { method: 'POST', body }),
   adjustHeat:              (body)   => request('/api/plans/adjust-heat',               { method: 'POST', body }),
+  scheduleRegen:           (body)   => request('/api/plans/schedule-regen',            { method: 'POST', body }),
   getProfile:              (userId) => request(`/api/profile/${userId}`),
   updateProfile:           (body)   => request('/api/profile/update',                  { method: 'POST', body }),
 }

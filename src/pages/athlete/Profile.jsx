@@ -45,12 +45,15 @@ export default function AthleteProfile() {
   }
 
   const KEY_FIELDS = {
-    vma:          'VMA',
-    objective:    'Objectif de course',
-    race_date:    'Date de course',
-    days_per_week:'Séances par semaine',
-    level:        'Niveau',
-    injuries:     'Blessures / douleurs',
+    vma:                   'VMA',
+    objective:             'Objectif de course',
+    race_date:             'Date de course',
+    days_per_week:         'Séances par semaine',
+    level:                 'Niveau',
+    injuries:              'Blessures / douleurs',
+    intermediate_race_date:'Course intermédiaire (date)',
+    intermediate_race_name:'Course intermédiaire (nom)',
+    training_terrain:      'Terrain d\'entraînement',
   }
 
   async function handleAvatarChange(e) {
@@ -109,7 +112,12 @@ export default function AthleteProfile() {
       const { data: updated, error: dbErr } = await supabase.from('profiles').update(patch).eq('id', profile.id).select().single()
       if (dbErr) throw dbErr
       updateProfile(updated)
-      showToast('Paramètres cycle sauvegardés ✓')
+      supabase.from('messages').insert({
+        user_id: profile.id, sender: 'athlete',
+        content: `⚠️ [PROFIL] ${profile.first_name} a modifié ses paramètres de cycle : douleurs ${periodPain ? `oui (${periodDays}j)` : 'non'}.\nLe plan sera automatiquement adapté d'ici 1h.`,
+      }).then()
+      api.scheduleRegen({ userId: profile.id, reason: 'Cycle menstruel' }).catch(() => {})
+      showToast('Cycle sauvegardé — plan adapté automatiquement d\'ici 1h.')
     } catch {
       showToast('Erreur lors de la sauvegarde ✗', 'error')
     } finally {
@@ -193,19 +201,20 @@ export default function AthleteProfile() {
       updateProfile(updated)
       setEditField(null)
 
-      if (KEY_FIELDS[dbKey] && oldValue !== newValue && newValue) {
+      if (KEY_FIELDS[dbKey] && oldValue !== newValue) {
         const label = KEY_FIELDS[dbKey]
         supabase.from('messages').insert({
           user_id: profile.id,
           sender:  'athlete',
-          content: `⚠️ [PROFIL] ${label} modifié : "${oldValue || '—'}" → "${newValue}"`,
+          content: `⚠️ [PROFIL] ${profile.first_name} a modifié "${label}" : "${oldValue || '—'}" → "${newValue || '—'}"\nLe plan sera automatiquement adapté d'ici 1h.`,
         }).then()
 
         if (dbKey === 'vma') {
           api.recalculateVma({ userId: profile.id, newVma: parseFloat(value) }).catch(() => {})
           showToast('Tes allures ont été recalculées selon ta nouvelle VMA ✓')
         } else {
-          showToast('Profil mis à jour — ton coach adaptera ton plan en conséquence.')
+          api.scheduleRegen({ userId: profile.id, reason: label }).catch(() => {})
+          showToast('Modification enregistrée — ton plan sera adapté automatiquement.')
         }
       } else {
         showToast('Profil mis à jour ✓')
@@ -785,65 +794,105 @@ export default function AthleteProfile() {
 
       </div>
 
-      {/* Mode canicule — visible pour tous les athlètes */}
+      {/* Alertes & adaptations — blessure + canicule + cycle */}
       <div className="card" style={{ marginBottom: '1.25rem' }}>
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '.75rem' }}>
-          <h4 style={{ margin: 0 }}>🌡️ Mode canicule</h4>
+        <h4 style={{ marginBottom: '1.25rem' }}>🚨 Alertes &amp; adaptations du plan</h4>
+        <p className="text-sm text-muted" style={{ marginBottom: '1.25rem', lineHeight: 1.6 }}>
+          Toute modification ici adapte automatiquement ton programme d'entraînement d'ici 1h.
+        </p>
+
+        {/* Blessures */}
+        <div style={{ marginBottom: '1.25rem' }}>
+          <div style={{ fontWeight: 600, fontSize: '.875rem', marginBottom: '.5rem' }}>🩹 Blessure / Douleur</div>
+          {editField === 'injuries' ? (
+            <div onClick={e => e.stopPropagation()}>
+              <textarea
+                className="form-textarea"
+                style={{ width: '100%', minHeight: 70, fontSize: '.875rem' }}
+                placeholder="Ex : tendinite genou gauche, douleur cheville…"
+                value={editVal.injuries ?? ''}
+                onChange={e => setEditVal(prev => ({ ...prev, injuries: e.target.value }))}
+                autoFocus
+              />
+              <div style={{ display: 'flex', gap: '.5rem', marginTop: '.5rem' }}>
+                <button className="btn btn-ghost btn-sm" style={{ fontSize: '.78rem' }} onClick={cancelEdit} disabled={editSaving}>Annuler</button>
+                <button className="btn btn-primary btn-sm" style={{ fontSize: '.78rem' }} onClick={() => saveField('injuries', editVal.injuries)} disabled={editSaving}>
+                  {editSaving ? '…' : '✓ Enregistrer'}
+                </button>
+              </div>
+            </div>
+          ) : (
+            <div
+              onClick={() => startEdit('injuries', profile?.injuries ?? '')}
+              style={{ cursor: 'pointer', background: 'var(--surface-2)', borderRadius: 'var(--radius)', padding: '.625rem .875rem', fontSize: '.875rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', border: '1.5px solid transparent' }}
+              className="field-card-hoverable">
+              <span style={{ color: profile?.injuries ? 'var(--text)' : 'var(--text-muted)', fontStyle: profile?.injuries ? 'normal' : 'italic' }}>
+                {profile?.injuries || 'Aucune douleur signalée'}
+              </span>
+              <span style={{ fontSize: '.75rem', opacity: 0 }} className="pencil-icon">✏️</span>
+            </div>
+          )}
+        </div>
+
+        <div style={{ height: 1, background: 'var(--border)', margin: '1rem 0' }} />
+
+        {/* Canicule */}
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: profile?.heat_mode ? '.75rem' : 0 }}>
+          <div>
+            <div style={{ fontWeight: 600, fontSize: '.875rem' }}>🌡️ Mode canicule</div>
+            <div style={{ fontSize: '.78rem', color: 'var(--text-muted)', marginTop: '.2rem', lineHeight: 1.5 }}>
+              Allège automatiquement la semaine en cours — que des footings tranquilles.
+            </div>
+          </div>
           <button
             onClick={toggleHeat}
             disabled={heatLoading}
             style={{
-              padding: '.4rem .9rem', borderRadius: 99, fontFamily: 'inherit',
+              flexShrink: 0, marginLeft: '1rem', padding: '.4rem .9rem', borderRadius: 99, fontFamily: 'inherit',
               border: profile?.heat_mode ? '1.5px solid rgba(251,146,60,.6)' : '1.5px solid var(--border)',
               background: profile?.heat_mode ? 'rgba(251,146,60,.15)' : 'var(--surface-2)',
               color: profile?.heat_mode ? '#FB923C' : 'var(--text-muted)',
-              fontWeight: 700, fontSize: '.82rem', cursor: heatLoading ? 'default' : 'pointer',
-              transition: 'all .2s',
+              fontWeight: 700, fontSize: '.82rem', cursor: heatLoading ? 'default' : 'pointer', transition: 'all .2s',
             }}>
             {heatLoading ? '…' : profile?.heat_mode ? '✓ Actif — Désactiver' : 'Activer'}
           </button>
         </div>
-        <p className="text-sm text-muted" style={{ lineHeight: 1.6 }}>
-          Active ce mode quand il fait trop chaud pour s'entraîner normalement. Ton plan de la semaine en cours est automatiquement allégé — que des footings tranquilles, aucune séance dure. Désactive-le dès que la chaleur redescend.
-        </p>
         {profile?.heat_mode && (
-          <div style={{ marginTop: '.75rem', background: 'rgba(251,146,60,.1)', border: '1px solid rgba(251,146,60,.3)', borderRadius: 10, padding: '.6rem .875rem', fontSize: '.82rem', color: '#FED7AA' }}>
-            🌡️ Actif — plan de cette semaine allégé. Va dans ton plan pour voir les séances adaptées.
+          <div style={{ background: 'rgba(251,146,60,.1)', border: '1px solid rgba(251,146,60,.3)', borderRadius: 10, padding: '.6rem .875rem', fontSize: '.82rem', color: '#FED7AA' }}>
+            🌡️ Actif — plan de cette semaine allégé.
           </div>
         )}
-      </div>
 
-      {/* Alerte règles — visible uniquement si gender = femme */}
-      {profile?.gender === 'femme' && (
-        <div className="card" style={{ marginBottom: '1.25rem' }}>
-          <h4 style={{ marginBottom: '.75rem' }}>🌸 Cycle menstruel</h4>
-          <p className="text-sm text-muted" style={{ marginBottom: '1rem', lineHeight: 1.6 }}>
-            Si tu as des douleurs importantes pendant tes règles qui t'empêchent de t'entraîner, active cette option.
-            Un bouton discret apparaîtra sur ton tableau de bord pour adapter automatiquement ton plan.
-          </p>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1rem' }}>
-            <label style={{ display: 'flex', alignItems: 'center', gap: '.5rem', cursor: 'pointer' }}>
-              <input type="checkbox" checked={periodPain} onChange={e => setPeriodPain(e.target.checked)}
-                style={{ width: 18, height: 18, accentColor: 'var(--primary)' }} />
-              <span style={{ fontWeight: 600, fontSize: '.9rem' }}>
-                J'ai des douleurs qui impactent mon entraînement
-              </span>
-            </label>
-          </div>
-          {periodPain && (
-            <div className="form-group" style={{ marginBottom: '1rem' }}>
-              <label className="form-label">Durée habituelle des douleurs : {periodDays} jour{periodDays > 1 ? 's' : ''}</label>
-              <input type="range" min={1} max={5} value={periodDays} onChange={e => setPeriodDays(parseInt(e.target.value))} />
-              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '.75rem', color: 'var(--text-muted)' }}>
-                <span>1 jour</span><span>5 jours</span>
-              </div>
+        {/* Cycle menstruel — femmes uniquement */}
+        {profile?.gender === 'femme' && (
+          <>
+            <div style={{ height: 1, background: 'var(--border)', margin: '1rem 0' }} />
+            <div style={{ fontWeight: 600, fontSize: '.875rem', marginBottom: '.75rem' }}>🌸 Cycle menstruel</div>
+            <p className="text-sm text-muted" style={{ marginBottom: '1rem', lineHeight: 1.6 }}>
+              Si tes règles impactent ton entraînement, active cette option pour que ton plan s'adapte automatiquement ces jours-là.
+            </p>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1rem' }}>
+              <label style={{ display: 'flex', alignItems: 'center', gap: '.5rem', cursor: 'pointer' }}>
+                <input type="checkbox" checked={periodPain} onChange={e => setPeriodPain(e.target.checked)}
+                  style={{ width: 18, height: 18, accentColor: 'var(--primary)' }} />
+                <span style={{ fontWeight: 600, fontSize: '.9rem' }}>J'ai des douleurs qui impactent mon entraînement</span>
+              </label>
             </div>
-          )}
-          <button className="btn btn-primary btn-sm" disabled={savingPeriod} onClick={savePeriodSettings}>
-            {savingPeriod ? 'Sauvegarde…' : '💾 Sauvegarder'}
-          </button>
-        </div>
-      )}
+            {periodPain && (
+              <div className="form-group" style={{ marginBottom: '1rem' }}>
+                <label className="form-label">Durée habituelle des douleurs : {periodDays} jour{periodDays > 1 ? 's' : ''}</label>
+                <input type="range" min={1} max={5} value={periodDays} onChange={e => setPeriodDays(parseInt(e.target.value))} />
+                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '.75rem', color: 'var(--text-muted)' }}>
+                  <span>1 jour</span><span>5 jours</span>
+                </div>
+              </div>
+            )}
+            <button className="btn btn-primary btn-sm" disabled={savingPeriod} onClick={savePeriodSettings}>
+              {savingPeriod ? 'Sauvegarde…' : '💾 Sauvegarder le cycle'}
+            </button>
+          </>
+        )}
+      </div>
 
       {/* Subscription */}
       <div className="card">

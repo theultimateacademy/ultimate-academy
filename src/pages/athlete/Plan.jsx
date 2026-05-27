@@ -846,10 +846,21 @@ export default function AthletePlan() {
               {(() => {
                 const courseCount = currentWeekData.seances?.filter(s => !String(s.type || '').toLowerCase().includes('renforcement')).length || 0
                 const renfoCount  = currentWeekData.seances?.filter(s =>  String(s.type || '').toLowerCase().includes('renforcement')).length || 0
+                const km  = currentWeekData.volume_total_km
+                const min = currentWeekData.temps_total_min
+                const timeLabel = min ? `${Math.floor(min/60)}h${String(min%60).padStart(2,'0')}` : null
                 return (
-                  <div style={{ fontSize: '.75rem', color: 'rgba(255,255,255,.55)', marginTop: '.2rem' }}>
-                    {courseCount} séance{courseCount > 1 ? 's' : ''} de course{renfoCount > 0 ? ` + ${renfoCount} renforcement` : ''}
-                  </div>
+                  <>
+                    <div style={{ fontSize: '.75rem', color: 'rgba(255,255,255,.55)', marginTop: '.2rem' }}>
+                      {courseCount} séance{courseCount > 1 ? 's' : ''} de course{renfoCount > 0 ? ` + ${renfoCount} renforcement` : ''}
+                    </div>
+                    {(km || timeLabel) && (
+                      <div style={{ fontSize: '.72rem', color: 'rgba(255,255,255,.4)', marginTop: '.15rem', display: 'flex', gap: '.5rem' }}>
+                        {km     && <span>📍 {km} km</span>}
+                        {timeLabel && <span>⏱ {timeLabel}</span>}
+                      </div>
+                    )}
+                  </>
                 )
               })()}
             </div>

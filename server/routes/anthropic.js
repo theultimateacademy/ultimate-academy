@@ -1396,6 +1396,7 @@ const ALLOWED_PROFILE_FIELDS = new Set([
   'period_pain', 'period_pain_days', 'avatar_url',
   'profile_completed',
   'intermediate_race_date', 'intermediate_race_name', 'training_terrain', 'heat_mode',
+  'plan_regen_after',
 ]);
 
 router.post('/profile/update', async (req, res) => {
@@ -1515,6 +1516,160 @@ router.post('/plans/generate-monthly', async (req, res) => {
     console.log(`[generate-monthly] Done: ${generated}/${athletes.length} plans generated`);
   } catch (err) {
     console.error('[generate-monthly]', err.message);
+  }
+});
+
+// ─── POST /api/plans/schedule-regen ─────────────────────────────────────────
+
+router.post('/plans/schedule-regen', async (req, res) => {
+  const { userId, reason } = req.body;
+  if (!userId) return res.status(400).json({ error: 'Missing userId' });
+  try {
+    const regenAt = new Date(Date.now() + 60 * 60 * 1000);
+    await supabase.from('profiles').update({ plan_regen_after: regenAt.toISOString() }).eq('id', userId);
+    console.log(`[schedule-regen] Scheduled for ${userId} at ${regenAt.toISOString()} — reason: ${reason}`);
+    res.json({ success: true, regen_scheduled_for: regenAt.toISOString() });
+  } catch (err) {
+    console.error('[schedule-regen]', err.message);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// ─── POST /api/plans/check-regen ─────────────────────────────────────────────
+// Called by cron every 15 min — regenerates plans for athletes who modified key fields
+
+router.post('/plans/check-regen', async (req, res) => {
+  try {
+    const now = new Date().toISOString();
+    const { data: profiles } = await supabase
+      .from('profiles')
+      .select('*')
+      .not('plan_regen_after', 'is', null)
+      .lte('plan_regen_after', now)
+      .in('subscription_status', ['active', 'trialing']);
+
+    if (!profiles?.length) return res.json({ processed: 0 });
+
+    const todayStr = getParisLocalDate();
+    let processed = 0;
+
+    for (const profile of profiles) {
+      try {
+        // Clear the regen flag immediately so it won't be picked up again
+        await supabase.from('profiles').update({ plan_regen_after: null }).eq('id', profile.id);
+
+        // Archive current active plan
+        await supabase.from('training_plans')
+          .update({ status: 'replaced' })
+          .eq('user_id', profile.id)
+          .eq('status', 'active');
+
+        // Build prompt (mirrors /plans/generate logic)
+        const vma            = resolveVma(profile);
+        const weeksUntilRace = computeWeeksUntilRace(profile.race_date);
+        const monthStructure = computeMonthStructure(profile.objective, weeksUntilRace);
+        const efMin          = profile.days_per_week >= 5 ? 'minimum 2 EF obligatoires' : 'minimum 1 EF obligatoire';
+        const structureDesc  = monthStructure.semaines.map(s => `  S${s.numero} → phase "${s.phase}", charge "${s.charge}"`).join('\n');
+
+        const localISO = d => {
+          const yr = d.getFullYear(), mo = String(d.getMonth()+1).padStart(2,'0'), dy = String(d.getDate()).padStart(2,'0');
+          return `${yr}-${mo}-${dy}`;
+        };
+        const today         = new Date(todayStr + 'T00:00:00');
+        const dayNames      = ['Dimanche','Lundi','Mardi','Mercredi','Jeudi','Vendredi','Samedi'];
+        const todayDayNum   = today.getDay();
+        const daysToSunday  = todayDayNum === 0 ? 0 : 7 - todayDayNum;
+        const thisSunday    = new Date(today); thisSunday.setDate(today.getDate() + daysToSunday);
+        const nextMonday    = new Date(thisSunday); nextMonday.setDate(thisSunday.getDate() + 1);
+        const DAY_NUM       = { Lundi:1, Mardi:2, Mercredi:3, Jeudi:4, Vendredi:5, Samedi:6, Dimanche:0 };
+        const normDay       = d => (DAY_NUM[d] === 0 ? 7 : DAY_NUM[d]);
+        const normToday     = todayDayNum === 0 ? 7 : todayDayNum;
+        const preferredDays = profile.preferred_days || [];
+        const remainingThisWeek   = preferredDays.filter(d => normDay(d) >= normToday);
+        const isPartialWeek       = todayDayNum !== 1;
+        const week1SessionCount   = isPartialWeek ? remainingThisWeek.length : profile.days_per_week;
+
+        const intermediateRaceInfo = profile.intermediate_race_date && profile.intermediate_race_name
+          ? `Course intermédiaire : ${profile.intermediate_race_name} — ${new Date(profile.intermediate_race_date).toLocaleDateString('fr-FR')} (RÈGLE 14 : prévoir mini-affûtage la semaine précédente)`
+          : 'Aucune course intermédiaire prévue dans ce plan';
+        const terrainInfo = profile.training_terrain
+          ? `Terrain d'entraînement : ${profile.training_terrain === 'montagne' ? 'Montagne (D+/descentes — RÈGLE 13)' : profile.training_terrain === 'semi_montagne' ? 'Semi-montagne (mix plat et pente — RÈGLE 13)' : 'Ville/Plat (escaliers, tapis incliné — RÈGLE 13)'}`
+          : '';
+
+        const calendarSection = isPartialWeek
+          ? `CALENDRIER — SEMAINE 1 PARTIELLE\nAujourd'hui : ${todayStr} (${dayNames[todayDayNum]}).\nSemaine 1 = du ${todayStr} au ${localISO(thisSunday)}.\nJours préférés encore disponibles cette semaine : ${remainingThisWeek.join(', ') || 'aucun'}.\n→ Assigne UNIQUEMENT ${week1SessionCount} séance(s) course en semaine 1.\n→ Semaines 2, 3, 4 commencent à partir du ${localISO(nextMonday)} avec ${profile.days_per_week} séances course + 1 RENFO chacune.`
+          : `CALENDRIER — SEMAINE 1 COMPLÈTE\nAujourd'hui : ${todayStr} (lundi).\nLe plan commence aujourd'hui.\nSemaines 1-4 : ${profile.days_per_week} séances course + 1 RENFO par semaine.`;
+
+        const userPrompt = `Génère un plan d'entraînement running de EXACTEMENT 4 SEMAINES pour :
+
+Prénom : ${profile.first_name}
+Objectif course : ${profile.objective}
+Date de course : ${profile.race_date ? new Date(profile.race_date).toLocaleDateString('fr-FR') : 'Non définie'}
+Semaines avant la course : ${weeksUntilRace !== null ? weeksUntilRace : 'N/A'}
+Contexte du mois : ${monthStructure.label}
+Niveau : ${profile.level}
+VMA : ${vma} km/h ${profile.vma_known ? '(mesurée)' : '(estimée)'}
+Objectif chrono : ${profile.chrono_goal_known ? profile.chrono_goal : 'Progresser'}
+Séances course/semaine : ${profile.days_per_week} → ${efMin} par semaine
+Jours préférés : ${preferredDays.join(', ') || 'Non précisé'}
+Blessures / douleurs : ${profile.injuries || 'Aucune'}
+Forme actuelle : ${profile.current_form || 'Non renseignée'}
+${intermediateRaceInfo}
+${terrainInfo}
+
+${calendarSection}
+
+${buildPaceSection(vma, profile.objective, profile.chrono_goal_known ? profile.chrono_goal : null)}
+
+STRUCTURE IMPOSÉE :
+${structureDesc}
+
+CONTRAINTES ABSOLUES :
+1. EXACTEMENT 4 semaines avec les phases ci-dessus
+2. Semaine 1 : ${week1SessionCount} séances course. Semaines 2-4 : EXACTEMENT ${profile.days_per_week} séances course + 1 RENFO
+3. ${efMin} dans chaque semaine complète
+4. Ratio 80/20 respecté`;
+
+        const libraryText = await loadSessionLibrary();
+        const message = await client.messages.create({
+          model:      'claude-sonnet-4-6',
+          max_tokens: 16000,
+          system:     buildSystemPrompt(libraryText),
+          messages:   [{ role: 'user', content: userPrompt }]
+        });
+
+        const rawText  = message.content[0].text.trim();
+        const jsonText = rawText.replace(/^```json\s*/i,'').replace(/^```\s*/i,'').replace(/\s*```$/i,'');
+        const planData = JSON.parse(jsonText);
+
+        await supabase.from('training_plans').insert({
+          user_id:      profile.id,
+          plan_data:    planData,
+          status:       'active',
+          activated_at: new Date().toISOString(),
+        });
+
+        await supabase.from('messages').insert({
+          user_id: profile.id,
+          sender:  'coach',
+          content: `Plan mis à jour ✓ J'ai pris en compte tes modifications et adapté ton programme. Tu peux le consulter dans l'onglet Plan.`,
+          read:    false,
+        });
+
+        processed++;
+        console.log(`[check-regen] Plan regenerated for ${profile.first_name} (${profile.id})`);
+        if (profiles.indexOf(profile) < profiles.length - 1) {
+          await new Promise(r => setTimeout(r, 5000));
+        }
+      } catch (err) {
+        console.error(`[check-regen] Error for ${profile.id}:`, err.message);
+      }
+    }
+
+    res.json({ processed });
+  } catch (err) {
+    console.error('[check-regen]', err.message);
+    res.status(500).json({ error: err.message });
   }
 });
 

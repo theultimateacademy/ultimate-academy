@@ -99,6 +99,16 @@ cron.schedule('0 18 * * 0', async () => {
   }
 });
 
+// Profile regen — every 15 minutes (athletes who modified key fields)
+cron.schedule('*/15 * * * *', async () => {
+  try {
+    const axios = require('axios');
+    await axios.post(`http://localhost:${PORT}/api/plans/check-regen`, {}, { timeout: 600000 });
+  } catch (err) {
+    console.error('[CRON] check-regen error:', err.message);
+  }
+});
+
 // Monthly plan generation — every Sunday at 15:00 UTC (17:00 Paris), only on the last Sunday of the month
 cron.schedule('0 15 * * 0', async () => {
   // Check if this is the last Sunday of the month (next Sunday is in a different month)
