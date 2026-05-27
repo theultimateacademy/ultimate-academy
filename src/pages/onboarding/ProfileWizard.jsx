@@ -125,12 +125,10 @@ export default function ProfileWizard() {
   const total    = steps.length
   const progress = Math.round(((currentIdx) / (total - 1)) * 100)
 
-  // Wake the server early — ping /health from step 5 onward so it's ready at submit
+  // Pre-warm Render immediately on mount so it's ready when the wizard finishes
   useEffect(() => {
-    if (currentIdx >= 4) {
-      api.health().catch(() => {})
-    }
-  }, [currentIdx])
+    api.health().catch(() => {})
+  }, [])
 
   function set(key, val) { setData(d => ({ ...d, [key]: val })) }
 
@@ -247,11 +245,21 @@ export default function ProfileWizard() {
         .catch(() => {})
     }
 
-    // Pass local date so server computes correct Paris calendar (avoids UTC midnight shift)
-    const clientDate = new Date().toLocaleDateString('sv-SE') // gives YYYY-MM-DD in browser local time
-    api.generatePlan({ userId: user.id, profile: savedProfile, clientDate }).catch(err =>
-      console.error('[Plan] Background error:', err.message)
-    )
+    // Generate plan with retries — Render may be waking from sleep (60s cold start)
+    const clientDate = new Date().toLocaleDateString('sv-SE') // YYYY-MM-DD local time
+    ;(async () => {
+      for (let attempt = 1; attempt <= 4; attempt++) {
+        try {
+          await api.generatePlan({ userId: user.id, profile: savedProfile, clientDate })
+          console.log('[Plan] Generated on attempt', attempt)
+          return
+        } catch (err) {
+          console.warn(`[Plan] Attempt ${attempt}/4 failed:`, err.message)
+          if (attempt < 4) await new Promise(r => setTimeout(r, 20000)) // wait 20s then retry
+        }
+      }
+      console.error('[Plan] All attempts failed — server will self-heal on next wake-up')
+    })().catch(() => {})
     await refreshProfile()
     setDone(true)
   }

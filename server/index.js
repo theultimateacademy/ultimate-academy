@@ -183,6 +183,58 @@ Réponds uniquement avec le texte du message, sans guillemets ni formatage.`
   }
 }
 
+function getParisLocalDate() {
+  const parts = new Intl.DateTimeFormat('fr-FR', {
+    timeZone: 'Europe/Paris', year: 'numeric', month: '2-digit', day: '2-digit'
+  }).formatToParts(new Date());
+  const year  = parts.find(p => p.type === 'year').value;
+  const month = parts.find(p => p.type === 'month').value;
+  const day   = parts.find(p => p.type === 'day').value;
+  return `${year}-${month}-${day}`;
+}
+
+// On server wake-up: find athletes with completed profile but no training plan and generate one
+async function healMissingPlans() {
+  console.log('[STARTUP] Checking for athletes missing training plans…');
+  try {
+    const { data: athletes } = await supabaseRT
+      .from('profiles')
+      .select('*')
+      .eq('role', 'athlete')
+      .eq('profile_completed', true)
+      .in('subscription_status', ['active', 'trialing']);
+
+    if (!athletes?.length) return;
+
+    const axios = require('axios');
+    for (const athlete of athletes) {
+      const { data: existing } = await supabaseRT
+        .from('training_plans')
+        .select('id')
+        .eq('user_id', athlete.id)
+        .in('status', ['active', 'pending'])
+        .maybeSingle();
+
+      if (existing) continue;
+
+      console.log(`[STARTUP] Generating missing plan for ${athlete.first_name} ${athlete.last_name}…`);
+      try {
+        await axios.post(`http://localhost:${PORT}/api/plans/generate`, {
+          userId: athlete.id,
+          profile: athlete,
+          clientDate: getParisLocalDate(),
+        }, { timeout: 120000 });
+        console.log(`[STARTUP] Plan generated for ${athlete.first_name}`);
+        await new Promise(r => setTimeout(r, 5000));
+      } catch (err) {
+        console.error(`[STARTUP] Failed for ${athlete.id}:`, err.message);
+      }
+    }
+  } catch (err) {
+    console.error('[STARTUP] healMissingPlans error:', err.message);
+  }
+}
+
 app.listen(PORT, () => {
   console.log(`The Ultimate Academy server running on port ${PORT}`);
 
@@ -198,4 +250,7 @@ app.listen(PORT, () => {
     .subscribe(status => {
       console.log(`[AutoReply] Realtime status: ${status}`);
     });
+
+  // Heal any athletes who registered while Render was sleeping (no plan generated)
+  setTimeout(healMissingPlans, 8000);
 });
