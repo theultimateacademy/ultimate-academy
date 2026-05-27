@@ -688,6 +688,9 @@ export default function AthletePlan() {
   const [postFlow,      setPostFlow]      = useState(null)
   const [loading,       setLoading]       = useState(true)
   const [heatLoading,   setHeatLoading]   = useState(false)
+  const [cycleModal,    setCycleModal]    = useState(false)
+  const [cycleLoading,  setCycleLoading]  = useState(false)
+  const [cycleDone,     setCycleDone]     = useState(false)
 
   useEffect(() => {
     if (!profile?.id) return
@@ -731,6 +734,20 @@ export default function AthletePlan() {
       console.error('[toggleHeat]', err)
     } finally {
       setHeatLoading(false)
+    }
+  }
+
+  async function triggerCycleAdapt() {
+    setCycleLoading(true)
+    try {
+      await api.periodAlert({ userId: profile.id })
+      await loadPlan()
+      setCycleDone(true)
+      setTimeout(() => { setCycleModal(false); setCycleDone(false) }, 2000)
+    } catch (err) {
+      console.error('[CycleAdapt]', err)
+    } finally {
+      setCycleLoading(false)
     }
   }
 
@@ -780,22 +797,39 @@ export default function AthletePlan() {
 
   return (
     <div className="page">
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1.5rem' }}>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1.5rem', gap: '.5rem' }}>
         <h2 className="page-heading" style={{ margin: 0 }}>Mon plan</h2>
-        <button
-          onClick={toggleHeat}
-          disabled={heatLoading}
-          style={{
-            display: 'flex', alignItems: 'center', gap: '.4rem',
-            padding: '.4rem .85rem', borderRadius: 99,
-            border: profile?.heat_mode ? '1.5px solid rgba(251,146,60,.6)' : '1.5px solid rgba(255,255,255,.15)',
-            background: profile?.heat_mode ? 'rgba(251,146,60,.15)' : 'rgba(255,255,255,.05)',
-            color: profile?.heat_mode ? '#FB923C' : 'rgba(255,255,255,.5)',
-            fontSize: '.78rem', fontWeight: 700, cursor: heatLoading ? 'default' : 'pointer',
-            fontFamily: 'inherit', transition: 'all .2s',
-          }}>
-          {heatLoading ? '…' : <>🌡️ {profile?.heat_mode ? 'Canicule ON' : 'Canicule'}</>}
-        </button>
+        <div style={{ display: 'flex', gap: '.4rem', flexShrink: 0 }}>
+          {(profile?.gender === 'female' || profile?.period_pain) && (
+            <button
+              onClick={() => setCycleModal(true)}
+              style={{
+                display: 'flex', alignItems: 'center', gap: '.35rem',
+                padding: '.4rem .75rem', borderRadius: 99,
+                border: '1.5px solid rgba(236,72,153,.5)',
+                background: 'rgba(236,72,153,.12)',
+                color: '#F472B6',
+                fontSize: '.75rem', fontWeight: 700, cursor: 'pointer',
+                fontFamily: 'inherit', whiteSpace: 'nowrap',
+              }}>
+              🌸 Adapter
+            </button>
+          )}
+          <button
+            onClick={toggleHeat}
+            disabled={heatLoading}
+            style={{
+              display: 'flex', alignItems: 'center', gap: '.35rem',
+              padding: '.4rem .75rem', borderRadius: 99,
+              border: profile?.heat_mode ? '1.5px solid #CA8A04' : '1.5px solid #CA8A04',
+              background: profile?.heat_mode ? 'rgba(234,179,8,.25)' : 'rgba(234,179,8,.1)',
+              color: profile?.heat_mode ? '#FDE047' : '#EAB308',
+              fontSize: '.75rem', fontWeight: 700, cursor: heatLoading ? 'default' : 'pointer',
+              fontFamily: 'inherit', whiteSpace: 'nowrap', transition: 'all .2s',
+            }}>
+            {heatLoading ? '…' : <>🌡️ {profile?.heat_mode ? 'Canicule ON' : 'Canicule'}</>}
+          </button>
+        </div>
       </div>
 
       {profile?.heat_mode && (
@@ -1031,6 +1065,38 @@ export default function AthletePlan() {
           onClose={() => setPostFlow(null)}
           onDone={() => { loadPlan() }}
         />
+      )}
+
+      {cycleModal && (
+        <div className="modal-overlay center" onClick={e => e.target === e.currentTarget && setCycleModal(false)}>
+          <div className="modal center-modal" style={{ maxWidth: 380 }}>
+            <div style={{ textAlign: 'center', marginBottom: '1.25rem' }}>
+              <div style={{ fontSize: '2rem', marginBottom: '.5rem' }}>🌸</div>
+              <h3 style={{ marginBottom: '.5rem' }}>Adapter mon plan</h3>
+              <p style={{ fontSize: '.875rem', color: 'var(--text-muted)', lineHeight: 1.6 }}>
+                Les séances intenses de cette semaine vont être remplacées par des footings légers de récupération. Tu reprends normalement dès que tu te sens prête.
+              </p>
+            </div>
+            {cycleDone ? (
+              <div style={{ textAlign: 'center', color: '#F472B6', fontWeight: 700, padding: '.75rem' }}>
+                ✅ Plan adapté — prends soin de toi 🌸
+              </div>
+            ) : (
+              <div style={{ display: 'flex', gap: '.75rem' }}>
+                <button className="btn btn-ghost" style={{ flex: 1 }} onClick={() => setCycleModal(false)}>
+                  Annuler
+                </button>
+                <button
+                  className="btn btn-primary"
+                  style={{ flex: 1, background: 'linear-gradient(135deg,#BE185D,#9D174D)', border: 'none' }}
+                  disabled={cycleLoading}
+                  onClick={triggerCycleAdapt}>
+                  {cycleLoading ? '…' : 'Adapter'}
+                </button>
+              </div>
+            )}
+          </div>
+        </div>
       )}
     </div>
   )
