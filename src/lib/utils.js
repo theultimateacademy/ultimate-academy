@@ -76,13 +76,15 @@ export const DAY_LABELS = {
 }
 
 export const SESSION_TYPE_COLORS = {
-  'Endurance fondamentale': '#10B981',
-  'Fractionné court':       '#E8237A',
-  'Fractionné long':        '#8B2FC9',
-  'Tempo':                  '#F59E0B',
-  'Côtes':                  '#EF4444',
-  'Spécifique':             '#6366F1',
-  'Sortie longue':          '#0EA5E9',
-  'Récupération active':    '#6B7280',
-  'Renforcement musculaire': '#D97706'
+  'Endurance fondamentale':  '#10B981',
+  'Fractionné court':        '#E8237A',
+  'Fractionné long':         '#8B2FC9',
+  'Tempo':                   '#F59E0B',
+  'Côtes':                   '#EF4444',
+  'Spécifique':              '#6366F1',
+  'Sortie longue':           '#0EA5E9',
+  'Récupération active':     '#6B7280',
+  'Renforcement musculaire': '#D97706',
+  'Course':                  '#FFD700',
+  'Course intermédiaire':    '#FB923C',
 }

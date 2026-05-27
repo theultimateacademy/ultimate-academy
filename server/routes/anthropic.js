@@ -146,6 +146,75 @@ Zones de référence :
   Fractionné court (95-105%) : ${calcPace(vma, 0.95)}/km – ${calcPace(vma, 1.05)}/km${targetPaceLine}`;
 }
 
+// ─── Inject race events as special sessions ──────────────────────────────────
+
+function injectRaceSessions(planData, profile) {
+  const semaines = planData?.semaines;
+  if (!semaines?.length) return planData;
+
+  const DAY_NAMES = ['Dimanche','Lundi','Mardi','Mercredi','Jeudi','Vendredi','Samedi'];
+
+  function injectOne(raceDate, type, name, encouragement) {
+    if (!raceDate) return;
+    const raceDateStr = raceDate.substring(0, 10);
+    for (const semaine of semaines) {
+      const debut = semaine.dates?.debut;
+      const fin   = semaine.dates?.fin;
+      if (!debut || !fin) continue;
+      if (raceDateStr >= debut && raceDateStr <= fin) {
+        if (!semaine.seances) semaine.seances = [];
+        const exists = semaine.seances.some(s => s.date === raceDateStr && (s.id_seance === 'RACE' || s.id_seance === 'RACE_INT'));
+        if (!exists) {
+          const jour = DAY_NAMES[new Date(raceDateStr + 'T12:00:00').getDay()];
+          semaine.seances.push({
+            jour,
+            date:          raceDateStr,
+            id_seance:     type === 'Course intermédiaire' ? 'RACE_INT' : 'RACE',
+            type,
+            titre:         `🏁 ${name}`,
+            duree_min:     0,
+            distance_km:   null,
+            intensite:     'course',
+            echauffement:  null,
+            corps:         encouragement,
+            retour_au_calme: null,
+            allures:       [],
+            notes_coach:   "Fais confiance à tout ce qu'on a travaillé ensemble. Gère bien ton départ, cours ta course — tu es prêt(e) 💪",
+            rpe_cible:     null,
+            est_seance_cle: true,
+            est_course:    true,
+          });
+          // Sort seances by date
+          semaine.seances.sort((a, b) => {
+            if (a.date && b.date) return a.date.localeCompare(b.date);
+            return 0;
+          });
+        }
+        break;
+      }
+    }
+  }
+
+  if (profile.race_date) {
+    const name = profile.objective === 'marathon' ? 'Marathon' :
+                 profile.objective === 'semi'     ? 'Semi-marathon' :
+                 profile.objective === '10km'     ? '10 km' :
+                 profile.objective === '5km'      ? '5 km' :
+                 (profile.objective || '').replace('_',' ');
+    injectOne(
+      profile.race_date, 'Course', `Jour J — ${name}`,
+      `C'est le grand jour ${profile.first_name} ! Tout ce travail, c'est pour aujourd'hui. Tu peux y aller la tête haute 🏆`
+    );
+  }
+  if (profile.intermediate_race_date && profile.intermediate_race_name) {
+    injectOne(
+      profile.intermediate_race_date, 'Course intermédiaire', profile.intermediate_race_name,
+      `Course intermédiaire aujourd'hui — ${profile.intermediate_race_name} ! Utilise ça comme repère, gère ton effort, et profite de l'ambiance 🎽`
+    );
+  }
+  return planData;
+}
+
 // ─── Load session library from DB ─────────────────────────────────────────────
 
 async function loadSessionLibrary() {
@@ -211,9 +280,15 @@ JAMAIS de décharge automatique. La décharge est déclenchée UNIQUEMENT si l'a
 En l'absence de ces signaux, pas de décharge — maintenir la progression.
 Niveau décharge : réduire volume 30-40%, max 1 séance intensité légère.
 
-RÈGLE 5 — AFFÛTAGE
-Marathon : 2 semaines. Semi-marathon : 10 jours. 10km : 1 semaine (jusqu'à 10 jours selon niveau). 5km : 1 semaine.
-Réduire volume 40-50%, garder intensités courtes. Dernière séance dure minimum J-10.
+RÈGLE 5 — AFFÛTAGE (RÉDUCTION VOLUME ET INTENSITÉ)
+Marathon : 2 semaines. Semi-marathon : 10 jours à 2 semaines. 10km : 1 semaine. 5km : 1 semaine.
+RÉDUIRE à la fois le volume ET l'intensité — les deux ensemble, jamais l'un sans l'autre :
+• Volume : -40% semaine pré-affûtage (S-2), -60% semaine d'affûtage final (S-1)
+• AUCUNE sortie longue pendant l'affûtage — max 40 min EF
+• AUCUN seuil long / tempo long — au maximum 1 bloc très court à allure objectif (2×1000m ou 3×1000m légers, pas plus)
+• Travail uniquement : footings EF 30-40 min, quelques strides, 1 séance courte allure course à très faible volume
+• Dernière séance dure minimum J-10 avant la course
+VEILLE DE COURSE (J-1) : séance d'activation OBLIGATOIRE = EXACTEMENT 20-25 min de footing très léger + 6 lignes droites 80m progressives + gammes athlétiques. JAMAIS 50 min la veille. JAMAIS de vraie séance. Code : EF-01 ou créer une séance d'activation spécifique si disponible dans la bibliothèque.
 
 RÈGLE 6 — VARIÉTÉ DES SÉANCES (RÈGLE ABSOLUE — AUCUNE EXCEPTION)
 INTERDIT de répéter le même id_seance PLUS D'UNE FOIS sur l'ensemble des 4 semaines du plan.
@@ -302,6 +377,22 @@ Si intermediate_race_date est fourni dans le profil et tombe dans la fenêtre du
 • La semaine PRÉCÉDANT cette course = mini-affûtage : volume réduit 30-40%, 1 séance légère à allure objectif race intermédiaire, aucune séance dure, charge "Légère (mini-affûtage)"
 • La semaine DE la course : 1 footing 25-30 min EF mardi ou mercredi, repos les 2 jours précédant la course, séance RENFO facultative
 • Mentionner la course intermédiaire dans le message_du_mois et dans les notes_coach de la semaine de mini-affûtage
+
+RÈGLE 15 — REPOS POST-COURSE ET TRANSITION
+Après une course PRINCIPALE (pas intermédiaire) dont la date est inférieure à 3 semaines avant le début du plan :
+• 5km / 10km : S+1 = récupération légère uniquement (EF 20-30 min, 1-2 footings max, aucune intensité)
+• Semi-marathon : S+1 = repos actif (EF court 20-30 min), S+2 = reprise très progressive
+• Marathon : S+1 à S+2 = repos complet ou footing 20 min max, aucune intensité avant la S+3
+• Ultra-trail 50k+ : S+1 à S+3 = repos presque complet, reprise très légère uniquement
+Détecter automatiquement : si race_date < aujourd'hui et < 3 semaines → appliquer RÈGLE 15 sur la S1 du nouveau plan.
+
+RÈGLE 16 — PRÉPARATION SPÉCIFIQUE ENTRE DEUX COURSES
+Pour préparer une nouvelle course, durée de préparation recommandée selon l'objectif :
+• 5km / 10km : 8-10 semaines de prépa spécifique
+• Semi-marathon : 10-12 semaines
+• Marathon : 14-16 semaines
+• Ultra-trail : 16-20 semaines
+L'objectif est de maintenir une base solide entre les cycles, sans jamais repartir de zéro. La phase "inter-cycle" travaille VMA + volume de base + renfo.
 
 ═══════════════════════════════════════
 CALCUL DES ALLURES — RÈGLES ABSOLUES
@@ -612,7 +703,7 @@ CONTRAINTES ABSOLUES — vérifie et documente dans auto_validation avant de sou
 
     const rawText  = message.content[0].text.trim();
     const jsonText = rawText.replace(/^```json\s*/i, '').replace(/^```\s*/i, '').replace(/\s*```$/i, '');
-    const planData = JSON.parse(jsonText);
+    const planData = injectRaceSessions(JSON.parse(jsonText), profile);
 
     const { data: plan, error } = await supabase
       .from('training_plans')
@@ -695,9 +786,13 @@ Retourne UNIQUEMENT : {"seances": [...séances adaptées...]}`;
       await supabase.from('training_plans').update({ plan_data: updatedPlan }).eq('id', plan.id);
     }
 
+    const heatWarmMsg = await client.messages.create({
+      model: 'claude-sonnet-4-6', max_tokens: 180,
+      messages: [{ role: 'user', content: `Tu es Alexis, coach running. ${profile.first_name} vient d'activer le mode canicule. Écris un message très court (2-3 phrases) style SMS de pote — parle à la 1ère personne, naturel, 1-2 emojis. Dis-lui que t'as allégé sa semaine, de courir tôt le matin ou le soir, et de bien s'hydrater. Réponds uniquement avec le texte.` }]
+    }).catch(() => null);
     await supabase.from('messages').insert({
       user_id: userId, sender: 'coach',
-      content: `Mode canicule activé 🌡️ J'ai allégé ta semaine — que des footings tranquilles, on ne force pas par cette chaleur. Cours tôt le matin ou en soirée, hydrate-toi bien. On reprend l'intensité dès que ça se calme.`,
+      content: heatWarmMsg?.content?.[0]?.text?.trim() || `Hello ${profile.first_name} ! J'ai allégé ta semaine — que des footings tranquilles, on ne force rien par cette chaleur 🌡️ Cours tôt le mat' ou en soirée et hydrate-toi bien.`,
       read: false,
     });
 
@@ -1051,7 +1146,7 @@ router.post('/plans/fatigue-adapt', async (req, res) => {
     adjustNextWeek(planId, weekNumber, fakeAnalysis, athleteProfile);
 
     // Generate a personalized coach message about the adaptation
-    const msgPrompt = `Tu es le coach Alexis de The Ultimate Academy. ${athleteProfile.first_name} vient de finir une séance avec un RPE de ${rpe}/10${comment ? ` et a dit : "${comment}"` : ''}. Tu vas alléger sa semaine prochaine automatiquement. Écris-lui un message très court (2-3 phrases max), style SMS entre potes — naturel, direct, bienveillant. Pas de "Cher athlète", pas de signature, pas de formules de politesse. Juste un message humain qui lui dit que t'as vu et que t'ajustes.`;
+    const msgPrompt = `Tu es Alexis, coach running. ${athleteProfile.first_name} vient de finir une séance avec un RPE de ${rpe}/10${comment ? ` et a dit : "${comment}"` : ''}. Tu vas alléger sa semaine prochaine automatiquement. Écris 2-3 phrases max style SMS de pote — parle à la 1ère personne, "Hello ${athleteProfile.first_name} !" ou similaire, 1-2 emojis max, naturel. Réponds uniquement avec le texte du message.`;
 
     const msg = await client.messages.create({
       model: 'claude-sonnet-4-6',
@@ -1173,31 +1268,85 @@ router.post('/analyses/pre-race/run', async (req, res) => {
     target.setDate(target.getDate() + 7);
     const dateStr = target.toISOString().split('T')[0];
 
-    const { data: athletes } = await supabase
-      .from('profiles').select('id')
-      .eq('race_date', dateStr)
-      .eq('subscription_status', 'active');
+    // Check both main race and intermediate race at J-7
+    const { data: byMainRace }   = await supabase.from('profiles').select('id').eq('race_date', dateStr).eq('subscription_status', 'active');
+    const { data: byInterRace }  = await supabase.from('profiles').select('id').eq('intermediate_race_date', dateStr).eq('subscription_status', 'active');
 
+    const allIds  = [...new Set([...(byMainRace || []).map(a => a.id), ...(byInterRace || []).map(a => a.id)])];
     const results = [];
-    for (const athlete of (athletes || [])) {
-      const { data: existing } = await supabase
-        .from('pre_race_analyses').select('id')
-        .eq('user_id', athlete.id).eq('race_date', dateStr).single();
-      if (existing) { results.push({ id: athlete.id, status: 'already_done' }); continue; }
+    const axios   = require('axios');
 
+    for (const id of allIds) {
+      const { data: existing } = await supabase.from('pre_race_analyses').select('id')
+        .eq('user_id', id).eq('race_date', dateStr).single();
+      if (existing) { results.push({ id, status: 'already_done' }); continue; }
       try {
         await new Promise(r => setTimeout(r, 1500));
-        const axios = require('axios');
-        await axios.post(`http://localhost:${process.env.PORT || 3001}/api/analyses/pre-race/generate`, { userId: athlete.id });
-        results.push({ id: athlete.id, status: 'generated' });
+        await axios.post(`http://localhost:${process.env.PORT || 3001}/api/analyses/pre-race/generate`, { userId: id });
+        results.push({ id, status: 'generated' });
       } catch (err) {
-        results.push({ id: athlete.id, status: 'error', error: err.message });
+        results.push({ id, status: 'error', error: err.message });
       }
     }
 
     res.json({ success: true, processed: results.length, results });
   } catch (err) {
     console.error('[PreRaceRun]', err.message);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// ─── POST /api/analyses/intermediate-post/run  (cron — J+2 after intermediate race) ─
+
+router.post('/analyses/intermediate-post/run', async (req, res) => {
+  try {
+    const target = new Date();
+    target.setDate(target.getDate() - 2);
+    const dateStr = target.toISOString().split('T')[0];
+
+    const { data: athletes } = await supabase
+      .from('profiles').select('id, first_name, objective, level, vma, vma_known, intermediate_race_name, intermediate_race_date')
+      .eq('intermediate_race_date', dateStr)
+      .eq('subscription_status', 'active');
+
+    if (!athletes?.length) return res.json({ processed: 0 });
+
+    let processed = 0;
+    for (const athlete of athletes) {
+      try {
+        // Check if already sent
+        const { data: existing } = await supabase.from('messages').select('id')
+          .eq('user_id', athlete.id).ilike('content', `%post-course%${athlete.intermediate_race_name || ''}%`).limit(1).single();
+        if (existing) continue;
+
+        const vma = resolveVma(athlete);
+        const prompt = `Tu es Alexis, coach running. ${athlete.first_name} vient de courir ${athlete.intermediate_race_name || 'une course intermédiaire'} il y a 2 jours.
+Écris un message de suivi post-course très chaleureux (4-6 phrases), style pote-coach, à la 1ère personne. Parle de :
+1. Bravo pour la course
+2. Il est normal de ressentir de la fatigue J+2, c'est le signe que l'effort était réel
+3. Cette semaine on récupère doucement : 1-2 footings EF légers max 30 min
+4. Ce que ça prédit pour la suite et comment ça s'intègre dans la prépa
+Tu peux mettre 1-2 emojis, style SMS naturel, pas de signature, pas de "Cher/Chère".
+Réponds uniquement avec le texte du message.`;
+
+        const msg = await client.messages.create({
+          model: 'claude-sonnet-4-6', max_tokens: 350,
+          messages: [{ role: 'user', content: prompt }]
+        });
+
+        await supabase.from('messages').insert({
+          user_id: athlete.id, sender: 'coach',
+          content: msg.content[0].text.trim(), read: false,
+        });
+        processed++;
+      } catch (err) {
+        console.error(`[intermediate-post] Error for ${athlete.id}:`, err.message);
+      }
+    }
+
+    res.json({ processed });
+  } catch (err) {
+    console.error('[intermediate-post/run]', err.message);
     res.status(500).json({ error: err.message });
   }
 });
@@ -1640,7 +1789,7 @@ CONTRAINTES ABSOLUES :
 
         const rawText  = message.content[0].text.trim();
         const jsonText = rawText.replace(/^```json\s*/i,'').replace(/^```\s*/i,'').replace(/\s*```$/i,'');
-        const planData = JSON.parse(jsonText);
+        const planData = injectRaceSessions(JSON.parse(jsonText), profile);
 
         await supabase.from('training_plans').insert({
           user_id:      profile.id,
@@ -1649,12 +1798,23 @@ CONTRAINTES ABSOLUES :
           activated_at: new Date().toISOString(),
         });
 
-        await supabase.from('messages').insert({
-          user_id: profile.id,
-          sender:  'coach',
-          content: `Plan mis à jour ✓ J'ai pris en compte tes modifications et adapté ton programme. Tu peux le consulter dans l'onglet Plan.`,
-          read:    false,
-        });
+        // Warm personal message — generated by Claude, buddy style
+        try {
+          const warmMsg = await client.messages.create({
+            model: 'claude-sonnet-4-6', max_tokens: 200,
+            messages: [{ role: 'user', content: `Tu es Alexis, coach running. Écris un message très court (2-3 phrases max) style SMS de pote à ${profile.first_name}. Tu viens de mettre à jour son plan suite à des changements dans son profil. Parle à la 1ère personne, dis "Hello ${profile.first_name} !" ou similaire, 1-2 emojis max en fin de phrase, très naturel, jamais "cher/chère", jamais de signature. Exemple : "Hello ${profile.first_name} ! J'ai vu tes modifs et j'ai mis ton plan à jour 💪 Vas voir l'onglet Plan !" Réponds uniquement avec le texte du message, sans guillemets.` }]
+          });
+          await supabase.from('messages').insert({
+            user_id: profile.id, sender: 'coach',
+            content: warmMsg.content[0].text.trim(), read: false,
+          });
+        } catch {
+          await supabase.from('messages').insert({
+            user_id: profile.id, sender: 'coach',
+            content: `Hello ${profile.first_name} ! J'ai mis ton plan à jour suite à tes modifs 💪 Vas jeter un œil dans l'onglet Plan.`,
+            read: false,
+          });
+        }
 
         processed++;
         console.log(`[check-regen] Plan regenerated for ${profile.first_name} (${profile.id})`);

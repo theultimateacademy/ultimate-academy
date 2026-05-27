@@ -368,8 +368,38 @@ export default function AdminDashboard() {
   const [stats,          setStats]          = useState({ athletes: 0, pending: 0, analyses: 0, cancelling: 0, newThisMonth: 0, feedbacks: 0, mrr: 0 })
   const [loading,        setLoading]        = useState(true)
   const [recentAthletes, setRecentAthletes] = useState([])
+  const [newAthlete,     setNewAthlete]     = useState(null)
 
   useEffect(() => { loadData() }, [])
+
+  // Realtime: notify when a new athlete completes their profile
+  useEffect(() => {
+    // Request browser notification permission
+    if ('Notification' in window && Notification.permission === 'default') {
+      Notification.requestPermission();
+    }
+
+    const channel = supabase.channel('admin-new-athlete')
+      .on('postgres_changes',
+        { event: 'UPDATE', schema: 'public', table: 'profiles' },
+        payload => {
+          if (!payload.old?.profile_completed && payload.new?.profile_completed && payload.new?.role === 'athlete') {
+            const name = `${payload.new.first_name || ''} ${payload.new.last_name || ''}`.trim();
+            setNewAthlete({ name, email: payload.new.email, objective: payload.new.objective });
+            loadData();
+            // Browser notification
+            if ('Notification' in window && Notification.permission === 'granted') {
+              new Notification('🏃 Nouvel inscrit — The Ultimate Academy', {
+                body: `${name} vient de finaliser son profil !`,
+                icon: '/icon-192.png',
+              });
+            }
+          }
+        })
+      .subscribe();
+
+    return () => { supabase.removeChannel(channel); };
+  }, [])
 
   async function loadData() {
     setLoading(true)
@@ -419,6 +449,14 @@ export default function AdminDashboard() {
   return (
     <div className="page">
       <h2 className="page-heading" style={{ marginBottom: '1.5rem' }}>Tableau de bord</h2>
+
+      {newAthlete && (
+        <div className="alert alert-success" style={{ marginBottom: '1rem', justifyContent: 'space-between', cursor: 'pointer' }}
+          onClick={() => { navigate('/admin/athletes'); setNewAthlete(null); }}>
+          <span>🎉 Nouvel inscrit : <strong>{newAthlete.name}</strong> ({newAthlete.email}) — {newAthlete.objective}</span>
+          <span onClick={e => { e.stopPropagation(); setNewAthlete(null); }} style={{ opacity: .6 }}>✕</span>
+        </div>
+      )}
 
       {(stats.pending > 0 || stats.analyses > 0 || badges.messages > 0) && (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '.75rem', marginBottom: '1.5rem' }}>

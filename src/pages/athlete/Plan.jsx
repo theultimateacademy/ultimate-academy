@@ -875,8 +875,52 @@ export default function AthletePlan() {
       {/* Sessions */}
       <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
         {currentWeekData?.seances?.map((session, idx) => {
-          const done = isCompleted(currentWeekData.numero, idx)
+          const done  = isCompleted(currentWeekData.numero, idx)
+          const isRace = session.est_course || session.id_seance === 'RACE' || session.id_seance === 'RACE_INT'
           const color = SESSION_TYPE_COLORS[session.type] || 'var(--primary)'
+
+          // ── Special race card ──────────────────────────────────────────────
+          if (isRace) {
+            const raceColor = session.type === 'Course intermédiaire' ? '#FB923C' : '#FFD700'
+            const dateLabel = sessionDate(plan.activated_at || plan.created_at, currentWeekData.numero, session.jour, session.date)
+            return (
+              <div key={idx} style={{
+                borderRadius: 'var(--radius)',
+                border: `2px solid ${raceColor}`,
+                background: `linear-gradient(135deg, ${raceColor}18, ${raceColor}08)`,
+                padding: '1rem 1.25rem',
+                position: 'relative', overflow: 'hidden',
+              }}>
+                <div style={{
+                  position: 'absolute', top: 0, right: 0, bottom: 0, width: 4,
+                  background: raceColor, opacity: .6,
+                }} />
+                <div style={{ display: 'flex', alignItems: 'center', gap: '.5rem', marginBottom: '.5rem' }}>
+                  <span style={{ fontSize: '1.25rem' }}>🏁</span>
+                  <span style={{ fontSize: '.75rem', fontWeight: 700, color: raceColor,
+                    background: raceColor + '25', padding: '.15rem .6rem', borderRadius: 99 }}>
+                    {session.type}
+                  </span>
+                </div>
+                <div style={{ fontWeight: 800, fontSize: '1.05rem', marginBottom: '.25rem', color: raceColor }}>
+                  {session.titre}
+                </div>
+                <div style={{ fontSize: '.8rem', color: 'var(--text-muted)', marginBottom: '.75rem' }}>{dateLabel}</div>
+                {session.corps && (
+                  <div style={{ fontSize: '.875rem', lineHeight: 1.6, color: 'var(--text)', fontStyle: 'italic',
+                    borderTop: `1px solid ${raceColor}30`, paddingTop: '.6rem' }}>
+                    {session.corps}
+                  </div>
+                )}
+                {session.notes_coach && (
+                  <div style={{ marginTop: '.5rem', fontSize: '.78rem', color: 'var(--text-muted)', lineHeight: 1.5 }}>
+                    💬 {session.notes_coach}
+                  </div>
+                )}
+              </div>
+            )
+          }
+
           return (
             <div key={idx} className="card"
               style={{

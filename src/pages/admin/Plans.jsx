@@ -299,29 +299,34 @@ export default function AdminPlans() {
           return (
             <div key={plan.id} className="card"
               style={{ borderLeft: plan.status === 'pending' ? '4px solid var(--warning)' : '4px solid var(--success)' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '1rem' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', minWidth: 0 }}>
-                  <div className="chat-avatar" style={{ flexShrink: 0 }}>{athlete?.first_name?.[0]?.toUpperCase()}</div>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '.75rem' }}>
+                {/* Athlete info + badges */}
+                <div style={{ display: 'flex', alignItems: 'flex-start', gap: '.75rem', minWidth: 0, flex: 1 }}>
+                  <div className="chat-avatar" style={{ flexShrink: 0, marginTop: '.1rem' }}>{athlete?.first_name?.[0]?.toUpperCase()}</div>
                   <div style={{ minWidth: 0 }}>
                     <div style={{ fontWeight: 700, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{athlete?.first_name} {athlete?.last_name}</div>
-                    <div style={{ fontSize: '.8rem', color: 'var(--text-muted)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{athlete?.email}</div>
+                    <div style={{ fontSize: '.78rem', color: 'var(--text-muted)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{athlete?.email}</div>
+                    <div style={{ display: 'flex', gap: '.35rem', flexWrap: 'wrap', marginTop: '.4rem', alignItems: 'center' }}>
+                      <span className="badge badge-info">{weeks} sem.</span>
+                      <span className={`badge ${plan.status === 'pending' ? 'badge-warning' : plan.status === 'active' ? 'badge-success' : 'badge-info'}`}>
+                        {plan.status === 'pending' ? '⏳ Attente' : plan.status === 'active' ? '✅ Actif' : plan.status}
+                      </span>
+                      <span style={{ fontSize: '.72rem', color: 'var(--text-muted)' }}>
+                        {new Date(plan.created_at).toLocaleDateString('fr-FR')}
+                      </span>
+                    </div>
                   </div>
                 </div>
-                <div style={{ display: 'flex', gap: '.5rem', alignItems: 'center', flexWrap: 'wrap', flexShrink: 0 }}>
-                  <span className="badge badge-info">{weeks} semaines</span>
-                  <span className={`badge ${plan.status === 'pending' ? 'badge-warning' : plan.status === 'active' ? 'badge-success' : 'badge-info'}`}>
-                    {plan.status === 'pending' ? '⏳ En attente' : plan.status === 'active' ? '✅ Actif' : plan.status}
-                  </span>
-                  <span style={{ fontSize: '.75rem', color: 'var(--text-muted)' }}>
-                    {new Date(plan.created_at).toLocaleDateString('fr-FR')}
-                  </span>
+                {/* Action buttons — compact, never overflow */}
+                <div style={{ display: 'flex', gap: '.4rem', flexShrink: 0, alignItems: 'center' }}>
                   <button className="btn btn-primary btn-sm"
+                    style={{ whiteSpace: 'nowrap' }}
                     onClick={() => setModal({ plan, athlete })}>
-                    {plan.status === 'pending' ? '📋 Réviser et valider' : '📋 Voir'}
+                    {plan.status === 'pending' ? '📋 Réviser' : '📋 Voir'}
                   </button>
                   {plan.status === 'pending' && (
                     <button className="btn btn-sm" onClick={() => setConfirmDelPlan({ plan, athlete })}
-                      style={{ background: 'var(--error)', color: '#fff', border: 'none' }}>
+                      style={{ background: 'var(--error)', color: '#fff', border: 'none', padding: '.35rem .6rem' }}>
                       🗑
                     </button>
                   )}

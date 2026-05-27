@@ -86,6 +86,17 @@ cron.schedule('0 6 * * *', async () => {
   }
 });
 
+// Intermediate post-race follow-up — every day at 09:00 (J+2 after intermediate race)
+cron.schedule('0 9 * * *', async () => {
+  console.log('[CRON] Running intermediate post-race analysis…');
+  try {
+    const axios = require('axios');
+    await axios.post(`http://localhost:${PORT}/api/analyses/intermediate-post/run`, {}, { timeout: 120000 });
+  } catch (err) {
+    console.error('[CRON] Intermediate post-race error:', err.message);
+  }
+});
+
 // Weekly analysis — every Sunday at 18:00
 cron.schedule('0 18 * * 0', async () => {
   console.log('[CRON] Running weekly analysis for all active athletes…');
@@ -245,6 +256,39 @@ async function healMissingPlans() {
   }
 }
 
+// ─── New athlete notification ────────────────────────────────────────────────
+
+async function notifyCoachNewAthlete(profile) {
+  const name  = `${profile.first_name || ''} ${profile.last_name || ''}`.trim();
+  const email = profile.email || '';
+  const obj   = profile.objective || '?';
+  const level = profile.level || '?';
+
+  console.log(`[NewAthlete] Nouvel inscrit : ${name} (${email})`);
+
+  // Email via Resend (optional — only if RESEND_API_KEY is set)
+  if (process.env.RESEND_API_KEY) {
+    try {
+      await fetch('https://api.resend.com/emails', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${process.env.RESEND_API_KEY}`,
+          'Content-Type':  'application/json',
+        },
+        body: JSON.stringify({
+          from:    'The Ultimate Academy <noreply@theultimateacademy.fr>',
+          to:      [process.env.COACH_EMAIL || 'alexiselie1912@gmail.com'],
+          subject: `🏃 Nouvel inscrit : ${name}`,
+          text:    `Nouveau membre sur The Ultimate Academy !\n\nNom : ${name}\nEmail : ${email}\nObjectif : ${obj}\nNiveau : ${level}\n\nConnecte-toi sur l'interface coach pour générer son plan.`,
+        }),
+      });
+      console.log(`[NewAthlete] Email sent to coach`);
+    } catch (err) {
+      console.error('[NewAthlete] Email error:', err.message);
+    }
+  }
+}
+
 app.listen(PORT, () => {
   console.log(`The Ultimate Academy server running on port ${PORT}`);
 
@@ -259,6 +303,21 @@ app.listen(PORT, () => {
       })
     .subscribe(status => {
       console.log(`[AutoReply] Realtime status: ${status}`);
+    });
+
+  // Listen for new athletes completing their profile
+  supabaseRT.channel('new-athlete-channel')
+    .on('postgres_changes',
+      { event: 'UPDATE', schema: 'public', table: 'profiles' },
+      payload => {
+        const prev = payload.old;
+        const next = payload.new;
+        if (!prev?.profile_completed && next?.profile_completed && next?.role === 'athlete') {
+          notifyCoachNewAthlete(next);
+        }
+      })
+    .subscribe(status => {
+      console.log(`[NewAthlete] Realtime status: ${status}`);
     });
 
   // Heal any athletes who registered while Render was sleeping (no plan generated)
