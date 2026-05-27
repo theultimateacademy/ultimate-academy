@@ -659,7 +659,7 @@ Semaines 1-4 : ${profile.days_per_week} séances course + 1 RENFO par semaine.`;
   // Intermediate race info
   const hasIntermediateRace = profile.intermediate_race_date && profile.intermediate_race_name;
   const intermediateRaceInfo = hasIntermediateRace
-    ? `Course intermédiaire : ${profile.intermediate_race_name} — ${new Date(profile.intermediate_race_date).toLocaleDateString('fr-FR')} (RÈGLE 14 : prévoir mini-affûtage la semaine précédente)`
+    ? `Course intermédiaire : ${profile.intermediate_race_name} — ${new Date(profile.intermediate_race_date).toLocaleDateString('fr-FR')} (RÈGLE 14 : mini-affûtage dans la semaine de la course elle-même — la semaine AVANT est développement normal)`
     : 'Aucune course intermédiaire prévue dans ce plan';
 
   const terrainInfo = profile.training_terrain
@@ -1762,7 +1762,7 @@ router.post('/plans/check-regen', async (req, res) => {
         const week1SessionCount   = isPartialWeek ? remainingThisWeek.length : profile.days_per_week;
 
         const intermediateRaceInfo = profile.intermediate_race_date && profile.intermediate_race_name
-          ? `Course intermédiaire : ${profile.intermediate_race_name} — ${new Date(profile.intermediate_race_date).toLocaleDateString('fr-FR')} (RÈGLE 14 : prévoir mini-affûtage la semaine précédente)`
+          ? `Course intermédiaire : ${profile.intermediate_race_name} — ${new Date(profile.intermediate_race_date).toLocaleDateString('fr-FR')} (RÈGLE 14 : mini-affûtage dans la semaine de la course elle-même — la semaine AVANT est développement normal)`
           : 'Aucune course intermédiaire prévue dans ce plan';
         const terrainInfo = profile.training_terrain
           ? `Terrain d'entraînement : ${profile.training_terrain === 'montagne' ? 'Montagne (D+/descentes — RÈGLE 13)' : profile.training_terrain === 'semi_montagne' ? 'Semi-montagne (mix plat et pente — RÈGLE 13)' : 'Ville/Plat (escaliers, tapis incliné — RÈGLE 13)'}`
