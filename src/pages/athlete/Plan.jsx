@@ -862,10 +862,25 @@ export default function AthletePlan() {
                   </>
                 )
               })()}
-              <span style={{ display: 'inline-block', marginTop: '.5rem', padding: '.25rem .7rem', borderRadius: 99,
-                background: 'rgba(255,255,255,.15)', fontSize: '.75rem', fontWeight: 600 }}>
-                {currentWeekData.charge}
-              </span>
+              {(() => {
+                const raw   = currentWeekData.charge || ''
+                const parenIdx = raw.indexOf('(')
+                const main  = parenIdx > 0 ? raw.slice(0, parenIdx).trim() : raw
+                const sub   = parenIdx > 0 ? raw.slice(parenIdx) : null
+                return (
+                  <div style={{ marginTop: '.5rem' }}>
+                    <span style={{ display: 'inline-block', padding: '.2rem .65rem', borderRadius: 99,
+                      background: 'rgba(255,255,255,.15)', fontSize: '.72rem', fontWeight: 700 }}>
+                      {main}
+                    </span>
+                    {sub && (
+                      <div style={{ fontSize: '.68rem', color: 'rgba(255,255,255,.4)', marginTop: '.2rem' }}>
+                        {sub}
+                      </div>
+                    )}
+                  </div>
+                )
+              })()}
             </div>
         </div>
       )}
