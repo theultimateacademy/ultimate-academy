@@ -163,13 +163,35 @@ function injectRaceSessions(planData, profile) {
       if (!debut || !fin) continue;
       if (raceDateStr >= debut && raceDateStr <= fin) {
         if (!semaine.seances) semaine.seances = [];
-        const exists = semaine.seances.some(s => s.date === raceDateStr && (s.id_seance === 'RACE' || s.id_seance === 'RACE_INT'));
-        if (!exists) {
+        const targetId = type === 'Course intermédiaire' ? 'RACE_INT' : 'RACE';
+        const existingIdx = semaine.seances.findIndex(s =>
+          s.date === raceDateStr && (
+            s.id_seance === 'RACE' || s.id_seance === 'RACE_INT' ||
+            s.est_course === true ||
+            (s.type && (s.type.toLowerCase().includes('course') || s.type.toLowerCase() === 'race'))
+          )
+        );
+        if (existingIdx >= 0) {
+          // Normalize Claude-generated race session to canonical format
+          const s = semaine.seances[existingIdx];
+          s.id_seance    = targetId;
+          s.type         = type;
+          s.titre        = `🏁 ${name}`;
+          s.est_course   = true;
+          s.est_seance_cle = true;
+          s.corps        = s.corps || s.conseil_seance || s.description_complete?.corps || encouragement;
+          s.notes_coach  = s.notes_coach || "Fais confiance à tout ce qu'on a travaillé ensemble. Gère bien ton départ, cours ta course — tu es prêt(e) 💪";
+          s.rpe_cible    = null;
+          s.allures      = s.allures || [];
+          delete s.nom;
+          delete s.conseil_seance;
+          delete s.description_complete;
+        } else {
           const jour = DAY_NAMES[new Date(raceDateStr + 'T12:00:00').getDay()];
           semaine.seances.push({
             jour,
             date:          raceDateStr,
-            id_seance:     type === 'Course intermédiaire' ? 'RACE_INT' : 'RACE',
+            id_seance:     targetId,
             type,
             titre:         `🏁 ${name}`,
             duree_min:     0,
@@ -184,7 +206,6 @@ function injectRaceSessions(planData, profile) {
             est_seance_cle: true,
             est_course:    true,
           });
-          // Sort seances by date
           semaine.seances.sort((a, b) => {
             if (a.date && b.date) return a.date.localeCompare(b.date);
             return 0;
@@ -371,12 +392,14 @@ Si training_terrain est fourni dans le profil :
 • ville_plat : escaliers répétés (cage d'escalier ou parking), marche nordique en côte, tapis incliné si disponible — mentionner ces alternatives dans le corps et notes_coach ; garder fractionnés sur piste/route
 Exception terrain Ultra Marin (Réunion) : course essentiellement sur route, pas besoin de D+ — préparer comme un marathon haute distance (volume, seuil, allure)
 
-RÈGLE 14 — COURSE INTERMÉDIAIRE (mini-affûtage)
+RÈGLE 14 — COURSE INTERMÉDIAIRE (mini-affûtage dans la semaine de la course)
 Si intermediate_race_date est fourni dans le profil et tombe dans la fenêtre du plan :
-• Identifier la semaine où se situe la course intermédiaire
-• La semaine PRÉCÉDANT cette course = mini-affûtage : volume réduit 30-40%, 1 séance légère à allure objectif race intermédiaire, aucune séance dure, charge "Légère (mini-affûtage)"
-• La semaine DE la course : 1 footing 25-30 min EF mardi ou mercredi, repos les 2 jours précédant la course, séance RENFO facultative
-• Mentionner la course intermédiaire dans le message_du_mois et dans les notes_coach de la semaine de mini-affûtage
+• Identifier la semaine OÙ SE SITUE la course intermédiaire (pas la semaine d'avant)
+• Cette semaine = mini-affûtage ET course : volume réduit 40-50%, aucune séance dure, 1 footing EF léger maximum (25-30 min), repos les 2 jours précédant la course, course le jour J
+• La semaine AVANT la course intermédiaire = semaine de développement normale — PAS d'affûtage, PAS de réduction de charge
+• INTERDIT de placer une sortie longue ou une séance dure dans la semaine de la course intermédiaire
+• Charge de la semaine de la course = "Légère (mini-affûtage course intermédiaire)"
+• Mentionner la course intermédiaire dans le message_du_mois
 
 RÈGLE 15 — REPOS POST-COURSE ET TRANSITION
 Après une course PRINCIPALE (pas intermédiaire) dont la date est inférieure à 3 semaines avant le début du plan :
