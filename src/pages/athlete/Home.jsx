@@ -15,8 +15,6 @@ export default function AthleteHome() {
   const [lastMessage,   setLastMessage]   = useState(null)
   const [loading,       setLoading]       = useState(true)
   const [analysis,      setAnalysis]      = useState(null)
-  const [periodAlert,   setPeriodAlert]   = useState(false)
-  const [periodLoading, setPeriodLoading] = useState(false)
   const [preRaceAnalysis, setPreRaceAnalysis] = useState(null)
   const [hasPostRace,     setHasPostRace]     = useState(false)
 
@@ -101,19 +99,6 @@ export default function AthleteHome() {
     }
   }
 
-  async function triggerPeriodAlert() {
-    setPeriodLoading(true)
-    try {
-      await api.periodAlert({ userId: profile.id })
-      setPeriodAlert(true)
-      await loadData()
-    } catch (err) {
-      alert('Erreur : ' + err.message)
-    } finally {
-      setPeriodLoading(false)
-    }
-  }
-
   const days = profile?.race_date ? daysUntil(profile.race_date) : null
 
   // Raw days (can be negative for past race dates)
@@ -127,27 +112,6 @@ export default function AthleteHome() {
 
   return (
     <div className="page">
-      {/* Alerte règles, discrète, uniquement si activée */}
-      {profile?.period_pain && plan && !periodAlert && (
-        <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '1rem' }}>
-          <button
-            onClick={triggerPeriodAlert}
-            disabled={periodLoading}
-            style={{
-              background: 'rgba(236,72,153,.12)', color: '#db2777',
-              border: '1px solid rgba(236,72,153,.3)', borderRadius: 99,
-              padding: '.35rem .9rem', fontSize: '.78rem', fontWeight: 600,
-              cursor: 'pointer', fontFamily: 'inherit'
-            }}>
-            {periodLoading ? '…' : '🌸 Adapter mon plan'}
-          </button>
-        </div>
-      )}
-      {periodAlert && (
-        <div className="alert alert-success" style={{ marginBottom: '1rem', fontSize: '.875rem' }}>
-          🌸 Plan adapté. Prends soin de toi, les séances sont allégées pour les prochains jours.
-        </div>
-      )}
 
       {/* Welcome */}
       <div style={{ marginBottom: '1.75rem' }}>

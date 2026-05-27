@@ -812,7 +812,7 @@ export default function AthletePlan() {
                 fontSize: '.75rem', fontWeight: 700, cursor: 'pointer',
                 fontFamily: 'inherit', whiteSpace: 'nowrap',
               }}>
-              🌸 Adapter
+              🌸 Adapter mon plan
             </button>
           )}
           <button
