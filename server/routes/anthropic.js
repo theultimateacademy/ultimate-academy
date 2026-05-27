@@ -146,6 +146,43 @@ Zones de référence :
   Fractionné court (95-105%) : ${calcPace(vma, 0.95)}/km – ${calcPace(vma, 1.05)}/km${targetPaceLine}`;
 }
 
+// ─── Recalculate distances from pace + duration ───────────────────────────────
+
+function recalculateDistances(planData, vma) {
+  if (!planData?.semaines) return planData;
+  for (const sem of planData.semaines) {
+    for (const s of (sem.seances || [])) {
+      if (s.est_course || !s.duree_min) continue;
+      const type = (s.type || '').toLowerCase();
+      if (type.includes('renforcement') || type.includes('repos')) {
+        s.distance_km = 0;
+        continue;
+      }
+      // Average speed from allures[] zones when available
+      const validAllures = (s.allures || []).filter(a => typeof a.vitesse_kmh === 'number' && a.vitesse_kmh > 0);
+      let avgSpeed;
+      if (validAllures.length > 0) {
+        avgSpeed = validAllures.reduce((sum, a) => sum + a.vitesse_kmh, 0) / validAllures.length;
+        // Fractionnés have rest periods — reduce effective speed
+        if (type.includes('fractionné') || type.includes('vma')) avgSpeed *= 0.85;
+      } else {
+        // Fallback: type-based % of VMA
+        const pct = (type.includes('tempo') || type.includes('seuil')) ? 0.73
+          : (type.includes('fractionné') || type.includes('vma'))     ? 0.70
+          : (type.includes('côte') || type.includes('cote'))          ? 0.68
+          : 0.67; // EF, SL, footing progressif
+        avgSpeed = vma * pct;
+      }
+      s.distance_km = Math.round((s.duree_min / 60) * avgSpeed * 10) / 10;
+    }
+    // Recalculate weekly volume
+    sem.volume_total_km = Math.round(
+      (sem.seances || []).reduce((sum, s) => sum + (s.distance_km || 0), 0) * 10
+    ) / 10;
+  }
+  return planData;
+}
+
 // ─── Inject race events as special sessions ──────────────────────────────────
 
 function injectRaceSessions(planData, profile) {
@@ -726,7 +763,7 @@ CONTRAINTES ABSOLUES — vérifie et documente dans auto_validation avant de sou
 
     const rawText  = message.content[0].text.trim();
     const jsonText = rawText.replace(/^```json\s*/i, '').replace(/^```\s*/i, '').replace(/\s*```$/i, '');
-    const planData = injectRaceSessions(JSON.parse(jsonText), profile);
+    const planData = recalculateDistances(injectRaceSessions(JSON.parse(jsonText), profile), resolveVma(profile));
 
     const { data: plan, error } = await supabase
       .from('training_plans')
@@ -1812,7 +1849,7 @@ CONTRAINTES ABSOLUES :
 
         const rawText  = message.content[0].text.trim();
         const jsonText = rawText.replace(/^```json\s*/i,'').replace(/^```\s*/i,'').replace(/\s*```$/i,'');
-        const planData = injectRaceSessions(JSON.parse(jsonText), profile);
+        const planData = recalculateDistances(injectRaceSessions(JSON.parse(jsonText), profile), resolveVma(profile));
 
         await supabase.from('training_plans').insert({
           user_id:      profile.id,
