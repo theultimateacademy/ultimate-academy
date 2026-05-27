@@ -247,7 +247,9 @@ export default function ProfileWizard() {
         .catch(() => {})
     }
 
-    api.generatePlan({ userId: user.id, profile: savedProfile }).catch(err =>
+    // Pass local date so server computes correct Paris calendar (avoids UTC midnight shift)
+    const clientDate = new Date().toLocaleDateString('sv-SE') // gives YYYY-MM-DD in browser local time
+    api.generatePlan({ userId: user.id, profile: savedProfile, clientDate }).catch(err =>
       console.error('[Plan] Background error:', err.message)
     )
     await refreshProfile()

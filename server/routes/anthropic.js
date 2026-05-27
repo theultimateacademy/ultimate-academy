@@ -101,6 +101,18 @@ function parseChronoToSeconds(str) {
 
 const RACE_DISTANCES = { '5km': 5, '10km': 10, 'semi': 21.097, 'marathon': 42.195 };
 
+// Returns YYYY-MM-DD for the current date in Paris timezone (handles UTC offset automatically)
+function getParisLocalDate() {
+  const parts = new Intl.DateTimeFormat('fr-FR', {
+    timeZone: 'Europe/Paris',
+    year: 'numeric', month: '2-digit', day: '2-digit'
+  }).formatToParts(new Date());
+  const year  = parts.find(p => p.type === 'year').value;
+  const month = parts.find(p => p.type === 'month').value;
+  const day   = parts.find(p => p.type === 'day').value;
+  return `${year}-${month}-${day}`;
+}
+
 function calcTargetPace(chronoGoal, objective) {
   if (!chronoGoal) return null;
   const totalSec = parseChronoToSeconds(chronoGoal);
@@ -203,11 +215,12 @@ RÈGLE 5 — AFFÛTAGE
 Marathon : 2 semaines. Semi-marathon : 10 jours. 10km : 1 semaine (jusqu'à 10 jours selon niveau). 5km : 1 semaine.
 Réduire volume 40-50%, garder intensités courtes. Dernière séance dure minimum J-10.
 
-RÈGLE 6 — VARIÉTÉ DES SÉANCES
-Ne jamais répéter le même id_seance deux semaines consécutives — ni deux semaines d'affilée sur le plan.
-Varier les types de séances à chaque semaine pour stimuler des adaptations différentes.
-Si une séance similaire est souhaitée, choisir un code différent dans la bibliothèque (ex : FL-03 puis FL-05 jamais FL-03/FL-03).
-Une répétition intentionnelle n'est acceptable qu'avec un écart minimum de 3 semaines et doit être documentée (est_repetition = true, date_premiere_realisation = date ISO).
+RÈGLE 6 — VARIÉTÉ DES SÉANCES (RÈGLE ABSOLUE — AUCUNE EXCEPTION)
+INTERDIT de répéter le même id_seance PLUS D'UNE FOIS sur l'ensemble des 4 semaines du plan.
+Chaque id_seance doit être UNIQUE sur les 4 semaines : si FL-03 est utilisé semaine 1, il est INTERDIT de l'utiliser en semaine 2, 3 ou 4.
+Varier obligatoirement : si un type de séance (ex: fractionné 1000m) apparaît plusieurs fois, utiliser des codes DIFFÉRENTS (FL-01 + FL-03, jamais FL-01 + FL-01).
+La bibliothèque contient suffisamment de codes pour garantir 4 semaines sans aucun doublon.
+Avant de soumettre : liste mentalement tous les id_seance utilisés et vérifie qu'il n'y a aucun doublon sur l'ensemble du plan.
 
 RÈGLE 7 — RÉCUPÉRATION VARIÉE
 Varier systématiquement les temps et modes de récupération selon la séance :
@@ -226,7 +239,7 @@ Vérifier et renseigner le champ auto_validation :
 ✓ progression_volume_ok : hausse max 10%
 ✓ echauffement_min_25min : toutes séances course
 ✓ retour_calme_min_10min : toutes séances course
-✓ variete_seances_ok : pas la même séance deux semaines consécutives
+✓ variete_seances_ok : pas le même id_seance deux fois dans l'ensemble du plan de 4 semaines — chaque code est unique
 ✓ recuperations_variees : temps de récup variés
 ✓ allures_toujours_specifiques : aucune description vague d'allure
 ✓ regles_toutes_respectees : toutes les règles ci-dessus
@@ -433,7 +446,7 @@ function buildSystemPrompt(libraryText) {
 // ─── POST /api/plans/generate ────────────────────────────────────────────────
 
 router.post('/plans/generate', async (req, res) => {
-  const { userId, profile: clientProfile } = req.body;
+  const { userId, profile: clientProfile, clientDate } = req.body;
   if (!userId || !clientProfile) return res.status(400).json({ error: 'Missing data' });
 
   // Always re-fetch the latest profile from DB so any modifications are taken into account
@@ -450,7 +463,6 @@ router.post('/plans/generate', async (req, res) => {
     .join('\n');
 
   // ── Calendar logic ──────────────────────────────────────────────────────────
-  // Use local date formatting to avoid UTC timezone shift
   const localISO = d => {
     const yr = d.getFullYear();
     const mo = String(d.getMonth() + 1).padStart(2, '0');
@@ -458,7 +470,9 @@ router.post('/plans/generate', async (req, res) => {
     return `${yr}-${mo}-${dy}`;
   };
 
-  const today = new Date();
+  // Use browser-provided date (local) or compute Paris timezone date (server UTC is unreliable near midnight)
+  const todayDateStr = clientDate || getParisLocalDate();
+  const today = new Date(todayDateStr + 'T00:00:00');
   today.setHours(0, 0, 0, 0);
   const todayISO      = localISO(today);
   const dayNames      = ['Dimanche', 'Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi'];
@@ -1296,6 +1310,92 @@ router.post('/profile/update', async (req, res) => {
   } catch (err) {
     console.error('[profile/update] ERROR:', err.message);
     res.status(500).json({ error: err.message });
+  }
+});
+
+// ─── POST /api/plans/generate-monthly ───────────────────────────────────────
+// Called by cron: generates pending plans for all active athletes who don't have one yet
+
+router.post('/plans/generate-monthly', async (req, res) => {
+  console.log('[generate-monthly] Starting monthly plan generation…');
+  res.json({ accepted: true }); // respond immediately so cron doesn't time out
+
+  try {
+    const { data: athletes, error: athletesErr } = await supabase
+      .from('profiles')
+      .select('*')
+      .eq('role', 'athlete')
+      .in('subscription_status', ['active', 'trialing']);
+
+    if (athletesErr) throw athletesErr;
+    if (!athletes?.length) { console.log('[generate-monthly] No active athletes.'); return; }
+
+    let generated = 0;
+    const todayStr = getParisLocalDate();
+
+    for (const athlete of athletes) {
+      try {
+        const { data: existing } = await supabase
+          .from('training_plans').select('id')
+          .eq('user_id', athlete.id).eq('status', 'pending').maybeSingle();
+
+        if (existing) { console.log(`[generate-monthly] Skip ${athlete.first_name} — pending plan exists`); continue; }
+
+        // Inline plan generation (reuse same logic as /plans/generate)
+        const vma            = resolveVma(athlete);
+        const weeksUntilRace = computeWeeksUntilRace(athlete.race_date);
+        const monthStructure = computeMonthStructure(athlete.objective, weeksUntilRace);
+        const efMin          = (athlete.days_per_week >= 5) ? 'minimum 2 EF obligatoires' : 'minimum 1 EF obligatoire';
+        const structureDesc  = monthStructure.semaines.map(s => `  S${s.numero} → phase "${s.phase}", charge "${s.charge}"`).join('\n');
+
+        const localISO = d => { const yr=d.getFullYear(), mo=String(d.getMonth()+1).padStart(2,'0'), dy=String(d.getDate()).padStart(2,'0'); return `${yr}-${mo}-${dy}`; };
+        const today       = new Date(todayStr + 'T00:00:00');
+        const dayNames    = ['Dimanche','Lundi','Mardi','Mercredi','Jeudi','Vendredi','Samedi'];
+        const todayDayNum = today.getDay();
+        const daysToSunday  = todayDayNum === 0 ? 0 : 7 - todayDayNum;
+        const thisSunday    = new Date(today); thisSunday.setDate(today.getDate() + daysToSunday);
+        const nextMonday    = new Date(thisSunday); nextMonday.setDate(thisSunday.getDate() + 1);
+        const DAY_NUM       = { Lundi:1, Mardi:2, Mercredi:3, Jeudi:4, Vendredi:5, Samedi:6, Dimanche:0 };
+        const normDay       = d => (DAY_NUM[d] === 0 ? 7 : DAY_NUM[d]);
+        const normToday     = todayDayNum === 0 ? 7 : todayDayNum;
+        const preferredDays = athlete.preferred_days || [];
+        const remainingThisWeek = preferredDays.filter(d => normDay(d) >= normToday);
+        const isPartialWeek     = todayDayNum !== 1;
+        const week1SessionCount = isPartialWeek ? remainingThisWeek.length : athlete.days_per_week;
+
+        const calendarSection = isPartialWeek
+          ? `CALENDRIER — SEMAINE 1 PARTIELLE\nAujourd'hui : ${todayStr} (${dayNames[todayDayNum]}).\nSemaine 1 = du ${todayStr} au ${localISO(thisSunday)}.\nJours préférés encore disponibles cette semaine : ${remainingThisWeek.join(', ') || 'aucun'}.\n→ Assigne UNIQUEMENT ${week1SessionCount} séance(s) course en semaine 1.\n→ Semaines 2, 3, 4 commencent à partir du ${localISO(nextMonday)} avec ${athlete.days_per_week} séances course + 1 RENFO chacune.`
+          : `CALENDRIER — SEMAINE 1 COMPLÈTE\nAujourd'hui : ${todayStr} (lundi).\nLe plan commence aujourd'hui.\nSemaines 1-4 : ${athlete.days_per_week} séances course + 1 RENFO par semaine.`;
+
+        const userPrompt = `Génère un plan d'entraînement running de EXACTEMENT 4 SEMAINES pour :\n\nPrénom : ${athlete.first_name}\nObjectif : ${athlete.objective}\nDate de course : ${athlete.race_date ? new Date(athlete.race_date).toLocaleDateString('fr-FR') : 'Non définie'}\nSemaines avant course : ${weeksUntilRace !== null ? weeksUntilRace : 'N/A'}\nContexte du mois : ${monthStructure.label}\nNiveau : ${athlete.level}\nVMA : ${vma} km/h\nSéances course/semaine : ${athlete.days_per_week} → ${efMin}\nJours préférés : ${preferredDays.join(', ') || 'Non précisé'}\nBlessures : ${athlete.injuries || 'Aucune'}\n\n${calendarSection}\n\n${buildPaceSection(vma, athlete.objective, athlete.chrono_goal_known ? athlete.chrono_goal : null)}\n\nSTRUCTURE IMPOSÉE :\n${structureDesc}`;
+
+        const libraryText = await loadSessionLibrary();
+        const message = await client.messages.create({
+          model: 'claude-sonnet-4-6', max_tokens: 16000,
+          system: buildSystemPrompt(libraryText),
+          messages: [{ role: 'user', content: userPrompt }]
+        });
+
+        const rawText  = message.content[0].text.trim();
+        const jsonText = rawText.replace(/^```json\s*/i,'').replace(/^```\s*/i,'').replace(/\s*```$/i,'');
+        const planData = JSON.parse(jsonText);
+
+        const { error: insertErr } = await supabase
+          .from('training_plans')
+          .insert({ user_id: athlete.id, plan_data: planData, status: 'pending' });
+
+        if (insertErr) throw insertErr;
+        generated++;
+        console.log(`[generate-monthly] Plan generated for ${athlete.first_name} ${athlete.last_name}`);
+        await new Promise(r => setTimeout(r, 5000)); // 5s between athletes
+      } catch (err) {
+        console.error(`[generate-monthly] Failed for ${athlete.id}:`, err.message);
+      }
+    }
+
+    console.log(`[generate-monthly] Done: ${generated}/${athletes.length} plans generated`);
+  } catch (err) {
+    console.error('[generate-monthly]', err.message);
   }
 });
 

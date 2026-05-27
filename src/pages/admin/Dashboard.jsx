@@ -383,6 +383,7 @@ export default function AdminDashboard() {
         { count: cancelling },
         { count: newThisMonth },
         { count: feedbacks },
+        { count: paying },
         { data: recent }
       ] = await Promise.all([
         supabase.from('profiles').select('id', { count: 'exact', head: true }).eq('role', 'athlete').eq('subscription_status', 'active'),
@@ -391,6 +392,8 @@ export default function AdminDashboard() {
         supabase.from('profiles').select('id', { count: 'exact', head: true }).eq('role', 'athlete').eq('subscription_status', 'cancelling'),
         supabase.from('profiles').select('id', { count: 'exact', head: true }).eq('role', 'athlete').gte('created_at', firstOfMonth),
         supabase.from('weekly_feedbacks').select('id', { count: 'exact', head: true }),
+        // Only count athletes with a real Stripe subscription (stripe_customer_id set by webhook)
+        supabase.from('profiles').select('id', { count: 'exact', head: true }).eq('role', 'athlete').in('subscription_status', ['active', 'trialing']).not('stripe_customer_id', 'is', null),
         supabase.from('profiles').select('id, first_name, last_name, objective, subscription_status, created_at')
           .eq('role', 'athlete').order('created_at', { ascending: false }).limit(5)
       ])
@@ -403,7 +406,7 @@ export default function AdminDashboard() {
         cancelling:   cancelling   || 0,
         newThisMonth: newThisMonth || 0,
         feedbacks:    feedbacks    || 0,
-        mrr:          a_ * PRICE,
+        mrr:          (paying || 0) * PRICE,
       })
       setRecentAthletes(recent || [])
     } finally {

@@ -99,6 +99,23 @@ cron.schedule('0 18 * * 0', async () => {
   }
 });
 
+// Monthly plan generation — every Sunday at 15:00 UTC (17:00 Paris), only on the last Sunday of the month
+cron.schedule('0 15 * * 0', async () => {
+  // Check if this is the last Sunday of the month (next Sunday is in a different month)
+  const now = new Date();
+  const nextSunday = new Date(now);
+  nextSunday.setDate(now.getDate() + 7);
+  if (nextSunday.getMonth() === now.getMonth()) return; // Not the last Sunday of the month
+
+  console.log('[CRON] Monthly plan generation triggered…');
+  try {
+    const axios = require('axios');
+    await axios.post(`http://localhost:${PORT}/api/plans/generate-monthly`, {}, { timeout: 600000 });
+  } catch (err) {
+    console.error('[CRON] Monthly plan generation error:', err.message);
+  }
+});
+
 // ─── Auto-reply to athlete messages ─────────────────────────────────────────
 
 const WebSocket = require('ws');

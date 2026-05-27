@@ -208,8 +208,9 @@ export default function AthleteProfile() {
       } else {
         showToast('Profil mis à jour ✓')
       }
-    } catch {
-      showToast('Erreur lors de la sauvegarde ✗', 'error')
+    } catch (err) {
+      console.error('[saveField]', err)
+      showToast((err?.message || 'Erreur inconnue') + ' ✗', 'error')
     } finally {
       setEditSaving(false)
     }
@@ -224,8 +225,9 @@ export default function AthleteProfile() {
       updateProfile(updated)
       setEditField(null)
       showToast('Profil mis à jour ✓')
-    } catch {
-      showToast('Erreur lors de la sauvegarde ✗', 'error')
+    } catch (err) {
+      console.error('[saveNameField]', err)
+      showToast((err?.message || 'Erreur inconnue') + ' ✗', 'error')
     } finally {
       setEditSaving(false)
     }
