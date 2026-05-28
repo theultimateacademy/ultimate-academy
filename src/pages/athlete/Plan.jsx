@@ -580,17 +580,28 @@ function SessionDetailPage({ session, weekNum, sessionIdx, planId, vma, onClose,
 
 const DAY_OFFSET = { Lundi: 0, Mardi: 1, Mercredi: 2, Jeudi: 3, Vendredi: 4, Samedi: 5, Dimanche: 6 }
 
-// Use the exact date from plan_data when available (most accurate)
 function sessionDate(planMonday, weekNumber, jourName, exactDate) {
   if (exactDate) {
     const d = new Date(exactDate + 'T00:00:00')
-    return `${jourName} ${d.toLocaleDateString('fr-FR', { day: 'numeric', month: 'long' })}`
+    // Derive correct day label from actual date (AI-generated jour may be wrong)
+    const dayLabel = d.toLocaleDateString('fr-FR', { weekday: 'long' })
+    const dayCapitalized = dayLabel.charAt(0).toUpperCase() + dayLabel.slice(1)
+    return `${dayCapitalized} ${d.toLocaleDateString('fr-FR', { day: 'numeric', month: 'long' })}`
   }
   const offset = DAY_OFFSET[jourName]
   if (offset === undefined) return jourName
   const d = new Date(planMonday)
   d.setDate(d.getDate() + (weekNumber - 1) * 7 + offset)
   return `${jourName} ${d.toLocaleDateString('fr-FR', { day: 'numeric', month: 'long' })}`
+}
+
+// Day order for sorting (Monday=1 … Sunday=7)
+function sessionDayOrder(session) {
+  if (session.date) {
+    const dow = new Date(session.date + 'T00:00:00').getDay() // 0=Sun
+    return dow === 0 ? 7 : dow
+  }
+  return (DAY_OFFSET[session.jour] ?? 10) + 1
 }
 
 function weekDateRange(planMonday, weekNumber, weekDates) {
@@ -992,9 +1003,13 @@ export default function AthletePlan() {
         </div>
       )}
 
-      {/* Sessions */}
+      {/* Sessions — sorted by day (Mon→Sun), original idx preserved for completion tracking */}
       <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-        {currentWeekData?.seances?.map((session, idx) => {
+        {(currentWeekData?.seances || [])
+          .map((s, origIdx) => ({ ...s, _origIdx: origIdx }))
+          .sort((a, b) => sessionDayOrder(a) - sessionDayOrder(b))
+          .map((session) => {
+          const idx   = session._origIdx
           const done  = isCompleted(currentWeekData.numero, idx)
           const isRace = session.est_course || session.id_seance === 'RACE' || session.id_seance === 'RACE_INT'
           const color = SESSION_TYPE_COLORS[session.type] || 'var(--primary)'

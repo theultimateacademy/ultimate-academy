@@ -80,21 +80,32 @@ export default function AthleteHome() {
             const rpeList  = (completions || []).filter(c => c.rpe).map(c => c.rpe)
             const avgRpe   = rpeList.length ? (rpeList.reduce((a,b) => a+b,0) / rpeList.length).toFixed(1) : null
 
-            const seances   = currentWeek.seances || []
-            const weekStart = new Date(planMonday)
+            const DAY_MAP   = { Lundi:0, Mardi:1, Mercredi:2, Jeudi:3, Vendredi:4, Samedi:5, Dimanche:6 }
+            const rawSeances = currentWeek.seances || []
+            const weekStart  = new Date(planMonday)
             weekStart.setDate(planMonday.getDate() + (weeksElapsed - 1) * 7)
             const today = new Date(); today.setHours(0,0,0,0)
 
-            const sessionStatuses = seances.map((s, idx) => {
-              if (doneIdxs.has(idx)) return 'done'
-              const DAY_MAP = { Lundi:0, Mardi:1, Mercredi:2, Jeudi:3, Vendredi:4, Samedi:5, Dimanche:6 }
-              const offset      = DAY_MAP[s.jour] ?? idx
+            // Sort by real calendar day, preserve original idx for completion lookup
+            const seancesWithIdx = rawSeances
+              .map((s, origIdx) => ({ ...s, _origIdx: origIdx }))
+              .sort((a, b) => {
+                const order = s => {
+                  if (s.date) { const d = new Date(s.date + 'T00:00:00').getDay(); return d === 0 ? 7 : d }
+                  return (DAY_MAP[s.jour] ?? 10) + 1
+                }
+                return order(a) - order(b)
+              })
+
+            const sessionStatuses = seancesWithIdx.map(s => {
+              if (doneIdxs.has(s._origIdx)) return 'done'
+              const offset      = DAY_MAP[s.jour] ?? s._origIdx
               const sessionDate = new Date(weekStart); sessionDate.setDate(weekStart.getDate() + offset)
               sessionDate.setHours(0,0,0,0)
               return sessionDate < today ? 'missed' : 'upcoming'
             })
 
-            setWeekProgress({ done: doneIdxs.size, total: seances.length, statuses: sessionStatuses, seances, avgRpe })
+            setWeekProgress({ done: doneIdxs.size, total: rawSeances.length, statuses: sessionStatuses, seances: seancesWithIdx, avgRpe })
 
             const next = seances.find((_, idx) => !doneIdxs.has(idx))
             if (next) setNextSession({ ...next, weekNum: currentWeek.numero })
