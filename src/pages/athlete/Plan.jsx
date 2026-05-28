@@ -580,14 +580,8 @@ function SessionDetailPage({ session, weekNum, sessionIdx, planId, vma, onClose,
 
 const DAY_OFFSET = { Lundi: 0, Mardi: 1, Mercredi: 2, Jeudi: 3, Vendredi: 4, Samedi: 5, Dimanche: 6 }
 
-function sessionDate(planMonday, weekNumber, jourName, exactDate) {
-  if (exactDate) {
-    const d = new Date(exactDate + 'T00:00:00')
-    // Derive correct day label from actual date (AI-generated jour may be wrong)
-    const dayLabel = d.toLocaleDateString('fr-FR', { weekday: 'long' })
-    const dayCapitalized = dayLabel.charAt(0).toUpperCase() + dayLabel.slice(1)
-    return `${dayCapitalized} ${d.toLocaleDateString('fr-FR', { day: 'numeric', month: 'long' })}`
-  }
+// Always compute date from planMonday — never trust AI-generated dates/jour labels
+function sessionDate(planMonday, weekNumber, jourName) {
   const offset = DAY_OFFSET[jourName]
   if (offset === undefined) return jourName
   const d = new Date(planMonday)
@@ -597,20 +591,11 @@ function sessionDate(planMonday, weekNumber, jourName, exactDate) {
 
 // Day order for sorting (Monday=1 … Sunday=7)
 function sessionDayOrder(session) {
-  if (session.date) {
-    const dow = new Date(session.date + 'T00:00:00').getDay() // 0=Sun
-    return dow === 0 ? 7 : dow
-  }
   return (DAY_OFFSET[session.jour] ?? 10) + 1
 }
 
-function weekDateRange(planMonday, weekNumber, weekDates) {
-  if (weekDates?.debut && weekDates?.fin) {
-    const start = new Date(weekDates.debut + 'T00:00:00')
-    const end   = new Date(weekDates.fin   + 'T00:00:00')
-    const fmt = d => d.toLocaleDateString('fr-FR', { day: 'numeric', month: 'long' })
-    return `${fmt(start)} – ${fmt(end)}`
-  }
+// Always compute from planMonday — never trust AI-generated weekDates
+function weekDateRange(planMonday, weekNumber) {
   const start = new Date(planMonday)
   start.setDate(start.getDate() + (weekNumber - 1) * 7)
   const end = new Date(start)
@@ -822,9 +807,9 @@ export default function AthletePlan() {
   const planMonday      = getPlanStartMonday(plan.activated_at || plan.created_at)
   const weeksElapsedNow = getPlanWeeksElapsed(plan)  // 0 = not started yet
   const realCurrentWeek = weeks.find(w => w.numero === weeksElapsedNow)
-  // For injury (full month), detect even before plan starts or if current week index is off
-  const adaptedFor = realCurrentWeek?._adapted_for ||
-                     (weeks.some(w => w._adapted_for === 'injury') ? 'injury' : null)
+  // Detect adaptation from current week OR any week (for full-month adaptations before plan starts)
+  const anyAdaptedWeek = realCurrentWeek || weeks.find(w => w._adapted_for)
+  const adaptedFor     = anyAdaptedWeek?._adapted_for || null
 
   if (planDone) {
     return (
@@ -945,7 +930,7 @@ export default function AthletePlan() {
                 fontSize: '.8rem', cursor: 'pointer', fontFamily: 'inherit',
                 whiteSpace: 'nowrap'
               }}>
-              {weekDateRange(planMonday, w.numero, w.dates)}
+              {weekDateRange(planMonday, w.numero)}
               {pct === 1 && <span style={{ marginLeft: '.3rem' }}>✅</span>}
             </button>
           )
@@ -957,7 +942,7 @@ export default function AthletePlan() {
         <div className="card" style={{ marginBottom: '1.25rem', background: 'linear-gradient(135deg,#1A1A2E,#2D1B4E)', color: '#fff' }}>
           <div>
               <div style={{ fontSize: '.8rem', opacity: .7, marginBottom: '.2rem' }}>
-                {weekDateRange(planMonday, currentWeekData.numero, currentWeekData.dates)}
+                {weekDateRange(planMonday, currentWeekData.numero)}
               </div>
               <div style={{ fontWeight: 700, fontSize: '1.1rem' }}>{currentWeekData.phase}</div>
               {(() => {
@@ -1017,7 +1002,7 @@ export default function AthletePlan() {
           // ── Special race card ──────────────────────────────────────────────
           if (isRace) {
             const raceColor = session.type === 'Course intermédiaire' ? '#FB923C' : '#FFD700'
-            const dateLabel = sessionDate(planMonday, currentWeekData.numero, session.jour, session.date)
+            const dateLabel = sessionDate(planMonday, currentWeekData.numero, session.jour)
             return (
               <div key={idx} style={{
                 borderRadius: 'var(--radius)',
@@ -1063,7 +1048,7 @@ export default function AthletePlan() {
                 opacity: done ? .75 : 1, cursor: 'pointer',
                 transition: 'transform .15s, box-shadow .15s'
               }}
-              onClick={() => setModal({ session: { ...session, _isDone: done, _dateLabel: sessionDate(planMonday, currentWeekData.numero, session.jour, session.date) }, weekNum: currentWeekData.numero, sessionIdx: idx })}
+              onClick={() => setModal({ session: { ...session, _isDone: done, _dateLabel: sessionDate(planMonday, currentWeekData.numero, session.jour) }, weekNum: currentWeekData.numero, sessionIdx: idx })}
               onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.boxShadow = 'var(--shadow-lg)' }}
               onMouseLeave={e => { e.currentTarget.style.transform = ''; e.currentTarget.style.boxShadow = '' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
@@ -1076,7 +1061,7 @@ export default function AthletePlan() {
                   </div>
                   <h4 style={{ marginBottom: '.2rem' }}>{session.titre}</h4>
                   <div style={{ fontSize: '.8rem', color: 'var(--text-muted)' }}>
-                    {sessionDate(planMonday, currentWeekData.numero, session.jour, session.date)} · {session.duree_min} min
+                    {sessionDate(planMonday, currentWeekData.numero, session.jour)} · {session.duree_min} min
                   </div>
                 </div>
                 <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '.4rem', flexShrink: 0 }}>

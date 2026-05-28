@@ -75,9 +75,12 @@ router.post('/period-alert', async (req, res) => {
 
     const currentWeek = updatedPlan.semaines.find(s => s.numero === weeksElapsed);
     if (currentWeek) {
-      currentWeek._original_seances = JSON.parse(JSON.stringify(currentWeek.seances));
-      currentWeek._original_charge  = currentWeek.charge;
-      currentWeek._adapted_for      = 'cycle';
+      // Preserve existing backup if another adaptation was already active
+      if (!currentWeek._original_seances) {
+        currentWeek._original_seances = JSON.parse(JSON.stringify(currentWeek.seances));
+        currentWeek._original_charge  = currentWeek.charge;
+      }
+      currentWeek._adapted_for = 'cycle';
 
       let replaced = 0;
       for (let i = 0; i < currentWeek.seances.length; i++) {

@@ -807,7 +807,6 @@ router.post('/plans/adjust-heat', async (req, res) => {
 
   try {
     const { data: profile } = await supabase.from('profiles').select('*').eq('id', userId).single();
-
     await supabase.from('profiles').update({ heat_mode: activate }).eq('id', userId);
 
     const { data: plan } = await supabase
@@ -815,33 +814,28 @@ router.post('/plans/adjust-heat', async (req, res) => {
 
     if (!plan) return res.json({ success: true, activated: activate, planData: null });
 
-    const weeksElapsed = getPlanWeeksElapsed(plan);
-    const weekIdx      = plan.plan_data?.semaines?.findIndex(s => s.numero === weeksElapsed) ?? -1;
-
-    if (weekIdx === -1) return res.json({ success: true, activated: activate, planData: null });
-
     const updatedPlan = JSON.parse(JSON.stringify(plan.plan_data));
-    const week        = updatedPlan.semaines[weekIdx];
 
     if (!activate) {
-      // Restore original sessions if backup exists
-      if (week._adapted_for === 'heat' && week._original_seances) {
+      // Restore all weeks adapted for heat
+      let restored = false;
+      for (const week of updatedPlan.semaines) {
+        if (week._adapted_for !== 'heat' || !week._original_seances) continue;
         week.seances = week._original_seances;
         if (week._original_charge) week.charge = week._original_charge;
         delete week._adapted_for;
         delete week._original_seances;
         delete week._original_charge;
+        restored = true;
+      }
+      if (restored) {
         await supabase.from('training_plans').update({ plan_data: updatedPlan }).eq('id', plan.id);
         return res.json({ success: true, activated: false, planData: updatedPlan });
       }
       return res.json({ success: true, activated: false, planData: null });
     }
 
-    // Save originals before adapting
-    week._original_seances = JSON.parse(JSON.stringify(week.seances));
-    week._original_charge  = week.charge;
-    week._adapted_for      = 'heat';
-
+    // ── Activate: adapt ALL weeks ────────────────────────────────────────────
     const vma = resolveVma(profile);
 
     function roundTo5(n) { return Math.max(30, Math.round(n / 5) * 5); }
@@ -855,28 +849,20 @@ router.post('/plans/adjust-heat', async (req, res) => {
 
     function lightenCorps(corps) {
       if (!corps) return corps;
-      // Reduce repetition count by ~40%
-      let out = corps.replace(/(\d+)\s*[×x×]/gi, (_, n) => {
-        const reduced = Math.max(3, Math.round(parseInt(n) * 0.6));
-        return `${reduced} ×`;
-      });
-      // Lower VMA percentages by ~10 pts
-      out = out.replace(/(\d{2,3})\s*%\s*(de\s*)?VMA/gi, (_, pct) => {
-        return `${Math.max(75, parseInt(pct) - 10)}% VMA`;
-      });
+      let out = corps.replace(/(\d+)\s*[×x×]/gi, (_, n) => `${Math.max(3, Math.round(parseInt(n) * 0.6))} ×`);
+      out = out.replace(/(\d{2,3})\s*%\s*(de\s*)?VMA/gi, (_, pct) => `${Math.max(75, parseInt(pct) - 10)}% VMA`);
       return out;
     }
 
-    week.seances = week.seances.map(s => {
+    function adaptSessionHeat(s) {
       const type = (s.type || '').toLowerCase();
       if (type.includes('renforcement')) return s;
       if (s.type === 'Récupération active') return s;
 
-      const orig        = s.duree_min || 45;
-      const newDuration = roundTo5(Math.round(orig * 0.80));
+      const newDuration = roundTo5(Math.round((s.duree_min || 45) * 0.80));
 
       if (isIntensity(s)) {
-        const mainMin     = Math.max(newDuration - 20, 10);
+        const mainMin      = Math.max(newDuration - 20, 10);
         const adaptedCorps = lightenCorps(s.corps);
         return {
           ...s,
@@ -885,43 +871,49 @@ router.post('/plans/adjust-heat', async (req, res) => {
           intensite:       'modérée — canicule',
           echauffement:    `10 min de footing léger à ${calcPace(vma, 0.63)}/km — progressif`,
           corps:           adaptedCorps
-            ? `${adaptedCorps}\n\n(Allure réduite de ~10% par rapport au plan normal — chaleur oblige. Arrête-toi si tu ressens des vertiges.)`
+            ? `${adaptedCorps}\n\n(Allure réduite de ~10% — chaleur oblige. Arrête-toi si vertiges.)`
             : `${mainMin} min — séance allégée : moins de répétitions, allure réduite de 10%.`,
           retour_au_calme: `10 min de footing léger à ${calcPace(vma, 0.63)}/km + étirements doux`,
           allures: [
             { zone: 'Échauffement / Retour', pourcentage_vma: 63, vitesse_kmh: parseFloat((vma * 0.63).toFixed(1)), allure_min_km: calcPace(vma, 0.63) + '/km' },
             { zone: 'Séance allégée',        pourcentage_vma: 82, vitesse_kmh: parseFloat((vma * 0.82).toFixed(1)), allure_min_km: calcPace(vma, 0.82) + '/km' },
           ],
-          notes_coach:     `Séance maintenue mais allégée pour la canicule — moins de répétitions, allure réduite. Réduis encore si c'est trop dur. Cours tôt le matin ou en soirée et hydrate-toi bien.`,
-          rpe_cible:       5,
-          est_seance_cle:  false,
+          notes_coach:  `Séance allégée pour la canicule — réduis encore si c'est trop dur. Cours tôt le matin ou en soirée, hydrate-toi bien.`,
+          rpe_cible:    5, est_seance_cle: false,
         };
       }
 
-      // Endurance / sortie longue → footing allégé
-      const mainMin     = Math.max(newDuration - 15, 10);
-      const efPaceStr   = `${calcPace(vma, 0.65)}/km – ${calcPace(vma, 0.70)}/km`;
+      const mainMin   = Math.max(newDuration - 15, 10);
+      const efPaceStr = `${calcPace(vma, 0.65)}/km – ${calcPace(vma, 0.70)}/km`;
       return {
         ...s,
         type:            'Endurance fondamentale',
         titre:           'Footing allégé — Canicule 🌡️',
-        duree_min:       newDuration,
-        intensite:       'facile',
+        duree_min:       newDuration, intensite: 'facile',
         echauffement:    `10 min de footing léger à ${calcPace(vma, 0.63)}/km — progressif`,
-        corps:           `${mainMin} min de footing allégé à ${efPaceStr} — réduis l'allure si c'est trop dur, l'essentiel est de bouger en douceur`,
+        corps:           `${mainMin} min de footing allégé à ${efPaceStr} — réduis l'allure si c'est trop dur`,
         retour_au_calme: `5 min de footing très lent à ${calcPace(vma, 0.60)}/km + étirements doux`,
         allures: [
           { zone: 'Échauffement',           pourcentage_vma: 63, vitesse_kmh: parseFloat((vma * 0.63).toFixed(1)), allure_min_km: calcPace(vma, 0.63) + '/km' },
           { zone: 'Endurance fondamentale', pourcentage_vma: 67, vitesse_kmh: parseFloat((vma * 0.67).toFixed(1)), allure_min_km: calcPace(vma, 0.67) + '/km' },
           { zone: 'Retour au calme',        pourcentage_vma: 60, vitesse_kmh: parseFloat((vma * 0.60).toFixed(1)), allure_min_km: calcPace(vma, 0.60) + '/km' },
         ],
-        recuperation:    null,
-        notes_coach:     `Tu peux réduire l'allure si c'est trop dur — l'essentiel est de maintenir le mouvement en douceur. Cours tôt le matin ou en soirée et hydrate-toi bien.`,
-        rpe_cible:       3,
-        est_seance_cle:  false,
+        recuperation: null,
+        notes_coach:  `Cours tôt le matin ou en soirée et hydrate-toi bien. Réduis l'allure si c'est trop dur.`,
+        rpe_cible: 3, est_seance_cle: false,
       };
-    });
-    week.charge = 'Canicule — Allégé';
+    }
+
+    for (const week of updatedPlan.semaines) {
+      // Preserve existing backup if another adaptation was already active
+      if (!week._original_seances) {
+        week._original_seances = JSON.parse(JSON.stringify(week.seances));
+        week._original_charge  = week.charge;
+      }
+      week._adapted_for = 'heat';
+      week.seances      = week.seances.map(adaptSessionHeat);
+      week.charge       = 'Canicule — Allégé';
+    }
 
     await supabase.from('training_plans').update({ plan_data: updatedPlan }).eq('id', plan.id);
     res.json({ success: true, activated: true, planData: updatedPlan });
@@ -984,11 +976,14 @@ router.post('/plans/adapt-injury', async (req, res) => {
     // Adapt ALL weeks of the plan (full month)
     for (const week of updatedPlan.semaines) {
       if (week._adapted_for === 'injury') continue; // already adapted
-      week._original_seances = JSON.parse(JSON.stringify(week.seances));
-      week._original_charge  = week.charge;
-      week._adapted_for      = 'injury';
-      week.seances           = week.seances.map(adaptSessionForInjury);
-      week.charge            = 'Blessure — Programme adapté';
+      // Preserve existing backup if another adaptation was active
+      if (!week._original_seances) {
+        week._original_seances = JSON.parse(JSON.stringify(week.seances));
+        week._original_charge  = week.charge;
+      }
+      week._adapted_for = 'injury';
+      week.seances      = week.seances.map(adaptSessionForInjury);
+      week.charge       = 'Blessure — Programme adapté';
     }
 
     await supabase.from('training_plans').update({ plan_data: updatedPlan }).eq('id', plan.id);
@@ -1019,10 +1014,10 @@ router.post('/plans/restore-week', async (req, res) => {
 
     const adaptedFor = anyAdapted._adapted_for;
 
-    if (adaptedFor === 'injury') {
-      // Restore ALL weeks (injury spans the whole month)
+    if (adaptedFor === 'injury' || adaptedFor === 'heat') {
+      // Restore ALL weeks (full-month adaptations)
       for (const week of updatedPlan.semaines) {
-        if (week._adapted_for !== 'injury' || !week._original_seances) continue;
+        if (week._adapted_for !== adaptedFor || !week._original_seances) continue;
         week.seances = week._original_seances;
         if (week._original_charge) week.charge = week._original_charge;
         delete week._adapted_for;
@@ -1030,7 +1025,7 @@ router.post('/plans/restore-week', async (req, res) => {
         delete week._original_charge;
       }
     } else {
-      // heat / cycle: restore only current week
+      // cycle: restore only current week
       const weeksElapsed = getPlanWeeksElapsed(plan);
       const weekIdx      = updatedPlan.semaines.findIndex(s => s.numero === weeksElapsed);
       if (weekIdx === -1) return res.json({ success: false, reason: 'week_not_found' });
