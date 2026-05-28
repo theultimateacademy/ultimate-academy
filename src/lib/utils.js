@@ -52,6 +52,28 @@ export function daysUntil(dateStr) {
   return Math.max(0, Math.ceil(diff / (1000 * 60 * 60 * 24)))
 }
 
+// Returns the Monday on or after the given date string/Date.
+// Plans always start on a Monday — if created on Thu May 28, week 1 begins Mon Jun 1.
+export function getPlanStartMonday(dateStr) {
+  const d = new Date(dateStr)
+  d.setHours(0, 0, 0, 0)
+  const dow = d.getDay() // 0=Sun 1=Mon … 6=Sat
+  if (dow !== 1) {
+    const toMonday = dow === 0 ? 1 : 8 - dow
+    d.setDate(d.getDate() + toMonday)
+  }
+  return d
+}
+
+// Returns how many weeks into the plan we are (1-based), or 0 if not started yet.
+export function getPlanWeeksElapsed(plan) {
+  const monday = getPlanStartMonday(plan.activated_at || plan.created_at)
+  const today  = new Date(); today.setHours(0, 0, 0, 0)
+  const ms     = today.getTime() - monday.getTime()
+  if (ms < 0) return 0
+  return Math.floor(ms / (7 * 24 * 3600 * 1000)) + 1
+}
+
 export const OBJECTIVE_LABELS = {
   '5km':        '5 km',
   '10km':       '10 km',

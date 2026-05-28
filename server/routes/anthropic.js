@@ -8,6 +8,26 @@ const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SER
 
 // ─── Helpers ────────────────────────────────────────────────────────────────
 
+// Plans always start on a Monday. If created on Thu May 28, week 1 begins Mon Jun 1.
+function getPlanStartMonday(dateStr) {
+  const d = new Date(dateStr);
+  d.setHours(0, 0, 0, 0);
+  const dow = d.getDay(); // 0=Sun 1=Mon … 6=Sat
+  if (dow !== 1) {
+    const toMonday = dow === 0 ? 1 : 8 - dow;
+    d.setDate(d.getDate() + toMonday);
+  }
+  return d;
+}
+
+function getPlanWeeksElapsed(plan) {
+  const monday = getPlanStartMonday(plan.activated_at || plan.created_at);
+  const today  = new Date(); today.setHours(0, 0, 0, 0);
+  const ms     = today.getTime() - monday.getTime();
+  if (ms < 0) return 1; // plan not started yet — operate on week 1
+  return Math.floor(ms / (7 * 24 * 3600 * 1000)) + 1;
+}
+
 const LEVEL_VMA    = { debutant: 10, intermediaire: 14, confirme: 17, expert: 20 };
 const TAPER_WEEKS  = { '5km': 1, '10km': 1, 'semi': 2, 'marathon': 2 };
 
@@ -795,8 +815,7 @@ router.post('/plans/adjust-heat', async (req, res) => {
 
     if (!plan) return res.json({ success: true, activated: activate, planData: null });
 
-    const startDate    = new Date(plan.activated_at || plan.created_at);
-    const weeksElapsed = Math.max(1, Math.floor((Date.now() - startDate.getTime()) / (7 * 24 * 3600 * 1000)) + 1);
+    const weeksElapsed = getPlanWeeksElapsed(plan);
     const weekIdx      = plan.plan_data?.semaines?.findIndex(s => s.numero === weeksElapsed) ?? -1;
 
     if (weekIdx === -1) return res.json({ success: true, activated: activate, planData: null });
@@ -926,8 +945,7 @@ router.post('/plans/adapt-injury', async (req, res) => {
 
     if (!plan) return res.json({ success: true, planData: null });
 
-    const startDate    = new Date(plan.activated_at || plan.created_at);
-    const weeksElapsed = Math.max(1, Math.floor((Date.now() - startDate.getTime()) / (7 * 24 * 3600 * 1000)) + 1);
+    const weeksElapsed = getPlanWeeksElapsed(plan);
     const weekIdx      = plan.plan_data?.semaines?.findIndex(s => s.numero === weeksElapsed) ?? -1;
 
     if (weekIdx === -1) return res.json({ success: true, planData: null });
@@ -985,8 +1003,7 @@ router.post('/plans/restore-week', async (req, res) => {
 
     if (!plan) return res.json({ success: false, reason: 'no_plan' });
 
-    const startDate    = new Date(plan.activated_at || plan.created_at);
-    const weeksElapsed = Math.max(1, Math.floor((Date.now() - startDate.getTime()) / (7 * 24 * 3600 * 1000)) + 1);
+    const weeksElapsed = getPlanWeeksElapsed(plan);
     const weekIdx      = plan.plan_data?.semaines?.findIndex(s => s.numero === weeksElapsed) ?? -1;
 
     if (weekIdx === -1) return res.json({ success: false, reason: 'week_not_found' });
@@ -1242,8 +1259,7 @@ router.post('/analyses/run-weekly', async (req, res) => {
 
       if (!plan) continue;
 
-      const startDate  = new Date(plan.activated_at || plan.created_at);
-      const weeksElapsed = Math.max(1, Math.floor((Date.now() - startDate.getTime()) / (7 * 24 * 3600 * 1000)));
+      const weeksElapsed = getPlanWeeksElapsed(plan);
 
       const weekData = plan.plan_data?.semaines?.find(s => s.numero === weeksElapsed);
       if (!weekData) continue;
@@ -1943,8 +1959,7 @@ router.post('/plans/check-regen', async (req, res) => {
             .from('training_plans').select('*').eq('user_id', profile.id).eq('status', 'active').single();
 
           if (heatPlan) {
-            const startDate    = new Date(heatPlan.activated_at || heatPlan.created_at);
-            const weeksElapsed = Math.max(1, Math.floor((Date.now() - startDate.getTime()) / (7 * 24 * 3600 * 1000)) + 1);
+            const weeksElapsed = getPlanWeeksElapsed(heatPlan);
             const weekIdx      = heatPlan.plan_data?.semaines?.findIndex(s => s.numero === weeksElapsed) ?? -1;
 
             if (weekIdx !== -1) {

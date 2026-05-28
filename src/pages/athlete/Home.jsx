@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../../contexts/AuthContext'
 import { supabase } from '../../lib/supabase'
 import { api } from '../../lib/api'
-import { daysUntil, OBJECTIVE_LABELS } from '../../lib/utils'
+import { daysUntil, OBJECTIVE_LABELS, getPlanStartMonday, getPlanWeeksElapsed } from '../../lib/utils'
 import LoadingSpinner from '../../components/UI/LoadingSpinner'
 
 export default function AthleteHome() {
@@ -58,40 +58,47 @@ export default function AthleteHome() {
       setAnalysis(analyses?.[0] || null)
 
       if (plans) {
-        const weeks = plans.plan_data?.semaines || []
-        const weeksElapsed = Math.max(1, Math.floor((Date.now() - new Date(plans.activated_at || plans.created_at).getTime()) / (7 * 24 * 3600 * 1000)) + 1)
-        const currentWeek  = weeks.find(w => w.numero === weeksElapsed) || weeks[0]
+        const weeks        = plans.plan_data?.semaines || []
+        const planMonday   = getPlanStartMonday(plans.activated_at || plans.created_at)
+        const weeksElapsed = getPlanWeeksElapsed(plans)
 
-        if (currentWeek) {
-          const { data: completions } = await supabase
-            .from('session_completions')
-            .select('week_number, session_index, rpe')
-            .eq('user_id', profile.id)
-            .eq('plan_id', plans.id)
-            .eq('week_number', currentWeek.numero)
+        if (weeksElapsed === 0) {
+          // Plan hasn't started yet — show start date, no sessions
+          setWeekProgress({ notStarted: true, startDate: planMonday })
+        } else {
+          const currentWeek = weeks.find(w => w.numero === weeksElapsed)
 
-          const doneIdxs = new Set((completions || []).map(c => c.session_index))
-          const rpeList  = (completions || []).filter(c => c.rpe).map(c => c.rpe)
-          const avgRpe   = rpeList.length ? (rpeList.reduce((a,b) => a+b,0) / rpeList.length).toFixed(1) : null
+          if (currentWeek) {
+            const { data: completions } = await supabase
+              .from('session_completions')
+              .select('week_number, session_index, rpe')
+              .eq('user_id', profile.id)
+              .eq('plan_id', plans.id)
+              .eq('week_number', currentWeek.numero)
 
-          const seances = currentWeek.seances || []
-          const weekStart = new Date(plans.activated_at || plans.created_at)
-          weekStart.setDate(weekStart.getDate() + (weeksElapsed - 1) * 7)
-          const today = new Date(); today.setHours(0,0,0,0)
+            const doneIdxs = new Set((completions || []).map(c => c.session_index))
+            const rpeList  = (completions || []).filter(c => c.rpe).map(c => c.rpe)
+            const avgRpe   = rpeList.length ? (rpeList.reduce((a,b) => a+b,0) / rpeList.length).toFixed(1) : null
 
-          const sessionStatuses = seances.map((s, idx) => {
-            if (doneIdxs.has(idx)) return 'done'
-            const DAY_MAP = { Lundi:0, Mardi:1, Mercredi:2, Jeudi:3, Vendredi:4, Samedi:5, Dimanche:6 }
-            const offset  = DAY_MAP[s.jour] ?? idx
-            const sessionDate = new Date(weekStart); sessionDate.setDate(weekStart.getDate() + offset)
-            sessionDate.setHours(0,0,0,0)
-            return sessionDate < today ? 'missed' : 'upcoming'
-          })
+            const seances   = currentWeek.seances || []
+            const weekStart = new Date(planMonday)
+            weekStart.setDate(planMonday.getDate() + (weeksElapsed - 1) * 7)
+            const today = new Date(); today.setHours(0,0,0,0)
 
-          setWeekProgress({ done: doneIdxs.size, total: seances.length, statuses: sessionStatuses, seances, avgRpe })
+            const sessionStatuses = seances.map((s, idx) => {
+              if (doneIdxs.has(idx)) return 'done'
+              const DAY_MAP = { Lundi:0, Mardi:1, Mercredi:2, Jeudi:3, Vendredi:4, Samedi:5, Dimanche:6 }
+              const offset      = DAY_MAP[s.jour] ?? idx
+              const sessionDate = new Date(weekStart); sessionDate.setDate(weekStart.getDate() + offset)
+              sessionDate.setHours(0,0,0,0)
+              return sessionDate < today ? 'missed' : 'upcoming'
+            })
 
-          const next = seances.find((_, idx) => !doneIdxs.has(idx))
-          if (next) setNextSession({ ...next, weekNum: currentWeek.numero })
+            setWeekProgress({ done: doneIdxs.size, total: seances.length, statuses: sessionStatuses, seances, avgRpe })
+
+            const next = seances.find((_, idx) => !doneIdxs.has(idx))
+            if (next) setNextSession({ ...next, weekNum: currentWeek.numero })
+          }
         }
       }
     } finally {
@@ -142,6 +149,20 @@ export default function AthleteHome() {
           <div className="stat-card">
             <div className="stat-value gradient-text">{OBJECTIVE_LABELS[profile?.objective] || 'N/C'}</div>
             <div className="stat-label">Ton objectif</div>
+          </div>
+        </div>
+      )}
+
+      {/* Plan not started yet */}
+      {plan && weekProgress.notStarted && (
+        <div className="card" style={{ marginBottom: '1.5rem', textAlign: 'center', padding: '1.5rem' }}>
+          <div style={{ fontSize: '1.5rem', marginBottom: '.5rem' }}>🗓️</div>
+          <div style={{ fontWeight: 700, marginBottom: '.25rem' }}>Ton programme démarre bientôt</div>
+          <div style={{ fontSize: '.875rem', color: 'var(--text-muted)' }}>
+            Semaine 1 commence le{' '}
+            <strong style={{ color: 'var(--primary)' }}>
+              {weekProgress.startDate?.toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long' })}
+            </strong>
           </div>
         </div>
       )}

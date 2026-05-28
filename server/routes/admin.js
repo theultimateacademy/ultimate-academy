@@ -1,6 +1,25 @@
 const express    = require('express');
 const { createClient } = require('@supabase/supabase-js');
 
+function getPlanStartMonday(dateStr) {
+  const d = new Date(dateStr);
+  d.setHours(0, 0, 0, 0);
+  const dow = d.getDay();
+  if (dow !== 1) {
+    const toMonday = dow === 0 ? 1 : 8 - dow;
+    d.setDate(d.getDate() + toMonday);
+  }
+  return d;
+}
+
+function getPlanWeeksElapsed(plan) {
+  const monday = getPlanStartMonday(plan.activated_at || plan.created_at);
+  const today  = new Date(); today.setHours(0, 0, 0, 0);
+  const ms     = today.getTime() - monday.getTime();
+  if (ms < 0) return 1;
+  return Math.floor(ms / (7 * 24 * 3600 * 1000)) + 1;
+}
+
 const router   = express.Router();
 const supabase = createClient(
   process.env.SUPABASE_URL,
@@ -46,9 +65,8 @@ router.post('/period-alert', async (req, res) => {
 
     if (!plan) return res.status(404).json({ error: 'Aucun plan actif trouvé.' });
 
-    const painDays    = profile?.period_pain_days || 1;
-    const startDate   = new Date(plan.activated_at || plan.created_at);
-    const weeksElapsed = Math.max(1, Math.floor((Date.now() - startDate.getTime()) / (7 * 24 * 3600 * 1000)) + 1);
+    const painDays     = profile?.period_pain_days || 1;
+    const weeksElapsed = getPlanWeeksElapsed(plan);
 
     const updatedPlan    = JSON.parse(JSON.stringify(plan.plan_data));
     let sessionsReplaced = 0;

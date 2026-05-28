@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react'
 import { useAuth } from '../../contexts/AuthContext'
 import { supabase } from '../../lib/supabase'
-import { parseAllutesPace, fmtDistance, fmtDuration, SESSION_TYPE_COLORS } from '../../lib/utils'
+import { parseAllutesPace, fmtDistance, fmtDuration, SESSION_TYPE_COLORS, getPlanStartMonday, getPlanWeeksElapsed } from '../../lib/utils'
 import { api } from '../../lib/api'
 import { downloadFit, generateFitWorkout } from '../../lib/fitGenerator'
 import LoadingSpinner from '../../components/UI/LoadingSpinner'
@@ -581,26 +581,26 @@ function SessionDetailPage({ session, weekNum, sessionIdx, planId, vma, onClose,
 const DAY_OFFSET = { Lundi: 0, Mardi: 1, Mercredi: 2, Jeudi: 3, Vendredi: 4, Samedi: 5, Dimanche: 6 }
 
 // Use the exact date from plan_data when available (most accurate)
-function sessionDate(planStart, weekNumber, jourName, exactDate) {
+function sessionDate(planMonday, weekNumber, jourName, exactDate) {
   if (exactDate) {
     const d = new Date(exactDate + 'T00:00:00')
     return `${jourName} ${d.toLocaleDateString('fr-FR', { day: 'numeric', month: 'long' })}`
   }
   const offset = DAY_OFFSET[jourName]
   if (offset === undefined) return jourName
-  const d = new Date(planStart)
+  const d = new Date(planMonday)
   d.setDate(d.getDate() + (weekNumber - 1) * 7 + offset)
   return `${jourName} ${d.toLocaleDateString('fr-FR', { day: 'numeric', month: 'long' })}`
 }
 
-function weekDateRange(planStart, weekNumber, weekDates) {
+function weekDateRange(planMonday, weekNumber, weekDates) {
   if (weekDates?.debut && weekDates?.fin) {
     const start = new Date(weekDates.debut + 'T00:00:00')
     const end   = new Date(weekDates.fin   + 'T00:00:00')
     const fmt = d => d.toLocaleDateString('fr-FR', { day: 'numeric', month: 'long' })
     return `${fmt(start)} – ${fmt(end)}`
   }
-  const start = new Date(planStart)
+  const start = new Date(planMonday)
   start.setDate(start.getDate() + (weekNumber - 1) * 7)
   const end = new Date(start)
   end.setDate(end.getDate() + 6)
@@ -715,7 +715,7 @@ export default function AthletePlan() {
         .eq('user_id', profile.id).eq('status', 'active').single()
       setPlan(p)
       if (p) {
-        const weeksElapsed = Math.max(1, Math.floor((Date.now() - new Date(p.activated_at || p.created_at).getTime()) / (7 * 24 * 3600 * 1000)) + 1)
+        const weeksElapsed = Math.max(1, getPlanWeeksElapsed(p))
         setActiveWeek(weeksElapsed)
         const [{ data: c }, { data: fb }] = await Promise.all([
           supabase.from('session_completions').select('*').eq('user_id', profile.id).eq('plan_id', p.id),
@@ -805,12 +805,13 @@ export default function AthletePlan() {
     )
   }
 
-  const weeks         = plan.plan_data?.semaines || []
-  const totalWeeks    = weeks.length
-  const planDone      = activeWeek > totalWeeks
-  const weeksElapsedNow = Math.max(1, Math.floor((Date.now() - new Date(plan.activated_at || plan.created_at).getTime()) / (7 * 24 * 3600 * 1000)) + 1)
+  const weeks           = plan.plan_data?.semaines || []
+  const totalWeeks      = weeks.length
+  const planDone        = activeWeek > totalWeeks
+  const planMonday      = getPlanStartMonday(planMonday)
+  const weeksElapsedNow = getPlanWeeksElapsed(plan)  // 0 = not started yet
   const realCurrentWeek = weeks.find(w => w.numero === weeksElapsedNow)
-  const adaptedFor    = realCurrentWeek?._adapted_for || null
+  const adaptedFor      = realCurrentWeek?._adapted_for || null
 
   if (planDone) {
     return (
@@ -919,7 +920,6 @@ export default function AthletePlan() {
           const doneInWeek  = completions.filter(c => c.week_number === w.numero).length
           const totalInWeek = w.seances?.length || 0
           const pct         = totalInWeek > 0 ? doneInWeek / totalInWeek : 0
-          const planStart   = plan.activated_at || plan.created_at
           return (
             <button key={w.numero}
               onClick={() => setActiveWeek(w.numero)}
@@ -932,7 +932,7 @@ export default function AthletePlan() {
                 fontSize: '.8rem', cursor: 'pointer', fontFamily: 'inherit',
                 whiteSpace: 'nowrap'
               }}>
-              {weekDateRange(planStart, w.numero, w.dates)}
+              {weekDateRange(planMonday, w.numero, w.dates)}
               {pct === 1 && <span style={{ marginLeft: '.3rem' }}>✅</span>}
             </button>
           )
@@ -944,7 +944,7 @@ export default function AthletePlan() {
         <div className="card" style={{ marginBottom: '1.25rem', background: 'linear-gradient(135deg,#1A1A2E,#2D1B4E)', color: '#fff' }}>
           <div>
               <div style={{ fontSize: '.8rem', opacity: .7, marginBottom: '.2rem' }}>
-                {weekDateRange(plan.activated_at || plan.created_at, currentWeekData.numero, currentWeekData.dates)}
+                {weekDateRange(planMonday, currentWeekData.numero, currentWeekData.dates)}
               </div>
               <div style={{ fontWeight: 700, fontSize: '1.1rem' }}>{currentWeekData.phase}</div>
               {(() => {
@@ -1000,7 +1000,7 @@ export default function AthletePlan() {
           // ── Special race card ──────────────────────────────────────────────
           if (isRace) {
             const raceColor = session.type === 'Course intermédiaire' ? '#FB923C' : '#FFD700'
-            const dateLabel = sessionDate(plan.activated_at || plan.created_at, currentWeekData.numero, session.jour, session.date)
+            const dateLabel = sessionDate(planMonday, currentWeekData.numero, session.jour, session.date)
             return (
               <div key={idx} style={{
                 borderRadius: 'var(--radius)',
@@ -1046,7 +1046,7 @@ export default function AthletePlan() {
                 opacity: done ? .75 : 1, cursor: 'pointer',
                 transition: 'transform .15s, box-shadow .15s'
               }}
-              onClick={() => setModal({ session: { ...session, _isDone: done, _dateLabel: sessionDate(plan.activated_at || plan.created_at, currentWeekData.numero, session.jour, session.date) }, weekNum: currentWeekData.numero, sessionIdx: idx })}
+              onClick={() => setModal({ session: { ...session, _isDone: done, _dateLabel: sessionDate(planMonday, currentWeekData.numero, session.jour, session.date) }, weekNum: currentWeekData.numero, sessionIdx: idx })}
               onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.boxShadow = 'var(--shadow-lg)' }}
               onMouseLeave={e => { e.currentTarget.style.transform = ''; e.currentTarget.style.boxShadow = '' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
@@ -1059,7 +1059,7 @@ export default function AthletePlan() {
                   </div>
                   <h4 style={{ marginBottom: '.2rem' }}>{session.titre}</h4>
                   <div style={{ fontSize: '.8rem', color: 'var(--text-muted)' }}>
-                    {sessionDate(plan.activated_at || plan.created_at, currentWeekData.numero, session.jour, session.date)} · {session.duree_min} min
+                    {sessionDate(planMonday, currentWeekData.numero, session.jour, session.date)} · {session.duree_min} min
                   </div>
                 </div>
                 <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '.4rem', flexShrink: 0 }}>
