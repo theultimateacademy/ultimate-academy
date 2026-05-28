@@ -691,16 +691,23 @@ router.post('/plans/generate', async (req, res) => {
   const DAY_NUM = { Lundi: 1, Mardi: 2, Mercredi: 3, Jeudi: 4, Vendredi: 5, Samedi: 6, Dimanche: 0 };
   const normDay = d => (DAY_NUM[d] === 0 ? 7 : DAY_NUM[d]); // Sun = 7 for ordering
   const normToday = todayDayNum === 0 ? 7 : todayDayNum;
-  const preferredDays       = profile.preferred_days || [];
-  const remainingThisWeek   = preferredDays.filter(d => normDay(d) >= normToday);
-  const isPartialWeek       = todayDayNum !== 1; // not Monday
-  const week1SessionCount   = isPartialWeek ? remainingThisWeek.length : profile.days_per_week;
+  const preferredDays = profile.preferred_days || [];
 
-  // Week 1 start is always today; full weeks (2-4) start from nextMonday
-  const planStartISO = todayISO;
+  // After Thursday (dow >= 4) or Sunday (0): too late in the week — start from next Monday
+  const isLateWeek    = todayDayNum === 0 || todayDayNum >= 4;
+  const isPartialWeek = !isLateWeek && todayDayNum !== 1; // Tue or Wed: partial current week
+  const remainingThisWeek = isPartialWeek
+    ? preferredDays.filter(d => normDay(d) >= normToday)
+    : [];
+  const week1SessionCount = isPartialWeek ? remainingThisWeek.length : profile.days_per_week;
 
   // ── Calendar section for prompt ─────────────────────────────────────────────
-  const calendarSection = isPartialWeek
+  const calendarSection = isLateWeek
+    ? `CALENDRIER — PLAN DÉMARRE LUNDI PROCHAIN
+Aujourd'hui : ${todayISO} (${todayDayName}) — fin de semaine, trop tard pour démarrer maintenant.
+Le plan démarre le ${nextMondayISO} (lundi prochain).
+Semaines 1-4 : ${profile.days_per_week} séances course + 1 RENFO par semaine, toutes complètes, à partir du ${nextMondayISO}.`
+    : isPartialWeek
     ? `CALENDRIER — SEMAINE 1 PARTIELLE
 Aujourd'hui : ${todayISO} (${todayDayName}).
 Semaine 1 = du ${todayISO} au ${thisSundayISO} (fin de semaine en cours).
@@ -754,7 +761,7 @@ ${structureDesc}
 
 CONTRAINTES ABSOLUES — vérifie et documente dans auto_validation avant de soumettre :
 1. EXACTEMENT 4 semaines avec les phases et charges ci-dessus
-2. Semaine 1 : ${week1SessionCount} séances course${week1SessionCount > 0 ? ' + 1 RENFO' : ' (partielle — adapter si peu de jours restants)'}. Semaines 2-4 : EXACTEMENT ${profile.days_per_week} séances course + 1 RENFO — ni plus, ni moins. Les séances RA (récupération active) comptent dans ce total.
+2. ${isLateWeek ? `Semaines 1-4 : EXACTEMENT ${profile.days_per_week} séances course + 1 RENFO chacune — toutes complètes.` : `Semaine 1 : ${week1SessionCount} séances course${week1SessionCount > 0 ? ' + 1 RENFO' : ' (partielle — adapter si peu de jours restants)'}. Semaines 2-4 : EXACTEMENT ${profile.days_per_week} séances course + 1 RENFO — ni plus, ni moins.`} Les séances RA (récupération active) comptent dans ce total.
 3. ${efMin} dans chaque semaine complète (Sortie longue compte comme EF — utilise EF-01/EF-02/EF-03, JAMAIS EF-04 par défaut). Varier les durées EF : alterner une session longue (65-80 min) et une session courte (40-50 min) pour reposer le système nerveux.
 4. Ratio 80/20 respecté : max 20% de séances dures (fractionné, tempo, côtes, spécifique)
 5. Jamais deux séances dures consécutives
