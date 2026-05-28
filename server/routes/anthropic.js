@@ -864,7 +864,7 @@ router.post('/plans/adjust-heat', async (req, res) => {
         const adaptedCorps = lightenCorps(s.corps);
         return {
           ...s,
-          titre:           (s.titre || s.type) + ' allégé 🌡️',
+          titre:           lightenCorps(s.titre || s.type) + ' allégé 🌡️',
           duree_min:       newDuration,
           intensite:       'modérée — canicule',
           echauffement:    `10 min de footing léger à ${calcPace(vma, 0.63)}/km — progressif`,

@@ -761,9 +761,12 @@ export default function AthletePlan() {
 
       if (p) {
         const updatedData = JSON.parse(JSON.stringify(p.plan_data))
+        const isHeatSession = s => /🌡️|allégé|canicule/i.test(s.titre || '') || s.intensite === 'modérée — canicule'
         for (const week of updatedData.semaines || []) {
           if (week._adapted_for !== 'heat') continue
-          if (week._original_seances) {
+          // Only restore backup if it contains original (non-canicule) sessions
+          const backupIsClean = week._original_seances && !week._original_seances.some(isHeatSession)
+          if (backupIsClean) {
             week.seances = week._original_seances
             if (week._original_charge) week.charge = week._original_charge
           }
