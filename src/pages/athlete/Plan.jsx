@@ -690,6 +690,7 @@ export default function AthletePlan() {
   const [heatModal,      setHeatModal]     = useState(false)
   const [heatLoading,    setHeatLoading]   = useState(false)
   const [heatDone,       setHeatDone]      = useState(false)
+  const [heatError,      setHeatError]     = useState(null)
   const [cycleModal,     setCycleModal]    = useState(false)
   const [cycleLoading,   setCycleLoading]  = useState(false)
   const [cycleDone,      setCycleDone]     = useState(false)
@@ -734,6 +735,7 @@ export default function AthletePlan() {
 
   async function activateHeat() {
     setHeatLoading(true)
+    setHeatError(null)
     try {
       const result = await api.adjustHeat({ userId: profile.id, activate: true })
       await refreshProfile()
@@ -743,10 +745,10 @@ export default function AthletePlan() {
         await loadPlan()
       }
       setHeatDone(true)
-      setTimeout(() => { setHeatModal(false); setHeatDone(false) }, 2000)
+      setTimeout(() => { setHeatModal(false); setHeatDone(false); setHeatError(null) }, 2000)
     } catch (err) {
       console.error('[activateHeat]', err)
-      showToast((err?.message || 'Erreur') + ' ✗', 'error')
+      setHeatError(err?.message || 'Erreur inconnue')
     } finally {
       setHeatLoading(false)
     }
@@ -1151,18 +1153,25 @@ export default function AthletePlan() {
                 ✅ Plan allégé — prends soin de toi 🌡️
               </div>
             ) : (
-              <div style={{ display: 'flex', gap: '.75rem' }}>
-                <button className="btn btn-ghost" style={{ flex: 1 }} onClick={() => setHeatModal(false)} disabled={heatLoading}>
-                  Annuler
-                </button>
-                <button
-                  className="btn btn-primary"
-                  style={{ flex: 1, background: 'linear-gradient(135deg,#CA8A04,#A16207)', border: 'none' }}
-                  disabled={heatLoading}
-                  onClick={activateHeat}>
-                  {heatLoading ? '…' : 'Activer 🌡️'}
-                </button>
-              </div>
+              <>
+                {heatError && (
+                  <div style={{ background: '#1f1010', border: '1px solid #ef4444', borderRadius: 8, padding: '.625rem .875rem', marginBottom: '.75rem', fontSize: '.8rem', color: '#fca5a5', fontFamily: 'monospace', wordBreak: 'break-all' }}>
+                    Erreur : {heatError}
+                  </div>
+                )}
+                <div style={{ display: 'flex', gap: '.75rem' }}>
+                  <button className="btn btn-ghost" style={{ flex: 1 }} onClick={() => { setHeatModal(false); setHeatError(null) }} disabled={heatLoading}>
+                    Annuler
+                  </button>
+                  <button
+                    className="btn btn-primary"
+                    style={{ flex: 1, background: 'linear-gradient(135deg,#CA8A04,#A16207)', border: 'none' }}
+                    disabled={heatLoading}
+                    onClick={activateHeat}>
+                    {heatLoading ? '…' : heatError ? 'Réessayer 🌡️' : 'Activer 🌡️'}
+                  </button>
+                </div>
+              </>
             )}
           </div>
         </div>
