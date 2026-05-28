@@ -48,32 +48,37 @@ router.post('/period-alert', async (req, res) => {
 
     const painDays    = profile?.period_pain_days || 1;
     const startDate   = new Date(plan.activated_at || plan.created_at);
-    const weeksElapsed = Math.max(1, Math.floor((Date.now() - startDate.getTime()) / (7 * 24 * 3600 * 1000))) + 1;
+    const weeksElapsed = Math.max(1, Math.floor((Date.now() - startDate.getTime()) / (7 * 24 * 3600 * 1000)) + 1);
 
-    const updatedPlan = JSON.parse(JSON.stringify(plan.plan_data));
+    const updatedPlan    = JSON.parse(JSON.stringify(plan.plan_data));
     let sessionsReplaced = 0;
-    const maxReplace     = Math.ceil(painDays / 2); // replace 1 session per ~2 days
+    const maxReplace     = Math.ceil(painDays / 2);
 
-    // Replace remaining running sessions in current week (and next if needed)
-    for (const week of updatedPlan.semaines) {
-      if (week.numero < weeksElapsed) continue;
-      if (sessionsReplaced >= maxReplace) break;
-      for (let i = 0; i < week.seances.length; i++) {
+    // Only adapt the current week and save backup
+    const currentWeek = updatedPlan.semaines.find(s => s.numero === weeksElapsed);
+    if (currentWeek) {
+      currentWeek._original_seances = JSON.parse(JSON.stringify(currentWeek.seances));
+      currentWeek._original_charge  = currentWeek.charge;
+      currentWeek._adapted_for      = 'cycle';
+
+      for (let i = 0; i < currentWeek.seances.length; i++) {
         if (sessionsReplaced >= maxReplace) break;
-        const s = week.seances[i];
-        if (s.type === 'Renforcement musculaire') continue;
+        const s = currentWeek.seances[i];
+        if ((s.type || '').toLowerCase().includes('renforcement')) continue;
         if (s.type === 'Récupération active') continue;
-        week.seances[i] = {
+        const newDuration = 30;
+        currentWeek.seances[i] = {
           ...s,
-          type:             'Récupération active',
-          titre:            'Récupération — période douloureuse',
-          duree_min:        30,
-          echauffement:     '5 min de marche douce',
-          corps:            '20 min de footing très léger ou marche active selon ressenti',
-          retour_au_calme:  '5 min d\'étirements doux',
-          allures:          'Au ressenti — très facile',
-          notes_coach:      'Prends soin de toi. On garde juste du mouvement doux. Pas de pression.',
-          rpe_cible:        2
+          type:            'Récupération active',
+          titre:           'Récupération — période douloureuse',
+          duree_min:       newDuration,
+          intensite:       'très facile',
+          echauffement:    '5 min de marche douce',
+          corps:           '20 min de footing très léger ou marche active selon ressenti',
+          retour_au_calme: "5 min d'étirements doux",
+          allures:         [],
+          notes_coach:     'Prends soin de toi. On garde juste du mouvement doux. Pas de pression.',
+          rpe_cible:       2,
         };
         sessionsReplaced++;
       }
@@ -81,15 +86,7 @@ router.post('/period-alert', async (req, res) => {
 
     await supabase.from('training_plans').update({ plan_data: updatedPlan }).eq('id', plan.id);
 
-    // Notification discrète au coach
-    await supabase.from('messages').insert({
-      user_id: userId,
-      sender:  'system',
-      content: `🔔 ${profile?.first_name} a activé l'alerte règles. ${sessionsReplaced} séance(s) adaptée(s) en récupération active pour ${painDays} jour(s).`,
-      read:    false
-    });
-
-    res.json({ success: true, sessionsReplaced });
+    res.json({ success: true, sessionsReplaced, planData: updatedPlan });
   } catch (err) {
     console.error('[Admin] Period alert error:', err.message);
     res.status(500).json({ error: err.message });

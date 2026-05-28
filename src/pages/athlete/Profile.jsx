@@ -90,6 +90,18 @@ export default function AthleteProfile() {
     if (stravaStatus === 'connected' || suuntoStatus === 'connected' || garminStatus === 'connected') refreshProfile()
   }, [stravaStatus, suuntoStatus, garminStatus])
 
+  useEffect(() => {
+    if (!profile?.intermediate_race_date) return
+    const raceDate = new Date(profile.intermediate_race_date)
+    if (raceDate < new Date()) {
+      supabase.from('profiles')
+        .update({ intermediate_race_name: null, intermediate_race_date: null })
+        .eq('id', profile.id)
+        .select().single()
+        .then(({ data }) => { if (data) updateProfile(data) })
+    }
+  }, [profile?.intermediate_race_date])
+
   async function cancelSubscription() {
     setCancelling(true)
     try {
@@ -202,18 +214,14 @@ export default function AthleteProfile() {
       setEditField(null)
 
       if (KEY_FIELDS[dbKey] && oldValue !== newValue) {
-        const label = KEY_FIELDS[dbKey]
-        supabase.from('messages').insert({
-          user_id: profile.id,
-          sender:  'athlete',
-          content: `⚠️ [PROFIL] ${profile.first_name} a modifié "${label}" : "${oldValue || '—'}" → "${newValue || '—'}"\nLe plan sera automatiquement adapté d'ici 1h.`,
-        }).then()
-
         if (dbKey === 'vma') {
           api.recalculateVma({ userId: profile.id, newVma: parseFloat(value) }).catch(() => {})
           showToast('Tes allures ont été recalculées selon ta nouvelle VMA ✓')
+        } else if (dbKey === 'injuries') {
+          api.adaptInjury({ userId: profile.id }).catch(() => {})
+          showToast('Blessure enregistrée — tes séances de la semaine sont adaptées 🩹')
         } else {
-          api.scheduleRegen({ userId: profile.id, reason: label }).catch(() => {})
+          api.scheduleRegen({ userId: profile.id, reason: KEY_FIELDS[dbKey] }).catch(() => {})
           showToast('Modification enregistrée — ton plan sera adapté automatiquement.')
         }
       } else {
@@ -313,17 +321,18 @@ export default function AthleteProfile() {
   }
 
   // ── Editable card sub-component ────────────────────────────────────────────
-  function FieldCard({ fieldKey, dbKey, label, displayValue, children }) {
+  function FieldCard({ fieldKey, dbKey, label, displayValue, children, highlight }) {
     const isEditing = editField === fieldKey
+    const borderColor = isEditing ? 'var(--primary)' : highlight ? '#F9A8D4' : 'transparent'
     return (
       <div
         onClick={() => { if (!isEditing) { startEdit(fieldKey, profile?.[dbKey] ?? '') } }}
         style={{
           position: 'relative',
           padding: '.875rem',
-          background: 'var(--surface-2)',
+          background: highlight ? 'rgba(249,168,212,.08)' : 'var(--surface-2)',
           borderRadius: 'var(--radius)',
-          border: isEditing ? '1.5px solid var(--primary)' : '1.5px solid transparent',
+          border: `1.5px solid ${borderColor}`,
           cursor: isEditing ? 'default' : 'pointer',
           transition: 'border-color .15s',
         }}
@@ -622,6 +631,7 @@ export default function AthleteProfile() {
             dbKey="intermediate_race_name"
             label="Course intermédiaire"
             displayValue={profile?.intermediate_race_name || 'Aucune'}
+            highlight
           >
             <input
               type="text"
@@ -639,6 +649,7 @@ export default function AthleteProfile() {
             fieldKey="intermediate_race_date"
             dbKey="intermediate_race_date"
             label="Date course intermédiaire"
+            highlight
             displayValue={profile?.intermediate_race_date
               ? new Date(profile.intermediate_race_date).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })
               : 'Non définie'}

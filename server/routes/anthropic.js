@@ -786,79 +786,182 @@ router.post('/plans/adjust-heat', async (req, res) => {
   if (!userId) return res.status(400).json({ error: 'Missing userId' });
 
   try {
-    await supabase.from('profiles').update({ heat_mode: activate }).eq('id', userId);
     const { data: profile } = await supabase.from('profiles').select('*').eq('id', userId).single();
 
-    if (!activate) {
-      await supabase.from('messages').insert({
-        user_id: userId, sender: 'coach',
-        content: `Mode canicule désactivé ✓ On reprend l'entraînement normal — ta prochaine séance est comme prévu.`,
-        read: false,
-      });
-      return res.json({ success: true, activated: false });
-    }
+    await supabase.from('profiles').update({ heat_mode: activate }).eq('id', userId);
 
-    // Find current active plan and week
     const { data: plan } = await supabase
       .from('training_plans').select('*').eq('user_id', userId).eq('status', 'active').single();
 
-    if (!plan) return res.json({ success: true, activated: true });
+    if (!plan) return res.json({ success: true, activated: activate, planData: null });
 
     const startDate    = new Date(plan.activated_at || plan.created_at);
     const weeksElapsed = Math.max(1, Math.floor((Date.now() - startDate.getTime()) / (7 * 24 * 3600 * 1000)) + 1);
-    const currentWeek  = plan.plan_data?.semaines?.find(s => s.numero === weeksElapsed);
+    const weekIdx      = plan.plan_data?.semaines?.findIndex(s => s.numero === weeksElapsed) ?? -1;
 
-    if (!currentWeek) return res.json({ success: true, activated: true });
-
-    const vma = resolveVma(profile);
-
-    const heatPrompt = `Mode canicule activé pour ${profile.first_name}. Adapte les séances de la semaine pour chaleur extrême.
-
-Séances actuelles :
-${JSON.stringify(currentWeek.seances, null, 2)}
-
-VMA : ${vma} km/h — Allures EF : ${calcPace(vma, 0.65)}/km – ${calcPace(vma, 0.70)}/km | Récup : ${calcPace(vma, 0.60)}/km – ${calcPace(vma, 0.63)}/km
-
-Règles strictes :
-- Remplace TOUTES les séances dures (fractionné, VMA, tempo, seuil, côtes) par des footings EF tranquilles
-- Réduis la durée de 20-25% sur toutes les séances course
-- Allure unique : EF 65-68% VMA, aucune intensité
-- Séances RENFO : garder identiques, sans changement
-- Séances ≤ 50 min maximum
-- Pour les EF : utilise EF-01 ou EF-02 selon la durée ; keep the same id_seance for RENFO
-
-Retourne UNIQUEMENT : {"seances": [...séances adaptées...]}`;
-
-    const message = await client.messages.create({
-      model: 'claude-sonnet-4-6', max_tokens: 2500,
-      messages: [{ role: 'user', content: heatPrompt }]
-    });
-
-    const raw      = message.content[0].text.trim();
-    const jsonText = raw.replace(/^```json\s*/i, '').replace(/^```\s*/i, '').replace(/\s*```$/i, '');
-    const { seances } = JSON.parse(jsonText);
+    if (weekIdx === -1) return res.json({ success: true, activated: activate, planData: null });
 
     const updatedPlan = JSON.parse(JSON.stringify(plan.plan_data));
-    const weekIdx = updatedPlan.semaines.findIndex(s => s.numero === weeksElapsed);
-    if (weekIdx !== -1) {
-      updatedPlan.semaines[weekIdx].seances = seances;
-      updatedPlan.semaines[weekIdx].charge  = 'Canicule — Allégé';
-      await supabase.from('training_plans').update({ plan_data: updatedPlan }).eq('id', plan.id);
+    const week        = updatedPlan.semaines[weekIdx];
+
+    if (!activate) {
+      // Restore original sessions if backup exists
+      if (week._adapted_for === 'heat' && week._original_seances) {
+        week.seances = week._original_seances;
+        if (week._original_charge) week.charge = week._original_charge;
+        delete week._adapted_for;
+        delete week._original_seances;
+        delete week._original_charge;
+        await supabase.from('training_plans').update({ plan_data: updatedPlan }).eq('id', plan.id);
+        return res.json({ success: true, activated: false, planData: updatedPlan });
+      }
+      return res.json({ success: true, activated: false, planData: null });
     }
 
-    const heatWarmMsg = await client.messages.create({
-      model: 'claude-sonnet-4-6', max_tokens: 180,
-      messages: [{ role: 'user', content: `Tu es Alexis, coach running. ${profile.first_name} vient d'activer le mode canicule. Écris un message très court (2-3 phrases) style SMS de pote — parle à la 1ère personne, naturel, 1-2 emojis. Dis-lui que t'as allégé sa semaine, de courir tôt le matin ou le soir, et de bien s'hydrater. Réponds uniquement avec le texte.` }]
-    }).catch(() => null);
-    await supabase.from('messages').insert({
-      user_id: userId, sender: 'coach',
-      content: heatWarmMsg?.content?.[0]?.text?.trim() || `Hello ${profile.first_name} ! J'ai allégé ta semaine — que des footings tranquilles, on ne force rien par cette chaleur 🌡️ Cours tôt le mat' ou en soirée et hydrate-toi bien.`,
-      read: false,
-    });
+    // Save originals before adapting
+    week._original_seances = JSON.parse(JSON.stringify(week.seances));
+    week._original_charge  = week.charge;
+    week._adapted_for      = 'heat';
 
-    res.json({ success: true, activated: true });
+    const vma       = resolveVma(profile);
+    const efPaceStr = `${calcPace(vma, 0.65)}/km – ${calcPace(vma, 0.70)}/km`;
+
+    week.seances = week.seances.map(s => {
+      if ((s.type || '').toLowerCase().includes('renforcement')) return s;
+      const newDuration = Math.min(50, Math.round((s.duree_min || 45) * 0.80));
+      const mainMin     = Math.max(newDuration - 15, 10);
+      return {
+        ...s,
+        type:            'Endurance fondamentale',
+        titre:           'Footing allégé — Canicule 🌡️',
+        duree_min:       newDuration,
+        intensite:       'facile',
+        echauffement:    `10 min de footing léger à ${calcPace(vma, 0.63)}/km — progressif`,
+        corps:           `${mainMin} min de footing allégé à ${efPaceStr} — réduis l'allure si c'est trop dur, l'essentiel est de bouger en douceur`,
+        retour_au_calme: `5 min de footing très lent à ${calcPace(vma, 0.60)}/km + étirements doux`,
+        allures: [
+          { zone: 'Échauffement',           pourcentage_vma: 63, vitesse_kmh: parseFloat((vma * 0.63).toFixed(1)), allure_min_km: calcPace(vma, 0.63) + '/km' },
+          { zone: 'Endurance fondamentale', pourcentage_vma: 67, vitesse_kmh: parseFloat((vma * 0.67).toFixed(1)), allure_min_km: calcPace(vma, 0.67) + '/km' },
+          { zone: 'Retour au calme',        pourcentage_vma: 60, vitesse_kmh: parseFloat((vma * 0.60).toFixed(1)), allure_min_km: calcPace(vma, 0.60) + '/km' },
+        ],
+        recuperation:    null,
+        notes_coach:     `Tu peux réduire l'allure si c'est trop dur — l'essentiel est de maintenir le mouvement en douceur. Cours tôt le matin ou en soirée et hydrate-toi bien.`,
+        rpe_cible:       3,
+        est_seance_cle:  false,
+      };
+    });
+    week.charge = 'Canicule — Allégé';
+
+    await supabase.from('training_plans').update({ plan_data: updatedPlan }).eq('id', plan.id);
+    res.json({ success: true, activated: true, planData: updatedPlan });
   } catch (err) {
     console.error('[AdjustHeat]', err.message);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// ─── POST /api/plans/adapt-injury ───────────────────────────────────────────
+
+router.post('/plans/adapt-injury', async (req, res) => {
+  const { userId } = req.body;
+  if (!userId) return res.status(400).json({ error: 'Missing userId' });
+
+  try {
+    const { data: profile } = await supabase.from('profiles').select('*').eq('id', userId).single();
+
+    const { data: plan } = await supabase
+      .from('training_plans').select('*').eq('user_id', userId).eq('status', 'active').single();
+
+    if (!plan) return res.json({ success: true, planData: null });
+
+    const startDate    = new Date(plan.activated_at || plan.created_at);
+    const weeksElapsed = Math.max(1, Math.floor((Date.now() - startDate.getTime()) / (7 * 24 * 3600 * 1000)) + 1);
+    const weekIdx      = plan.plan_data?.semaines?.findIndex(s => s.numero === weeksElapsed) ?? -1;
+
+    if (weekIdx === -1) return res.json({ success: true, planData: null });
+
+    const vma         = resolveVma(profile);
+    const updatedPlan = JSON.parse(JSON.stringify(plan.plan_data));
+    const week        = updatedPlan.semaines[weekIdx];
+
+    // Save originals before adapting
+    week._original_seances = JSON.parse(JSON.stringify(week.seances));
+    week._original_charge  = week.charge;
+    week._adapted_for      = 'injury';
+
+    week.seances = week.seances.map(s => {
+      if ((s.type || '').toLowerCase().includes('renforcement')) return s;
+      const newDuration = Math.min(40, Math.round((s.duree_min || 45) * 0.70));
+      const mainMin     = Math.max(newDuration - 10, 10);
+      return {
+        ...s,
+        type:            'Récupération active',
+        titre:           'Récupération — blessure 🩹',
+        duree_min:       newDuration,
+        intensite:       'très facile',
+        echauffement:    '5 min de marche douce pour activer la circulation',
+        corps:           `${mainMin} min de footing très léger — écoute ton corps, arrête si douleur`,
+        retour_au_calme: "5 min d'étirements doux en insistant sur la zone blessée",
+        allures: [
+          { zone: 'Récupération', pourcentage_vma: 60, vitesse_kmh: parseFloat((vma * 0.60).toFixed(1)), allure_min_km: calcPace(vma, 0.60) + '/km' },
+        ],
+        recuperation:    null,
+        notes_coach:     'Prends soin de toi. On garde juste du mouvement doux. Arrête immédiatement si tu ressens de la douleur — pas de pression.',
+        rpe_cible:       2,
+        est_seance_cle:  false,
+      };
+    });
+    week.charge = 'Blessure — Adapté';
+
+    await supabase.from('training_plans').update({ plan_data: updatedPlan }).eq('id', plan.id);
+    res.json({ success: true, planData: updatedPlan });
+  } catch (err) {
+    console.error('[AdaptInjury]', err.message);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// ─── POST /api/plans/restore-week ───────────────────────────────────────────
+
+router.post('/plans/restore-week', async (req, res) => {
+  const { userId } = req.body;
+  if (!userId) return res.status(400).json({ error: 'Missing userId' });
+
+  try {
+    const { data: plan } = await supabase
+      .from('training_plans').select('*').eq('user_id', userId).eq('status', 'active').single();
+
+    if (!plan) return res.json({ success: false, reason: 'no_plan' });
+
+    const startDate    = new Date(plan.activated_at || plan.created_at);
+    const weeksElapsed = Math.max(1, Math.floor((Date.now() - startDate.getTime()) / (7 * 24 * 3600 * 1000)) + 1);
+    const weekIdx      = plan.plan_data?.semaines?.findIndex(s => s.numero === weeksElapsed) ?? -1;
+
+    if (weekIdx === -1) return res.json({ success: false, reason: 'week_not_found' });
+
+    const updatedPlan = JSON.parse(JSON.stringify(plan.plan_data));
+    const week        = updatedPlan.semaines[weekIdx];
+
+    if (!week._adapted_for || !week._original_seances) {
+      return res.json({ success: false, reason: 'not_adapted' });
+    }
+
+    const adaptedFor   = week._adapted_for;
+    week.seances       = week._original_seances;
+    if (week._original_charge) week.charge = week._original_charge;
+    delete week._adapted_for;
+    delete week._original_seances;
+    delete week._original_charge;
+
+    await supabase.from('training_plans').update({ plan_data: updatedPlan }).eq('id', plan.id);
+
+    if (adaptedFor === 'heat') {
+      await supabase.from('profiles').update({ heat_mode: false }).eq('id', userId);
+    }
+
+    res.json({ success: true, planData: updatedPlan });
+  } catch (err) {
+    console.error('[RestoreWeek]', err.message);
     res.status(500).json({ error: err.message });
   }
 });
@@ -1737,6 +1840,21 @@ router.post('/plans/schedule-regen', async (req, res) => {
     const regenAt = new Date(Date.now() + 60 * 60 * 1000);
     await supabase.from('profiles').update({ plan_regen_after: regenAt.toISOString() }).eq('id', userId);
     console.log(`[schedule-regen] Scheduled for ${userId} at ${regenAt.toISOString()} — reason: ${reason}`);
+
+    const { data: profile } = await supabase.from('profiles').select('first_name').eq('id', userId).single();
+    const firstName = profile?.first_name || '';
+    let confirmMsg = `Bien reçu ${firstName} ! J'ai pris note de ta modification — ton plan sera automatiquement adapté d'ici 1h. 👌`;
+    if (reason === 'Blessures / douleurs') {
+      confirmMsg = `Bien reçu ${firstName} 🩹 J'ai pris note de ta blessure — ton plan sera adapté d'ici 1h pour tenir compte de ça. Prends soin de toi, on y va progressivement.`;
+    } else if (reason === 'Cycle menstruel') {
+      confirmMsg = `Bien reçu ${firstName} 🌸 Tes paramètres de cycle sont enregistrés — ton plan sera adapté d'ici 1h. Prends soin de toi.`;
+    }
+    await supabase.from('messages').insert({
+      user_id: userId, sender: 'coach',
+      content: confirmMsg,
+      read: false,
+    });
+
     res.json({ success: true, regen_scheduled_for: regenAt.toISOString() });
   } catch (err) {
     console.error('[schedule-regen]', err.message);
@@ -1766,6 +1884,56 @@ router.post('/plans/check-regen', async (req, res) => {
       try {
         // Clear the regen flag immediately so it won't be picked up again
         await supabase.from('profiles').update({ plan_regen_after: null }).eq('id', profile.id);
+
+        // ── Canicule: adapt current week programmatically, no full regen ──────
+        if (profile.heat_mode) {
+          const { data: heatPlan } = await supabase
+            .from('training_plans').select('*').eq('user_id', profile.id).eq('status', 'active').single();
+
+          if (heatPlan) {
+            const startDate    = new Date(heatPlan.activated_at || heatPlan.created_at);
+            const weeksElapsed = Math.max(1, Math.floor((Date.now() - startDate.getTime()) / (7 * 24 * 3600 * 1000)) + 1);
+            const weekIdx      = heatPlan.plan_data?.semaines?.findIndex(s => s.numero === weeksElapsed) ?? -1;
+
+            if (weekIdx !== -1) {
+              const vma       = resolveVma(profile);
+              const efPaceStr = `${calcPace(vma, 0.65)}/km – ${calcPace(vma, 0.70)}/km`;
+              const updatedPlan = JSON.parse(JSON.stringify(heatPlan.plan_data));
+
+              updatedPlan.semaines[weekIdx].seances = updatedPlan.semaines[weekIdx].seances.map(s => {
+                if (s.type === 'Renforcement musculaire') return s;
+                const newDuration = Math.min(50, Math.round((s.duree_min || 45) * 0.80));
+                return {
+                  ...s,
+                  type:            'Endurance fondamentale',
+                  titre:           'Footing EF — Canicule 🌡️',
+                  duree_min:       newDuration,
+                  intensite:       'facile',
+                  echauffement:    '5 min de marche / trot très léger',
+                  corps:           `${Math.max(newDuration - 10, 10)} min de footing EF tranquille à ${efPaceStr} — écoute ton corps par cette chaleur`,
+                  retour_au_calme: '5 min de marche douce + étirements',
+                  allures: [{ zone: 'Endurance fondamentale', pourcentage_vma: 67, vitesse_kmh: parseFloat((vma * 0.67).toFixed(1)), allure_min_km: calcPace(vma, 0.67) + '/km' }],
+                  recuperation:    null,
+                  notes_coach:     'Cours tôt le matin ou en soirée. Hydrate-toi avant, pendant et après. Aucune intensité par cette chaleur.',
+                  rpe_cible:       3,
+                  est_seance_cle:  false,
+                };
+              });
+              updatedPlan.semaines[weekIdx].charge = 'Canicule — Allégé';
+              await supabase.from('training_plans').update({ plan_data: updatedPlan }).eq('id', heatPlan.id);
+            }
+          }
+
+          await supabase.from('messages').insert({
+            user_id: profile.id, sender: 'coach',
+            content: `${profile.first_name}, c'est fait — ta semaine est allégée 🌡️ Que des footings tranquilles jusqu'à ce que la canicule passe. Cours tôt le mat' ou en soirée et hydrate-toi bien.`,
+            read: false,
+          });
+
+          processed++;
+          console.log(`[check-regen] Heat adaptation applied for ${profile.first_name} (${profile.id})`);
+          continue;
+        }
 
         // Archive current active plan
         await supabase.from('training_plans')

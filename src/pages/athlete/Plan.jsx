@@ -680,17 +680,26 @@ function WeeklyFeedbackCard({ weekNum, planId, userId, onSaved }) {
 
 export default function AthletePlan() {
   const { profile, refreshProfile } = useAuth()
-  const [plan,          setPlan]          = useState(null)
-  const [completions,   setCompletions]   = useState([])
-  const [weekFeedbacks, setWeekFeedbacks] = useState([])
-  const [activeWeek,    setActiveWeek]    = useState(1)
-  const [modal,         setModal]         = useState(null)
-  const [postFlow,      setPostFlow]      = useState(null)
-  const [loading,       setLoading]       = useState(true)
-  const [heatLoading,   setHeatLoading]   = useState(false)
-  const [cycleModal,    setCycleModal]    = useState(false)
-  const [cycleLoading,  setCycleLoading]  = useState(false)
-  const [cycleDone,     setCycleDone]     = useState(false)
+  const [plan,           setPlan]          = useState(null)
+  const [completions,    setCompletions]   = useState([])
+  const [weekFeedbacks,  setWeekFeedbacks] = useState([])
+  const [activeWeek,     setActiveWeek]    = useState(1)
+  const [modal,          setModal]         = useState(null)
+  const [postFlow,       setPostFlow]      = useState(null)
+  const [loading,        setLoading]       = useState(true)
+  const [heatModal,      setHeatModal]     = useState(false)
+  const [heatLoading,    setHeatLoading]   = useState(false)
+  const [heatDone,       setHeatDone]      = useState(false)
+  const [cycleModal,     setCycleModal]    = useState(false)
+  const [cycleLoading,   setCycleLoading]  = useState(false)
+  const [cycleDone,      setCycleDone]     = useState(false)
+  const [restoreLoading, setRestoreLoading] = useState(false)
+  const [toast,          setToast]         = useState(null)
+
+  function showToast(message, type = 'success') {
+    setToast({ message, type })
+    setTimeout(() => setToast(null), 4500)
+  }
 
   useEffect(() => {
     if (!profile?.id) return
@@ -723,25 +732,52 @@ export default function AthletePlan() {
     return completions.some(c => c.week_number === weekNum && c.session_index === sessionIdx)
   }
 
-  async function toggleHeat() {
+  async function activateHeat() {
     setHeatLoading(true)
     try {
-      const activate = !profile?.heat_mode
-      await api.adjustHeat({ userId: profile.id, activate })
+      const result = await api.adjustHeat({ userId: profile.id, activate: true })
       await refreshProfile()
-      await loadPlan()
+      if (result?.planData) {
+        setPlan(prev => prev ? { ...prev, plan_data: result.planData } : prev)
+      } else {
+        await loadPlan()
+      }
+      setHeatDone(true)
+      setTimeout(() => { setHeatModal(false); setHeatDone(false) }, 2000)
     } catch (err) {
-      console.error('[toggleHeat]', err)
+      console.error('[activateHeat]', err)
+      showToast((err?.message || 'Erreur') + ' ✗', 'error')
     } finally {
       setHeatLoading(false)
+    }
+  }
+
+  async function handleRestoreWeek() {
+    setRestoreLoading(true)
+    try {
+      const result = await api.restoreWeek({ userId: profile.id })
+      if (result?.planData) {
+        await refreshProfile()
+        setPlan(prev => prev ? { ...prev, plan_data: result.planData } : prev)
+        showToast('Plan restauré — retour aux séances normales ✓')
+      }
+    } catch (err) {
+      console.error('[RestoreWeek]', err)
+      showToast((err?.message || 'Erreur lors de la restauration') + ' ✗', 'error')
+    } finally {
+      setRestoreLoading(false)
     }
   }
 
   async function triggerCycleAdapt() {
     setCycleLoading(true)
     try {
-      await api.periodAlert({ userId: profile.id })
-      await loadPlan()
+      const result = await api.periodAlert({ userId: profile.id })
+      if (result?.planData) {
+        setPlan(prev => prev ? { ...prev, plan_data: result.planData } : prev)
+      } else {
+        await loadPlan()
+      }
       setCycleDone(true)
       setTimeout(() => { setCycleModal(false); setCycleDone(false) }, 2000)
     } catch (err) {
@@ -767,9 +803,12 @@ export default function AthletePlan() {
     )
   }
 
-  const weeks      = plan.plan_data?.semaines || []
-  const totalWeeks = weeks.length
-  const planDone   = activeWeek > totalWeeks
+  const weeks         = plan.plan_data?.semaines || []
+  const totalWeeks    = weeks.length
+  const planDone      = activeWeek > totalWeeks
+  const weeksElapsedNow = Math.max(1, Math.floor((Date.now() - new Date(plan.activated_at || plan.created_at).getTime()) / (7 * 24 * 3600 * 1000)) + 1)
+  const realCurrentWeek = weeks.find(w => w.numero === weeksElapsedNow)
+  const adaptedFor    = realCurrentWeek?._adapted_for || null
 
   if (planDone) {
     return (
@@ -797,48 +836,78 @@ export default function AthletePlan() {
 
   return (
     <div className="page">
+      <style>{`@keyframes toastIn { from { opacity:0; transform:translateX(-50%) translateY(12px); } to { opacity:1; transform:translateX(-50%) translateY(0); } }`}</style>
+      {toast && (
+        <div style={{
+          position: 'fixed', bottom: '5.5rem', left: '50%', transform: 'translateX(-50%)',
+          background: toast.type === 'success' ? 'rgba(16,185,129,.95)' : 'rgba(239,68,68,.95)',
+          color: '#fff', borderRadius: 99, padding: '.75rem 1.5rem',
+          fontWeight: 600, fontSize: '.875rem', zIndex: 500,
+          boxShadow: '0 4px 24px rgba(0,0,0,.35)',
+          animation: 'toastIn .3s ease',
+          whiteSpace: 'nowrap', maxWidth: '90vw', textAlign: 'center',
+        }}>
+          {toast.message}
+        </div>
+      )}
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1.5rem', gap: '.5rem' }}>
         <h2 className="page-heading" style={{ margin: 0 }}>Mon plan</h2>
         <div style={{ display: 'flex', gap: '.4rem', flexShrink: 0 }}>
           {(profile?.gender === 'female' || profile?.period_pain) && (
             <button
-              onClick={() => setCycleModal(true)}
+              onClick={adaptedFor === 'cycle' ? handleRestoreWeek : () => setCycleModal(true)}
+              disabled={restoreLoading || (adaptedFor !== null && adaptedFor !== 'cycle')}
               style={{
                 display: 'flex', alignItems: 'center', gap: '.35rem',
                 padding: '.4rem .75rem', borderRadius: 99,
-                border: '1.5px solid rgba(236,72,153,.5)',
-                background: 'rgba(236,72,153,.12)',
+                border: adaptedFor === 'cycle' ? '1.5px solid rgba(236,72,153,.8)' : '1.5px solid rgba(236,72,153,.5)',
+                background: adaptedFor === 'cycle' ? 'rgba(236,72,153,.25)' : 'rgba(236,72,153,.12)',
                 color: '#F472B6',
-                fontSize: '.75rem', fontWeight: 700, cursor: 'pointer',
-                fontFamily: 'inherit', whiteSpace: 'nowrap',
+                fontSize: '.75rem', fontWeight: 700,
+                cursor: (restoreLoading || (adaptedFor !== null && adaptedFor !== 'cycle')) ? 'default' : 'pointer',
+                fontFamily: 'inherit', whiteSpace: 'nowrap', opacity: (adaptedFor !== null && adaptedFor !== 'cycle') ? .4 : 1,
               }}>
-              🌸 Adapter mon plan
+              {restoreLoading && adaptedFor === 'cycle' ? '…' : adaptedFor === 'cycle' ? '🌸 Adapté ✓ — Retour normal' : '🌸 Adapter mon plan'}
             </button>
           )}
           <button
-            onClick={toggleHeat}
-            disabled={heatLoading}
+            onClick={adaptedFor === 'heat' ? handleRestoreWeek : () => setHeatModal(true)}
+            disabled={heatLoading || restoreLoading || (adaptedFor !== null && adaptedFor !== 'heat')}
             style={{
               display: 'flex', alignItems: 'center', gap: '.35rem',
               padding: '.4rem .75rem', borderRadius: 99,
-              border: profile?.heat_mode ? '1.5px solid #CA8A04' : '1.5px solid #CA8A04',
-              background: profile?.heat_mode ? 'rgba(234,179,8,.25)' : 'rgba(234,179,8,.1)',
-              color: profile?.heat_mode ? '#FDE047' : '#EAB308',
-              fontSize: '.75rem', fontWeight: 700, cursor: heatLoading ? 'default' : 'pointer',
+              border: '1.5px solid #CA8A04',
+              background: adaptedFor === 'heat' ? 'rgba(234,179,8,.25)' : 'rgba(234,179,8,.1)',
+              color: adaptedFor === 'heat' ? '#FDE047' : '#EAB308',
+              fontSize: '.75rem', fontWeight: 700,
+              cursor: (heatLoading || restoreLoading || (adaptedFor !== null && adaptedFor !== 'heat')) ? 'default' : 'pointer',
               fontFamily: 'inherit', whiteSpace: 'nowrap', transition: 'all .2s',
+              opacity: (adaptedFor !== null && adaptedFor !== 'heat') ? .4 : 1,
             }}>
-            {heatLoading ? '…' : <>🌡️ {profile?.heat_mode ? 'Canicule ON' : 'Canicule'}</>}
+            {(heatLoading || (restoreLoading && adaptedFor === 'heat')) ? '…' : adaptedFor === 'heat' ? '🌡️ Canicule ON ✓ — Retour normal' : '🌡️ Canicule'}
           </button>
         </div>
       </div>
 
-      {profile?.heat_mode && (
+      {adaptedFor === 'injury' && (
         <div style={{
           background: 'rgba(251,146,60,.1)', border: '1px solid rgba(251,146,60,.3)',
           borderRadius: 'var(--radius)', padding: '.75rem 1rem', marginBottom: '1rem',
           fontSize: '.82rem', lineHeight: 1.6, color: '#FED7AA',
+          display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '1rem',
         }}>
-          🌡️ <strong>Mode canicule actif</strong> — Tes séances de cette semaine ont été allégées. On reprend l'intensité dès que la chaleur redescend.
+          <span>🩹 <strong>Plan adapté — blessure</strong> — Tes séances de cette semaine sont en récupération douce.</span>
+          <button
+            onClick={handleRestoreWeek}
+            disabled={restoreLoading}
+            style={{
+              flexShrink: 0, background: 'rgba(251,146,60,.2)', border: '1px solid rgba(251,146,60,.5)',
+              color: '#FED7AA', borderRadius: 99, padding: '.3rem .75rem',
+              fontSize: '.72rem', fontWeight: 700, cursor: restoreLoading ? 'default' : 'pointer',
+              fontFamily: 'inherit',
+            }}>
+            {restoreLoading ? '…' : 'Retour normal'}
+          </button>
         </div>
       )}
 
@@ -1065,6 +1134,38 @@ export default function AthletePlan() {
           onClose={() => setPostFlow(null)}
           onDone={() => { loadPlan() }}
         />
+      )}
+
+      {heatModal && (
+        <div className="modal-overlay center" onClick={e => e.target === e.currentTarget && !heatLoading && setHeatModal(false)}>
+          <div className="modal center-modal" style={{ maxWidth: 380 }}>
+            <div style={{ textAlign: 'center', marginBottom: '1.25rem' }}>
+              <div style={{ fontSize: '2rem', marginBottom: '.5rem' }}>🌡️</div>
+              <h3 style={{ marginBottom: '.5rem' }}>Mode Canicule</h3>
+              <p style={{ fontSize: '.875rem', color: 'var(--text-muted)', lineHeight: 1.6 }}>
+                Ta semaine va être allégée — tous tes footings seront à allure tranquille. Tu peux réduire l'allure si tu en ressens le besoin, l'essentiel est de bouger en douceur. Quand la chaleur redescend, reclique sur le bouton pour revenir au plan normal.
+              </p>
+            </div>
+            {heatDone ? (
+              <div style={{ textAlign: 'center', color: '#FDE047', fontWeight: 700, padding: '.75rem' }}>
+                ✅ Plan allégé — prends soin de toi 🌡️
+              </div>
+            ) : (
+              <div style={{ display: 'flex', gap: '.75rem' }}>
+                <button className="btn btn-ghost" style={{ flex: 1 }} onClick={() => setHeatModal(false)} disabled={heatLoading}>
+                  Annuler
+                </button>
+                <button
+                  className="btn btn-primary"
+                  style={{ flex: 1, background: 'linear-gradient(135deg,#CA8A04,#A16207)', border: 'none' }}
+                  disabled={heatLoading}
+                  onClick={activateHeat}>
+                  {heatLoading ? '…' : 'Activer 🌡️'}
+                </button>
+              </div>
+            )}
+          </div>
+        </div>
       )}
 
       {cycleModal && (
