@@ -750,14 +750,34 @@ export default function AthletePlan() {
     }
   }
 
+  async function refetchPlan() {
+    const { data: p } = await supabase
+      .from('training_plans').select('*')
+      .eq('user_id', profile.id).eq('status', 'active').single()
+    if (p) setPlan(p)
+  }
+
+  async function handleRestoreHeat() {
+    setRestoreLoading(true)
+    try {
+      await api.adjustHeat({ userId: profile.id, activate: false })
+      await refreshProfile()
+      await refetchPlan()
+      showToast('Plan restauré — retour aux séances normales ✓')
+    } catch (err) {
+      console.error('[RestoreHeat]', err)
+      showToast((err?.message || 'Erreur lors de la restauration') + ' ✗', 'error')
+    } finally {
+      setRestoreLoading(false)
+    }
+  }
+
   async function handleRestoreWeek() {
     setRestoreLoading(true)
     try {
-      const result = await api.restoreWeek({ userId: profile.id })
+      await api.restoreWeek({ userId: profile.id })
       await refreshProfile()
-      if (result?.planData) {
-        setPlan(prev => prev ? { ...prev, plan_data: result.planData } : prev)
-      }
+      await refetchPlan()
       showToast('Plan restauré — retour aux séances normales ✓')
     } catch (err) {
       console.error('[RestoreWeek]', err)
@@ -872,7 +892,7 @@ export default function AthletePlan() {
             </button>
           )}
           <button
-            onClick={adaptedFor === 'heat' ? handleRestoreWeek : () => setHeatModal(true)}
+            onClick={adaptedFor === 'heat' ? handleRestoreHeat : () => setHeatModal(true)}
             disabled={heatLoading || restoreLoading || (adaptedFor !== null && adaptedFor !== 'heat')}
             style={{
               display: 'flex', alignItems: 'center', gap: '.35rem',

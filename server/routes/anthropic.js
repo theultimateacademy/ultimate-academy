@@ -817,22 +817,20 @@ router.post('/plans/adjust-heat', async (req, res) => {
     const updatedPlan = JSON.parse(JSON.stringify(plan.plan_data));
 
     if (!activate) {
-      // Restore all weeks adapted for heat
-      let restored = false;
+      // Restore all weeks adapted for heat — always clear flag, restore sessions when backup exists
       for (const week of updatedPlan.semaines) {
-        if (week._adapted_for !== 'heat' || !week._original_seances) continue;
-        week.seances = week._original_seances;
-        if (week._original_charge) week.charge = week._original_charge;
+        if (week._adapted_for !== 'heat') continue;
+        if (week._original_seances) {
+          week.seances = week._original_seances;
+          if (week._original_charge) week.charge = week._original_charge;
+        }
         delete week._adapted_for;
         delete week._original_seances;
         delete week._original_charge;
-        restored = true;
       }
-      if (restored) {
-        await supabase.from('training_plans').update({ plan_data: updatedPlan }).eq('id', plan.id);
-        return res.json({ success: true, activated: false, planData: updatedPlan });
-      }
-      return res.json({ success: true, activated: false, planData: null });
+      await supabase.from('training_plans').update({ plan_data: updatedPlan }).eq('id', plan.id);
+      await supabase.from('profiles').update({ heat_mode: false }).eq('id', userId);
+      return res.json({ success: true, activated: false, planData: updatedPlan });
     }
 
     // ── Activate: adapt ALL weeks ────────────────────────────────────────────
