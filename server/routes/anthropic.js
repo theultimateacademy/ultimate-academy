@@ -458,6 +458,15 @@ Si intermediate_race_date est fourni dans le profil et tombe dans la fenêtre du
 • Charge de la semaine de la course = "Légère (mini-affûtage course intermédiaire)"
 • Mentionner la course intermédiaire dans le message_du_mois
 
+RÈGLE 14bis — SEMAINE APRÈS UNE COURSE INTERMÉDIAIRE (RÉCUPÉRATION OBLIGATOIRE)
+La semaine qui SUIT immédiatement une course intermédiaire = récupération obligatoire, pas de développement :
+• J+1 et J+2 après la course = REPOS COMPLET — jamais de reprise le lendemain d'une course (ex: si course dimanche → lundi et mardi = repos absolu)
+• Reprise uniquement à partir de J+3 : EF très léger uniquement, 25-35 min max (65-68% VMA) — jamais de sortie longue ni séance clé cette semaine-là
+• AUCUNE séance dure (seuil, fractionné, tempo, côtes, spécifique) avant J+7 après la course — aucune exception, même si l'athlète se sent bien
+• La séance RENFO peut être placée à J+2 ou J+3 — c'est la seule séance non-course autorisée précocement
+• Charge de cette semaine = "Légère — Récupération post-course intermédiaire"
+• Si cette semaine est la dernière du plan, concentrer sur la récupération et ne pas forcer le volume
+
 RÈGLE 15 — REPOS POST-COURSE ET TRANSITION
 Après une course PRINCIPALE (pas intermédiaire) dont la date est inférieure à 3 semaines avant le début du plan :
 • 5km / 10km : S+1 = récupération légère uniquement (EF 20-30 min, 1-2 footings max, aucune intensité)
@@ -777,7 +786,7 @@ CONTRAINTES ABSOLUES — vérifie et documente dans auto_validation avant de sou
 15. NUTRITION : pour toute séance course ≥ 60 min, ajouter en fin de notes_coach : "🍬 Nutrition : à partir de 45 min, prends un gel, une compote, une pâte de fruit, une purée ou tout ce qui passe bien pour toi — vise 40-50g de glucides par heure."
 16. ÉCHAUFFEMENT FRACTIONNÉ : pour toute séance de type fractionné, tempo ou côtes, terminer l'échauffement par la phrase exacte : "Terminer par quelques accélérations progressives et la routine des gammes." — ne pas détailler les exercices dans l'échauffement.
 17. ALTERNANCE SORTIES LONGUES : S1 et S3 = sortie longue pure EF (allure constante 65-72% VMA). S2 et S4 = sortie longue EF avec blocs tempo (20-30 min à 75-80% VMA insérés en milieu de sortie). Utiliser les codes EF adaptés de la bibliothèque.
-18. FRACTIONNÉ 2000m : OBLIGATOIREMENT à 85% VMA exactement = ${calcPace(vma, 0.85)}/km pour VMA ${vma}. JAMAIS à 80%, JAMAIS à 83%. Aucune exception.${profile.chrono_goal_known && calcTargetPace(profile.chrono_goal, profile.objective) ? `\n19. Allure objectif chrono = ${calcTargetPace(profile.chrono_goal, profile.objective)} (calculée depuis "${profile.chrono_goal}") — utilise cette valeur exacte pour tous les blocs spécifiques allure course` : ''}`;
+18. FRACTIONNÉ 2000m : OBLIGATOIREMENT à 85% VMA exactement = ${calcPace(vma, 0.85)}/km pour VMA ${vma}. JAMAIS à 80%, JAMAIS à 83%. Aucune exception.${profile.chrono_goal_known && calcTargetPace(profile.chrono_goal, profile.objective) ? `\n19. Allure objectif chrono = ${calcTargetPace(profile.chrono_goal, profile.objective)} (calculée depuis "${profile.chrono_goal}") — utilise cette valeur exacte pour tous les blocs spécifiques allure course` : ''}${hasIntermediateRace ? `\n${profile.chrono_goal_known && calcTargetPace(profile.chrono_goal, profile.objective) ? '20' : '19'}. RÉCUPÉRATION POST-COURSE INTERMÉDIAIRE (RÈGLE 14bis — ABSOLUE) : La semaine qui SUIT la course intermédiaire du ${new Date(profile.intermediate_race_date).toLocaleDateString('fr-FR')} doit être une semaine de récupération. J+1 et J+2 = repos complet. Aucun seuil/fractionné/tempo/côtes avant J+7. EF léger uniquement à partir de J+3 (25-35 min, 65-68% VMA). Charge = "Légère — Récupération post-course intermédiaire". JAMAIS de séance dure le lundi ou mardi après la course.` : ''}`;
 
   try {
     const libraryText = await loadSessionLibrary();
