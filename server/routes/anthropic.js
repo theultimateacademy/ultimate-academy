@@ -945,43 +945,51 @@ router.post('/plans/adapt-injury', async (req, res) => {
 
     if (!plan) return res.json({ success: true, planData: null });
 
-    const weeksElapsed = getPlanWeeksElapsed(plan);
-    const weekIdx      = plan.plan_data?.semaines?.findIndex(s => s.numero === weeksElapsed) ?? -1;
-
-    if (weekIdx === -1) return res.json({ success: true, planData: null });
-
     const vma         = resolveVma(profile);
     const updatedPlan = JSON.parse(JSON.stringify(plan.plan_data));
-    const week        = updatedPlan.semaines[weekIdx];
 
-    // Save originals before adapting
-    week._original_seances = JSON.parse(JSON.stringify(week.seances));
-    week._original_charge  = week.charge;
-    week._adapted_for      = 'injury';
+    function isIntensityType(s) {
+      const t = (s.type || '').toLowerCase();
+      return t.includes('fractionné') || t.includes('vma') || t.includes('seuil') ||
+             t.includes('côtes') || t.includes('spécifique') || t.includes('interval');
+    }
 
-    week.seances = week.seances.map(s => {
+    function adaptSessionForInjury(s) {
       if ((s.type || '').toLowerCase().includes('renforcement')) return s;
-      const newDuration = Math.min(40, Math.round((s.duree_min || 45) * 0.70));
-      const mainMin     = Math.max(newDuration - 10, 10);
+      const isIntensity = isIntensityType(s);
+      // Intensity → récupération active; EF/sortie longue → footing récup allégé
+      const newDuration = isIntensity
+        ? Math.max(25, Math.round((s.duree_min || 40) * 0.60))
+        : Math.min(40, Math.round((s.duree_min || 45) * 0.70));
+      const mainMin = Math.max(newDuration - 10, 10);
       return {
         ...s,
         type:            'Récupération active',
-        titre:           'Récupération — blessure 🩹',
+        titre:           isIntensity ? 'Footing récupération — blessure 🩹' : 'Footing léger — blessure 🩹',
         duree_min:       newDuration,
         intensite:       'très facile',
-        echauffement:    '5 min de marche douce pour activer la circulation',
-        corps:           `${mainMin} min de footing très léger — écoute ton corps, arrête si douleur`,
-        retour_au_calme: "5 min d'étirements doux en insistant sur la zone blessée",
+        echauffement:    `5 min de footing très léger à ${calcPace(vma, 0.60)}/km pour activer doucement`,
+        corps:           `${mainMin} min de footing à ${calcPace(vma, 0.60)}/km – ${calcPace(vma, 0.63)}/km — écoute ton corps en permanence`,
+        retour_au_calme: "5 min d'étirements doux sur la zone blessée",
         allures: [
-          { zone: 'Récupération', pourcentage_vma: 60, vitesse_kmh: parseFloat((vma * 0.60).toFixed(1)), allure_min_km: calcPace(vma, 0.60) + '/km' },
+          { zone: 'Récupération active', pourcentage_vma: 61, vitesse_kmh: parseFloat((vma * 0.61).toFixed(1)), allure_min_km: calcPace(vma, 0.61) + '/km' },
         ],
         recuperation:    null,
-        notes_coach:     'Prends soin de toi. On garde juste du mouvement doux. Arrête immédiatement si tu ressens de la douleur — pas de pression.',
+        notes_coach:     `Arrête-toi complètement si la douleur dépasse 4/10 pendant la séance ou si elle persiste après — dans ce cas, repos total et consulte un professionnel de santé. Pas de pression.`,
         rpe_cible:       2,
         est_seance_cle:  false,
       };
-    });
-    week.charge = 'Blessure — Adapté';
+    }
+
+    // Adapt ALL weeks of the plan (full month)
+    for (const week of updatedPlan.semaines) {
+      if (week._adapted_for === 'injury') continue; // already adapted
+      week._original_seances = JSON.parse(JSON.stringify(week.seances));
+      week._original_charge  = week.charge;
+      week._adapted_for      = 'injury';
+      week.seances           = week.seances.map(adaptSessionForInjury);
+      week.charge            = 'Blessure — Programme adapté';
+    }
 
     await supabase.from('training_plans').update({ plan_data: updatedPlan }).eq('id', plan.id);
     res.json({ success: true, planData: updatedPlan });
@@ -1003,24 +1011,39 @@ router.post('/plans/restore-week', async (req, res) => {
 
     if (!plan) return res.json({ success: false, reason: 'no_plan' });
 
-    const weeksElapsed = getPlanWeeksElapsed(plan);
-    const weekIdx      = plan.plan_data?.semaines?.findIndex(s => s.numero === weeksElapsed) ?? -1;
-
-    if (weekIdx === -1) return res.json({ success: false, reason: 'week_not_found' });
-
     const updatedPlan = JSON.parse(JSON.stringify(plan.plan_data));
-    const week        = updatedPlan.semaines[weekIdx];
 
-    if (!week._adapted_for || !week._original_seances) {
-      return res.json({ success: false, reason: 'not_adapted' });
+    // Detect what type of adaptation is active (check any week)
+    const anyAdapted = updatedPlan.semaines.find(w => w._adapted_for);
+    if (!anyAdapted) return res.json({ success: false, reason: 'not_adapted' });
+
+    const adaptedFor = anyAdapted._adapted_for;
+
+    if (adaptedFor === 'injury') {
+      // Restore ALL weeks (injury spans the whole month)
+      for (const week of updatedPlan.semaines) {
+        if (week._adapted_for !== 'injury' || !week._original_seances) continue;
+        week.seances = week._original_seances;
+        if (week._original_charge) week.charge = week._original_charge;
+        delete week._adapted_for;
+        delete week._original_seances;
+        delete week._original_charge;
+      }
+    } else {
+      // heat / cycle: restore only current week
+      const weeksElapsed = getPlanWeeksElapsed(plan);
+      const weekIdx      = updatedPlan.semaines.findIndex(s => s.numero === weeksElapsed);
+      if (weekIdx === -1) return res.json({ success: false, reason: 'week_not_found' });
+      const week = updatedPlan.semaines[weekIdx];
+      if (!week._adapted_for || !week._original_seances) {
+        return res.json({ success: false, reason: 'not_adapted' });
+      }
+      week.seances = week._original_seances;
+      if (week._original_charge) week.charge = week._original_charge;
+      delete week._adapted_for;
+      delete week._original_seances;
+      delete week._original_charge;
     }
-
-    const adaptedFor   = week._adapted_for;
-    week.seances       = week._original_seances;
-    if (week._original_charge) week.charge = week._original_charge;
-    delete week._adapted_for;
-    delete week._original_seances;
-    delete week._original_charge;
 
     await supabase.from('training_plans').update({ plan_data: updatedPlan }).eq('id', plan.id);
 

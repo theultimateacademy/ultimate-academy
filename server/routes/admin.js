@@ -68,43 +68,44 @@ router.post('/period-alert', async (req, res) => {
     const painDays     = profile?.period_pain_days || 1;
     const weeksElapsed = getPlanWeeksElapsed(plan);
 
-    const updatedPlan    = JSON.parse(JSON.stringify(plan.plan_data));
-    let sessionsReplaced = 0;
-    const maxReplace     = Math.ceil(painDays / 2);
+    const updatedPlan = JSON.parse(JSON.stringify(plan.plan_data));
 
-    // Only adapt the current week and save backup
+    // Number of complete rest sessions: ~2 for 3 pain days, scales with painDays
+    const restSessions = Math.max(1, Math.round(painDays * 2 / 3));
+
     const currentWeek = updatedPlan.semaines.find(s => s.numero === weeksElapsed);
     if (currentWeek) {
       currentWeek._original_seances = JSON.parse(JSON.stringify(currentWeek.seances));
       currentWeek._original_charge  = currentWeek.charge;
       currentWeek._adapted_for      = 'cycle';
 
+      let replaced = 0;
       for (let i = 0; i < currentWeek.seances.length; i++) {
-        if (sessionsReplaced >= maxReplace) break;
+        if (replaced >= restSessions) break;
         const s = currentWeek.seances[i];
         if ((s.type || '').toLowerCase().includes('renforcement')) continue;
-        if (s.type === 'Récupération active') continue;
-        const newDuration = 30;
+        if (s.type === 'Repos') continue;
         currentWeek.seances[i] = {
           ...s,
-          type:            'Récupération active',
-          titre:           'Récupération — période douloureuse',
-          duree_min:       newDuration,
-          intensite:       'très facile',
-          echauffement:    '5 min de marche douce',
-          corps:           '20 min de footing très léger ou marche active selon ressenti',
-          retour_au_calme: "5 min d'étirements doux",
+          type:            'Repos',
+          titre:           'Repos complet — période douloureuse 🌸',
+          duree_min:       0,
+          intensite:       'repos',
+          echauffement:    '',
+          corps:           'Journée de repos complet. Accorde-toi du temps pour récupérer — ton corps en a besoin.',
+          retour_au_calme: '',
           allures:         [],
-          notes_coach:     'Prends soin de toi. On garde juste du mouvement doux. Pas de pression.',
-          rpe_cible:       2,
+          notes_coach:     'Prends soin de toi. Hydrate-toi, repose-toi et écoute ton corps. On reprend dès que tu te sens prête.',
+          rpe_cible:       0,
+          est_seance_cle:  false,
         };
-        sessionsReplaced++;
+        replaced++;
       }
     }
 
     await supabase.from('training_plans').update({ plan_data: updatedPlan }).eq('id', plan.id);
 
-    res.json({ success: true, sessionsReplaced, planData: updatedPlan });
+    res.json({ success: true, planData: updatedPlan });
   } catch (err) {
     console.error('[Admin] Period alert error:', err.message);
     res.status(500).json({ error: err.message });

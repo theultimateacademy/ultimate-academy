@@ -808,10 +808,12 @@ export default function AthletePlan() {
   const weeks           = plan.plan_data?.semaines || []
   const totalWeeks      = weeks.length
   const planDone        = activeWeek > totalWeeks
-  const planMonday      = getPlanStartMonday(planMonday)
+  const planMonday      = getPlanStartMonday(plan.activated_at || plan.created_at)
   const weeksElapsedNow = getPlanWeeksElapsed(plan)  // 0 = not started yet
   const realCurrentWeek = weeks.find(w => w.numero === weeksElapsedNow)
-  const adaptedFor      = realCurrentWeek?._adapted_for || null
+  // For injury (full month), detect even before plan starts or if current week index is off
+  const adaptedFor = realCurrentWeek?._adapted_for ||
+                     (weeks.some(w => w._adapted_for === 'injury') ? 'injury' : null)
 
   if (planDone) {
     return (
