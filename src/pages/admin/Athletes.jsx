@@ -5,12 +5,14 @@ import LoadingSpinner from '../../components/UI/LoadingSpinner'
 
 // ─── Design tokens ─────────────────────────────────────────────────────────────
 const TYPE_COLORS = {
-  'fractionné': '#8B2FC9', 'vma': '#8B2FC9',
+  'fractionné court': '#E8237A', 'fractionné long': '#8B2FC9', 'fractionné': '#8B2FC9', 'vma': '#8B2FC9',
   'tempo': '#F59E0B', 'seuil': '#F59E0B',
-  'endurance': '#10B981', 'sortie longue': '#10B981', 'footing': '#10B981',
-  'renforcement': '#6B7280', 'repos': '#374151',
-  'course intermédiaire': '#F97316', 'course': '#EF4444',
-  'récupération': '#3B82F6', 'côtes': '#EC4899', 'progressif': '#6366F1',
+  'endurance': '#10B981', 'footing': '#10B981',
+  'sortie longue': '#0EA5E9',
+  'renforcement': '#D97706',
+  'repos': '#374151',
+  'course intermédiaire': '#FB923C', 'course': '#FFD700',
+  'récupération': '#6B7280', 'côtes': '#EF4444', 'progressif': '#6366F1', 'spécifique': '#6366F1',
 }
 function typeColor(type) {
   const t = (type || '').toLowerCase()
@@ -685,14 +687,16 @@ function AthleteDetailPanel({ athlete, onClose, onUpdated, onAlertDismissed }) {
 
                       return (
                         <div key={week.numero} style={{ marginBottom:'1.25rem' }}>
-                          {/* Week header — couleur distincte des cartes de séance */}
+                          {/* Week header — rose pour distinguer des cartes de séance */}
                           <div style={{
                             background: isCurrent
-                              ? 'linear-gradient(135deg, #0F172A, #1E1B4B)'
-                              : 'var(--surface)',
-                            border: isCurrent ? '2px solid rgba(139,47,201,.45)' : '1px solid var(--border)',
+                              ? 'linear-gradient(135deg, rgba(190,24,93,.22), rgba(139,47,201,.14))'
+                              : 'rgba(236,72,153,.07)',
+                            border: isCurrent
+                              ? '2px solid rgba(236,72,153,.55)'
+                              : '1px solid rgba(236,72,153,.22)',
                             borderRadius:12, padding:'1rem 1.25rem', marginBottom:'.5rem',
-                            boxShadow: isCurrent ? '0 4px 24px rgba(139,47,201,.18)' : 'none' }}>
+                            boxShadow: isCurrent ? '0 4px 24px rgba(236,72,153,.15)' : 'none' }}>
                             <div style={{ display:'flex', alignItems:'center', gap:'.75rem', flexWrap:'wrap' }}>
                               <div style={{ display:'flex', alignItems:'center', gap:'.5rem' }}>
                                 <span style={{ fontWeight:800, fontSize:'1rem' }}>S{week.numero}</span>
