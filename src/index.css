@@ -509,6 +509,43 @@ tr:hover td { background: rgba(255,255,255,.04); }
   .bottom-nav::-webkit-scrollbar { display: none; }
   .bottom-nav-item               { flex: 0 0 68px; font-size: .68rem; }
   .bottom-nav-item .icon         { font-size: 1.3rem; }
+
+  /* ── Coach panel — mobile fixes ──────────────────────────── */
+
+  /* Header : wrap sur 2 lignes pour ne pas écraser sur petit écran */
+  .coach-panel-header {
+    flex-wrap: wrap !important;
+    row-gap: .5rem !important;
+    padding: .875rem 1rem !important;
+  }
+  .coach-panel-header-info { font-size: .72rem !important; }
+  /* Badges passent en bas sur toute la largeur */
+  .coach-panel-badges {
+    order: 4;
+    width: 100%;
+    display: flex !important;
+    flex-wrap: wrap;
+    gap: .3rem;
+  }
+
+  /* Tab content : padding réduit */
+  .coach-tab-pane { padding: 1rem !important; }
+
+  /* Session card : badge de type tronqué si trop long */
+  .coach-type-badge {
+    max-width: 88px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  /* Week header : padding réduit */
+  .coach-week-header { padding: .75rem 1rem !important; }
+
+  /* Session modal : inner padding réduit + safe-area bottom */
+  .coach-session-modal-inner {
+    padding-bottom: max(env(safe-area-inset-bottom, 0px), 1rem) !important;
+  }
 }
 
 /* ── Misc helpers ────────────────────────────────────────── */

@@ -152,10 +152,11 @@ function SessionCard({ session, completion, weekNum, sessionIdx, onOpen }) {
         </div>
       </div>
 
-      {/* Type badge */}
-      <span style={{ flexShrink:0, fontSize:'.63rem', fontWeight:700, padding:'.18rem .55rem',
-        borderRadius:20, background:`${color}20`, color, textTransform:'uppercase',
-        letterSpacing:'.04em', whiteSpace:'nowrap' }}>
+      {/* Type badge — tronqué sur mobile via .coach-type-badge */}
+      <span className="coach-type-badge"
+        style={{ flexShrink:0, fontSize:'.63rem', fontWeight:700, padding:'.18rem .55rem',
+          borderRadius:20, background:`${color}20`, color, textTransform:'uppercase',
+          letterSpacing:'.04em', whiteSpace:'nowrap' }}>
         {session.type}
       </span>
 
@@ -279,7 +280,8 @@ function CoachSessionModal({ session, weekNum, sessionIdx, completion, onClose, 
 
         {/* Body */}
         {!editing ? (
-          <div style={{ padding:'1rem 1.25rem 2.5rem', display:'flex', flexDirection:'column', gap:'.75rem' }}>
+          <div className="coach-session-modal-inner"
+            style={{ padding:'1rem 1.25rem 2.5rem', display:'flex', flexDirection:'column', gap:'.75rem' }}>
 
             {/* Programme structuré */}
             {(session.echauffement || session.corps || session.retour_au_calme) && (
@@ -488,14 +490,15 @@ function AthleteDetailPanel({ athlete, onClose, onUpdated, onAlertDismissed }) {
   ]
 
   return (
-    <div style={{ position:'fixed', inset:0, zIndex:200, background:'var(--bg)', display:'flex', flexDirection:'column' }}>
+    <div style={{ position:'fixed', inset:0, zIndex:201, background:'var(--bg)', display:'flex', flexDirection:'column' }}>
 
       {/* ── Header ─────────────────────────────────────────── */}
-      <div style={{ background:'var(--surface)', borderBottom:'1px solid var(--border)',
-        padding:'1rem 1.5rem', display:'flex', alignItems:'center', gap:'1rem', flexShrink:0 }}>
+      <div className="coach-panel-header"
+        style={{ background:'var(--surface)', borderBottom:'1px solid var(--border)',
+          padding:'1rem 1.5rem', display:'flex', alignItems:'center', gap:'1rem', flexShrink:0 }}>
         <button onClick={onClose}
           style={{ padding:'.38rem .75rem', background:'none', border:'1px solid var(--border)',
-            borderRadius:8, cursor:'pointer', fontFamily:'inherit', color:'var(--text-muted)', fontSize:'.82rem' }}>
+            borderRadius:8, cursor:'pointer', fontFamily:'inherit', color:'var(--text-muted)', fontSize:'.82rem', flexShrink:0 }}>
           ← Retour
         </button>
         <div className="chat-avatar" style={{ width:42, height:42, fontSize:'1.05rem', flexShrink:0 }}>
@@ -507,15 +510,15 @@ function AthleteDetailPanel({ athlete, onClose, onUpdated, onAlertDismissed }) {
             {alerts.length > 0 && (
               <span style={{ background:'#EF4444', color:'#fff', borderRadius:99,
                 fontSize:'.6rem', fontWeight:800, padding:'.1rem .4rem' }}>
-                {alerts.length} alerte{alerts.length > 1 ? 's' : ''}
+                {alerts.length}!
               </span>
             )}
           </div>
-          <div style={{ fontSize:'.78rem', color:'var(--text-muted)' }}>
+          <div className="coach-panel-header-info" style={{ fontSize:'.78rem', color:'var(--text-muted)' }}>
             {local.email} · {OBJECTIVE_LABELS[local.objective] || '—'} · {LEVEL_LABELS[local.level] || '—'}
           </div>
         </div>
-        <div style={{ display:'flex', gap:'.4rem', flexShrink:0, flexWrap:'wrap' }}>
+        <div className="coach-panel-badges" style={{ display:'flex', gap:'.4rem', flexShrink:0, flexWrap:'wrap' }}>
           <span className={`badge ${local.subscription_status === 'active' ? 'badge-success' : 'badge-warning'}`}>
             {local.subscription_status === 'active' ? '✓ Actif' : 'Inactif'}
           </span>
@@ -552,7 +555,7 @@ function AthleteDetailPanel({ athlete, onClose, onUpdated, onAlertDismissed }) {
           <>
             {/* ══════════ PROFIL ══════════ */}
             {tab === 'profile' && (
-              <div style={{ maxWidth:960, margin:'0 auto', padding:'1.5rem' }}>
+              <div className="coach-tab-pane" style={{ maxWidth:960, margin:'0 auto', padding:'1.5rem' }}>
 
                 {/* Field grid */}
                 <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fill, minmax(200px, 1fr))', gap:'.65rem', marginBottom:'1.25rem' }}>
@@ -659,7 +662,7 @@ function AthleteDetailPanel({ athlete, onClose, onUpdated, onAlertDismissed }) {
 
             {/* ══════════ PLAN ══════════ */}
             {tab === 'plan' && (
-              <div style={{ maxWidth:900, margin:'0 auto', padding:'1.5rem' }}>
+              <div className="coach-tab-pane" style={{ maxWidth:900, margin:'0 auto', padding:'1.5rem' }}>
                 {!plan ? (
                   <div style={{ textAlign:'center', padding:'4rem 2rem', color:'var(--text-muted)' }}>
                     <div style={{ fontSize:'2rem', marginBottom:'.75rem' }}>📋</div>
@@ -688,7 +691,7 @@ function AthleteDetailPanel({ athlete, onClose, onUpdated, onAlertDismissed }) {
                       return (
                         <div key={week.numero} style={{ marginBottom:'1.25rem' }}>
                           {/* Week header — rose pour distinguer des cartes de séance */}
-                          <div style={{
+                          <div className="coach-week-header" style={{
                             background: isCurrent
                               ? 'linear-gradient(135deg, rgba(190,24,93,.22), rgba(139,47,201,.14))'
                               : 'rgba(236,72,153,.07)',
@@ -757,7 +760,7 @@ function AthleteDetailPanel({ athlete, onClose, onUpdated, onAlertDismissed }) {
 
             {/* ══════════ RETOURS ══════════ */}
             {tab === 'retours' && (
-              <div style={{ maxWidth:700, margin:'0 auto', padding:'1.5rem' }}>
+              <div className="coach-tab-pane" style={{ maxWidth:700, margin:'0 auto', padding:'1.5rem' }}>
                 {/* Stats */}
                 <div style={{ display:'grid', gridTemplateColumns:'repeat(3,1fr)', gap:'.75rem', marginBottom:'1.5rem' }}>
                   {[
@@ -820,7 +823,7 @@ function AthleteDetailPanel({ athlete, onClose, onUpdated, onAlertDismissed }) {
 
             {/* ══════════ ALERTES ══════════ */}
             {tab === 'alertes' && (
-              <div style={{ maxWidth:700, margin:'0 auto', padding:'1.5rem' }}>
+              <div className="coach-tab-pane" style={{ maxWidth:700, margin:'0 auto', padding:'1.5rem' }}>
                 <p style={{ fontSize:'.82rem', color:'var(--text-muted)', marginBottom:'1rem' }}>
                   Clique sur ✓ pour marquer une alerte comme lue et la supprimer.
                 </p>
