@@ -362,9 +362,9 @@ RÈGLE 5 — AFFÛTAGE (RÉDUCTION VOLUME ET INTENSITÉ)
 Marathon : 2 semaines. Semi-marathon : 10 jours à 2 semaines. 10km : 1 semaine. 5km : 1 semaine.
 RÉDUIRE à la fois le volume ET l'intensité — les deux ensemble, jamais l'un sans l'autre :
 • Volume : -40% semaine pré-affûtage (S-2), -60% semaine d'affûtage final (S-1)
-• AUCUNE sortie longue pendant l'affûtage — max 40 min EF
-• AUCUN seuil long / tempo long — au maximum 1 bloc très court à allure objectif (2×1000m ou 3×1000m légers, pas plus)
-• Travail uniquement : footings EF 30-40 min, quelques strides, 1 séance courte allure course à très faible volume
+• AUCUNE sortie longue pendant l'affûtage — max 25 min EF
+• AUCUN seuil long / tempo long — au maximum 1 bloc très court à allure objectif (2×1000m ou 3×1000m légers, absolument pas plus)
+• Travail uniquement : footings EF 20-25 min + 6 lignes droites 80m progressives + gammes athlétiques. 1 séance courte allure course à très faible volume (2×1000m ou 3×1000m légers maximum)
 • Dernière séance dure minimum J-10 avant la course
 VEILLE DE COURSE (J-1) : séance d'activation OBLIGATOIRE = EXACTEMENT 20-25 min de footing très léger + 6 lignes droites 80m progressives + gammes athlétiques. JAMAIS 50 min la veille. JAMAIS de vraie séance. Code : EF-01 ou créer une séance d'activation spécifique si disponible dans la bibliothèque.
 
@@ -452,7 +452,8 @@ Exception terrain Ultra Marin (Réunion) : course essentiellement sur route, pas
 RÈGLE 14 — COURSE INTERMÉDIAIRE (mini-affûtage dans la semaine de la course)
 Si intermediate_race_date est fourni dans le profil et tombe dans la fenêtre du plan :
 • Identifier la semaine OÙ SE SITUE la course intermédiaire (pas la semaine d'avant)
-• Cette semaine = mini-affûtage ET course : volume réduit 40-50%, aucune séance dure, 1 footing EF léger maximum (25-30 min), repos les 2 jours précédant la course, course le jour J
+• Cette semaine = mini-affûtage ET course : volume réduit 40-50%, aucune séance dure, repos les 2 jours précédant la course, course le jour J
+• Nombre de séances course dans la semaine de course : RESPECTER days_per_week — ex: si days_per_week=3 → 1 EF léger 25 min (début de semaine) + 1 activation J-1 (20-25 min footing très léger + lignes droites + gammes) + course le jour J = 3 séances course. Pour days_per_week=2 → 1 EF léger + course = 2 séances. Ne JAMAIS descendre sous days_per_week en semaine de course intermédiaire (la course compte comme une séance).
 • La semaine AVANT la course intermédiaire = semaine de développement normale — PAS d'affûtage, PAS de réduction de charge
 • INTERDIT de placer une sortie longue ou une séance dure dans la semaine de la course intermédiaire
 • Charge de la semaine de la course = "Légère (mini-affûtage course intermédiaire)"
@@ -1017,28 +1018,94 @@ router.post('/plans/restore-week', async (req, res) => {
   if (!userId) return res.status(400).json({ error: 'Missing userId' });
 
   try {
-    const { data: plan } = await supabase
-      .from('training_plans').select('*').eq('user_id', userId).eq('status', 'active').single();
+    const [{ data: plan }, { data: profile }] = await Promise.all([
+      supabase.from('training_plans').select('*').eq('user_id', userId).eq('status', 'active').single(),
+      supabase.from('profiles').select('*').eq('id', userId).single(),
+    ]);
 
     if (!plan) return res.json({ success: false, reason: 'no_plan' });
 
     const updatedPlan = JSON.parse(JSON.stringify(plan.plan_data));
-
-    // Detect what type of adaptation is active (check any week)
     const anyAdapted = updatedPlan.semaines.find(w => w._adapted_for);
 
     if (!anyAdapted) {
-      // DB already clean — reset heat_mode just in case and return current plan to sync frontend
       await supabase.from('profiles').update({ heat_mode: false }).eq('id', userId);
       return res.json({ success: true, planData: plan.plan_data });
     }
 
     const adaptedFor = anyAdapted._adapted_for;
 
-    if (adaptedFor === 'injury' || adaptedFor === 'heat') {
-      // Restore ALL weeks — always clear flag; restore sessions when backup exists
+    if (adaptedFor === 'injury') {
+      // Progressive recovery: replace intensity with progressif for current & next week
+      const vma = resolveVma(profile);
+      const weeksElapsed = getPlanWeeksElapsed(plan);
+
+      function makeProgressifSession(s, phase) {
+        const type = (s.type || '').toLowerCase();
+        const isIntensity = type.includes('fractionné') || type.includes('vma') ||
+                            type.includes('seuil') || type.includes('côtes') ||
+                            type.includes('spécifique') || type.includes('interval');
+        const isHardIntensity = type.includes('fractionné') || type.includes('vma') || type.includes('côtes');
+        if (phase === 'current' && !isIntensity) return s;
+        if (phase === 'next'    && !isHardIntensity) return s;
+        const dur     = phase === 'current' ? 35 : 45;
+        const main    = dur - 10;
+        const chunk   = Math.round(main / 3);
+        return {
+          ...s,
+          type:            'Footing progressif',
+          titre:           phase === 'current' ? 'Footing de reprise progressif 🩹' : 'Footing progressif — reprise S2 🩹',
+          duree_min:       dur,
+          intensite:       phase === 'current' ? 'très facile' : 'facile',
+          echauffement:    `5 min de footing très léger à ${calcPace(vma, 0.60)}/km`,
+          corps:           phase === 'current'
+            ? `${main} min progressif : ${chunk} min à ${calcPace(vma, 0.63)}/km → ${chunk} min à ${calcPace(vma, 0.65)}/km → ${chunk} min à ${calcPace(vma, 0.68)}/km. Arrête-toi si douleur.`
+            : `${main} min progressif : ${chunk} min à ${calcPace(vma, 0.65)}/km → ${chunk} min à ${calcPace(vma, 0.68)}/km → ${chunk} min à ${calcPace(vma, 0.72)}/km. Pas encore de fractionné.`,
+          retour_au_calme: `5 min très léger à ${calcPace(vma, 0.60)}/km + étirements doux`,
+          allures:         phase === 'current' ? [
+            { zone: 'Phase 1', pourcentage_vma: 63, vitesse_kmh: parseFloat((vma*0.63).toFixed(1)), allure_min_km: calcPace(vma,0.63)+'/km' },
+            { zone: 'Phase 2', pourcentage_vma: 65, vitesse_kmh: parseFloat((vma*0.65).toFixed(1)), allure_min_km: calcPace(vma,0.65)+'/km' },
+            { zone: 'Phase 3', pourcentage_vma: 68, vitesse_kmh: parseFloat((vma*0.68).toFixed(1)), allure_min_km: calcPace(vma,0.68)+'/km' },
+          ] : [
+            { zone: 'Phase 1', pourcentage_vma: 65, vitesse_kmh: parseFloat((vma*0.65).toFixed(1)), allure_min_km: calcPace(vma,0.65)+'/km' },
+            { zone: 'Phase 2', pourcentage_vma: 68, vitesse_kmh: parseFloat((vma*0.68).toFixed(1)), allure_min_km: calcPace(vma,0.68)+'/km' },
+            { zone: 'Phase 3', pourcentage_vma: 72, vitesse_kmh: parseFloat((vma*0.72).toFixed(1)), allure_min_km: calcPace(vma,0.72)+'/km' },
+          ],
+          recuperation:    null,
+          notes_coach:     phase === 'current'
+            ? 'Reprise post-blessure. Pas de pression sur le rythme — écoute ton corps. Arrête si douleur > 3/10.'
+            : '2ème semaine de reprise. Tu peux sentir le retour de forme — reste en footing, pas encore de fractionné ni de côtes.',
+          rpe_cible:       phase === 'current' ? 3 : 4,
+          est_seance_cle:  false,
+        };
+      }
+
       for (const week of updatedPlan.semaines) {
-        if (week._adapted_for !== adaptedFor) continue;
+        if (week._adapted_for !== 'injury') continue;
+        const orig = week._original_seances || week.seances;
+        if (week.numero === weeksElapsed) {
+          week.seances = orig.map(s => makeProgressifSession(s, 'current'));
+          week.charge  = 'Légère — Reprise post-blessure (S1)';
+        } else if (week.numero === weeksElapsed + 1) {
+          week.seances = orig.map(s => makeProgressifSession(s, 'next'));
+          week.charge  = 'Légère — Reprise progressive (S2)';
+        } else {
+          week.seances = orig;
+          if (week._original_charge) week.charge = week._original_charge;
+        }
+        delete week._adapted_for;
+        delete week._original_seances;
+        delete week._original_charge;
+      }
+
+      recalculateDistances(updatedPlan, vma);
+      await supabase.from('training_plans').update({ plan_data: updatedPlan }).eq('id', plan.id);
+      return res.json({ success: true, planData: updatedPlan });
+    }
+
+    if (adaptedFor === 'heat') {
+      for (const week of updatedPlan.semaines) {
+        if (week._adapted_for !== 'heat') continue;
         if (week._original_seances) {
           week.seances = week._original_seances;
           if (week._original_charge) week.charge = week._original_charge;
@@ -1047,6 +1114,7 @@ router.post('/plans/restore-week', async (req, res) => {
         delete week._original_seances;
         delete week._original_charge;
       }
+      await supabase.from('profiles').update({ heat_mode: false }).eq('id', userId);
     } else {
       // cycle: restore current week only
       const weeksElapsed = getPlanWeeksElapsed(plan);
@@ -1063,11 +1131,6 @@ router.post('/plans/restore-week', async (req, res) => {
     }
 
     await supabase.from('training_plans').update({ plan_data: updatedPlan }).eq('id', plan.id);
-
-    if (adaptedFor === 'heat') {
-      await supabase.from('profiles').update({ heat_mode: false }).eq('id', userId);
-    }
-
     res.json({ success: true, planData: updatedPlan });
   } catch (err) {
     console.error('[RestoreWeek]', err.message);
