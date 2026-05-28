@@ -1010,34 +1010,40 @@ router.post('/plans/restore-week', async (req, res) => {
 
     // Detect what type of adaptation is active (check any week)
     const anyAdapted = updatedPlan.semaines.find(w => w._adapted_for);
-    if (!anyAdapted) return res.json({ success: false, reason: 'not_adapted' });
+
+    if (!anyAdapted) {
+      // DB already clean — reset heat_mode just in case and return current plan to sync frontend
+      await supabase.from('profiles').update({ heat_mode: false }).eq('id', userId);
+      return res.json({ success: true, planData: plan.plan_data });
+    }
 
     const adaptedFor = anyAdapted._adapted_for;
 
     if (adaptedFor === 'injury' || adaptedFor === 'heat') {
-      // Restore ALL weeks (full-month adaptations)
+      // Restore ALL weeks — always clear flag; restore sessions when backup exists
       for (const week of updatedPlan.semaines) {
-        if (week._adapted_for !== adaptedFor || !week._original_seances) continue;
-        week.seances = week._original_seances;
-        if (week._original_charge) week.charge = week._original_charge;
+        if (week._adapted_for !== adaptedFor) continue;
+        if (week._original_seances) {
+          week.seances = week._original_seances;
+          if (week._original_charge) week.charge = week._original_charge;
+        }
         delete week._adapted_for;
         delete week._original_seances;
         delete week._original_charge;
       }
     } else {
-      // cycle: restore only current week
+      // cycle: restore current week only
       const weeksElapsed = getPlanWeeksElapsed(plan);
-      const weekIdx      = updatedPlan.semaines.findIndex(s => s.numero === weeksElapsed);
-      if (weekIdx === -1) return res.json({ success: false, reason: 'week_not_found' });
-      const week = updatedPlan.semaines[weekIdx];
-      if (!week._adapted_for || !week._original_seances) {
-        return res.json({ success: false, reason: 'not_adapted' });
+      const week = updatedPlan.semaines.find(s => s.numero === weeksElapsed);
+      if (week) {
+        if (week._original_seances) {
+          week.seances = week._original_seances;
+          if (week._original_charge) week.charge = week._original_charge;
+        }
+        delete week._adapted_for;
+        delete week._original_seances;
+        delete week._original_charge;
       }
-      week.seances = week._original_seances;
-      if (week._original_charge) week.charge = week._original_charge;
-      delete week._adapted_for;
-      delete week._original_seances;
-      delete week._original_charge;
     }
 
     await supabase.from('training_plans').update({ plan_data: updatedPlan }).eq('id', plan.id);

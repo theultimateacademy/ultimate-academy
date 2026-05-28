@@ -754,11 +754,11 @@ export default function AthletePlan() {
     setRestoreLoading(true)
     try {
       const result = await api.restoreWeek({ userId: profile.id })
+      await refreshProfile()
       if (result?.planData) {
-        await refreshProfile()
         setPlan(prev => prev ? { ...prev, plan_data: result.planData } : prev)
-        showToast('Plan restauré — retour aux séances normales ✓')
       }
+      showToast('Plan restauré — retour aux séances normales ✓')
     } catch (err) {
       console.error('[RestoreWeek]', err)
       showToast((err?.message || 'Erreur lors de la restauration') + ' ✗', 'error')
