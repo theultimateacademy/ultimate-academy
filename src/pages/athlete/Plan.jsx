@@ -750,19 +750,36 @@ export default function AthletePlan() {
     }
   }
 
-  async function refetchPlan() {
-    const { data: p } = await supabase
-      .from('training_plans').select('*')
-      .eq('user_id', profile.id).eq('status', 'active').single()
-    if (p) setPlan(p)
-  }
-
+  // Restore heat adaptation directly via Supabase client — bypasses Render server entirely
   async function handleRestoreHeat() {
     setRestoreLoading(true)
     try {
-      await api.adjustHeat({ userId: profile.id, activate: false })
+      const { data: p, error: fetchErr } = await supabase
+        .from('training_plans').select('*')
+        .eq('user_id', profile.id).eq('status', 'active').single()
+      if (fetchErr) throw new Error(fetchErr.message)
+
+      if (p) {
+        const updatedData = JSON.parse(JSON.stringify(p.plan_data))
+        for (const week of updatedData.semaines || []) {
+          if (week._adapted_for !== 'heat') continue
+          if (week._original_seances) {
+            week.seances = week._original_seances
+            if (week._original_charge) week.charge = week._original_charge
+          }
+          delete week._adapted_for
+          delete week._original_seances
+          delete week._original_charge
+        }
+        const { error: updateErr } = await supabase
+          .from('training_plans').update({ plan_data: updatedData }).eq('id', p.id)
+        if (updateErr) throw new Error(updateErr.message)
+        setPlan({ ...p, plan_data: updatedData })
+      }
+
+      // Reset heat_mode flag in profile (fire-and-forget via API, ignore errors)
+      api.adjustHeat({ userId: profile.id, activate: false }).catch(() => {})
       await refreshProfile()
-      await refetchPlan()
       showToast('Plan restauré — retour aux séances normales ✓')
     } catch (err) {
       console.error('[RestoreHeat]', err)
@@ -775,9 +792,16 @@ export default function AthletePlan() {
   async function handleRestoreWeek() {
     setRestoreLoading(true)
     try {
-      await api.restoreWeek({ userId: profile.id })
+      const result = await api.restoreWeek({ userId: profile.id })
       await refreshProfile()
-      await refetchPlan()
+      if (result?.planData) {
+        setPlan(prev => prev ? { ...prev, plan_data: result.planData } : prev)
+      } else {
+        const { data: p } = await supabase
+          .from('training_plans').select('*')
+          .eq('user_id', profile.id).eq('status', 'active').single()
+        if (p) setPlan(p)
+      }
       showToast('Plan restauré — retour aux séances normales ✓')
     } catch (err) {
       console.error('[RestoreWeek]', err)
