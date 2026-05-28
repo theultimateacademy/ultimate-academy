@@ -823,13 +823,65 @@ router.post('/plans/adjust-heat', async (req, res) => {
     week._original_charge  = week.charge;
     week._adapted_for      = 'heat';
 
-    const vma       = resolveVma(profile);
-    const efPaceStr = `${calcPace(vma, 0.65)}/km – ${calcPace(vma, 0.70)}/km`;
+    const vma = resolveVma(profile);
+
+    function roundTo5(n) { return Math.max(30, Math.round(n / 5) * 5); }
+
+    function isIntensity(s) {
+      const t = (s.type || '').toLowerCase();
+      return t.includes('fractionné') || t.includes('vma') || t.includes('seuil') ||
+             t.includes('côtes') || t.includes('progressif') || t.includes('spécifique') ||
+             t.includes('interval');
+    }
+
+    function lightenCorps(corps) {
+      if (!corps) return corps;
+      // Reduce repetition count by ~40%
+      let out = corps.replace(/(\d+)\s*[×x×]/gi, (_, n) => {
+        const reduced = Math.max(3, Math.round(parseInt(n) * 0.6));
+        return `${reduced} ×`;
+      });
+      // Lower VMA percentages by ~10 pts
+      out = out.replace(/(\d{2,3})\s*%\s*(de\s*)?VMA/gi, (_, pct) => {
+        return `${Math.max(75, parseInt(pct) - 10)}% VMA`;
+      });
+      return out;
+    }
 
     week.seances = week.seances.map(s => {
-      if ((s.type || '').toLowerCase().includes('renforcement')) return s;
-      const newDuration = Math.min(50, Math.round((s.duree_min || 45) * 0.80));
+      const type = (s.type || '').toLowerCase();
+      if (type.includes('renforcement')) return s;
+      if (s.type === 'Récupération active') return s;
+
+      const orig        = s.duree_min || 45;
+      const newDuration = roundTo5(Math.round(orig * 0.80));
+
+      if (isIntensity(s)) {
+        const mainMin     = Math.max(newDuration - 20, 10);
+        const adaptedCorps = lightenCorps(s.corps);
+        return {
+          ...s,
+          titre:           (s.titre || s.type) + ' allégé 🌡️',
+          duree_min:       newDuration,
+          intensite:       'modérée — canicule',
+          echauffement:    `10 min de footing léger à ${calcPace(vma, 0.63)}/km — progressif`,
+          corps:           adaptedCorps
+            ? `${adaptedCorps}\n\n(Allure réduite de ~10% par rapport au plan normal — chaleur oblige. Arrête-toi si tu ressens des vertiges.)`
+            : `${mainMin} min — séance allégée : moins de répétitions, allure réduite de 10%.`,
+          retour_au_calme: `10 min de footing léger à ${calcPace(vma, 0.63)}/km + étirements doux`,
+          allures: [
+            { zone: 'Échauffement / Retour', pourcentage_vma: 63, vitesse_kmh: parseFloat((vma * 0.63).toFixed(1)), allure_min_km: calcPace(vma, 0.63) + '/km' },
+            { zone: 'Séance allégée',        pourcentage_vma: 82, vitesse_kmh: parseFloat((vma * 0.82).toFixed(1)), allure_min_km: calcPace(vma, 0.82) + '/km' },
+          ],
+          notes_coach:     `Séance maintenue mais allégée pour la canicule — moins de répétitions, allure réduite. Réduis encore si c'est trop dur. Cours tôt le matin ou en soirée et hydrate-toi bien.`,
+          rpe_cible:       5,
+          est_seance_cle:  false,
+        };
+      }
+
+      // Endurance / sortie longue → footing allégé
       const mainMin     = Math.max(newDuration - 15, 10);
+      const efPaceStr   = `${calcPace(vma, 0.65)}/km – ${calcPace(vma, 0.70)}/km`;
       return {
         ...s,
         type:            'Endurance fondamentale',
