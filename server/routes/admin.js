@@ -1,6 +1,37 @@
 const express    = require('express');
 const { createClient } = require('@supabase/supabase-js');
 
+const LEVEL_VMA = { debutant: 10, intermediaire: 14, confirme: 17, expert: 20 };
+
+function resolveVma(profile) {
+  return (profile.vma_known && profile.vma) ? parseFloat(profile.vma) : LEVEL_VMA[profile.level] || 14;
+}
+
+function recalculateDistances(planData, vma) {
+  if (!planData?.semaines) return planData;
+  for (const sem of planData.semaines) {
+    for (const s of (sem.seances || [])) {
+      if (s.est_course || !s.duree_min) continue;
+      const type = (s.type || '').toLowerCase();
+      if (type.includes('renforcement') || type.includes('repos')) { s.distance_km = 0; continue; }
+      const validAllures = (s.allures || []).filter(a => typeof a.vitesse_kmh === 'number' && a.vitesse_kmh > 0);
+      let avgSpeed;
+      if (validAllures.length > 0) {
+        avgSpeed = validAllures.reduce((sum, a) => sum + a.vitesse_kmh, 0) / validAllures.length;
+        if (type.includes('fractionné') || type.includes('vma')) avgSpeed *= 0.85;
+      } else {
+        const pct = (type.includes('tempo') || type.includes('seuil')) ? 0.73
+          : (type.includes('fractionné') || type.includes('vma'))     ? 0.70
+          : 0.67;
+        avgSpeed = vma * pct;
+      }
+      s.distance_km = Math.round((s.duree_min / 60) * avgSpeed * 10) / 10;
+    }
+    sem.volume_total_km = Math.round((sem.seances || []).reduce((sum, s) => sum + (s.distance_km || 0), 0) * 10) / 10;
+  }
+  return planData;
+}
+
 function getPlanStartMonday(dateStr) {
   const d = new Date(dateStr);
   d.setHours(0, 0, 0, 0);
@@ -58,7 +89,7 @@ router.post('/period-alert', async (req, res) => {
 
   try {
     const [{ data: profile }, { data: plan }] = await Promise.all([
-      supabase.from('profiles').select('first_name, last_name, period_pain_days').eq('id', userId).single(),
+      supabase.from('profiles').select('first_name, last_name, period_pain_days, vma, vma_known, level').eq('id', userId).single(),
       supabase.from('training_plans').select('id, plan_data, activated_at, created_at')
         .eq('user_id', userId).eq('status', 'active').single()
     ]);
@@ -106,6 +137,7 @@ router.post('/period-alert', async (req, res) => {
       }
     }
 
+    recalculateDistances(updatedPlan, resolveVma(profile));
     await supabase.from('training_plans').update({ plan_data: updatedPlan }).eq('id', plan.id);
 
     res.json({ success: true, planData: updatedPlan });

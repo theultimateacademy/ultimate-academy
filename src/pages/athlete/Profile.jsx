@@ -216,13 +216,16 @@ export default function AthleteProfile() {
       if (KEY_FIELDS[dbKey] && oldValue !== newValue) {
         if (dbKey === 'vma') {
           api.recalculateVma({ userId: profile.id, newVma: parseFloat(value) }).catch(() => {})
-          showToast('Tes allures ont été recalculées selon ta nouvelle VMA ✓')
+          showToast('Tes allures et distances ont été recalculées selon ta nouvelle VMA ✓')
         } else if (dbKey === 'injuries') {
           api.adaptInjury({ userId: profile.id }).catch(() => {})
-          showToast('Blessure enregistrée — tes séances de la semaine sont adaptées 🩹')
+          showToast('Blessure enregistrée — tes séances sont adaptées 🩹')
+        } else if (['objective', 'race_date', 'days_per_week', 'level'].includes(dbKey)) {
+          api.scheduleRegen({ userId: profile.id, reason: KEY_FIELDS[dbKey] }).catch(() => {})
+          showToast('Modification enregistrée — ton coach va adapter ton plan prochainement.')
         } else {
           api.scheduleRegen({ userId: profile.id, reason: KEY_FIELDS[dbKey] }).catch(() => {})
-          showToast('Modification enregistrée — ton plan sera adapté automatiquement.')
+          showToast('Modification enregistrée ✓')
         }
       } else {
         showToast('Profil mis à jour ✓')

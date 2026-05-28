@@ -913,6 +913,7 @@ router.post('/plans/adjust-heat', async (req, res) => {
       week.charge       = 'Canicule — Allégé';
     }
 
+    recalculateDistances(updatedPlan, vma);
     await supabase.from('training_plans').update({ plan_data: updatedPlan }).eq('id', plan.id);
     res.json({ success: true, activated: true, planData: updatedPlan });
   } catch (err) {
@@ -984,6 +985,7 @@ router.post('/plans/adapt-injury', async (req, res) => {
       week.charge       = 'Blessure — Programme adapté';
     }
 
+    recalculateDistances(updatedPlan, vma);
     await supabase.from('training_plans').update({ plan_data: updatedPlan }).eq('id', plan.id);
     res.json({ success: true, planData: updatedPlan });
   } catch (err) {
@@ -1091,6 +1093,7 @@ router.post('/plans/recalculate-vma', async (req, res) => {
       });
     });
 
+    recalculateDistances(planData, vma);
     await supabase.from('training_plans').update({ plan_data: planData }).eq('id', plan.id);
     res.json({ success: true, updated: true });
   } catch (err) {
