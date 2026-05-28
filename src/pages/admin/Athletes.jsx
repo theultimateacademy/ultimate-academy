@@ -119,124 +119,229 @@ function SessionEditForm({ session, onSave, onCancel }) {
   )
 }
 
-// ─── Session card ─────────────────────────────────────────────────────────────
-function SessionCard({ session, completion, weekNum, sessionIdx, onEdit }) {
-  const [expanded, setExpanded] = useState(false)
-  const [editing,  setEditing]  = useState(false)
-  const color = typeColor(session.type)
+// ─── Session card (row only — click opens CoachSessionModal) ──────────────────
+function SessionCard({ session, completion, weekNum, sessionIdx, onOpen }) {
+  const color  = typeColor(session.type)
   const isRest = (session.type || '').toLowerCase().includes('repos')
 
   return (
-    <div style={{ background:'var(--surface-2)', borderRadius:12, overflow:'hidden',
-      border: completion ? '1px solid rgba(16,185,129,.3)' : '1px solid transparent',
-      boxShadow: expanded ? 'var(--shadow)' : 'none', transition:'box-shadow .2s' }}>
+    <div
+      onClick={() => onOpen(session, weekNum, sessionIdx, completion)}
+      style={{
+        display:'flex', alignItems:'center', gap:'.75rem', padding:'.8rem 1rem',
+        borderRadius:12, cursor:'pointer',
+        background: isRest ? 'var(--surface-2)' : `${color}0D`,
+        border: completion
+          ? '1px solid rgba(16,185,129,.3)'
+          : isRest ? '1px solid var(--border)' : `1px solid ${color}28`,
+        transition:'box-shadow .15s, transform .1s',
+      }}
+      onMouseEnter={e => { e.currentTarget.style.boxShadow='var(--shadow)'; e.currentTarget.style.transform='translateY(-1px)' }}
+      onMouseLeave={e => { e.currentTarget.style.boxShadow='none'; e.currentTarget.style.transform='' }}
+    >
+      {/* Color bar */}
+      <div style={{ width:4, height:44, borderRadius:2, background: isRest ? 'var(--border)' : color, flexShrink:0 }} />
 
-      {/* Row */}
-      <div style={{ display:'flex', alignItems:'center', gap:'.75rem', padding:'.8rem 1rem', cursor:'pointer' }}
-        onClick={() => !editing && setExpanded(e => !e)}>
-
-        {/* Color bar */}
-        <div style={{ width:3, height:40, borderRadius:2, background: isRest ? 'var(--border)' : color, flexShrink:0 }} />
-
-        {/* Date chip */}
-        <div style={{ flexShrink:0, minWidth:58, textAlign:'center' }}>
-          <div style={{ fontSize:'.65rem', textTransform:'uppercase', letterSpacing:'.05em', color:'var(--text-muted)', fontWeight:700 }}>
-            {session.jour?.substring(0,3) || '—'}
-          </div>
-          {session.date && (
-            <div style={{ fontSize:'.75rem', fontWeight:600, color:'var(--text)' }}>
-              {new Date(session.date + 'T12:00:00').toLocaleDateString('fr-FR', { day:'numeric', month:'short' })}
-            </div>
-          )}
-        </div>
-
-        {/* Type badge */}
-        <div style={{ flexShrink:0 }}>
-          <span style={{ fontSize:'.65rem', fontWeight:700, padding:'.2rem .5rem', borderRadius:20,
-            background: `${color}20`, color, textTransform:'uppercase', letterSpacing:'.04em' }}>
-            {session.type}
-          </span>
-        </div>
-
-        {/* Title + meta */}
-        <div style={{ flex:1, minWidth:0 }}>
-          <div style={{ fontWeight:600, fontSize:'.875rem', overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>
-            {session.titre}
-          </div>
-          <div style={{ fontSize:'.72rem', color:'var(--text-muted)', marginTop:'.1rem', display:'flex', gap:'.6rem', flexWrap:'wrap' }}>
-            {session.duree_min > 0 && <span>{session.duree_min} min</span>}
-            {session.distance_km != null && session.distance_km > 0 && <span>{session.distance_km} km</span>}
-            {session.rpe_cible && <span>RPE {session.rpe_cible}/10</span>}
-            {completion && <span style={{ color:'#10B981' }}>✓ fait · RPE {completion.rpe || '?'}</span>}
-            {session.est_seance_cle && <span style={{ color:'#F59E0B' }}>★ clé</span>}
-          </div>
-        </div>
-
-        {/* Actions */}
-        <div style={{ display:'flex', gap:'.4rem', flexShrink:0 }} onClick={e => e.stopPropagation()}>
-          <button onClick={() => { setEditing(e => !e); setExpanded(true) }}
-            style={{ padding:'.28rem .6rem', background:'none', border:'1px solid var(--border)',
-              borderRadius:7, cursor:'pointer', fontFamily:'inherit', fontSize:'.72rem', color:'var(--text-muted)' }}>
-            {editing ? '✕' : '✏️'}
-          </button>
-          <button onClick={() => setExpanded(e => !e)}
-            style={{ padding:'.28rem .55rem', background:'none', border:'1px solid var(--border)',
-              borderRadius:7, cursor:'pointer', fontFamily:'inherit', fontSize:'.72rem', color:'var(--text-muted)' }}>
-            {expanded ? '▲' : '▼'}
-          </button>
+      {/* Day */}
+      <div style={{ flexShrink:0, minWidth:38, textAlign:'center' }}>
+        <div style={{ fontSize:'.65rem', textTransform:'uppercase', letterSpacing:'.05em',
+          color: isRest ? 'var(--text-muted)' : color, fontWeight:700 }}>
+          {session.jour?.substring(0,3) || '—'}
         </div>
       </div>
 
-      {/* Expanded details */}
-      {expanded && !editing && (
-        <div style={{ borderTop:'1px solid var(--border)', padding:'.875rem 1rem 1rem 1rem',
-          display:'flex', flexDirection:'column', gap:'.6rem' }}>
-          {session.echauffement && (
-            <div style={{ fontSize:'.8rem', lineHeight:1.6 }}>
-              <span style={{ fontSize:'.65rem', fontWeight:700, textTransform:'uppercase', letterSpacing:'.04em',
-                color:'var(--text-muted)', marginRight:'.4rem' }}>É</span>
-              {session.echauffement}
-            </div>
-          )}
-          {session.corps && (
-            <div style={{ fontSize:'.8rem', lineHeight:1.6 }}>
-              <span style={{ fontSize:'.65rem', fontWeight:700, textTransform:'uppercase', letterSpacing:'.04em',
-                color:'var(--text-muted)', marginRight:'.4rem' }}>Corps</span>
-              {session.corps}
-            </div>
-          )}
-          {session.retour_au_calme && (
-            <div style={{ fontSize:'.8rem', lineHeight:1.6 }}>
-              <span style={{ fontSize:'.65rem', fontWeight:700, textTransform:'uppercase', letterSpacing:'.04em',
-                color:'var(--text-muted)', marginRight:'.4rem' }}>RC</span>
-              {session.retour_au_calme}
-            </div>
-          )}
-          {session.notes_coach && (
-            <div style={{ background:'rgba(232,35,122,.06)', borderLeft:'3px solid var(--primary)',
-              padding:'.6rem .875rem', borderRadius:'0 8px 8px 0', fontSize:'.8rem',
-              fontStyle:'italic', lineHeight:1.6, color:'var(--text)' }}>
-              {session.notes_coach}
-            </div>
-          )}
-          {completion?.comment && (
-            <div style={{ background:'rgba(16,185,129,.06)', borderLeft:'3px solid #10B981',
-              padding:'.6rem .875rem', borderRadius:'0 8px 8px 0', fontSize:'.8rem',
-              fontStyle:'italic', lineHeight:1.6, color:'#6EE7B7' }}>
-              💬 &quot;{completion.comment}&quot;
-            </div>
-          )}
-        </div>
-      )}
+      {/* Type badge */}
+      <span style={{ flexShrink:0, fontSize:'.63rem', fontWeight:700, padding:'.18rem .55rem',
+        borderRadius:20, background:`${color}20`, color, textTransform:'uppercase',
+        letterSpacing:'.04em', whiteSpace:'nowrap' }}>
+        {session.type}
+      </span>
 
-      {/* Edit form */}
-      {editing && (
-        <SessionEditForm
-          session={session}
-          onSave={updated => { onEdit(weekNum, sessionIdx, updated); setEditing(false); setExpanded(false) }}
-          onCancel={() => { setEditing(false); setExpanded(false) }}
-        />
-      )}
+      {/* Title + meta */}
+      <div style={{ flex:1, minWidth:0 }}>
+        <div style={{ fontWeight:600, fontSize:'.875rem', overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>
+          {session.titre}
+        </div>
+        <div style={{ fontSize:'.72rem', color:'var(--text-muted)', marginTop:'.1rem',
+          display:'flex', gap:'.5rem', flexWrap:'wrap' }}>
+          {session.duree_min > 0 && <span>{session.duree_min} min</span>}
+          {session.distance_km != null && session.distance_km > 0 && <span>{session.distance_km} km</span>}
+          {session.rpe_cible && <span>RPE {session.rpe_cible}/10</span>}
+          {completion && <span style={{ color:'#10B981' }}>✓ fait · RPE {completion.rpe || '?'}</span>}
+          {session.est_seance_cle && <span style={{ color:'#F59E0B' }}>★ clé</span>}
+        </div>
+      </div>
+
+      {/* Chevron */}
+      <span style={{ color:'var(--text-muted)', fontSize:'.9rem', flexShrink:0 }}>›</span>
+    </div>
+  )
+}
+
+// ─── Coach session modal (bottom sheet, style interface athlète) ───────────────
+function CoachSessionModal({ session, weekNum, sessionIdx, completion, onClose, onSave }) {
+  const [editing, setEditing] = useState(false)
+  const color = typeColor(session.type)
+
+  useEffect(() => {
+    document.body.style.overflow = 'hidden'
+    return () => { document.body.style.overflow = '' }
+  }, [])
+
+  function PhaseArrow() {
+    return (
+      <div style={{ display:'flex', alignItems:'center', padding:'0 1.25rem', height:24 }}>
+        <div style={{ width:1, height:'100%', background:'var(--border)', margin:'0 auto' }} />
+      </div>
+    )
+  }
+
+  return (
+    <div
+      style={{ position:'fixed', inset:0, zIndex:300,
+        background:'rgba(0,0,0,.65)', backdropFilter:'blur(6px)',
+        display:'flex', alignItems:'flex-end', justifyContent:'center' }}
+      onClick={e => e.target === e.currentTarget && onClose()}
+    >
+      <style>{`@keyframes slideUpSheet { from { transform:translateY(100%); } to { transform:translateY(0); } }`}</style>
+      <div style={{
+        width:'100%', maxWidth:720,
+        background:'var(--surface)',
+        borderRadius:'24px 24px 0 0',
+        border:'1px solid var(--border)',
+        maxHeight:'90vh', overflowY:'auto',
+        animation:'slideUpSheet .3s cubic-bezier(0.32,0.72,0,1)',
+      }}>
+
+        {/* Handle */}
+        <div style={{ display:'flex', justifyContent:'center', paddingTop:'.875rem', paddingBottom:'.25rem' }}>
+          <div style={{ width:40, height:4, borderRadius:99, background:'rgba(255,255,255,.15)' }} />
+        </div>
+
+        {/* Header */}
+        <div style={{ padding:'1rem 1.25rem 1.25rem', borderBottom:'1px solid var(--border)' }}>
+          <div style={{ display:'flex', justifyContent:'space-between', alignItems:'flex-start', marginBottom:'.625rem' }}>
+            <span style={{
+              display:'inline-block',
+              background:`${color}18`, border:`1px solid ${color}40`,
+              borderRadius:99, padding:'.2rem .75rem',
+              fontSize:'.7rem', fontWeight:800, color,
+              letterSpacing:'.08em', textTransform:'uppercase',
+            }}>{session.type || 'Séance'}</span>
+            <div style={{ display:'flex', gap:'.5rem', alignItems:'center' }}>
+              {!editing && (
+                <button onClick={() => setEditing(true)}
+                  style={{ padding:'.35rem .8rem', background:'none', border:'1px solid var(--border)',
+                    borderRadius:8, cursor:'pointer', fontFamily:'inherit', fontSize:'.75rem', color:'var(--text-muted)' }}>
+                  ✏️ Modifier
+                </button>
+              )}
+              <button onClick={onClose}
+                style={{ padding:'.35rem .7rem', background:'none', border:'1px solid var(--border)',
+                  borderRadius:8, cursor:'pointer', fontFamily:'inherit', fontSize:'.82rem', color:'var(--text-muted)' }}>
+                ✕
+              </button>
+            </div>
+          </div>
+
+          <h3 style={{ fontSize:'1.1rem', fontWeight:700, lineHeight:1.25, marginBottom:'.35rem' }}>
+            {session.titre}
+          </h3>
+          <p style={{ fontSize:'.8rem', color:'var(--text-muted)', marginBottom:'.875rem' }}>
+            {session.jour && `📅 ${session.jour}`}
+            {completion && (
+              <span style={{ marginLeft:'.75rem', color:'#10B981', fontWeight:600 }}>
+                ✓ Effectuée · RPE {completion.rpe || '?'}/10
+              </span>
+            )}
+          </p>
+
+          {/* Stats chips */}
+          <div style={{ display:'flex', gap:'.4rem', flexWrap:'wrap' }}>
+            {[
+              session.duree_min > 0 ? { icon:'⏱', val:`${session.duree_min} min` } : null,
+              session.distance_km > 0 ? { icon:'📍', val:`${session.distance_km} km` } : null,
+              session.rpe_cible ? { icon:'💪', val:`RPE ${session.rpe_cible}` } : null,
+              session.est_seance_cle ? { icon:'★', val:'Séance clé' } : null,
+            ].filter(Boolean).map(({ icon, val }) => (
+              <div key={val} style={{
+                background:'var(--surface-2)', border:'1px solid var(--border)',
+                borderRadius:99, padding:'.25rem .75rem',
+                fontSize:'.78rem', fontWeight:600, display:'flex', alignItems:'center', gap:'.3rem',
+              }}>
+                <span>{icon}</span><span>{val}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Body */}
+        {!editing ? (
+          <div style={{ padding:'1rem 1.25rem 2.5rem', display:'flex', flexDirection:'column', gap:'.75rem' }}>
+
+            {/* Programme structuré */}
+            {(session.echauffement || session.corps || session.retour_au_calme) && (
+              <div style={{ background:'var(--bg)', borderRadius:16, overflow:'hidden', border:'1px solid var(--border)' }}>
+                {session.echauffement && (
+                  <div style={{ borderLeft:'3px solid #F59E0B', padding:'.875rem 1rem .875rem .875rem' }}>
+                    <div style={{ fontSize:'.65rem', fontWeight:700, textTransform:'uppercase',
+                      letterSpacing:'.08em', color:'#FCD34D', marginBottom:'.4rem' }}>🔥 Échauffement</div>
+                    <p style={{ fontSize:'.85rem', lineHeight:1.65, color:'rgba(255,255,255,.75)' }}>{session.echauffement}</p>
+                  </div>
+                )}
+                {session.echauffement && session.corps && <PhaseArrow />}
+                {session.corps && (
+                  <div style={{ borderLeft:`3px solid ${color}`, padding:'.875rem 1rem .875rem .875rem', background:`${color}06` }}>
+                    <div style={{ fontSize:'.65rem', fontWeight:700, textTransform:'uppercase',
+                      letterSpacing:'.08em', color, marginBottom:'.4rem' }}>⚡ Séance principale</div>
+                    <p style={{ fontSize:'.85rem', lineHeight:1.65, color:'rgba(255,255,255,.75)', whiteSpace:'pre-line' }}>{session.corps}</p>
+                  </div>
+                )}
+                {session.corps && session.retour_au_calme && <PhaseArrow />}
+                {session.retour_au_calme && (
+                  <div style={{ borderLeft:'3px solid #3B82F6', padding:'.875rem 1rem .875rem .875rem' }}>
+                    <div style={{ fontSize:'.65rem', fontWeight:700, textTransform:'uppercase',
+                      letterSpacing:'.08em', color:'#93C5FD', marginBottom:'.4rem' }}>❄️ Retour au calme</div>
+                    <p style={{ fontSize:'.85rem', lineHeight:1.65, color:'rgba(255,255,255,.75)' }}>{session.retour_au_calme}</p>
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* Notes coach */}
+            {session.notes_coach && (
+              <div style={{ background:'var(--bg)', border:'1px solid rgba(139,47,201,.25)',
+                borderRadius:14, padding:'.875rem 1rem' }}>
+                <div style={{ fontWeight:700, fontSize:'.65rem', textTransform:'uppercase',
+                  letterSpacing:'.08em', color:'#C084FC', marginBottom:'.4rem' }}>Ma note</div>
+                <p style={{ fontSize:'.85rem', lineHeight:1.7, fontStyle:'italic', color:'rgba(255,255,255,.82)' }}>
+                  &ldquo;{session.notes_coach}&rdquo;
+                </p>
+              </div>
+            )}
+
+            {/* Retour athlète */}
+            {completion?.comment && (
+              <div style={{ background:'rgba(16,185,129,.07)', border:'1px solid rgba(16,185,129,.2)',
+                borderRadius:14, padding:'.875rem 1rem' }}>
+                <div style={{ fontWeight:700, fontSize:'.65rem', textTransform:'uppercase',
+                  letterSpacing:'.08em', color:'#6EE7B7', marginBottom:'.4rem' }}>💬 Retour athlète</div>
+                <p style={{ fontSize:'.85rem', lineHeight:1.7, color:'rgba(255,255,255,.82)' }}>
+                  &ldquo;{completion.comment}&rdquo;
+                </p>
+              </div>
+            )}
+          </div>
+        ) : (
+          <div style={{ padding:'1rem 1.25rem 2.5rem' }}>
+            <SessionEditForm
+              session={session}
+              onSave={updated => { onSave(weekNum, sessionIdx, updated); onClose() }}
+              onCancel={() => setEditing(false)}
+            />
+          </div>
+        )}
+      </div>
     </div>
   )
 }
@@ -257,6 +362,7 @@ function AthleteDetailPanel({ athlete, onClose, onUpdated, onAlertDismissed }) {
   const [editMsg,       setEditMsg]       = useState(false)
   const [msgVal,        setMsgVal]        = useState(athlete.coach_message || '')
   const [sessionSaving, setSessionSaving] = useState(false)
+  const [openSession,   setOpenSession]   = useState(null)
 
   const currentWeekNum = getCurrentWeekNum(plan)
 
@@ -579,11 +685,14 @@ function AthleteDetailPanel({ athlete, onClose, onUpdated, onAlertDismissed }) {
 
                       return (
                         <div key={week.numero} style={{ marginBottom:'1.25rem' }}>
-                          {/* Week header */}
-                          <div style={{ background: isCurrent ? 'var(--surface)' : 'var(--surface-2)',
-                            border: isCurrent ? '2px solid var(--primary)' : '1px solid var(--border)',
+                          {/* Week header — couleur distincte des cartes de séance */}
+                          <div style={{
+                            background: isCurrent
+                              ? 'linear-gradient(135deg, #0F172A, #1E1B4B)'
+                              : 'var(--surface)',
+                            border: isCurrent ? '2px solid rgba(139,47,201,.45)' : '1px solid var(--border)',
                             borderRadius:12, padding:'1rem 1.25rem', marginBottom:'.5rem',
-                            boxShadow: isCurrent ? '0 4px 20px rgba(232,35,122,.12)' : 'none' }}>
+                            boxShadow: isCurrent ? '0 4px 24px rgba(139,47,201,.18)' : 'none' }}>
                             <div style={{ display:'flex', alignItems:'center', gap:'.75rem', flexWrap:'wrap' }}>
                               <div style={{ display:'flex', alignItems:'center', gap:'.5rem' }}>
                                 <span style={{ fontWeight:800, fontSize:'1rem' }}>S{week.numero}</span>
@@ -620,7 +729,7 @@ function AthleteDetailPanel({ athlete, onClose, onUpdated, onAlertDismissed }) {
                             </div>
                           </div>
 
-                          {/* Sessions */}
+                          {/* Sessions — chaque séance a sa propre couleur */}
                           <div style={{ display:'flex', flexDirection:'column', gap:'.4rem', paddingLeft:'.5rem' }}>
                             {(week.seances || []).map((s, sIdx) => (
                               <SessionCard
@@ -629,7 +738,8 @@ function AthleteDetailPanel({ athlete, onClose, onUpdated, onAlertDismissed }) {
                                 completion={weekComps.find(c => c.session_index === sIdx)}
                                 weekNum={week.numero}
                                 sessionIdx={sIdx}
-                                onEdit={saveSession}
+                                onOpen={(session, weekNum, sessionIdx, completion) =>
+                                  setOpenSession({ session, weekNum, sessionIdx, completion })}
                               />
                             ))}
                           </div>
@@ -745,6 +855,18 @@ function AthleteDetailPanel({ athlete, onClose, onUpdated, onAlertDismissed }) {
           </>
         )}
       </div>
+
+      {/* ── Coach session modal ─────────────────────────────── */}
+      {openSession && (
+        <CoachSessionModal
+          session={openSession.session}
+          weekNum={openSession.weekNum}
+          sessionIdx={openSession.sessionIdx}
+          completion={openSession.completion}
+          onClose={() => setOpenSession(null)}
+          onSave={(wn, si, updated) => { saveSession(wn, si, updated); setOpenSession(null) }}
+        />
+      )}
     </div>
   )
 }
