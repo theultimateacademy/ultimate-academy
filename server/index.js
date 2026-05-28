@@ -45,8 +45,15 @@ const PORT = process.env.PORT || 3001;
 // Stripe webhook needs raw body
 app.use('/api/stripe/webhook', express.raw({ type: 'application/json' }));
 
+const ALLOWED_ORIGINS = [
+  'http://localhost:3000',
+  'http://localhost:5173',
+  'https://theultimateacademy.fr',
+  'https://www.theultimateacademy.fr',
+  ...(process.env.CLIENT_URL ? [process.env.CLIENT_URL] : []),
+];
 app.use(cors({
-  origin: process.env.CLIENT_URL || 'http://localhost:3000',
+  origin: (origin, cb) => cb(null, !origin || ALLOWED_ORIGINS.includes(origin)),
   credentials: true
 }));
 app.use(express.json());
