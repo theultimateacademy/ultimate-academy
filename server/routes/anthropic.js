@@ -1198,11 +1198,10 @@ CONTRAINTES ABSOLUES — vérifie et documente dans auto_validation avant de sou
       model:      'claude-sonnet-4-6',
       max_tokens: 16000,
       system:     buildSystemPrompt(libraryText),
-      messages:   [{ role: 'user', content: userPrompt }]
+      messages:   [{ role: 'user', content: userPrompt + '\n\nRÉPONDS UNIQUEMENT AVEC LE JSON — COMMENCE DIRECTEMENT PAR { SANS AUCUN TEXTE AVANT.' }]
     });
 
     const rawText  = message.content[0].text.trim();
-    // Strip markdown fences
     let jsonText = rawText.replace(/^```json\s*/i, '').replace(/^```\s*/i, '').replace(/\s*```$/i, '');
     // Extract JSON object — strip any text before first { or after last }
     const jsonStart = jsonText.indexOf('{');
