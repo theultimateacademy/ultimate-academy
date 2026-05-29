@@ -1103,6 +1103,10 @@ RÈGLES TRIATHLON OBLIGATOIRES :
 - Périodisation : ${profile.objective === 'tri_sprint' ? '8-12 semaines' : profile.objective === 'tri_olympic' ? '12-16 semaines' : profile.objective === 'tri_half' ? '16-20 semaines' : '20-30 semaines'}
 - Le champ "type" des séances : natation = "Natation", vélo = "Vélo", brique = "Brique", course = type running habituel
 
+⛔ RÈGLE TERRAIN VÉLO :
+Si training_terrain = 'ville_plat' → INTERDIT d'utiliser VEL-10 (côtes répétées vélo). Remplacer par VEL-05, VEL-06, VEL-08 ou VEL-09 selon la phase.
+Si training_terrain = 'montagne' ou 'semi_montagne' → VEL-10 autorisé.
+
 ⛔ RÈGLE BRIQUE — ABSOLUE ET NON NÉGOCIABLE :
 CHAQUE SEMAINE d'entraînement DOIT contenir EXACTEMENT 1 séance brique (BRK-xx).
 La brique = sortie vélo suivie immédiatement d'une course à pied — obligatoire pour préparer la transition T2.

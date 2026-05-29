@@ -112,49 +112,58 @@ export const DAY_LABELS = {
 // Brique        : violet #8B5CF6
 // Courses/Race  : or/ambre
 
+// ── Palette strictement par discipline — aucun doublon inter-sport ────────────
+// Course à pied : famille vert / rose / violet / ambre
+// Renforcement  : rose fuchsia
+// Natation      : famille cyan / bleu ciel
+// Vélo          : famille orange / ambre foncé
+// Trail         : famille vert forêt / brun / olive
+// Brique        : violet
+// Race          : or / pêche
+
 export const SESSION_TYPE_COLORS = {
   // ── Course à pied ──────────────────────────────────────────
   'Endurance fondamentale':  '#10B981',  // vert émeraude
   'Footing progressif':      '#84CC16',  // vert lime
-  'Récupération active':     '#6B7280',  // gris
-  'Sortie longue':           '#0EA5E9',  // bleu ciel
+  'Récupération active':     '#6B7280',  // gris neutre (running seulement)
+  'Sortie longue':           '#0EA5E9',  // bleu running
   'Fractionné court':        '#E8237A',  // rose vif
   'Fractionné long':         '#8B2FC9',  // violet
   'Tempo':                   '#D97706',  // ambre
   'Tempo / Seuil':           '#D97706',
   'Tempo/Seuil':             '#D97706',
-  'Côtes':                   '#EF4444',  // rouge
+  'Côtes':                   '#EF4444',  // rouge running
   'Spécifique':              '#6366F1',  // indigo
   // ── Renforcement ───────────────────────────────────────────
-  'Renforcement':            '#EC4899',  // rose
+  'Renforcement':            '#EC4899',  // rose fuchsia
   'Renforcement musculaire': '#EC4899',
-  // ── Trail ──────────────────────────────────────────────────
-  'Trail endurance':         '#22C55E',
-  'Trail côtes':             '#EF4444',
-  'Trail technique':         '#F97316',
-  'Trail fractionné':        '#A855F7',
-  'Trail montagne':          '#6366F1',
-  'Trail simulation':        '#0EA5E9',
-  // ── Natation — toutes les variantes ────────────────────────
+  // ── Trail — famille verts forêt / brun ─────────────────────
+  'Trail endurance':         '#22C55E',  // vert forêt
+  'Trail fractionné':        '#16A34A',  // vert foncé
+  'Trail côtes':             '#65A30D',  // vert olive
+  'Trail technique':         '#CA8A04',  // doré / terre
+  'Trail montagne':          '#92400E',  // brun montagne
+  'Trail simulation':        '#059669',  // émeraude trail
+  // ── Natation — famille cyan / bleu ─────────────────────────
   'Natation':                '#06B6D4',  // cyan
   'Natation endurance':      '#06B6D4',
-  'Natation vitesse':        '#0891B2',
+  'Natation vitesse':        '#0891B2',  // cyan foncé
   'Natation seuil':          '#0891B2',
   'Natation tempo':          '#0891B2',
-  'Natation technique':      '#22D3EE',
-  'Natation test':           '#0891B2',
-  'Natation récupération':   '#6B7280',
-  // ── Vélo — toutes les variantes ────────────────────────────
+  'Natation technique':      '#22D3EE',  // cyan clair
+  'Natation test':           '#0284C7',  // bleu intense
+  'Natation récupération':   '#A5F3FC',  // cyan très clair (≠ gris running)
+  // ── Vélo — famille orange / ambre ──────────────────────────
   'Vélo':                    '#F97316',  // orange
   'Vélo endurance':          '#F97316',
-  'Vélo tempo':              '#EA580C',
-  'Vélo intervalles':        '#DC2626',
-  'Vélo côtes':              '#C2410C',
-  'Vélo test':               '#FB923C',
-  'Vélo récupération':       '#6B7280',
+  'Vélo tempo':              '#EA580C',  // orange foncé
+  'Vélo intervalles':        '#C2410C',  // orange-brun intense
+  'Vélo côtes':              '#9A3412',  // terre cuite foncée
+  'Vélo test':               '#FDBA74',  // pêche clair (≠ course intermédiaire)
+  'Vélo récupération':       '#FED7AA',  // orange très clair (≠ gris running)
   // ── Brique ─────────────────────────────────────────────────
   'Brique':                  '#8B5CF6',  // violet
   // ── Courses / Race ─────────────────────────────────────────
-  'Course':                  '#FFD700',
-  'Course intermédiaire':    '#FB923C',
+  'Course':                  '#FFD700',  // or
+  'Course intermédiaire':    '#FB923C',  // pêche/orange clair
 }
