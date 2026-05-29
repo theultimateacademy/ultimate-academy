@@ -717,27 +717,59 @@ export default function AthleteProfile() {
             </FieldCard>
           )}
 
-          {/* Jours/semaine */}
-          <FieldCard
-            fieldKey="days_per_week"
-            dbKey="days_per_week"
-            label="Jours/semaine"
-            displayValue={profile?.days_per_week ? `${profile.days_per_week} jours` : '—'}
-          >
-            <div style={{ display: 'flex', alignItems: 'center', gap: '.4rem' }}>
-              <input
-                type="number"
-                className="form-input"
-                style={{ flex: 1, fontSize: '.875rem' }}
-                min={2}
-                max={7}
-                value={editVal.days_per_week ?? ''}
-                onChange={e => setEditVal(prev => ({ ...prev, days_per_week: e.target.value }))}
-                autoFocus
-              />
-              <span style={{ fontSize: '.8rem', color: 'var(--text-muted)', whiteSpace: 'nowrap' }}>jours/sem.</span>
-            </div>
-          </FieldCard>
+          {/* Jours/semaine — masqué pour les triathlètes (remplacé par les 3 compteurs) */}
+          {!['tri_sprint','tri_olympic','tri_half','tri_ironman'].includes(profile?.objective) && (
+            <FieldCard
+              fieldKey="days_per_week"
+              dbKey="days_per_week"
+              label="Jours/semaine"
+              displayValue={profile?.days_per_week ? `${profile.days_per_week} jours` : '—'}
+            >
+              <div style={{ display: 'flex', alignItems: 'center', gap: '.4rem' }}>
+                <input
+                  type="number"
+                  className="form-input"
+                  style={{ flex: 1, fontSize: '.875rem' }}
+                  min={2}
+                  max={7}
+                  value={editVal.days_per_week ?? ''}
+                  onChange={e => setEditVal(prev => ({ ...prev, days_per_week: e.target.value }))}
+                  autoFocus
+                />
+                <span style={{ fontSize: '.8rem', color: 'var(--text-muted)', whiteSpace: 'nowrap' }}>jours/sem.</span>
+              </div>
+            </FieldCard>
+          )}
+
+          {/* Séances/semaine par discipline — triathlon uniquement */}
+          {['tri_sprint','tri_olympic','tri_half','tri_ironman'].includes(profile?.objective) && (<>
+            {[
+              { key: 'tri_swim_sessions', dbKey: 'tri_swim_sessions', label: '🏊 Nage / semaine', max: 4, unit: 'séance(s)' },
+              { key: 'tri_bike_sessions', dbKey: 'tri_bike_sessions', label: '🚴 Vélo / semaine',  max: 5, unit: 'séance(s)' },
+              { key: 'tri_run_sessions',  dbKey: 'tri_run_sessions',  label: '🏃 Course / semaine', max: 4, unit: 'séance(s)' },
+            ].map(({ key, dbKey: dk, label, max, unit }) => (
+              <FieldCard
+                key={key}
+                fieldKey={key}
+                dbKey={dk}
+                label={label}
+                displayValue={profile?.[dk] ? `${profile[dk]} ${unit}` : 'Non renseigné'}
+              >
+                <div style={{ display: 'flex', alignItems: 'center', gap: '.4rem' }}>
+                  <input
+                    type="number"
+                    className="form-input"
+                    style={{ flex: 1, fontSize: '.875rem' }}
+                    min={1} max={max}
+                    value={editVal[key] ?? ''}
+                    onChange={e => setEditVal(prev => ({ ...prev, [key]: e.target.value }))}
+                    autoFocus
+                  />
+                  <span style={{ fontSize: '.8rem', color: 'var(--text-muted)', whiteSpace: 'nowrap' }}>{unit}</span>
+                </div>
+              </FieldCard>
+            ))}
+          </>)}
 
           {/* Course intermédiaire — nom */}
           <FieldCard

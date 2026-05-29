@@ -387,6 +387,7 @@ function buildCorps(libSession, vma) {
   const main     = libSession.main_set || '';
   const recovery = libSession.recovery || '';
   const cat      = (libSession.category || '').toLowerCase();
+  const type     = (libSession.type || '').toLowerCase();
 
   // EF, RA: plain text — the EF display component handles them
   if (cat === 'endurance_fondamentale' || cat === 'recuperation_active') {
@@ -398,7 +399,6 @@ function buildCorps(libSession, vma) {
 
   // Sortie longue with phase splits (SL-07, SL-08, SL-09, SL-10)
   if (cat === 'sortie_longue') {
-    // Split on "puis" or " → " to detect multi-phase
     const phases = main.split(/\s+(?:puis|→)\s+/);
     if (phases.length > 1) {
       const phaseLabels = ['Endurance fondamentale', 'Blocs tempo / Allure spécifique', 'Allure course'];
@@ -406,18 +406,86 @@ function buildCorps(libSession, vma) {
         `BLOC ${phaseLabels[i] || 'Phase ' + (i + 1)}\n• ${subsPaces(p.trim(), vma)}`
       ).join('\n\n');
     }
-    // Pure SL: plain text (SL display component handles duration + pace range)
     return subsPaces(main, vma);
   }
 
-  // Fractionné, Tempo, Côtes, Spécifique, Footing progressif → BLOC structure
+  // Footing progressif: Phase 1 / Phase 2 / Phase 3
   if (cat === 'footing_progressif') {
-    // "phase1 → phase2 → phase3"
     const phases = main.split(/\s*→\s*/);
     return phases.map((p, i) => `BLOC Phase ${i + 1}\n• ${subsPaces(p.trim(), vma)}`).join('\n\n');
   }
 
-  // FC, FL, T, CO, SP — effort + récupération en deux BLOCs séparés (même style que SL)
+  // ── Natation ────────────────────────────────────────────────
+  if (cat === 'natation') {
+    // Endurance / récupération nage : plain (comme EF)
+    if (type.includes('endurance') || type.includes('recuperation')) {
+      return subsPaces(main, vma);
+    }
+    // Technique : phases split
+    if (type.includes('technique')) {
+      const phases = main.split(/\s*→\s*/);
+      if (phases.length > 1)
+        return phases.map((p, i) => `BLOC Exercice ${i + 1}\n• ${subsPaces(p.trim(), vma)}`).join('\n\n');
+    }
+    // Pyramide : split sur "→"
+    if (main.includes('→')) {
+      const phases = main.split(/\s*→\s*/);
+      return phases.map((p, i) => `BLOC Phase ${i + 1}\n• ${subsPaces(p.trim(), vma)}`).join('\n\n');
+    }
+    // Intervalles / seuil / tempo / test nage : BLOC + Récupération
+    const natLabel = type.includes('vitesse') ? 'Intervalles vitesse'
+      : type.includes('seuil') || type.includes('tempo') ? 'Tempo / Seuil'
+      : type.includes('test') ? 'Test chronométré'
+      : 'Séries';
+    let corps = `BLOC ${natLabel}\n• ${subsPaces(main, vma)}`;
+    if (recovery) corps += `\n\nBLOC Récupération\n• ${subsPaces(recovery, vma)}`;
+    return corps;
+  }
+
+  // ── Vélo ────────────────────────────────────────────────────
+  if (cat === 'velo') {
+    // Endurance / récupération vélo : plain
+    if (type.includes('endurance') || type.includes('recuperation')) {
+      return subsPaces(main, vma);
+    }
+    // Tempo / Sweet spot / Intervalles / Côtes : phases ou BLOC
+    if (main.includes('→') || main.includes('puis')) {
+      const phases = main.split(/\s*(?:→|puis)\s*/);
+      return phases.map((p, i) => `BLOC Phase ${i + 1}\n• ${subsPaces(p.trim(), vma)}`).join('\n\n');
+    }
+    const velLabel = type.includes('intervalles') ? 'Intervalles FTP'
+      : type.includes('tempo') ? 'Tempo / Sweet spot'
+      : type.includes('cotes') ? 'Montées répétées'
+      : type.includes('test') ? 'Test FTP'
+      : 'Effort';
+    let corps = `BLOC ${velLabel}\n• ${subsPaces(main, vma)}`;
+    if (recovery) corps += `\n\nBLOC Récupération\n• ${subsPaces(recovery, vma)}`;
+    return corps;
+  }
+
+  // ── Brique : split multi-phases sur BLOC intégré ────────────
+  if (cat === 'brique') {
+    // main_set already contains BLOC structure from the library
+    return main;
+  }
+
+  // ── Trail ───────────────────────────────────────────────────
+  if (cat === 'trail') {
+    if (type.includes('endurance') || type.includes('simulation')) return main;
+    if (main.includes('→')) {
+      const phases = main.split(/\s*→\s*/);
+      return phases.map((p, i) => `BLOC Phase ${i + 1}\n• ${subsPaces(p.trim(), vma)}`).join('\n\n');
+    }
+    const trailLabel = type.includes('fractionne') ? 'Intervalles côtes'
+      : type.includes('technique') ? 'Technique'
+      : type.includes('montagne') ? 'Montée'
+      : 'Effort';
+    let corps = `BLOC ${trailLabel}\n• ${subsPaces(main, vma)}`;
+    if (recovery) corps += `\n\nBLOC Récupération\n• ${subsPaces(recovery, vma)}`;
+    return corps;
+  }
+
+  // ── FC, FL, T, CO, SP (course à pied) ───────────────────────
   const blocLabel = {
     fractionne_court: 'Intervalles',
     fractionne_long:  'Intervalles',
@@ -433,6 +501,32 @@ function buildCorps(libSession, vma) {
   return corps;
 }
 
+// Maps library category → display type (used for colors in the UI)
+const CATEGORY_TO_TYPE = {
+  natation_endurance:   'Natation endurance',
+  natation_vitesse:     'Natation vitesse',
+  natation_seuil:       'Natation seuil',
+  natation_tempo:       'Natation tempo',
+  natation_technique:   'Natation technique',
+  natation_test:        'Natation test',
+  natation_recuperation:'Natation récupération',
+  natation:             'Natation',
+  velo_endurance:       'Vélo endurance',
+  velo_tempo:           'Vélo tempo',
+  velo_intervalles:     'Vélo intervalles',
+  velo_cotes:           'Vélo côtes',
+  velo_test:            'Vélo test',
+  velo_recuperation:    'Vélo récupération',
+  velo:                 'Vélo',
+  brique:               'Brique',
+  trail_endurance:      'Trail endurance',
+  trail_fractionne:     'Trail fractionné',
+  trail_cotes:          'Trail côtes',
+  trail_technique:      'Trail technique',
+  trail_montagne:       'Trail montagne',
+  trail_simulation:     'Trail simulation',
+};
+
 function injectLibraryContent(planData, libMap, vma) {
   if (!libMap || !planData?.semaines) return planData;
   for (const sem of planData.semaines) {
@@ -440,8 +534,12 @@ function injectLibraryContent(planData, libMap, vma) {
       const lib = libMap[s.id_seance];
       if (!lib) continue;
 
-      // Source of truth: duration from library
+      // Source of truth: duration and display type from library
       s.duree_min = lib.duration_min;
+
+      // Force correct display type for color consistency
+      const mappedType = CATEGORY_TO_TYPE[lib.type] || CATEGORY_TO_TYPE[lib.category];
+      if (mappedType) s.type = mappedType;
 
       // Echauffement & retour from library (with paces substituted)
       s.echauffement    = lib.warmup   ? subsPaces(lib.warmup,   vma) : '';
@@ -997,14 +1095,20 @@ Vélo : ${profile.bike_type || 'non précisé'}
 Expérience triathlon : ${profile.tri_experience || 'non précisée'}
 
 RÈGLES TRIATHLON OBLIGATOIRES :
-- Générer des séances pour LES 3 DISCIPLINES + briques
+- Générer des séances pour LES 3 DISCIPLINES + briques chaque semaine
 - Chaque séance porte un id_seance de la bibliothèque (NAT-xx, VEL-xx, BRK-xx, ou codes running)
 - La course à pied est la PRIORITÉ — placer les séances course les jours clés
 - JAMAIS 2 séances dures le même jour (ex: pas de tempo vélo + fractionné course)
-- Les briques comptent comme 2 séances (vélo + course) dans le planning
 - 1 jour repos total minimum par semaine
 - Périodisation : ${profile.objective === 'tri_sprint' ? '8-12 semaines' : profile.objective === 'tri_olympic' ? '12-16 semaines' : profile.objective === 'tri_half' ? '16-20 semaines' : '20-30 semaines'}
-- Le champ "type" des séances natation = "Natation", vélo = "Vélo", brique = "Brique"`;
+- Le champ "type" des séances : natation = "Natation", vélo = "Vélo", brique = "Brique", course = type running habituel
+
+⛔ RÈGLE BRIQUE — ABSOLUE ET NON NÉGOCIABLE :
+CHAQUE SEMAINE d'entraînement DOIT contenir EXACTEMENT 1 séance brique (BRK-xx).
+La brique = sortie vélo suivie immédiatement d'une course à pied — obligatoire pour préparer la transition T2.
+Choisir le code BRK adapté à l'objectif et à la semaine (BRK-01 à BRK-08).
+La brique est placée le SAMEDI de préférence (ou le jour long de l'athlète).
+AUCUNE semaine sans brique — c'est la séance la plus spécifique du triathlon.`;
   }
   if (discipline === 'trail') {
     const denivele = profile.race_denivele ? `${profile.race_denivele}m D+` : 'non précisé';

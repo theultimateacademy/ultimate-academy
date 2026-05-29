@@ -104,47 +104,57 @@ export const DAY_LABELS = {
   'Jeu': 'Jeudi', 'Ven': 'Vendredi', 'Sam': 'Samedi', 'Dim': 'Dimanche'
 }
 
+// ── Palette principale par discipline ─────────────────────────────────────────
+// Course à pied : vert/lime/violet/rose — famille running
+// Renforcement  : rose #EC4899
+// Natation      : cyan #06B6D4
+// Vélo          : orange #F97316
+// Brique        : violet #8B5CF6
+// Courses/Race  : or/ambre
+
 export const SESSION_TYPE_COLORS = {
-  // Running
-  'Endurance fondamentale':  '#10B981',
-  'Footing progressif':      '#84CC16',
-  'Fractionné court':        '#E8237A',
-  'Fractionné long':         '#8B2FC9',
-  'Tempo':                   '#F59E0B',
-  'Tempo / Seuil':           '#F59E0B',
-  'Tempo/Seuil':             '#F59E0B',
-  'Côtes':                   '#EF4444',
-  'Spécifique':              '#6366F1',
-  'Sortie longue':           '#0EA5E9',
-  'Récupération active':     '#6B7280',
-  'Renforcement':            '#EC4899',
+  // ── Course à pied ──────────────────────────────────────────
+  'Endurance fondamentale':  '#10B981',  // vert émeraude
+  'Footing progressif':      '#84CC16',  // vert lime
+  'Récupération active':     '#6B7280',  // gris
+  'Sortie longue':           '#0EA5E9',  // bleu ciel
+  'Fractionné court':        '#E8237A',  // rose vif
+  'Fractionné long':         '#8B2FC9',  // violet
+  'Tempo':                   '#D97706',  // ambre
+  'Tempo / Seuil':           '#D97706',
+  'Tempo/Seuil':             '#D97706',
+  'Côtes':                   '#EF4444',  // rouge
+  'Spécifique':              '#6366F1',  // indigo
+  // ── Renforcement ───────────────────────────────────────────
+  'Renforcement':            '#EC4899',  // rose
   'Renforcement musculaire': '#EC4899',
-  'Course':                  '#FFD700',
-  'Course intermédiaire':    '#FB923C',
-  // Trail
+  // ── Trail ──────────────────────────────────────────────────
   'Trail endurance':         '#22C55E',
   'Trail côtes':             '#EF4444',
   'Trail technique':         '#F97316',
   'Trail fractionné':        '#A855F7',
   'Trail montagne':          '#6366F1',
   'Trail simulation':        '#0EA5E9',
-  // Triathlon — Natation
-  'Natation':                '#06B6D4',
+  // ── Natation — toutes les variantes ────────────────────────
+  'Natation':                '#06B6D4',  // cyan
   'Natation endurance':      '#06B6D4',
-  'Natation vitesse':        '#0284C7',
-  'Natation seuil':          '#0369A1',
+  'Natation vitesse':        '#0891B2',
+  'Natation seuil':          '#0891B2',
   'Natation tempo':          '#0891B2',
-  'Natation technique':      '#67E8F9',
-  'Natation test':           '#F59E0B',
+  'Natation technique':      '#22D3EE',
+  'Natation test':           '#0891B2',
   'Natation récupération':   '#6B7280',
-  // Triathlon — Vélo
-  'Vélo':                    '#F97316',
+  // ── Vélo — toutes les variantes ────────────────────────────
+  'Vélo':                    '#F97316',  // orange
   'Vélo endurance':          '#F97316',
   'Vélo tempo':              '#EA580C',
   'Vélo intervalles':        '#DC2626',
   'Vélo côtes':              '#C2410C',
-  'Vélo test':               '#F59E0B',
+  'Vélo test':               '#FB923C',
   'Vélo récupération':       '#6B7280',
-  // Triathlon — Brique
-  'Brique':                  '#8B5CF6',
+  // ── Brique ─────────────────────────────────────────────────
+  'Brique':                  '#8B5CF6',  // violet
+  // ── Courses / Race ─────────────────────────────────────────
+  'Course':                  '#FFD700',
+  'Course intermédiaire':    '#FB923C',
 }
