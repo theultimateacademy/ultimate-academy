@@ -18,8 +18,12 @@ export default function AthleteProfile() {
   const [suuntoStatus,   setSuuntoStatus]   = useState('')
   const [garminLoading,  setGarminLoading]  = useState(false)
   const [garminStatus,   setGarminStatus]   = useState('')
-  // Canicule
+  // Adaptations
   const [heatLoading,    setHeatLoading]    = useState(false)
+  const [fatigueLoading, setFatigueLoading] = useState(false)
+  const [injuryLoading,  setInjuryLoading]  = useState(false)
+  const [restoreLoading, setRestoreLoading] = useState(false)
+  const [planAdaptedFor, setPlanAdaptedFor] = useState(null)  // synced from plan_data
   // Résiliation
   const [cancelConfirm,  setCancelConfirm]  = useState(false)
   const [cancelling,     setCancelling]     = useState(false)
@@ -129,7 +133,7 @@ export default function AthleteProfile() {
         content: `⚠️ [PROFIL] ${profile.first_name} a modifié ses paramètres de cycle : douleurs ${periodPain ? `oui (${periodDays}j)` : 'non'}.\nLe plan sera automatiquement adapté d'ici 1h.`,
       }).then()
       api.scheduleRegen({ userId: profile.id, reason: 'Cycle menstruel' }).catch(() => {})
-      showToast('Cycle sauvegardé — plan adapté automatiquement d\'ici 1h.')
+      showToast('Cycle sauvegardé. Plan adapté automatiquement d\'ici 1h.')
     } catch {
       showToast('Erreur lors de la sauvegarde ✗', 'error')
     } finally {
@@ -140,13 +144,31 @@ export default function AthleteProfile() {
   async function loadStats() {
     setLoading(true)
     try {
-      const { data: completions } = await supabase
-        .from('session_completions').select('rpe').eq('user_id', profile.id)
+      const [{ data: completions }, { data: plan }] = await Promise.all([
+        supabase.from('session_completions').select('rpe').eq('user_id', profile.id),
+        supabase.from('training_plans').select('plan_data,activated_at,created_at').eq('user_id', profile.id).eq('status', 'active').single(),
+      ])
       const sessions = completions?.length || 0
       const avgRpe   = sessions > 0
         ? Math.round((completions.filter(c => c.rpe).reduce((a, c) => a + c.rpe, 0)) / completions.filter(c => c.rpe).length * 10) / 10
         : 0
       setStats({ sessions, avgRpe })
+
+      // Derive plan adaptation state
+      if (plan?.plan_data?.semaines) {
+        const startDate = new Date(plan.activated_at || plan.created_at)
+        // align to next monday
+        const dayOfWeek = startDate.getDay()
+        const daysUntilMonday = dayOfWeek === 1 ? 0 : (8 - dayOfWeek) % 7 || 7
+        startDate.setDate(startDate.getDate() + daysUntilMonday)
+        startDate.setHours(0, 0, 0, 0)
+        const today = new Date(); today.setHours(0, 0, 0, 0)
+        const ms = today.getTime() - startDate.getTime()
+        const weeksElapsed = ms < 0 ? 1 : Math.floor(ms / (7 * 24 * 3600 * 1000)) + 1
+        const currentWeek = plan.plan_data.semaines.find(s => s.numero === weeksElapsed)
+          || plan.plan_data.semaines.find(s => s._adapted_for)
+        setPlanAdaptedFor(currentWeek?._adapted_for || null)
+      }
     } finally {
       setLoading(false)
     }
@@ -219,10 +241,10 @@ export default function AthleteProfile() {
           showToast('Tes allures et distances ont été recalculées selon ta nouvelle VMA ✓')
         } else if (dbKey === 'injuries') {
           api.adaptInjury({ userId: profile.id }).catch(() => {})
-          showToast('Blessure enregistrée — tes séances sont adaptées 🩹')
+          showToast('Blessure enregistrée. Tes séances sont adaptées 🩹')
         } else if (['objective', 'race_date', 'days_per_week', 'level'].includes(dbKey)) {
           api.scheduleRegen({ userId: profile.id, reason: KEY_FIELDS[dbKey] }).catch(() => {})
-          showToast('Modification enregistrée — ton coach va adapter ton plan prochainement.')
+          showToast('Modification enregistrée. Ton coach va adapter ton plan prochainement.')
         } else {
           api.scheduleRegen({ userId: profile.id, reason: KEY_FIELDS[dbKey] }).catch(() => {})
           showToast('Modification enregistrée ✓')
@@ -261,11 +283,64 @@ export default function AthleteProfile() {
       const activate = !profile?.heat_mode
       await api.adjustHeat({ userId: profile.id, activate })
       await refreshProfile()
-      showToast(activate ? '🌡️ Mode canicule activé — plan allégé cette semaine' : '✅ Mode canicule désactivé')
+      if (!activate) setPlanAdaptedFor(null)
+      showToast(activate ? '🌡️ Mode canicule activé' : '✅ Mode canicule désactivé')
     } catch (err) {
       showToast((err?.message || 'Erreur') + ' ✗', 'error')
     } finally {
       setHeatLoading(false)
+    }
+  }
+
+  async function toggleFatigue() {
+    if (planAdaptedFor === 'fatigue') {
+      setRestoreLoading(true)
+      try {
+        await api.restoreWeek({ userId: profile.id })
+        setPlanAdaptedFor(null)
+        showToast('Plan restauré ✓')
+      } catch (err) {
+        showToast((err?.message || 'Erreur') + ' ✗', 'error')
+      } finally {
+        setRestoreLoading(false)
+      }
+    } else {
+      setFatigueLoading(true)
+      try {
+        await api.fatigueAdapt({ userId: profile.id })
+        setPlanAdaptedFor('fatigue')
+        showToast('Semaine allégée — repose-toi bien 😴')
+      } catch (err) {
+        showToast((err?.message || 'Erreur') + ' ✗', 'error')
+      } finally {
+        setFatigueLoading(false)
+      }
+    }
+  }
+
+  async function toggleInjury() {
+    if (planAdaptedFor === 'injury') {
+      setRestoreLoading(true)
+      try {
+        await api.restoreWeek({ userId: profile.id })
+        setPlanAdaptedFor(null)
+        showToast('Plan restauré ✓')
+      } catch (err) {
+        showToast((err?.message || 'Erreur') + ' ✗', 'error')
+      } finally {
+        setRestoreLoading(false)
+      }
+    } else {
+      setInjuryLoading(true)
+      try {
+        await api.adaptInjury({ userId: profile.id })
+        setPlanAdaptedFor('injury')
+        showToast('Plan adapté pour la blessure 🩹')
+      } catch (err) {
+        showToast((err?.message || 'Erreur') + ' ✗', 'error')
+      } finally {
+        setInjuryLoading(false)
+      }
     }
   }
 
@@ -767,7 +842,7 @@ export default function AthleteProfile() {
             </div>
           ) : (
             <div style={{ background:'rgba(139,47,201,.08)', border:'1px solid rgba(139,47,201,.2)', borderRadius:10, padding:'.6rem .75rem', fontSize:'.78rem', lineHeight:1.5 }}>
-              💡 <strong style={{ color:'#C084FC' }}>Astuce :</strong> Connecte Strava pour importer automatiquement tes données Coros →{' '}
+              💡 <strong style={{ color:'#C084FC' }}>Astuce :</strong> Connecte Strava pour importer automatiquement tes données Coros :{' '}
               <button style={{ background:'none', border:'none', cursor:'pointer', color:'var(--primary)', fontWeight:600, fontSize:'.78rem', fontFamily:'inherit', padding:0 }}
                 onClick={connectStrava}>
                 Connecter Strava
@@ -787,7 +862,7 @@ export default function AthleteProfile() {
         >
           <p style={{ fontSize:'.78rem', color:'var(--text-muted)', lineHeight:1.5 }}>
             Synchronisation via Strava disponible.<br />
-            <span style={{ opacity:.65 }}>Connexion directe à la montre — Bientôt disponible</span>
+            <span style={{ opacity:.65 }}>Connexion directe à la montre. Bientôt disponible.</span>
           </p>
         </ServiceRow>
 
@@ -802,110 +877,175 @@ export default function AthleteProfile() {
         >
           <p style={{ fontSize:'.78rem', color:'var(--text-muted)', lineHeight:1.5 }}>
             Synchronisation via Strava disponible.<br />
-            <span style={{ opacity:.65 }}>Connexion directe à la montre — Bientôt disponible</span>
+            <span style={{ opacity:.65 }}>Connexion directe à la montre. Bientôt disponible.</span>
           </p>
         </ServiceRow>
 
       </div>
 
-      {/* Alertes & adaptations — blessure + canicule + cycle */}
+      {/* Adapter mon plan */}
       <div className="card" style={{ marginBottom: '1.25rem' }}>
-        <h4 style={{ marginBottom: '1.25rem' }}>🚨 Alertes &amp; adaptations du plan</h4>
-        <p className="text-sm text-muted" style={{ marginBottom: '1.25rem', lineHeight: 1.6 }}>
-          Toute modification ici adapte automatiquement ton programme d'entraînement d'ici 1h.
+        <h4 style={{ marginBottom: '.4rem' }}>Adapter mon plan</h4>
+        <p style={{ fontSize: '.82rem', color: 'var(--text-muted)', marginBottom: '1.25rem', lineHeight: 1.5 }}>
+          Active une option pour adapter ta semaine en cours. Une seule adaptation à la fois.
         </p>
 
-        {/* Blessures */}
-        <div style={{ marginBottom: '1.25rem' }}>
-          <div style={{ fontWeight: 600, fontSize: '.875rem', marginBottom: '.5rem' }}>🩹 Blessure / Douleur</div>
-          {editField === 'injuries' ? (
-            <div onClick={e => e.stopPropagation()}>
-              <textarea
-                className="form-textarea"
-                style={{ width: '100%', minHeight: 70, fontSize: '.875rem' }}
-                placeholder="Ex : tendinite genou gauche, douleur cheville…"
-                value={editVal.injuries ?? ''}
-                onChange={e => setEditVal(prev => ({ ...prev, injuries: e.target.value }))}
-                autoFocus
-              />
-              <div style={{ display: 'flex', gap: '.5rem', marginTop: '.5rem' }}>
-                <button className="btn btn-ghost btn-sm" style={{ fontSize: '.78rem' }} onClick={cancelEdit} disabled={editSaving}>Annuler</button>
-                <button className="btn btn-primary btn-sm" style={{ fontSize: '.78rem' }} onClick={() => saveField('injuries', editVal.injuries)} disabled={editSaving}>
-                  {editSaving ? '…' : '✓ Enregistrer'}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '.75rem' }}>
+
+          {/* 🩹 Blessure */}
+          {(() => {
+            const active  = planAdaptedFor === 'injury'
+            const loading = injuryLoading || (restoreLoading && active)
+            const blocked = planAdaptedFor !== null && !active
+            return (
+              <div style={{
+                borderRadius: 14, border: `1.5px solid ${active ? 'rgba(251,146,60,.7)' : 'rgba(251,146,60,.25)'}`,
+                background: active ? 'rgba(251,146,60,.1)' : 'rgba(251,146,60,.04)',
+                padding: '1rem 1.125rem', opacity: blocked ? .45 : 1,
+                display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '1rem',
+              }}>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{ fontWeight: 700, fontSize: '.9rem', color: '#FB923C', marginBottom: '.2rem' }}>🩹 Blessure</div>
+                  <div style={{ fontSize: '.78rem', color: 'var(--text-muted)', lineHeight: 1.45 }}>
+                    Remplace les séances intenses par des footings de récupération.
+                  </div>
+                  {active && (
+                    <div style={{ marginTop: '.4rem', fontSize: '.75rem', color: '#FED7AA', fontWeight: 600 }}>
+                      Actif cette semaine
+                    </div>
+                  )}
+                </div>
+                <button
+                  onClick={toggleInjury}
+                  disabled={loading || blocked}
+                  style={{
+                    flexShrink: 0, padding: '.42rem .9rem', borderRadius: 99, fontFamily: 'inherit',
+                    border: active ? '1.5px solid rgba(251,146,60,.7)' : '1.5px solid rgba(251,146,60,.4)',
+                    background: active ? 'rgba(251,146,60,.2)' : 'transparent',
+                    color: active ? '#FED7AA' : '#FB923C',
+                    fontWeight: 700, fontSize: '.8rem', cursor: (loading || blocked) ? 'default' : 'pointer',
+                  }}>
+                  {loading ? '…' : active ? 'Désactiver' : 'Activer'}
                 </button>
               </div>
-            </div>
-          ) : (
-            <div
-              onClick={() => startEdit('injuries', profile?.injuries ?? '')}
-              style={{ cursor: 'pointer', background: 'var(--surface-2)', borderRadius: 'var(--radius)', padding: '.625rem .875rem', fontSize: '.875rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', border: '1.5px solid transparent' }}
-              className="field-card-hoverable">
-              <span style={{ color: profile?.injuries ? 'var(--text)' : 'var(--text-muted)', fontStyle: profile?.injuries ? 'normal' : 'italic' }}>
-                {profile?.injuries || 'Aucune douleur signalée'}
-              </span>
-              <span style={{ fontSize: '.75rem', opacity: 0 }} className="pencil-icon">✏️</span>
+            )
+          })()}
+
+          {/* 😴 Fatigue */}
+          {(() => {
+            const active  = planAdaptedFor === 'fatigue'
+            const loading = fatigueLoading || (restoreLoading && active)
+            const blocked = planAdaptedFor !== null && !active
+            return (
+              <div style={{
+                borderRadius: 14, border: `1.5px solid ${active ? 'rgba(99,102,241,.7)' : 'rgba(99,102,241,.25)'}`,
+                background: active ? 'rgba(99,102,241,.1)' : 'rgba(99,102,241,.04)',
+                padding: '1rem 1.125rem', opacity: blocked ? .45 : 1,
+                display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '1rem',
+              }}>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{ fontWeight: 700, fontSize: '.9rem', color: '#818CF8', marginBottom: '.2rem' }}>😴 Fatigue</div>
+                  <div style={{ fontSize: '.78rem', color: 'var(--text-muted)', lineHeight: 1.45 }}>
+                    Allège la semaine : supprime l'intensité, garde des footings légers.
+                  </div>
+                  {active && (
+                    <div style={{ marginTop: '.4rem', fontSize: '.75rem', color: '#A5B4FC', fontWeight: 600 }}>
+                      Actif cette semaine
+                    </div>
+                  )}
+                </div>
+                <button
+                  onClick={toggleFatigue}
+                  disabled={loading || blocked}
+                  style={{
+                    flexShrink: 0, padding: '.42rem .9rem', borderRadius: 99, fontFamily: 'inherit',
+                    border: active ? '1.5px solid rgba(99,102,241,.7)' : '1.5px solid rgba(99,102,241,.4)',
+                    background: active ? 'rgba(99,102,241,.2)' : 'transparent',
+                    color: active ? '#A5B4FC' : '#818CF8',
+                    fontWeight: 700, fontSize: '.8rem', cursor: (loading || blocked) ? 'default' : 'pointer',
+                  }}>
+                  {loading ? '…' : active ? 'Désactiver' : 'Activer'}
+                </button>
+              </div>
+            )
+          })()}
+
+          {/* 🌡️ Canicule */}
+          {(() => {
+            const active  = !!profile?.heat_mode
+            const blocked = planAdaptedFor !== null && !active
+            return (
+              <div style={{
+                borderRadius: 14, border: `1.5px solid ${active ? 'rgba(234,179,8,.7)' : 'rgba(234,179,8,.25)'}`,
+                background: active ? 'rgba(234,179,8,.1)' : 'rgba(234,179,8,.04)',
+                padding: '1rem 1.125rem', opacity: blocked ? .45 : 1,
+                display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '1rem',
+              }}>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{ fontWeight: 700, fontSize: '.9rem', color: '#EAB308', marginBottom: '.2rem' }}>🌡️ Canicule</div>
+                  <div style={{ fontSize: '.78rem', color: 'var(--text-muted)', lineHeight: 1.45 }}>
+                    Footings tranquilles uniquement. Pas de séance intense par forte chaleur.
+                  </div>
+                  {active && (
+                    <div style={{ marginTop: '.4rem', fontSize: '.75rem', color: '#FDE047', fontWeight: 600 }}>
+                      Actif cette semaine
+                    </div>
+                  )}
+                </div>
+                <button
+                  onClick={toggleHeat}
+                  disabled={heatLoading || blocked}
+                  style={{
+                    flexShrink: 0, padding: '.42rem .9rem', borderRadius: 99, fontFamily: 'inherit',
+                    border: active ? '1.5px solid rgba(234,179,8,.7)' : '1.5px solid rgba(234,179,8,.4)',
+                    background: active ? 'rgba(234,179,8,.2)' : 'transparent',
+                    color: active ? '#FDE047' : '#EAB308',
+                    fontWeight: 700, fontSize: '.8rem', cursor: (heatLoading || blocked) ? 'default' : 'pointer',
+                  }}>
+                  {heatLoading ? '…' : active ? 'Désactiver' : 'Activer'}
+                </button>
+              </div>
+            )
+          })()}
+
+          {/* 🌸 Cycle — femmes uniquement */}
+          {profile?.gender === 'femme' && (
+            <div style={{
+              borderRadius: 14, border: '1.5px solid rgba(236,72,153,.25)',
+              background: 'rgba(236,72,153,.04)',
+              padding: '1rem 1.125rem',
+            }}>
+              <div style={{ fontWeight: 700, fontSize: '.9rem', color: '#F472B6', marginBottom: '.4rem' }}>🌸 Cycle menstruel</div>
+              <p style={{ fontSize: '.78rem', color: 'var(--text-muted)', marginBottom: '1rem', lineHeight: 1.5 }}>
+                Si tes règles impactent ton entraînement, active cette option pour que ton plan s'adapte automatiquement.
+              </p>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '.875rem' }}>
+                <label style={{ display: 'flex', alignItems: 'center', gap: '.5rem', cursor: 'pointer' }}>
+                  <input type="checkbox" checked={periodPain} onChange={e => setPeriodPain(e.target.checked)}
+                    style={{ width: 16, height: 16, accentColor: '#EC4899' }} />
+                  <span style={{ fontSize: '.875rem', fontWeight: 600 }}>Douleurs impactant l'entraînement</span>
+                </label>
+              </div>
+              {periodPain && (
+                <div style={{ marginBottom: '1rem' }}>
+                  <label style={{ fontSize: '.8rem', color: 'var(--text-muted)', display: 'block', marginBottom: '.35rem' }}>
+                    Durée habituelle : {periodDays} jour{periodDays > 1 ? 's' : ''}
+                  </label>
+                  <input type="range" min={1} max={5} value={periodDays} onChange={e => setPeriodDays(parseInt(e.target.value))}
+                    style={{ width: '100%', accentColor: '#EC4899' }} />
+                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '.72rem', color: 'var(--text-muted)' }}>
+                    <span>1 jour</span><span>5 jours</span>
+                  </div>
+                </div>
+              )}
+              <button className="btn btn-sm" disabled={savingPeriod} onClick={savePeriodSettings}
+                style={{ background: 'rgba(236,72,153,.15)', border: '1px solid rgba(236,72,153,.3)', color: '#F472B6', fontFamily: 'inherit' }}>
+                {savingPeriod ? 'Sauvegarde…' : '💾 Sauvegarder'}
+              </button>
             </div>
           )}
+
         </div>
-
-        <div style={{ height: 1, background: 'var(--border)', margin: '1rem 0' }} />
-
-        {/* Canicule */}
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: profile?.heat_mode ? '.75rem' : 0 }}>
-          <div>
-            <div style={{ fontWeight: 600, fontSize: '.875rem' }}>🌡️ Mode canicule</div>
-            <div style={{ fontSize: '.78rem', color: 'var(--text-muted)', marginTop: '.2rem', lineHeight: 1.5 }}>
-              Allège automatiquement la semaine en cours — que des footings tranquilles.
-            </div>
-          </div>
-          <button
-            onClick={toggleHeat}
-            disabled={heatLoading}
-            style={{
-              flexShrink: 0, marginLeft: '1rem', padding: '.4rem .9rem', borderRadius: 99, fontFamily: 'inherit',
-              border: profile?.heat_mode ? '1.5px solid rgba(251,146,60,.6)' : '1.5px solid var(--border)',
-              background: profile?.heat_mode ? 'rgba(251,146,60,.15)' : 'var(--surface-2)',
-              color: profile?.heat_mode ? '#FB923C' : 'var(--text-muted)',
-              fontWeight: 700, fontSize: '.82rem', cursor: heatLoading ? 'default' : 'pointer', transition: 'all .2s',
-            }}>
-            {heatLoading ? '…' : profile?.heat_mode ? '✓ Actif — Désactiver' : 'Activer'}
-          </button>
-        </div>
-        {profile?.heat_mode && (
-          <div style={{ background: 'rgba(251,146,60,.1)', border: '1px solid rgba(251,146,60,.3)', borderRadius: 10, padding: '.6rem .875rem', fontSize: '.82rem', color: '#FED7AA' }}>
-            🌡️ Actif — plan de cette semaine allégé.
-          </div>
-        )}
-
-        {/* Cycle menstruel — femmes uniquement */}
-        {profile?.gender === 'femme' && (
-          <>
-            <div style={{ height: 1, background: 'var(--border)', margin: '1rem 0' }} />
-            <div style={{ fontWeight: 600, fontSize: '.875rem', marginBottom: '.75rem' }}>🌸 Cycle menstruel</div>
-            <p className="text-sm text-muted" style={{ marginBottom: '1rem', lineHeight: 1.6 }}>
-              Si tes règles impactent ton entraînement, active cette option pour que ton plan s'adapte automatiquement ces jours-là.
-            </p>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1rem' }}>
-              <label style={{ display: 'flex', alignItems: 'center', gap: '.5rem', cursor: 'pointer' }}>
-                <input type="checkbox" checked={periodPain} onChange={e => setPeriodPain(e.target.checked)}
-                  style={{ width: 18, height: 18, accentColor: 'var(--primary)' }} />
-                <span style={{ fontWeight: 600, fontSize: '.9rem' }}>J'ai des douleurs qui impactent mon entraînement</span>
-              </label>
-            </div>
-            {periodPain && (
-              <div className="form-group" style={{ marginBottom: '1rem' }}>
-                <label className="form-label">Durée habituelle des douleurs : {periodDays} jour{periodDays > 1 ? 's' : ''}</label>
-                <input type="range" min={1} max={5} value={periodDays} onChange={e => setPeriodDays(parseInt(e.target.value))} />
-                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '.75rem', color: 'var(--text-muted)' }}>
-                  <span>1 jour</span><span>5 jours</span>
-                </div>
-              </div>
-            )}
-            <button className="btn btn-primary btn-sm" disabled={savingPeriod} onClick={savePeriodSettings}>
-              {savingPeriod ? 'Sauvegarde…' : '💾 Sauvegarder le cycle'}
-            </button>
-          </>
-        )}
       </div>
 
       {/* Subscription */}

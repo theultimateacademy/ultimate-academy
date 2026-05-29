@@ -290,7 +290,7 @@ export default function AthleteHome() {
               <div style={{ fontSize: '2rem' }}>🎯</div>
               <div style={{ flex: 1 }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '.5rem', marginBottom: '.2rem' }}>
-                  <span style={{ fontWeight: 700, fontSize: '.95rem' }}>Ta course approche — Lis ton analyse</span>
+                  <span style={{ fontWeight: 700, fontSize: '.95rem' }}>Ta course approche. Lis ton analyse</span>
                   <span style={{
                     background: '#E8237A', color: '#fff', borderRadius: 99,
                     padding: '.1rem .5rem', fontSize: '.7rem', fontWeight: 700,
@@ -364,7 +364,7 @@ export default function AthleteHome() {
             <div style={{ display: 'flex', gap: '.75rem', alignItems: 'flex-start' }}>
               <img src="/Coach.JPG" alt="Alexis" style={{ width: 40, height: 40, borderRadius: '50%', objectFit: 'cover', flexShrink: 0, border: '2px solid rgba(139,47,201,.4)' }} />
               <div>
-                <div style={{ fontWeight: 700, fontSize: '.875rem', marginBottom: '.375rem', color: 'var(--primary)' }}>Alexis — Message du mois</div>
+                <div style={{ fontWeight: 700, fontSize: '.875rem', marginBottom: '.375rem', color: 'var(--primary)' }}>Alexis · Message du mois</div>
                 <p style={{ fontSize: '.9375rem', lineHeight: 1.65, fontStyle: 'italic' }}>{plan.plan_data.message_du_mois}</p>
               </div>
             </div>

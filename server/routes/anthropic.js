@@ -1046,7 +1046,7 @@ router.post('/plans/fatigue-adapt', async (req, res) => {
       currentWeek._original_charge  = currentWeek.charge;
     }
     currentWeek._adapted_for = 'fatigue';
-    currentWeek.charge = 'Fatigue — Semaine allégée';
+    currentWeek.charge = 'Fatigue : Semaine allégée';
 
     function isIntensityType(s) {
       const t = (s.type || '').toLowerCase();

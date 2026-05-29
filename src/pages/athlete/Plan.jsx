@@ -106,7 +106,7 @@ function ExportBtn({ session, suuntoConnected, garminConnected, userId }) {
       )}
       {info === 'coros' && (
         <div style={{ ...confirmStyle, whiteSpace: 'normal', maxWidth: 220, lineHeight: 1.4 }}>
-          ✅ Fichier téléchargé — ouvre la séance pour les instructions
+          ✅ Fichier téléchargé. Ouvre la séance pour les instructions.
         </div>
       )}
       {(info === 'garmin_fit' || info === 'suunto') && (
@@ -193,13 +193,13 @@ function SessionDetailPage({ session, weekNum, sessionIdx, planId, vma, onClose,
             border: `1px solid ${typeColor}30`, marginBottom: '1rem' }}>
             {paceMin && <span style={{ fontSize: '1rem', fontWeight: 700, color: typeColor }}>{paceMin.allure_min_km}</span>}
             {paceMax && <>
-              <span style={{ color: 'rgba(255,255,255,.22)', fontSize: '.85rem' }}>—</span>
+              <span style={{ color: 'rgba(255,255,255,.3)', fontSize: '.82rem' }}>à</span>
               <span style={{ fontSize: '1rem', fontWeight: 700, color: typeColor }}>{paceMax.allure_min_km}</span>
             </>}
             <span style={{ fontSize: '.72rem', color: 'rgba(255,255,255,.35)' }}>/km</span>
           </div>
           <div style={{ fontSize: '.78rem', color: 'rgba(255,255,255,.35)', fontStyle: 'italic' }}>
-            65–72% VMA · allure au ressenti
+            65 à 72% VMA · allure au ressenti
           </div>
         </div>
       )
@@ -289,13 +289,12 @@ function SessionDetailPage({ session, weekNum, sessionIdx, planId, vma, onClose,
     // (inclut footings, progressif, récupération, activation, et fractionné simple)
     if (session.duree_min > 0) {
       const allOk = (session.allures || []).filter(a => a?.allure_min_km)
-      // Exclure les zones warmup/retour pour trouver les allures "corps"
       const corpsAllures = allOk.filter(a => !/retour|calme|récup|échauff/i.test(a.zone || ''))
       const display = corpsAllures.length > 0 ? corpsAllures : allOk
-      // Trier par vitesse croissante (lent → rapide)
       const sorted = [...display].sort((a, b) => (a.vitesse_kmh || 0) - (b.vitesse_kmh || 0))
       const paceMin = sorted[0] || null
       const paceMax = sorted.length > 1 && sorted[sorted.length - 1] !== paceMin ? sorted[sorted.length - 1] : null
+      const isProgressif = type.includes('progressif') || type.includes('progression')
       return (
         <div style={{ padding: '.5rem 0', textAlign: 'center' }}>
           <div style={{ fontSize: '3.8rem', fontWeight: 900, lineHeight: 1, color: '#fff' }}>
@@ -310,7 +309,7 @@ function SessionDetailPage({ session, weekNum, sessionIdx, planId, vma, onClose,
               border: `1px solid ${typeColor}30`, marginBottom: '.875rem' }}>
               {paceMin && <span style={{ fontSize: '1rem', fontWeight: 700, color: typeColor }}>{paceMin.allure_min_km}</span>}
               {paceMax && <>
-                <span style={{ color: 'rgba(255,255,255,.22)', fontSize: '.85rem' }}>—</span>
+                <span style={{ color: 'rgba(255,255,255,.3)', fontSize: '.82rem' }}>à</span>
                 <span style={{ fontSize: '1rem', fontWeight: 700, color: typeColor }}>{paceMax.allure_min_km}</span>
               </>}
               <span style={{ fontSize: '.72rem', color: 'rgba(255,255,255,.35)' }}>/km</span>
@@ -318,9 +317,11 @@ function SessionDetailPage({ session, weekNum, sessionIdx, planId, vma, onClose,
           )}
           {paceMin && (
             <div style={{ fontSize: '.78rem', color: 'rgba(255,255,255,.35)', fontStyle: 'italic' }}>
-              {paceMax
-                ? `${paceMin.pourcentage_vma}–${paceMax.pourcentage_vma}% VMA · allure au ressenti`
-                : `${paceMin.pourcentage_vma}% VMA · allure au ressenti`}
+              {isProgressif && paceMax
+                ? `On part de ${paceMin.pourcentage_vma}% VMA pour aller vers ${paceMax.pourcentage_vma}% VMA`
+                : paceMax
+                  ? `${paceMin.pourcentage_vma} à ${paceMax.pourcentage_vma}% VMA · allure au ressenti`
+                  : `${paceMin.pourcentage_vma}% VMA · allure au ressenti`}
             </div>
           )}
         </div>
@@ -546,7 +547,7 @@ function SessionDetailPage({ session, weekNum, sessionIdx, planId, vma, onClose,
           {exportInfo === 'garmin_sent' && (
             <div style={{ marginTop: '.75rem', background: 'rgba(16,185,129,.12)', border: '1px solid rgba(16,185,129,.3)', borderRadius: 12, padding: '.875rem', fontSize: '.8rem', lineHeight: 1.7 }}>
               <div style={{ fontWeight: 700, marginBottom: '.3rem', color: '#6EE7B7' }}>✅ Séance envoyée sur Garmin Connect</div>
-              Elle apparaîtra sur ta montre à la prochaine synchronisation — ouvre <strong>Garmin Connect</strong> sur ton téléphone.
+              Elle apparaîtra sur ta montre à la prochaine synchronisation. Ouvre <strong>Garmin Connect</strong> sur ton téléphone.
             </div>
           )}
           {exportInfo === 'garmin_error' && (
@@ -705,7 +706,7 @@ function weekDateRange(planMonday, weekNumber) {
   const end = new Date(start)
   end.setDate(end.getDate() + 6)
   const fmt = d => d.toLocaleDateString('fr-FR', { day: 'numeric', month: 'long' })
-  return `${fmt(start)} – ${fmt(end)}`
+  return `${fmt(start)} au ${fmt(end)}`
 }
 
 function WeeklyFeedbackCard({ weekNum, planId, userId, onSaved }) {
@@ -893,7 +894,7 @@ export default function AthletePlan() {
       // Reset heat_mode flag in profile (fire-and-forget via API, ignore errors)
       api.adjustHeat({ userId: profile.id, activate: false }).catch(() => {})
       await refreshProfile()
-      showToast('Plan restauré — retour aux séances normales ✓')
+      showToast('Plan restauré. Retour aux séances normales ✓')
     } catch (err) {
       console.error('[RestoreHeat]', err)
       showToast((err?.message || 'Erreur lors de la restauration') + ' ✗', 'error')
@@ -915,7 +916,7 @@ export default function AthletePlan() {
           .eq('user_id', profile.id).eq('status', 'active').single()
         if (p) setPlan(p)
       }
-      showToast('Plan restauré — retour aux séances normales ✓')
+      showToast('Plan restauré. Retour aux séances normales ✓')
     } catch (err) {
       console.error('[RestoreWeek]', err)
       showToast((err?.message || 'Erreur lors de la restauration') + ' ✗', 'error')
@@ -934,9 +935,12 @@ export default function AthletePlan() {
         await loadPlan()
       }
       setFatigueDone(true)
+      showToast('Semaine allégée. Repose-toi bien 😴')
       setTimeout(() => { setFatigueModal(false); setFatigueDone(false) }, 2000)
     } catch (err) {
       console.error('[FatigueAdapt]', err)
+      setFatigueModal(false)
+      showToast((err?.message || 'Erreur lors de l\'adaptation') + ' ✗', 'error')
     } finally {
       setFatigueLoading(false)
     }
@@ -952,9 +956,12 @@ export default function AthletePlan() {
         await loadPlan()
       }
       setInjuryDone(true)
+      showToast('Plan adapté pour la blessure 🩹')
       setTimeout(() => { setInjuryModal(false); setInjuryDone(false) }, 2000)
     } catch (err) {
       console.error('[InjuryAdapt]', err)
+      setInjuryModal(false)
+      showToast((err?.message || 'Erreur lors de l\'adaptation') + ' ✗', 'error')
     } finally {
       setInjuryLoading(false)
     }
@@ -970,9 +977,12 @@ export default function AthletePlan() {
         await loadPlan()
       }
       setCycleDone(true)
+      showToast('Plan adapté pour ton cycle 🌸')
       setTimeout(() => { setCycleModal(false); setCycleDone(false) }, 2000)
     } catch (err) {
       console.error('[CycleAdapt]', err)
+      setCycleModal(false)
+      showToast((err?.message || 'Erreur lors de l\'adaptation') + ' ✗', 'error')
     } finally {
       setCycleLoading(false)
     }
@@ -1014,7 +1024,7 @@ export default function AthletePlan() {
             Tu as terminé toutes les semaines de ton programme. Félicitations pour le travail accompli.
           </p>
           <p className="text-muted" style={{ fontSize: '.875rem', marginBottom: '2rem' }}>
-            Ton coach prépare la suite — tu seras notifié dès que le nouveau plan est disponible.
+            Ton coach prépare la suite. Tu seras notifié dès que le nouveau plan est disponible.
           </p>
           <button
             className="btn btn-ghost btn-sm"
@@ -1114,20 +1124,25 @@ export default function AthletePlan() {
           const doneInWeek  = completions.filter(c => c.week_number === w.numero).length
           const totalInWeek = w.seances?.length || 0
           const pct         = totalInWeek > 0 ? doneInWeek / totalInWeek : 0
+          const isActive    = activeWeek === w.numero
           return (
             <button key={w.numero}
               onClick={() => setActiveWeek(w.numero)}
               style={{
-                flexShrink: 0, padding: '.5rem .875rem',
-                borderRadius: 99, border: `2px solid ${activeWeek === w.numero ? 'var(--primary)' : 'var(--border)'}`,
-                background: activeWeek === w.numero ? 'linear-gradient(135deg,rgba(139,47,201,.35),rgba(232,35,122,.25))' : 'var(--surface)',
-                color: activeWeek === w.numero ? '#fff' : 'var(--text-muted)',
-                fontWeight: activeWeek === w.numero ? 700 : 500,
-                fontSize: '.8rem', cursor: 'pointer', fontFamily: 'inherit',
-                whiteSpace: 'nowrap'
+                flexShrink: 0, padding: '.45rem .875rem',
+                borderRadius: 12, border: `2px solid ${isActive ? 'var(--primary)' : 'var(--border)'}`,
+                background: isActive ? 'linear-gradient(135deg,rgba(139,47,201,.35),rgba(232,35,122,.25))' : 'var(--surface)',
+                color: isActive ? '#fff' : 'var(--text-muted)',
+                fontWeight: isActive ? 700 : 500,
+                fontSize: '.78rem', cursor: 'pointer', fontFamily: 'inherit',
+                whiteSpace: 'nowrap', textAlign: 'left', lineHeight: 1.35,
               }}>
-              {weekDateRange(planMonday, w.numero)}
-              {pct === 1 && <span style={{ marginLeft: '.3rem' }}>✅</span>}
+              <div style={{ fontWeight: 700, fontSize: '.8rem', color: isActive ? '#fff' : 'var(--text)' }}>
+                Semaine {w.numero}{pct === 1 ? ' ✅' : ''}
+              </div>
+              <div style={{ fontSize: '.7rem', opacity: .6 }}>
+                {weekDateRange(planMonday, w.numero)}
+              </div>
             </button>
           )
         })}
@@ -1138,9 +1153,11 @@ export default function AthletePlan() {
         <div className="card" style={{ marginBottom: '1.25rem', background: 'linear-gradient(135deg,#1A1A2E,#2D1B4E)', color: '#fff' }}>
           <div>
               <div style={{ fontSize: '.8rem', opacity: .7, marginBottom: '.2rem' }}>
-                {weekDateRange(planMonday, currentWeekData.numero)}
+                Semaine {currentWeekData.numero} · {weekDateRange(planMonday, currentWeekData.numero)}
               </div>
-              <div style={{ fontWeight: 700, fontSize: '1.1rem' }}>{currentWeekData.phase}</div>
+              <div style={{ fontWeight: 700, fontSize: '1.1rem' }}>
+                {(currentWeekData.phase || '').replace(/^S\d+\s*[—–-]\s*/i, '')}
+              </div>
               {(() => {
                 const courseCount = currentWeekData.seances?.filter(s => !String(s.type || '').toLowerCase().includes('renforcement')).length || 0
                 const renfoCount  = currentWeekData.seances?.filter(s =>  String(s.type || '').toLowerCase().includes('renforcement')).length || 0
@@ -1162,7 +1179,7 @@ export default function AthletePlan() {
                 )
               })()}
               {(() => {
-                const raw   = currentWeekData.charge || ''
+                const raw   = (currentWeekData.charge || '').replace(/ — /g, ' · ')
                 const parenIdx = raw.indexOf('(')
                 const main  = parenIdx > 0 ? raw.slice(0, parenIdx).trim() : raw
                 const sub   = parenIdx > 0 ? raw.slice(parenIdx) : null
@@ -1343,12 +1360,12 @@ export default function AthletePlan() {
               <div style={{ fontSize: '2rem', marginBottom: '.5rem' }}>🌡️</div>
               <h3 style={{ marginBottom: '.5rem' }}>Mode Canicule</h3>
               <p style={{ fontSize: '.875rem', color: 'var(--text-muted)', lineHeight: 1.6 }}>
-                Ta semaine va être allégée — tous tes footings seront à allure tranquille. Tu peux réduire l'allure si tu en ressens le besoin, l'essentiel est de bouger en douceur. Quand la chaleur redescend, reclique sur le bouton pour revenir au plan normal.
+                Ta semaine va être allégée. Tous tes footings seront à allure tranquille. Tu peux réduire l'allure si tu en ressens le besoin, l'essentiel est de bouger en douceur. Quand la chaleur redescend, reclique sur le bouton pour revenir au plan normal.
               </p>
             </div>
             {heatDone ? (
               <div style={{ textAlign: 'center', color: '#FDE047', fontWeight: 700, padding: '.75rem' }}>
-                ✅ Plan allégé — prends soin de toi 🌡️
+                ✅ Plan allégé. Prends soin de toi 🌡️
               </div>
             ) : (
               <>
@@ -1387,7 +1404,7 @@ export default function AthletePlan() {
             </div>
             {fatigueDone ? (
               <div style={{ textAlign: 'center', color: '#A5B4FC', fontWeight: 700, padding: '.75rem' }}>
-                ✅ Semaine allégée — repose-toi bien 😴
+                ✅ Semaine allégée. Repose-toi bien 😴
               </div>
             ) : (
               <div style={{ display: 'flex', gap: '.75rem' }}>
@@ -1417,7 +1434,7 @@ export default function AthletePlan() {
             </div>
             {injuryDone ? (
               <div style={{ textAlign: 'center', color: '#FED7AA', fontWeight: 700, padding: '.75rem' }}>
-                ✅ Plan adapté — prends soin de toi 🩹
+                ✅ Plan adapté. Prends soin de toi 🩹
               </div>
             ) : (
               <div style={{ display: 'flex', gap: '.75rem' }}>
@@ -1447,7 +1464,7 @@ export default function AthletePlan() {
             </div>
             {cycleDone ? (
               <div style={{ textAlign: 'center', color: '#F472B6', fontWeight: 700, padding: '.75rem' }}>
-                ✅ Plan adapté — prends soin de toi 🌸
+                ✅ Plan adapté. Prends soin de toi 🌸
               </div>
             ) : (
               <div style={{ display: 'flex', gap: '.75rem' }}>

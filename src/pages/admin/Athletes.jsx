@@ -216,13 +216,13 @@ function CoachSessionModal({ session, weekNum, sessionIdx, completion, onClose, 
             border:`1px solid ${color}30`, marginBottom:'.75rem' }}>
             {paceMin && <span style={{ fontSize:'.95rem', fontWeight:700, color }}>{paceMin.allure_min_km}</span>}
             {paceMax && <>
-              <span style={{ color:'rgba(255,255,255,.22)', fontSize:'.8rem' }}>—</span>
+              <span style={{ color:'rgba(255,255,255,.3)', fontSize:'.8rem' }}>à</span>
               <span style={{ fontSize:'.95rem', fontWeight:700, color }}>{paceMax.allure_min_km}</span>
             </>}
             <span style={{ fontSize:'.7rem', color:'rgba(255,255,255,.35)' }}>/km</span>
           </div>
           <div style={{ fontSize:'.75rem', color:'rgba(255,255,255,.35)', fontStyle:'italic' }}>
-            65–72% VMA · allure au ressenti
+            65 à 72% VMA · allure au ressenti
           </div>
         </div>
       )
@@ -297,7 +297,7 @@ function CoachSessionModal({ session, weekNum, sessionIdx, completion, onClose, 
               border:`1px solid ${color}30`, marginBottom:'.625rem' }}>
               {paceMin && <span style={{ fontSize:'.95rem', fontWeight:700, color }}>{paceMin.allure_min_km}</span>}
               {paceMax && <>
-                <span style={{ color:'rgba(255,255,255,.22)', fontSize:'.8rem' }}>—</span>
+                <span style={{ color:'rgba(255,255,255,.3)', fontSize:'.8rem' }}>à</span>
                 <span style={{ fontSize:'.95rem', fontWeight:700, color }}>{paceMax.allure_min_km}</span>
               </>}
               <span style={{ fontSize:'.7rem', color:'rgba(255,255,255,.35)' }}>/km</span>
@@ -306,7 +306,7 @@ function CoachSessionModal({ session, weekNum, sessionIdx, completion, onClose, 
           {paceMin && (
             <div style={{ fontSize:'.75rem', color:'rgba(255,255,255,.35)', fontStyle:'italic' }}>
               {paceMax
-                ? `${paceMin.pourcentage_vma}–${paceMax.pourcentage_vma}% VMA · allure au ressenti`
+                ? `${paceMin.pourcentage_vma} à ${paceMax.pourcentage_vma}% VMA · allure au ressenti`
                 : `${paceMin.pourcentage_vma}% VMA`}
             </div>
           )}
