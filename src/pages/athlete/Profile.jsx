@@ -54,6 +54,7 @@ export default function AthleteProfile() {
     objective:             'Objectif de course',
     race_date:             'Date de course',
     days_per_week:         'Séances par semaine',
+    preferred_days:        'Jours d\'entraînement préférés',
     level:                 'Niveau',
     injuries:              'Blessures / douleurs',
     intermediate_race_date:'Course intermédiaire (date)',
@@ -225,10 +226,11 @@ export default function AthleteProfile() {
     try {
       const oldValue = String(profile?.[dbKey] ?? '')
       const newValue = String(value ?? '')
-      let coercedValue = value === '' ? null : value
+      let coercedValue = (value === '' || (Array.isArray(value) && value.length === 0)) ? null : value
       if (coercedValue !== null && dbKey === 'days_per_week') coercedValue = parseInt(coercedValue, 10)
       if (coercedValue !== null && dbKey === 'vma')           coercedValue = parseFloat(coercedValue)
       if (coercedValue !== null && dbKey === 'race_denivele') coercedValue = parseInt(coercedValue, 10)
+      // Arrays (preferred_days): keep as-is — Supabase handles TEXT[]
 
       const { data: updated, error: dbErr } = await supabase
         .from('profiles').update({ [dbKey]: coercedValue }).eq('id', profile.id).select().single()
@@ -770,6 +772,43 @@ export default function AthleteProfile() {
               </FieldCard>
             ))}
           </>)}
+
+          {/* Jours d'entraînement préférés — tous athlètes */}
+          {(() => {
+            const days = ['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim']
+            const currentDays = profile?.preferred_days || []
+            const editDays = Array.isArray(editVal.preferred_days) ? editVal.preferred_days : currentDays
+            const toggle = (d) => {
+              const next = editDays.includes(d) ? editDays.filter(x => x !== d) : [...editDays, d]
+              setEditVal(prev => ({ ...prev, preferred_days: next }))
+            }
+            return (
+              <FieldCard
+                fieldKey="preferred_days"
+                dbKey="preferred_days"
+                label="📅 Jours d'entraînement"
+                displayValue={currentDays.length ? currentDays.join(' · ') : 'Non précisé'}
+              >
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '.4rem', marginBottom: '.25rem' }}>
+                  {days.map(d => {
+                    const sel = editDays.includes(d)
+                    return (
+                      <button key={d} type="button" onClick={() => toggle(d)} style={{
+                        padding: '.35rem .65rem', borderRadius: 8, fontWeight: 600, fontSize: '.82rem',
+                        border: sel ? '2px solid var(--primary)' : '1px solid var(--border)',
+                        background: sel ? 'rgba(139,47,201,.2)' : 'var(--surface)',
+                        color: sel ? '#fff' : 'var(--text-muted)',
+                        cursor: 'pointer', fontFamily: 'inherit',
+                      }}>{d}</button>
+                    )
+                  })}
+                </div>
+                <p style={{ fontSize: '.75rem', color: 'var(--text-muted)', margin: '.25rem 0 0' }}>
+                  Au moins 1 jour de repos · {editDays.length} sélectionné{editDays.length > 1 ? 's' : ''}
+                </p>
+              </FieldCard>
+            )
+          })()}
 
           {/* Course intermédiaire — nom */}
           <FieldCard
