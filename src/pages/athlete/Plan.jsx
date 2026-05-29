@@ -437,15 +437,17 @@ function SessionDetailPage({ session, weekNum, sessionIdx, planId, vma, onClose,
 
           {/* Corps — élément central */}
           {session.corps && (() => {
-            const isEF = (session.type || '').toLowerCase().includes('endurance fondamentale') || (session.type || '').toLowerCase() === 'ef'
+            const t = (session.type || '').toLowerCase()
+            const isSimple = t.includes('endurance fondamentale') || t === 'ef' || t.includes('sortie longue')
             return (
-              <div style={{ borderLeft: `3px solid ${typeColor}`, padding: isEF ? '1.5rem 1.25rem' : '1.125rem 1.125rem 1.125rem 1rem', background: typeColor + '06' }}>
-                {!isEF && (
+              <div style={{ borderLeft: `3px solid ${typeColor}`, padding: isSimple ? '1.5rem 1.25rem' : '1.125rem 1.125rem 1.125rem 1rem', background: typeColor + '06' }}>
+                {!isSimple && (
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '.875rem' }}>
                     <span style={{ fontWeight: 800, fontSize: '.76rem', color: typeColor, letterSpacing: '.1em', textTransform: 'uppercase' }}>⚡ Séance principale</span>
                     <PaceChip allure={spePace} color={typeColor} />
                   </div>
                 )}
+
                 <MainSetVisual />
               </div>
             )

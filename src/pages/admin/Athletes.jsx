@@ -202,7 +202,7 @@ function CoachSessionModal({ session, weekNum, sessionIdx, completion, onClose, 
   function CorpsVisual({ mainSet }) {
     const sType = (session.type || '').toLowerCase()
 
-    // EF — clean centered display
+    // EF — clean centered display (not for sortie longue which has fixed pace + richer corps text)
     if (sType.includes('endurance fondamentale') || sType === 'ef') {
       const allOk   = (session.allures || []).filter(a => a?.allure_min_km)
       const paceMin = allOk.find(a => (a.pourcentage_vma || 0) <= 66) || allOk[0]
@@ -377,13 +377,19 @@ function CoachSessionModal({ session, weekNum, sessionIdx, completion, onClose, 
                   </div>
                 )}
                 {session.echauffement && session.corps && <PhaseArrow />}
-                {session.corps && (
-                  <div style={{ borderLeft:`3px solid ${color}`, padding:'.875rem 1rem .875rem .875rem', background:`${color}06` }}>
-                    <div style={{ fontSize:'.65rem', fontWeight:700, textTransform:'uppercase',
-                      letterSpacing:'.08em', color, marginBottom:'.4rem' }}>⚡ Séance principale</div>
-                    <p style={{ fontSize:'.85rem', lineHeight:1.65, color:'rgba(255,255,255,.75)', whiteSpace:'pre-line' }}>{session.corps}</p>
-                  </div>
-                )}
+                {session.corps && (() => {
+                  const t = (session.type || '').toLowerCase()
+                  const isSimple = t.includes('endurance fondamentale') || t === 'ef' || t.includes('sortie longue')
+                  return (
+                    <div style={{ borderLeft:`3px solid ${color}`, padding: isSimple ? '1.25rem 1rem' : '.875rem 1rem .875rem .875rem', background:`${color}06` }}>
+                      {!isSimple && (
+                        <div style={{ fontSize:'.65rem', fontWeight:700, textTransform:'uppercase',
+                          letterSpacing:'.08em', color, marginBottom:'.4rem' }}>⚡ Séance principale</div>
+                      )}
+                      <CorpsVisual mainSet={session.corps} />
+                    </div>
+                  )
+                })()}
                 {session.corps && session.retour_au_calme && <PhaseArrow />}
                 {session.retour_au_calme && (
                   <div style={{ borderLeft:'3px solid #3B82F6', padding:'.875rem 1rem .875rem .875rem' }}>
