@@ -322,7 +322,18 @@ async function loadSessionLibrary(objective) {
   }
   // triathlon: no filter — all sports included
 
-  const { data, error } = await query;
+  let { data, error } = await query;
+
+  // Fallback: sport/montagne_only columns may not exist yet (migration not run)
+  if (error && (error.message?.includes('column') || error.message?.includes('does not exist'))) {
+    console.warn('[session_library] sport column missing, using fallback query');
+    const fallback = await supabase
+      .from('session_library')
+      .select('code, category, name, duration_min, intensity_rpe, warmup, main_set, recovery, cooldown, coach_notes, compatible_goals')
+      .order('code');
+    data = fallback.data;
+    error = fallback.error;
+  }
 
   if (error || !data?.length) {
     console.warn('[session_library] Error or empty:', error?.message);
@@ -331,15 +342,16 @@ async function loadSessionLibrary(objective) {
 
   const map = Object.fromEntries(data.map(s => [s.code, s]));
 
-  // Group by sport for the prompt
+  // Group by sport for the prompt (if sport column exists)
+  const sportLabels = { running: 'COURSE À PIED', natation: 'NATATION', velo: 'VÉLO', brique: 'BRIQUES (multi-sport)', trail: 'TRAIL' };
+  const hasSportCol = data[0] && 'sport' in data[0];
   const bySport = {};
   for (const s of data) {
-    const sp = s.sport || 'running';
+    const sp = (hasSportCol ? s.sport : null) || 'running';
     if (!bySport[sp]) bySport[sp] = [];
     bySport[sp].push(s);
   }
 
-  const sportLabels = { running: 'COURSE À PIED', natation: 'NATATION', velo: 'VÉLO', brique: 'BRIQUES (multi-sport)', trail: 'TRAIL', };
   const text = Object.entries(bySport).map(([sport, sessions]) => {
     const label = sportLabels[sport] || sport.toUpperCase();
     const lines = sessions.map(s => {
@@ -1063,7 +1075,12 @@ CONTRAINTES ABSOLUES — vérifie et documente dans auto_validation avant de sou
     });
 
     const rawText  = message.content[0].text.trim();
-    const jsonText = rawText.replace(/^```json\s*/i, '').replace(/^```\s*/i, '').replace(/\s*```$/i, '');
+    // Strip markdown fences
+    let jsonText = rawText.replace(/^```json\s*/i, '').replace(/^```\s*/i, '').replace(/\s*```$/i, '');
+    // Extract JSON object — strip any text before first { or after last }
+    const jsonStart = jsonText.indexOf('{');
+    const jsonEnd   = jsonText.lastIndexOf('}');
+    if (jsonStart >= 0 && jsonEnd > jsonStart) jsonText = jsonText.slice(jsonStart, jsonEnd + 1);
     const parsed   = JSON.parse(jsonText);
 
     // Strip any empty/partial semaines the AI creates for the current partial week
