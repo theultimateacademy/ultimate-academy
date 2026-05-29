@@ -279,6 +279,41 @@ function CoachSessionModal({ session, weekNum, sessionIdx, completion, onClose, 
       return <div style={{ display:'flex', flexDirection:'column', gap:'.55rem' }}>{nodes}</div>
     }
 
+    // Affichage unifié pour tout le reste (footings, récup, progression, etc.)
+    if (session.duree_min > 0) {
+      const allOk = (session.allures || []).filter(a => a?.allure_min_km)
+      const corpsAllures = allOk.filter(a => !/retour|calme|récup|échauff/i.test(a.zone || ''))
+      const display = corpsAllures.length > 0 ? corpsAllures : allOk
+      const sorted = [...display].sort((a, b) => (a.vitesse_kmh || 0) - (b.vitesse_kmh || 0))
+      const paceMin = sorted[0] || null
+      const paceMax = sorted.length > 1 ? sorted[sorted.length - 1] : null
+      return (
+        <div style={{ padding:'.5rem 0', textAlign:'center' }}>
+          <div style={{ fontSize:'3rem', fontWeight:900, lineHeight:1, color:'#fff' }}>{session.duree_min}</div>
+          <div style={{ fontSize:'.78rem', color:'rgba(255,255,255,.35)', marginBottom:'1rem', marginTop:'.15rem' }}>minutes</div>
+          {(paceMin || paceMax) && (
+            <div style={{ display:'inline-flex', alignItems:'center', gap:'.5rem',
+              background:`${color}14`, borderRadius:99, padding:'.4rem 1rem',
+              border:`1px solid ${color}30`, marginBottom:'.625rem' }}>
+              {paceMin && <span style={{ fontSize:'.95rem', fontWeight:700, color }}>{paceMin.allure_min_km}</span>}
+              {paceMax && <>
+                <span style={{ color:'rgba(255,255,255,.22)', fontSize:'.8rem' }}>—</span>
+                <span style={{ fontSize:'.95rem', fontWeight:700, color }}>{paceMax.allure_min_km}</span>
+              </>}
+              <span style={{ fontSize:'.7rem', color:'rgba(255,255,255,.35)' }}>/km</span>
+            </div>
+          )}
+          {paceMin && (
+            <div style={{ fontSize:'.75rem', color:'rgba(255,255,255,.35)', fontStyle:'italic' }}>
+              {paceMax
+                ? `${paceMin.pourcentage_vma}–${paceMax.pourcentage_vma}% VMA · allure au ressenti`
+                : `${paceMin.pourcentage_vma}% VMA`}
+            </div>
+          )}
+        </div>
+      )
+    }
+
     return <p style={{ fontSize:'.85rem', lineHeight:1.65, color:'rgba(255,255,255,.75)', whiteSpace:'pre-line', margin:0 }}>{mainSet}</p>
   }
 

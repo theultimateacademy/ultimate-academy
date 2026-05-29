@@ -285,55 +285,44 @@ function SessionDetailPage({ session, weekNum, sessionIdx, planId, vma, onClose,
       return <div style={{ display: 'flex', flexDirection: 'column', gap: '.625rem' }}>{nodes}</div>
     }
 
-    // ── Simple intervals (N × Xm without BLOC structure) ─────────
-    const isInterval   = type.includes('fraction') || type.includes('côte') || type.includes('cote') || type.includes('vma') || /\d+\s*[xX×]/.test(mainSet)
-    const isProgressif = !isInterval && (mainSet.includes('→') || type.includes('progressif'))
-
-    const repMatch  = mainSet.match(/(\d+)\s*[xX×]\s*(\d+(?:[.,]\d+)?)\s*(m\b|km|min)/i)
-    const reps      = repMatch ? parseInt(repMatch[1]) : 0
-    const repVal    = repMatch ? `${repMatch[2].replace(',', '.')}${repMatch[3]}` : null
-    const recovMMin = mainSet.match(/(\d+(?:[.,]\d+)?)\s*min[^\w]*r[eé]cup/i) || mainSet.match(/r[eé]cup[^\w]*(\d+(?:[.,]\d+)?)\s*min/i)
-    const recovSec  = mainSet.match(/(\d+)\s*s(?:ec)?[^\w]*r[eé]cup/i) || mainSet.match(/r[eé]cup[^\w]*(\d+)\s*s(?:ec)?/i)
-    const recovText = recovMMin ? `${recovMMin[1]} min` : recovSec ? `${recovSec[1]}s` : (session.recuperation?.description || session.recuperation || null)
-
-    if (isInterval && reps >= 2) {
+    // ── Tout le reste : affichage unifié — durée + allures ───────
+    // (inclut footings, progressif, récupération, activation, et fractionné simple)
+    if (session.duree_min > 0) {
+      const allOk = (session.allures || []).filter(a => a?.allure_min_km)
+      // Exclure les zones warmup/retour pour trouver les allures "corps"
+      const corpsAllures = allOk.filter(a => !/retour|calme|récup|échauff/i.test(a.zone || ''))
+      const display = corpsAllures.length > 0 ? corpsAllures : allOk
+      // Trier par vitesse croissante (lent → rapide)
+      const sorted = [...display].sort((a, b) => (a.vitesse_kmh || 0) - (b.vitesse_kmh || 0))
+      const paceMin = sorted[0] || null
+      const paceMax = sorted.length > 1 && sorted[sorted.length - 1] !== paceMin ? sorted[sorted.length - 1] : null
       return (
-        <div>
-          <div style={{ display: 'flex', alignItems: 'baseline', gap: '.4rem', marginBottom: '.625rem' }}>
-            <span style={{ fontSize: '2.5rem', fontWeight: 900, color: '#fff', lineHeight: 1 }}>{reps}</span>
-            <span style={{ fontSize: '1.3rem', color: 'rgba(255,255,255,.35)', lineHeight: 1 }}>×</span>
-            {repVal && <span style={{ fontSize: '1.6rem', fontWeight: 800, color: '#fff', lineHeight: 1 }}>{repVal}</span>}
+        <div style={{ padding: '.5rem 0', textAlign: 'center' }}>
+          <div style={{ fontSize: '3.8rem', fontWeight: 900, lineHeight: 1, color: '#fff' }}>
+            {session.duree_min}
           </div>
-          <div style={{ display: 'flex', gap: 4, marginBottom: '1rem' }}>
-            {Array.from({ length: Math.min(reps, 14) }).map((_, i) => (
-              <div key={i} style={{ flex: 1, height: 7, borderRadius: 99, background: typeColor, opacity: .55 + i * .02 }} />
-            ))}
+          <div style={{ fontSize: '.82rem', color: 'rgba(255,255,255,.35)', marginBottom: '1.25rem', marginTop: '.2rem' }}>
+            minutes
           </div>
-          <p style={{ fontSize: '.875rem', lineHeight: 1.7, color: 'rgba(255,255,255,.7)', whiteSpace: 'pre-line', marginBottom: recovText ? '.75rem' : 0 }}>{mainSet}</p>
-          {recovText && (
-            <div style={{ display: 'flex', alignItems: 'center', gap: '.5rem',
-              background: 'rgba(14,165,233,.1)', border: '1px solid rgba(14,165,233,.25)',
-              borderRadius: 10, padding: '.5rem .875rem' }}>
-              <span style={{ color: '#38BDF8', fontWeight: 700, fontSize: '.78rem' }}>⏸ Récup</span>
-              <span style={{ fontSize: '.82rem', color: 'rgba(255,255,255,.65)' }}>{recovText}</span>
+          {(paceMin || paceMax) && (
+            <div style={{ display: 'inline-flex', alignItems: 'center', gap: '.5rem',
+              background: typeColor + '14', borderRadius: 99, padding: '.45rem 1.125rem',
+              border: `1px solid ${typeColor}30`, marginBottom: '.875rem' }}>
+              {paceMin && <span style={{ fontSize: '1rem', fontWeight: 700, color: typeColor }}>{paceMin.allure_min_km}</span>}
+              {paceMax && <>
+                <span style={{ color: 'rgba(255,255,255,.22)', fontSize: '.85rem' }}>—</span>
+                <span style={{ fontSize: '1rem', fontWeight: 700, color: typeColor }}>{paceMax.allure_min_km}</span>
+              </>}
+              <span style={{ fontSize: '.72rem', color: 'rgba(255,255,255,.35)' }}>/km</span>
             </div>
           )}
-        </div>
-      )
-    }
-
-    if (isProgressif && mainSet.includes('→')) {
-      const phases = mainSet.split('→').map(p => p.trim()).filter(Boolean)
-      const dotC   = ['#10B981', '#F59E0B', '#EF4444', '#8B5CF6']
-      return (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '.875rem' }}>
-          {phases.map((phase, i) => (
-            <div key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: '.875rem' }}>
-              <div style={{ width: 10, height: 10, borderRadius: '50%', flexShrink: 0, marginTop: '.5rem',
-                background: dotC[Math.min(i, dotC.length - 1)], boxShadow: `0 0 8px ${dotC[Math.min(i, dotC.length - 1)]}80` }} />
-              <p style={{ fontSize: '.9rem', lineHeight: 1.65, color: 'rgba(255,255,255,.82)', margin: 0 }}>{phase}</p>
+          {paceMin && (
+            <div style={{ fontSize: '.78rem', color: 'rgba(255,255,255,.35)', fontStyle: 'italic' }}>
+              {paceMax
+                ? `${paceMin.pourcentage_vma}–${paceMax.pourcentage_vma}% VMA · allure au ressenti`
+                : `${paceMin.pourcentage_vma}% VMA · allure au ressenti`}
             </div>
-          ))}
+          )}
         </div>
       )
     }
@@ -805,6 +794,12 @@ export default function AthletePlan() {
   const [cycleModal,     setCycleModal]    = useState(false)
   const [cycleLoading,   setCycleLoading]  = useState(false)
   const [cycleDone,      setCycleDone]     = useState(false)
+  const [fatigueModal,   setFatigueModal]  = useState(false)
+  const [fatigueLoading, setFatigueLoading] = useState(false)
+  const [fatigueDone,    setFatigueDone]   = useState(false)
+  const [injuryModal,    setInjuryModal]   = useState(false)
+  const [injuryLoading,  setInjuryLoading] = useState(false)
+  const [injuryDone,     setInjuryDone]    = useState(false)
   const [restoreLoading, setRestoreLoading] = useState(false)
   const [toast,          setToast]         = useState(null)
 
@@ -929,6 +924,42 @@ export default function AthletePlan() {
     }
   }
 
+  async function triggerFatigueAdapt() {
+    setFatigueLoading(true)
+    try {
+      const result = await api.fatigueAdapt({ userId: profile.id })
+      if (result?.planData) {
+        setPlan(prev => prev ? { ...prev, plan_data: result.planData } : prev)
+      } else {
+        await loadPlan()
+      }
+      setFatigueDone(true)
+      setTimeout(() => { setFatigueModal(false); setFatigueDone(false) }, 2000)
+    } catch (err) {
+      console.error('[FatigueAdapt]', err)
+    } finally {
+      setFatigueLoading(false)
+    }
+  }
+
+  async function triggerInjuryAdapt() {
+    setInjuryLoading(true)
+    try {
+      const result = await api.adaptInjury({ userId: profile.id })
+      if (result?.planData) {
+        setPlan(prev => prev ? { ...prev, plan_data: result.planData } : prev)
+      } else {
+        await loadPlan()
+      }
+      setInjuryDone(true)
+      setTimeout(() => { setInjuryModal(false); setInjuryDone(false) }, 2000)
+    } catch (err) {
+      console.error('[InjuryAdapt]', err)
+    } finally {
+      setInjuryLoading(false)
+    }
+  }
+
   async function triggerCycleAdapt() {
     setCycleLoading(true)
     try {
@@ -1015,64 +1046,67 @@ export default function AthletePlan() {
       )}
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1.5rem', gap: '.5rem' }}>
         <h2 className="page-heading" style={{ margin: 0 }}>Mon plan</h2>
-        <div style={{ display: 'flex', gap: '.4rem', flexShrink: 0 }}>
+        <div style={{ display: 'flex', gap: '.35rem', flexShrink: 0, flexWrap: 'wrap', justifyContent: 'flex-end' }}>
           {(profile?.gender === 'female' || profile?.period_pain) && (
             <button
               onClick={adaptedFor === 'cycle' ? handleRestoreWeek : () => setCycleModal(true)}
               disabled={restoreLoading || (adaptedFor !== null && adaptedFor !== 'cycle')}
               style={{
-                display: 'flex', alignItems: 'center', gap: '.35rem',
-                padding: '.4rem .75rem', borderRadius: 99,
+                padding: '.38rem .7rem', borderRadius: 99,
                 border: adaptedFor === 'cycle' ? '1.5px solid rgba(236,72,153,.8)' : '1.5px solid rgba(236,72,153,.5)',
                 background: adaptedFor === 'cycle' ? 'rgba(236,72,153,.25)' : 'rgba(236,72,153,.12)',
-                color: '#F472B6',
-                fontSize: '.75rem', fontWeight: 700,
+                color: '#F472B6', fontSize: '.72rem', fontWeight: 700,
                 cursor: (restoreLoading || (adaptedFor !== null && adaptedFor !== 'cycle')) ? 'default' : 'pointer',
                 fontFamily: 'inherit', whiteSpace: 'nowrap', opacity: (adaptedFor !== null && adaptedFor !== 'cycle') ? .4 : 1,
               }}>
-              {restoreLoading && adaptedFor === 'cycle' ? '…' : adaptedFor === 'cycle' ? '🌸 Adapté ✓ — Retour normal' : '🌸 Adapter mon plan'}
+              {adaptedFor === 'cycle' ? '🌸 ✓' : '🌸 Cycle'}
             </button>
           )}
+          <button
+            onClick={adaptedFor === 'fatigue' ? handleRestoreWeek : () => setFatigueModal(true)}
+            disabled={fatigueLoading || restoreLoading || (adaptedFor !== null && adaptedFor !== 'fatigue')}
+            style={{
+              padding: '.38rem .7rem', borderRadius: 99,
+              border: adaptedFor === 'fatigue' ? '1.5px solid rgba(99,102,241,.8)' : '1.5px solid rgba(99,102,241,.5)',
+              background: adaptedFor === 'fatigue' ? 'rgba(99,102,241,.25)' : 'rgba(99,102,241,.1)',
+              color: adaptedFor === 'fatigue' ? '#A5B4FC' : '#818CF8',
+              fontSize: '.72rem', fontWeight: 700,
+              cursor: (fatigueLoading || restoreLoading || (adaptedFor !== null && adaptedFor !== 'fatigue')) ? 'default' : 'pointer',
+              fontFamily: 'inherit', whiteSpace: 'nowrap', opacity: (adaptedFor !== null && adaptedFor !== 'fatigue') ? .4 : 1,
+            }}>
+            {(fatigueLoading || (restoreLoading && adaptedFor === 'fatigue')) ? '…' : adaptedFor === 'fatigue' ? '😴 ✓' : '😴 Fatigue'}
+          </button>
+          <button
+            onClick={adaptedFor === 'injury' ? handleRestoreWeek : () => setInjuryModal(true)}
+            disabled={injuryLoading || restoreLoading || (adaptedFor !== null && adaptedFor !== 'injury')}
+            style={{
+              padding: '.38rem .7rem', borderRadius: 99,
+              border: adaptedFor === 'injury' ? '1.5px solid rgba(251,146,60,.8)' : '1.5px solid rgba(251,146,60,.5)',
+              background: adaptedFor === 'injury' ? 'rgba(251,146,60,.25)' : 'rgba(251,146,60,.1)',
+              color: adaptedFor === 'injury' ? '#FED7AA' : '#FB923C',
+              fontSize: '.72rem', fontWeight: 700,
+              cursor: (injuryLoading || restoreLoading || (adaptedFor !== null && adaptedFor !== 'injury')) ? 'default' : 'pointer',
+              fontFamily: 'inherit', whiteSpace: 'nowrap', opacity: (adaptedFor !== null && adaptedFor !== 'injury') ? .4 : 1,
+            }}>
+            {(injuryLoading || (restoreLoading && adaptedFor === 'injury')) ? '…' : adaptedFor === 'injury' ? '🩹 ✓' : '🩹 Blessure'}
+          </button>
           <button
             onClick={adaptedFor === 'heat' ? handleRestoreHeat : () => setHeatModal(true)}
             disabled={heatLoading || restoreLoading || (adaptedFor !== null && adaptedFor !== 'heat')}
             style={{
-              display: 'flex', alignItems: 'center', gap: '.35rem',
-              padding: '.4rem .75rem', borderRadius: 99,
+              padding: '.38rem .7rem', borderRadius: 99,
               border: '1.5px solid #CA8A04',
               background: adaptedFor === 'heat' ? 'rgba(234,179,8,.25)' : 'rgba(234,179,8,.1)',
               color: adaptedFor === 'heat' ? '#FDE047' : '#EAB308',
-              fontSize: '.75rem', fontWeight: 700,
+              fontSize: '.72rem', fontWeight: 700,
               cursor: (heatLoading || restoreLoading || (adaptedFor !== null && adaptedFor !== 'heat')) ? 'default' : 'pointer',
-              fontFamily: 'inherit', whiteSpace: 'nowrap', transition: 'all .2s',
+              fontFamily: 'inherit', whiteSpace: 'nowrap',
               opacity: (adaptedFor !== null && adaptedFor !== 'heat') ? .4 : 1,
             }}>
-            {(heatLoading || (restoreLoading && adaptedFor === 'heat')) ? '…' : adaptedFor === 'heat' ? '🌡️ Canicule ON ✓ — Retour normal' : '🌡️ Canicule'}
+            {(heatLoading || (restoreLoading && adaptedFor === 'heat')) ? '…' : adaptedFor === 'heat' ? '🌡️ ✓' : '🌡️ Canicule'}
           </button>
         </div>
       </div>
-
-      {adaptedFor === 'injury' && (
-        <div style={{
-          background: 'rgba(251,146,60,.1)', border: '1px solid rgba(251,146,60,.3)',
-          borderRadius: 'var(--radius)', padding: '.75rem 1rem', marginBottom: '1rem',
-          fontSize: '.82rem', lineHeight: 1.6, color: '#FED7AA',
-          display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '1rem',
-        }}>
-          <span>🩹 <strong>Plan adapté — blessure</strong> — Tes séances de cette semaine sont en récupération douce.</span>
-          <button
-            onClick={handleRestoreWeek}
-            disabled={restoreLoading}
-            style={{
-              flexShrink: 0, background: 'rgba(251,146,60,.2)', border: '1px solid rgba(251,146,60,.5)',
-              color: '#FED7AA', borderRadius: 99, padding: '.3rem .75rem',
-              fontSize: '.72rem', fontWeight: 700, cursor: restoreLoading ? 'default' : 'pointer',
-              fontFamily: 'inherit',
-            }}>
-            {restoreLoading ? '…' : 'Retour normal'}
-          </button>
-        </div>
-      )}
 
       {/* Week selector */}
       <div style={{ display: 'flex', gap: '.5rem', overflowX: 'auto', paddingBottom: '.5rem', marginBottom: '1.5rem' }}>
@@ -1336,6 +1370,66 @@ export default function AthletePlan() {
                   </button>
                 </div>
               </>
+            )}
+          </div>
+        </div>
+      )}
+
+      {fatigueModal && (
+        <div className="modal-overlay center" onClick={e => e.target === e.currentTarget && !fatigueLoading && setFatigueModal(false)}>
+          <div className="modal center-modal" style={{ maxWidth: 380 }}>
+            <div style={{ textAlign: 'center', marginBottom: '1.25rem' }}>
+              <div style={{ fontSize: '2rem', marginBottom: '.5rem' }}>😴</div>
+              <h3 style={{ marginBottom: '.5rem' }}>Semaine Fatigue</h3>
+              <p style={{ fontSize: '.875rem', color: 'var(--text-muted)', lineHeight: 1.6 }}>
+                Ta séance intense de la semaine est remplacée par un footing léger, et les autres séances sont réduites. Tu récupères, tu reprends normal la semaine prochaine.
+              </p>
+            </div>
+            {fatigueDone ? (
+              <div style={{ textAlign: 'center', color: '#A5B4FC', fontWeight: 700, padding: '.75rem' }}>
+                ✅ Semaine allégée — repose-toi bien 😴
+              </div>
+            ) : (
+              <div style={{ display: 'flex', gap: '.75rem' }}>
+                <button className="btn btn-ghost" style={{ flex: 1 }} onClick={() => setFatigueModal(false)} disabled={fatigueLoading}>Annuler</button>
+                <button
+                  className="btn btn-primary"
+                  style={{ flex: 1, background: 'linear-gradient(135deg,#4F46E5,#7C3AED)', border: 'none' }}
+                  disabled={fatigueLoading}
+                  onClick={triggerFatigueAdapt}>
+                  {fatigueLoading ? '…' : 'Alléger 😴'}
+                </button>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
+      {injuryModal && (
+        <div className="modal-overlay center" onClick={e => e.target === e.currentTarget && !injuryLoading && setInjuryModal(false)}>
+          <div className="modal center-modal" style={{ maxWidth: 380 }}>
+            <div style={{ textAlign: 'center', marginBottom: '1.25rem' }}>
+              <div style={{ fontSize: '2rem', marginBottom: '.5rem' }}>🩹</div>
+              <h3 style={{ marginBottom: '.5rem' }}>Plan Blessure</h3>
+              <p style={{ fontSize: '.875rem', color: 'var(--text-muted)', lineHeight: 1.6 }}>
+                Toutes tes séances sont adaptées en récupération douce sur tout le plan. Dès que tu te sens prêt(e), reclique sur le bouton pour revenir au programme normal.
+              </p>
+            </div>
+            {injuryDone ? (
+              <div style={{ textAlign: 'center', color: '#FED7AA', fontWeight: 700, padding: '.75rem' }}>
+                ✅ Plan adapté — prends soin de toi 🩹
+              </div>
+            ) : (
+              <div style={{ display: 'flex', gap: '.75rem' }}>
+                <button className="btn btn-ghost" style={{ flex: 1 }} onClick={() => setInjuryModal(false)} disabled={injuryLoading}>Annuler</button>
+                <button
+                  className="btn btn-primary"
+                  style={{ flex: 1, background: 'linear-gradient(135deg,#EA580C,#C2410C)', border: 'none' }}
+                  disabled={injuryLoading}
+                  onClick={triggerInjuryAdapt}>
+                  {injuryLoading ? '…' : 'Adapter 🩹'}
+                </button>
+              </div>
             )}
           </div>
         </div>

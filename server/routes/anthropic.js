@@ -1020,6 +1020,91 @@ router.post('/plans/adapt-injury', async (req, res) => {
   }
 });
 
+// ─── POST /api/plans/fatigue-adapt ──────────────────────────────────────────
+
+router.post('/plans/fatigue-adapt', async (req, res) => {
+  const { userId } = req.body;
+  if (!userId) return res.status(400).json({ error: 'Missing userId' });
+
+  try {
+    const [{ data: profile }, { data: plan }] = await Promise.all([
+      supabase.from('profiles').select('*').eq('id', userId).single(),
+      supabase.from('training_plans').select('*').eq('user_id', userId).eq('status', 'active').single(),
+    ]);
+
+    if (!plan) return res.json({ success: false, planData: null });
+
+    const vma          = resolveVma(profile);
+    const weeksElapsed = getPlanWeeksElapsed(plan);
+    const updatedPlan  = JSON.parse(JSON.stringify(plan.plan_data));
+
+    const currentWeek = updatedPlan.semaines.find(s => s.numero === weeksElapsed);
+    if (!currentWeek) return res.json({ success: false, reason: 'no_current_week' });
+
+    if (!currentWeek._original_seances) {
+      currentWeek._original_seances = JSON.parse(JSON.stringify(currentWeek.seances));
+      currentWeek._original_charge  = currentWeek.charge;
+    }
+    currentWeek._adapted_for = 'fatigue';
+    currentWeek.charge = 'Fatigue — Semaine allégée';
+
+    function isIntensityType(s) {
+      const t = (s.type || '').toLowerCase();
+      return t.includes('fractionné') || t.includes('vma') || t.includes('seuil') ||
+             t.includes('côtes') || t.includes('tempo') || t.includes('spécifique');
+    }
+
+    currentWeek.seances = currentWeek.seances.map(s => {
+      const t = (s.type || '').toLowerCase();
+      if (t.includes('renforcement') || t.includes('repos') || s.est_course) return s;
+
+      if (isIntensityType(s)) {
+        const dur = Math.max(25, Math.round((s.duree_min || 40) * 0.65));
+        return {
+          ...s,
+          type:            'Endurance fondamentale',
+          titre:           'Footing léger — semaine de récupération 😴',
+          duree_min:       dur,
+          intensite:       'très facile',
+          echauffement:    '',
+          corps:           `${dur} min à 65-72% VMA (${calcPace(vma, 0.65)}/km – ${calcPace(vma, 0.72)}/km) — allure au ressenti. Séance de récupération active.`,
+          retour_au_calme: '',
+          allures: [
+            { zone: 'Min (65% VMA)', pourcentage_vma: 65, vitesse_kmh: parseFloat((vma * 0.65).toFixed(1)), allure_min_km: calcPace(vma, 0.65) + '/km' },
+            { zone: 'Max (72% VMA)', pourcentage_vma: 72, vitesse_kmh: parseFloat((vma * 0.72).toFixed(1)), allure_min_km: calcPace(vma, 0.72) + '/km' },
+          ],
+          notes_coach:  'Ton corps a besoin de souffler cette semaine. Reste dans ta zone de confort, pas de forçage.',
+          rpe_cible:    3,
+          est_seance_cle: false,
+        };
+      } else {
+        const dur = Math.max(25, Math.round((s.duree_min || 40) * 0.75));
+        return {
+          ...s,
+          duree_min:       dur,
+          echauffement:    '',
+          retour_au_calme: '',
+          corps:           `${dur} min à 65-72% VMA (${calcPace(vma, 0.65)}/km – ${calcPace(vma, 0.72)}/km) — allure au ressenti, reste léger.`,
+          allures: [
+            { zone: 'Min (65% VMA)', pourcentage_vma: 65, vitesse_kmh: parseFloat((vma * 0.65).toFixed(1)), allure_min_km: calcPace(vma, 0.65) + '/km' },
+            { zone: 'Max (72% VMA)', pourcentage_vma: 72, vitesse_kmh: parseFloat((vma * 0.72).toFixed(1)), allure_min_km: calcPace(vma, 0.72) + '/km' },
+          ],
+          notes_coach:  'Semaine allégée — reste léger et ne te force pas.',
+          rpe_cible:    3,
+          est_seance_cle: false,
+        };
+      }
+    });
+
+    recalculateDistances(updatedPlan, vma);
+    await supabase.from('training_plans').update({ plan_data: updatedPlan }).eq('id', plan.id);
+    res.json({ success: true, planData: updatedPlan });
+  } catch (err) {
+    console.error('[FatigueAdapt]', err.message);
+    res.status(500).json({ error: err.message });
+  }
+});
+
 // ─── POST /api/plans/restore-week ───────────────────────────────────────────
 
 router.post('/plans/restore-week', async (req, res) => {
