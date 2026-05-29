@@ -1208,15 +1208,16 @@ export default function AthletePlan() {
       {['tri_sprint','tri_olympic','tri_half','tri_ironman'].includes(profile?.objective) && (
         <div style={{ display: 'flex', gap: '.4rem', marginBottom: '1rem', overflowX: 'auto', paddingBottom: '.25rem' }}>
           {[
-            { v: 'all',      l: '🗓 Semaine complète' },
-            { v: 'natation', l: '🏊 Natation' },
-            { v: 'velo',     l: '🚴 Vélo' },
-            { v: 'course',   l: '🏃 Course' },
+            { v: 'all',       l: '🗓 Semaine',   color: '#8B2FC9' },
+            { v: 'natation',  l: '🏊 Natation',  color: '#06B6D4' },
+            { v: 'velo',      l: '🚴 Vélo',      color: '#F97316' },
+            { v: 'course',    l: '🏃 Course',    color: '#10B981' },
+            { v: 'renfo',     l: '💪 Renfo',     color: '#EC4899' },
           ].map(t => (
             <button key={t.v} onClick={() => setTriTab(t.v)} style={{
               padding: '.35rem .85rem', borderRadius: 99, fontWeight: 600, fontSize: '.8rem',
-              border: triTab === t.v ? '2px solid #8B2FC9' : '1px solid rgba(255,255,255,.15)',
-              background: triTab === t.v ? 'rgba(139,47,201,.25)' : 'rgba(255,255,255,.05)',
+              border: triTab === t.v ? `2px solid ${t.color}` : '1px solid rgba(255,255,255,.15)',
+              background: triTab === t.v ? t.color + '30' : 'rgba(255,255,255,.05)',
               color: triTab === t.v ? '#fff' : 'rgba(255,255,255,.6)',
               cursor: 'pointer', fontFamily: 'inherit', whiteSpace: 'nowrap', flexShrink: 0,
             }}>{t.l}</button>
@@ -1232,9 +1233,11 @@ export default function AthletePlan() {
           .filter(session => {
             if (triTab === 'all') return true;
             const t = (session.type || '').toLowerCase();
+            const isRenfo = t.includes('renforcement') || (session.id_seance || '').startsWith('RENFO');
             if (triTab === 'natation') return t.includes('natation');
             if (triTab === 'velo')     return t.includes('vélo') || t.includes('velo');
-            if (triTab === 'course')   return !t.includes('natation') && !t.includes('vélo') && !t.includes('velo') && !t.includes('brique');
+            if (triTab === 'renfo')    return isRenfo;
+            if (triTab === 'course')   return !t.includes('natation') && !t.includes('vélo') && !t.includes('velo') && !t.includes('brique') && !isRenfo;
             return true;
           })
           .map((session) => {

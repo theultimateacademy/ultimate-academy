@@ -1095,24 +1095,43 @@ Vélo : ${profile.bike_type || 'non précisé'}
 Expérience triathlon : ${profile.tri_experience || 'non précisée'}
 
 RÈGLES TRIATHLON OBLIGATOIRES :
-- Générer des séances pour LES 3 DISCIPLINES + briques chaque semaine
+- Générer des séances pour LES 3 DISCIPLINES + 1 brique chaque semaine
 - Chaque séance porte un id_seance de la bibliothèque (NAT-xx, VEL-xx, BRK-xx, ou codes running)
 - La course à pied est la PRIORITÉ — placer les séances course les jours clés
-- JAMAIS 2 séances dures le même jour (ex: pas de tempo vélo + fractionné course)
+- JAMAIS 2 séances dures le même jour
 - 1 jour repos total minimum par semaine
 - Périodisation : ${profile.objective === 'tri_sprint' ? '8-12 semaines' : profile.objective === 'tri_olympic' ? '12-16 semaines' : profile.objective === 'tri_half' ? '16-20 semaines' : '20-30 semaines'}
 - Le champ "type" des séances : natation = "Natation", vélo = "Vélo", brique = "Brique", course = type running habituel
 
 ⛔ RÈGLE TERRAIN VÉLO :
-Si training_terrain = 'ville_plat' → INTERDIT d'utiliser VEL-10 (côtes répétées vélo). Remplacer par VEL-05, VEL-06, VEL-08 ou VEL-09 selon la phase.
+Si training_terrain = 'ville_plat' → INTERDIT d'utiliser VEL-10 (côtes répétées vélo).
 Si training_terrain = 'montagne' ou 'semi_montagne' → VEL-10 autorisé.
 
 ⛔ RÈGLE BRIQUE — ABSOLUE ET NON NÉGOCIABLE :
-CHAQUE SEMAINE d'entraînement DOIT contenir EXACTEMENT 1 séance brique (BRK-xx).
-La brique = sortie vélo suivie immédiatement d'une course à pied — obligatoire pour préparer la transition T2.
-Choisir le code BRK adapté à l'objectif et à la semaine (BRK-01 à BRK-08).
-La brique est placée le SAMEDI de préférence (ou le jour long de l'athlète).
-AUCUNE semaine sans brique — c'est la séance la plus spécifique du triathlon.`;
+CHAQUE SEMAINE d'entraînement DOIT contenir EXACTEMENT 1 brique (BRK-xx), placée de préférence le samedi.
+AUCUNE semaine sans brique.
+
+⛔ RÈGLE COMPTAGE SÉANCES AVEC BRIQUE :
+La brique remplace des séances des disciplines qu'elle contient. NE PAS ajouter de séances supplémentaires pour ces disciplines.
+- BRK contenant natation (BRK-05, BRK-06) → compte comme 1 séance natation + 1 séance vélo. Ajouter seulement (tri_swim_sessions - 1) séances natation additionnelles.
+- BRK contenant vélo + course (BRK-01, BRK-02, BRK-03, BRK-04, BRK-07, BRK-08) → compte comme 1 séance vélo + 1 séance course. Ajouter seulement (tri_bike_sessions - 1) vélos et (tri_run_sessions - 1) courses additionnelles.
+- BRK-06 (nage + vélo + course) → compte comme 1 natation + 1 vélo + 1 course. Soustraire respectivement.
+Exemple : tri_swim_sessions=2, tri_bike_sessions=2, tri_run_sessions=2 + BRK-01 (vélo+course) → ajouter : 2 natations, 1 vélo, 1 course (+ brique).
+
+⛔ RÈGLE AFFÛTAGE TRIATHLON (semaine de course ou mini-affûtage) :
+UNIQUEMENT ces séances — pas plus :
+• 1 footing EF léger 25-35 min (EF-01 ou EF-02)
+• 1 sortie vélo endurance légère max 45-60 min (VEL-01 ou VEL-11)
+• 1 natation légère 1000-1500m (NAT-01 ou NAT-15)
+• 1 brique très courte ou légère (BRK-01 ou BRK-07)
+• 1 activation J-1 (EF-01, 20-25 min, footing léger + gammes)
+• 1 RENFO mobilité (RENFO-05)
+AUCUNE séance intensive. AUCUNE longue sortie. Pas plus de 6 séances au total.
+
+⛔ RÈGLE COURSE — NE JAMAIS CRÉER DE SÉANCE RACE :
+NE JAMAIS utiliser un code NAT-xx, VEL-xx ou BRK-xx pour représenter la course objectif ou intermédiaire.
+Le jour de course dans le plan DOIT rester VIDE (sans séance) — la course est injectée automatiquement par le système.
+Un athlète triathlon court au jour J avec id_seance="RACE_INT" ou "RACE" injecté automatiquement.`;
   }
   if (discipline === 'trail') {
     const denivele = profile.race_denivele ? `${profile.race_denivele}m D+` : 'non précisé';
