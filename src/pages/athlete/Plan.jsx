@@ -139,10 +139,13 @@ function SessionDetailPage({ session, weekNum, sessionIdx, planId, vma, onClose,
   }, [])
 
   // Helpers
-  const typeColor  = SESSION_TYPE_COLORS[session.type] || '#8B5CF6'
+  const typeColor    = SESSION_TYPE_COLORS[session.type] || '#8B5CF6'
+  const sessionTypeL = (session.type || '').toLowerCase()
+  // Natation/vélo/brique : pas d'allure en min/km
+  const isNonRunning = sessionTypeL.includes('natation') || sessionTypeL.includes('vélo') || sessionTypeL.includes('velo') || sessionTypeL.includes('brique')
   const alluresOk  = (session.allures || []).filter(a => a?.allure_min_km && typeof a.allure_min_km === 'string' && !a.allure_min_km.includes('[object'))
-  const efPace       = alluresOk[0] || null
-  const cooldownPace = alluresOk.find(a => /retour|calme|récup/i.test(a.zone || '')) || efPace
+  const efPace       = isNonRunning ? null : (alluresOk[0] || null)
+  const cooldownPace = isNonRunning ? null : (alluresOk.find(a => /retour|calme|récup/i.test(a.zone || '')) || efPace)
   // spePace = the main-set (corps) allure: prefer explicit "Corps" zone label, else highest intensity
   const spePace    = alluresOk.length > 1
     ? (alluresOk.find(a => /corps|principal/i.test(a.zone || ''))
@@ -151,8 +154,9 @@ function SessionDetailPage({ session, weekNum, sessionIdx, planId, vma, onClose,
 
   function PaceChip({ allure, color }) {
     if (!allure?.allure_min_km) return null
-    const pace = allure.allure_min_km.replace(/"/g, '')
-    const bg   = color ? color + '18' : 'rgba(255,255,255,.08)'
+    // Strip trailing /km so we never produce "7'06/km/km"
+    const pace = allure.allure_min_km.replace(/"/g, '').replace(/\/km$/i, '')
+    const bg     = color ? color + '18' : 'rgba(255,255,255,.08)'
     const border = color ? color + '35' : 'rgba(255,255,255,.14)'
     const text   = color || 'rgba(255,255,255,.7)'
     return (
@@ -430,12 +434,14 @@ function SessionDetailPage({ session, weekNum, sessionIdx, planId, vma, onClose,
           {session.corps && (() => {
             const t = (session.type || '').toLowerCase()
             const isSimple = t.includes('endurance fondamentale') || t === 'ef' || t.includes('sortie longue')
+            // Natation et vélo : pas d'allure en min/km
+            const hidePaceChip = t.includes('natation') || t.includes('vélo') || t.includes('velo') || t.includes('brique')
             return (
               <div style={{ borderLeft: `3px solid ${typeColor}`, padding: isSimple ? '1.5rem 1.25rem' : '1.125rem 1.125rem 1.125rem 1rem', background: typeColor + '06' }}>
                 {!isSimple && (
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '.875rem' }}>
                     <span style={{ fontWeight: 800, fontSize: '.76rem', color: typeColor, letterSpacing: '.1em', textTransform: 'uppercase' }}>⚡ Séance principale</span>
-                    <PaceChip allure={spePace} color={typeColor} />
+                    {!hidePaceChip && <PaceChip allure={spePace} color={typeColor} />}
                   </div>
                 )}
 

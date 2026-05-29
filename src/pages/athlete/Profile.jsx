@@ -896,6 +896,35 @@ export default function AthleteProfile() {
                 autoFocus
               />
             </FieldCard>
+            {/* Nage libre toggle */}
+            <FieldCard
+              fieldKey="open_water"
+              dbKey="open_water"
+              label="🌊 Nage en eau libre"
+              displayValue={
+                profile?.open_water === 'oui'              ? '🌊 Oui, j\'ai accès' :
+                profile?.open_water === 'selon_conditions' ? '🌤️ Selon les conditions' :
+                profile?.open_water === 'non'              ? '🏊 Non, piscine seulement' :
+                'Non renseigné'
+              }
+            >
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '.5rem' }}>
+                {[
+                  { v: 'oui',              l: '🌊 Oui, j\'ai accès à l\'eau libre' },
+                  { v: 'selon_conditions', l: '🌤️ Selon les conditions' },
+                  { v: 'non',              l: '🏊 Non, piscine uniquement' },
+                ].map(o => (
+                  <label key={o.v} style={{ display: 'flex', alignItems: 'center', gap: '.5rem', cursor: 'pointer', fontSize: '.875rem' }}>
+                    <input type="radio" name="open_water" value={o.v}
+                      checked={(editVal.open_water ?? profile?.open_water) === o.v}
+                      onChange={() => setEditVal(prev => ({ ...prev, open_water: o.v }))}
+                      style={{ accentColor: '#06B6D4' }} />
+                    {o.l}
+                  </label>
+                ))}
+              </div>
+            </FieldCard>
+
             <FieldCard
               fieldKey="chrono_goal"
               dbKey="chrono_goal"
