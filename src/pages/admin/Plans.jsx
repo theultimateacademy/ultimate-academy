@@ -57,6 +57,14 @@ function PlanModal({ plan, athlete, onClose, onActivate }) {
     })
   }
 
+  async function deleteSession(weekIdx, sessionIdx) {
+    const updated = JSON.parse(JSON.stringify(planData))
+    updated.semaines[weekIdx].seances.splice(sessionIdx, 1)
+    setPlanData(updated)
+    setEditSession(null)
+    await supabase.from('training_plans').update({ plan_data: updated }).eq('id', plan.id)
+  }
+
   const currentWeek = weeks[activeWeek]
 
   return (
@@ -133,10 +141,22 @@ function PlanModal({ plan, athlete, onClose, onActivate }) {
                           {session.jour} · {session.duree_min} min · RPE {session.rpe_cible}/10
                         </div>
                       </div>
-                      <button className="btn btn-ghost btn-sm" onClick={() =>
-                        setEditSession(isEditing ? null : `${activeWeek}-${si}`)}>
-                        {isEditing ? 'Fermer' : '✏️ Modifier'}
-                      </button>
+                      <div style={{ display: 'flex', gap: '.35rem', flexShrink: 0 }}>
+                        <button className="btn btn-ghost btn-sm" onClick={() =>
+                          setEditSession(isEditing ? null : `${activeWeek}-${si}`)}>
+                          {isEditing ? 'Fermer' : '✏️'}
+                        </button>
+                        <button
+                          className="btn btn-ghost btn-sm"
+                          style={{ color: 'var(--error)', borderColor: 'rgba(239,68,68,.3)' }}
+                          onClick={() => {
+                            if (window.confirm(`Supprimer "${session.titre}" ?`)) {
+                              deleteSession(activeWeek, si)
+                            }
+                          }}>
+                          🗑️
+                        </button>
+                      </div>
                     </div>
 
                     {isEditing && (
