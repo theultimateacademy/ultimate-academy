@@ -596,393 +596,356 @@ export default function AthleteProfile() {
           </div>
         </div>
 
-        {/* Editable grid */}
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1rem' }}>
+        {/* Editable sections */}
+        {(() => {
+          const isTri   = ['tri_sprint','tri_olympic','tri_half','tri_ironman'].includes(profile?.objective)
+          const isTrail = ['trail_20k','trail_50k','trail_100k','trail_100m'].includes(profile?.objective)
 
-          {/* Objectif */}
-          <FieldCard
-            fieldKey="objective"
-            dbKey="objective"
-            label="Objectif"
-            displayValue={OBJECTIVE_LABELS[profile?.objective] || 'Non renseigné'}
-          >
-            <select
-              className="form-input"
-              style={{ width: '100%', fontSize: '.875rem' }}
-              value={editVal.objective ?? ''}
-              onChange={e => setEditVal(prev => ({ ...prev, objective: e.target.value }))}
-              autoFocus
-            >
-              <option value="">— Choisir —</option>
-              <optgroup label="🏃 Course sur route">
-                <option value="5km">5 km</option>
-                <option value="10km">10 km</option>
-                <option value="semi">Semi-marathon</option>
-                <option value="marathon">Marathon</option>
-              </optgroup>
-              <optgroup label="⛰️ Trail">
-                <option value="trail_20k">Trail 20K</option>
-                <option value="trail_50k">Trail 50K</option>
-                <option value="trail_100k">Trail 100K</option>
-                <option value="trail_100m">Trail 100M</option>
-              </optgroup>
-              <optgroup label="🦾 Triathlon">
-                <option value="tri_sprint">Triathlon Sprint</option>
-                <option value="tri_olympic">Triathlon Olympic</option>
-                <option value="tri_half">Half Ironman 70.3</option>
-                <option value="tri_ironman">Ironman</option>
-              </optgroup>
-            </select>
-          </FieldCard>
+          const sectionHdr = {
+            fontSize: '.68rem', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '.1em',
+            color: 'var(--text-muted)', padding: '.625rem 0', borderBottom: '1px solid var(--border)',
+            marginBottom: '.125rem', marginTop: '1.5rem',
+          }
 
-          {/* Niveau */}
-          <FieldCard
-            fieldKey="level"
-            dbKey="level"
-            label="Niveau"
-            displayValue={LEVEL_LABELS[profile?.level] || 'Non renseigné'}
-          >
-            <select
-              className="form-input"
-              style={{ width: '100%', fontSize: '.875rem' }}
-              value={editVal.level ?? ''}
-              onChange={e => setEditVal(prev => ({ ...prev, level: e.target.value }))}
-              autoFocus
-            >
-              <option value="">— Choisir —</option>
-              <option value="debutant">Débutant</option>
-              <option value="intermediaire">Intermédiaire</option>
-              <option value="confirme">Confirmé</option>
-              <option value="expert">Expert</option>
-            </select>
-          </FieldCard>
+          const rowBase = {
+            display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+            padding: '.75rem 0', borderBottom: '1px solid rgba(255,255,255,.04)',
+            cursor: 'pointer', gap: '1rem',
+          }
 
-          {/* VMA */}
-          <FieldCard
-            fieldKey="vma"
-            dbKey="vma"
-            label="VMA"
-            displayValue={profile?.vma ? `${profile.vma} km/h` : 'À estimer'}
-          >
-            <div style={{ display: 'flex', alignItems: 'center', gap: '.4rem' }}>
-              <input
-                type="number"
-                className="form-input"
-                style={{ flex: 1, fontSize: '.875rem' }}
-                step={0.1}
-                min={8}
-                max={30}
-                value={editVal.vma ?? ''}
-                onChange={e => setEditVal(prev => ({ ...prev, vma: e.target.value }))}
-                autoFocus
-              />
-              <span style={{ fontSize: '.8rem', color: 'var(--text-muted)', whiteSpace: 'nowrap' }}>km/h</span>
-            </div>
-          </FieldCard>
-
-          {/* Date de course */}
-          <FieldCard
-            fieldKey="race_date"
-            dbKey="race_date"
-            label="Date de course"
-            displayValue={profile?.race_date
-              ? new Date(profile.race_date).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })
-              : 'Non définie'}
-          >
-            <input
-              type="date"
-              className="form-input"
-              style={{ width: '100%', fontSize: '.875rem' }}
-              value={editVal.race_date ?? ''}
-              onChange={e => setEditVal(prev => ({ ...prev, race_date: e.target.value }))}
-              autoFocus
-            />
-          </FieldCard>
-
-          {/* Chrono cible — masqué pour les triathlètes (remplacé par les 3 chronos spécifiques) */}
-          {!['tri_sprint','tri_olympic','tri_half','tri_ironman'].includes(profile?.objective) && (
-            <FieldCard
-              fieldKey="chrono_goal"
-              dbKey="chrono_goal"
-              label="Chrono cible"
-              displayValue={profile?.chrono_goal || 'Progresser'}
-            >
-              <input
-                type="text"
-                className="form-input"
-                style={{ width: '100%', fontSize: '.875rem' }}
-                placeholder="ex: 1h45 au semi"
-                value={editVal.chrono_goal ?? ''}
-                onChange={e => setEditVal(prev => ({ ...prev, chrono_goal: e.target.value }))}
-                autoFocus
-              />
-            </FieldCard>
-          )}
-
-          {/* Jours/semaine — masqué pour les triathlètes (remplacé par les 3 compteurs) */}
-          {!['tri_sprint','tri_olympic','tri_half','tri_ironman'].includes(profile?.objective) && (
-            <FieldCard
-              fieldKey="days_per_week"
-              dbKey="days_per_week"
-              label="Jours/semaine"
-              displayValue={profile?.days_per_week ? `${profile.days_per_week} jours` : '—'}
-            >
-              <div style={{ display: 'flex', alignItems: 'center', gap: '.4rem' }}>
-                <input
-                  type="number"
-                  className="form-input"
-                  style={{ flex: 1, fontSize: '.875rem' }}
-                  min={2}
-                  max={7}
-                  value={editVal.days_per_week ?? ''}
-                  onChange={e => setEditVal(prev => ({ ...prev, days_per_week: e.target.value }))}
-                  autoFocus
-                />
-                <span style={{ fontSize: '.8rem', color: 'var(--text-muted)', whiteSpace: 'nowrap' }}>jours/sem.</span>
-              </div>
-            </FieldCard>
-          )}
-
-          {/* Séances/semaine par discipline — triathlon uniquement */}
-          {['tri_sprint','tri_olympic','tri_half','tri_ironman'].includes(profile?.objective) && (<>
-            {[
-              { key: 'tri_swim_sessions', dbKey: 'tri_swim_sessions', label: '🏊 Nage / semaine', max: 4, unit: 'séance(s)' },
-              { key: 'tri_bike_sessions', dbKey: 'tri_bike_sessions', label: '🚴 Vélo / semaine',  max: 5, unit: 'séance(s)' },
-              { key: 'tri_run_sessions',  dbKey: 'tri_run_sessions',  label: '🏃 Course / semaine', max: 4, unit: 'séance(s)' },
-            ].map(({ key, dbKey: dk, label, max, unit }) => (
-              <FieldCard
-                key={key}
-                fieldKey={key}
-                dbKey={dk}
-                label={label}
-                displayValue={profile?.[dk] ? `${profile[dk]} ${unit}` : 'Non renseigné'}
-              >
-                <div style={{ display: 'flex', alignItems: 'center', gap: '.4rem' }}>
-                  <input
-                    type="number"
-                    className="form-input"
-                    style={{ flex: 1, fontSize: '.875rem' }}
-                    min={1} max={max}
-                    value={editVal[key] ?? ''}
-                    onChange={e => setEditVal(prev => ({ ...prev, [key]: e.target.value }))}
-                    autoFocus
-                  />
-                  <span style={{ fontSize: '.8rem', color: 'var(--text-muted)', whiteSpace: 'nowrap' }}>{unit}</span>
-                </div>
-              </FieldCard>
-            ))}
-          </>)}
-
-          {/* Jours d'entraînement préférés — tous athlètes */}
-          {(() => {
-            const days = ['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim']
-            const currentDays = profile?.preferred_days || []
-            const editDays = Array.isArray(editVal.preferred_days) ? editVal.preferred_days : currentDays
-            const toggle = (d) => {
-              const next = editDays.includes(d) ? editDays.filter(x => x !== d) : [...editDays, d]
-              setEditVal(prev => ({ ...prev, preferred_days: next }))
-            }
+          // Generic row: label left, value/edit right
+          function FieldRow({ fieldKey, dbKey, label, displayVal, children }) {
+            const isEditing = editField === fieldKey
             return (
-              <FieldCard
-                fieldKey="preferred_days"
-                dbKey="preferred_days"
-                label="📅 Jours d'entraînement"
-                displayValue={currentDays.length ? currentDays.join(' · ') : 'Non précisé'}
-              >
-                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '.4rem', marginBottom: '.25rem' }}>
-                  {days.map(d => {
-                    const sel = editDays.includes(d)
-                    return (
-                      <button key={d} type="button" onClick={() => toggle(d)} style={{
-                        padding: '.35rem .65rem', borderRadius: 8, fontWeight: 600, fontSize: '.82rem',
-                        border: sel ? '2px solid var(--primary)' : '1px solid var(--border)',
-                        background: sel ? 'rgba(139,47,201,.2)' : 'var(--surface)',
-                        color: sel ? '#fff' : 'var(--text-muted)',
-                        cursor: 'pointer', fontFamily: 'inherit',
-                      }}>{d}</button>
-                    )
-                  })}
-                </div>
-                <p style={{ fontSize: '.75rem', color: 'var(--text-muted)', margin: '.25rem 0 0' }}>
-                  Au moins 1 jour de repos · {editDays.length} sélectionné{editDays.length > 1 ? 's' : ''}
-                </p>
-              </FieldCard>
+              <div style={{ ...rowBase, cursor: isEditing ? 'default' : 'pointer', alignItems: isEditing ? 'flex-start' : 'center' }}
+                onClick={() => { if (!isEditing) startEdit(fieldKey, profile?.[dbKey ?? fieldKey] ?? '') }}>
+                <span style={{ fontSize: '.82rem', color: 'var(--text-muted)', flexShrink: 0, minWidth: 160 }}>{label}</span>
+                {isEditing ? (
+                  <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '.4rem' }}
+                    onClick={e => e.stopPropagation()}>
+                    {children}
+                    <div style={{ display: 'flex', gap: '.4rem' }}>
+                      <button className="btn btn-ghost btn-sm" style={{ fontSize: '.75rem', padding: '.22rem .55rem' }}
+                        onClick={cancelEdit} disabled={editSaving}>Annuler</button>
+                      <button className="btn btn-primary btn-sm" style={{ fontSize: '.75rem', padding: '.22rem .6rem' }}
+                        onClick={() => saveField(dbKey ?? fieldKey, editVal[fieldKey])} disabled={editSaving}>
+                        {editSaving ? '…' : '✓'}
+                      </button>
+                    </div>
+                  </div>
+                ) : (
+                  <span style={{ fontWeight: 600, fontSize: '.875rem', textAlign: 'right' }}>{displayVal}</span>
+                )}
+              </div>
             )
-          })()}
+          }
 
-          {/* Course intermédiaire — nom */}
-          <FieldCard
-            fieldKey="intermediate_race_name"
-            dbKey="intermediate_race_name"
-            label="Course intermédiaire"
-            displayValue={profile?.intermediate_race_name || 'Aucune'}
-            highlight
-          >
-            <input
-              type="text"
-              className="form-input"
-              style={{ width: '100%', fontSize: '.875rem' }}
-              placeholder="ex : Semi de Paris"
-              value={editVal.intermediate_race_name ?? ''}
-              onChange={e => setEditVal(prev => ({ ...prev, intermediate_race_name: e.target.value }))}
-              autoFocus
-            />
-          </FieldCard>
+          const DAYS = ['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim']
 
-          {/* Course intermédiaire — date */}
-          <FieldCard
-            fieldKey="intermediate_race_date"
-            dbKey="intermediate_race_date"
-            label="Date course intermédiaire"
-            highlight
-            displayValue={profile?.intermediate_race_date
-              ? new Date(profile.intermediate_race_date).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })
-              : 'Non définie'}
-          >
-            <input
-              type="date"
-              className="form-input"
-              style={{ width: '100%', fontSize: '.875rem' }}
-              value={editVal.intermediate_race_date ?? ''}
-              onChange={e => setEditVal(prev => ({ ...prev, intermediate_race_date: e.target.value }))}
-              autoFocus
-            />
-          </FieldCard>
+          return (
+            <div>
+              {/* ── Section 1 : Objectif & Course ── */}
+              <div style={sectionHdr}>Objectif &amp; Course</div>
 
-          {/* Terrain d'entraînement — visible si trail */}
-          {['trail_20k','trail_50k','trail_100k','trail_100m'].includes(profile?.objective) && (
-            <FieldCard
-              fieldKey="training_terrain"
-              dbKey="training_terrain"
-              label="Zone d'habitation"
-              displayValue={
-                profile?.training_terrain === 'montagne'      ? '🏔️ Montagne' :
-                profile?.training_terrain === 'semi_montagne' ? '⛰️ Semi-montagne' :
-                profile?.training_terrain === 'ville_plat'    ? '🏙️ Ville / Plat' :
-                'Non renseigné'
-              }
-            >
-              <select
-                className="form-input"
-                style={{ width: '100%', fontSize: '.875rem' }}
-                value={editVal.training_terrain ?? ''}
-                onChange={e => setEditVal(prev => ({ ...prev, training_terrain: e.target.value }))}
-                autoFocus
-              >
-                <option value="">— Choisir —</option>
-                <option value="montagne">🏔️ Montagne (accès D+ direct)</option>
-                <option value="semi_montagne">⛰️ Semi-montagne (relief modéré)</option>
-                <option value="ville_plat">🏙️ Ville / Plat (peu de dénivelé)</option>
-              </select>
-            </FieldCard>
-          )}
+              <FieldRow fieldKey="objective" dbKey="objective" label="Objectif"
+                displayVal={OBJECTIVE_LABELS[profile?.objective] || 'Non renseigné'}>
+                <select className="form-input" style={{ fontSize: '.875rem', width: '100%' }}
+                  value={editVal.objective ?? ''} autoFocus
+                  onChange={e => setEditVal(prev => ({ ...prev, objective: e.target.value }))}>
+                  <option value="">— Choisir —</option>
+                  <optgroup label="🏃 Course sur route">
+                    <option value="5km">5 km</option>
+                    <option value="10km">10 km</option>
+                    <option value="semi">Semi-marathon</option>
+                    <option value="marathon">Marathon</option>
+                  </optgroup>
+                  <optgroup label="⛰️ Trail">
+                    <option value="trail_20k">Trail 20K</option>
+                    <option value="trail_50k">Trail 50K</option>
+                    <option value="trail_100k">Trail 100K</option>
+                    <option value="trail_100m">Trail 100M</option>
+                  </optgroup>
+                  <optgroup label="🦾 Triathlon">
+                    <option value="tri_sprint">Triathlon Sprint</option>
+                    <option value="tri_olympic">Triathlon Olympic</option>
+                    <option value="tri_half">Half Ironman 70.3</option>
+                    <option value="tri_ironman">Ironman</option>
+                  </optgroup>
+                </select>
+              </FieldRow>
 
-          {/* Dénivelé course — visible si trail */}
-          {['trail_20k','trail_50k','trail_100k','trail_100m'].includes(profile?.objective) && (
-            <FieldCard
-              fieldKey="race_denivele"
-              dbKey="race_denivele"
-              label="Dénivelé course (D+)"
-              displayValue={profile?.race_denivele ? `${profile.race_denivele} m D+` : 'Non renseigné'}
-            >
-              <div style={{ display: 'flex', alignItems: 'center', gap: '.4rem' }}>
-                <input
-                  type="number"
-                  className="form-input"
-                  style={{ flex: 1, fontSize: '.875rem' }}
-                  min={0} max={25000} step={100}
-                  placeholder="ex: 2500"
-                  value={editVal.race_denivele ?? ''}
-                  onChange={e => setEditVal(prev => ({ ...prev, race_denivele: e.target.value }))}
-                  autoFocus
-                />
-                <span style={{ fontSize: '.8rem', color: 'var(--text-muted)', whiteSpace: 'nowrap' }}>m D+</span>
-              </div>
-            </FieldCard>
-          )}
+              <FieldRow fieldKey="level" dbKey="level" label="Niveau"
+                displayVal={LEVEL_LABELS[profile?.level] || 'Non renseigné'}>
+                <select className="form-input" style={{ fontSize: '.875rem', width: '100%' }}
+                  value={editVal.level ?? ''} autoFocus
+                  onChange={e => setEditVal(prev => ({ ...prev, level: e.target.value }))}>
+                  <option value="">— Choisir —</option>
+                  <option value="debutant">Débutant</option>
+                  <option value="intermediaire">Intermédiaire</option>
+                  <option value="confirme">Confirmé</option>
+                  <option value="expert">Expert</option>
+                </select>
+              </FieldRow>
 
-          {/* Chronos triathlon — visibles uniquement si objectif triathlon */}
-          {['tri_sprint','tri_olympic','tri_half','tri_ironman'].includes(profile?.objective) && (<>
-            <FieldCard
-              fieldKey="chrono_natation"
-              dbKey="chrono_natation"
-              label="🏊 Chrono nage cible"
-              displayValue={profile?.chrono_natation || 'Non renseigné'}
-            >
-              <input
-                type="text"
-                className="form-input"
-                style={{ width: '100%', fontSize: '.875rem' }}
-                placeholder={profile?.objective === 'tri_sprint' ? 'ex: 15min' : profile?.objective === 'tri_olympic' ? 'ex: 28min' : profile?.objective === 'tri_half' ? 'ex: 38min' : 'ex: 1h15'}
-                value={editVal.chrono_natation ?? ''}
-                onChange={e => setEditVal(prev => ({ ...prev, chrono_natation: e.target.value }))}
-                autoFocus
-              />
-            </FieldCard>
-            <FieldCard
-              fieldKey="chrono_velo"
-              dbKey="chrono_velo"
-              label="🚴 Chrono vélo cible"
-              displayValue={profile?.chrono_velo || 'Non renseigné'}
-            >
-              <input
-                type="text"
-                className="form-input"
-                style={{ width: '100%', fontSize: '.875rem' }}
-                placeholder={profile?.objective === 'tri_sprint' ? 'ex: 40min' : profile?.objective === 'tri_olympic' ? 'ex: 1h15' : profile?.objective === 'tri_half' ? 'ex: 2h45' : 'ex: 5h30'}
-                value={editVal.chrono_velo ?? ''}
-                onChange={e => setEditVal(prev => ({ ...prev, chrono_velo: e.target.value }))}
-                autoFocus
-              />
-            </FieldCard>
-            {/* Nage libre toggle */}
-            <FieldCard
-              fieldKey="open_water"
-              dbKey="open_water"
-              label="🌊 Nage en eau libre"
-              displayValue={
-                profile?.open_water === 'oui'              ? '🌊 Oui, j\'ai accès' :
-                profile?.open_water === 'selon_conditions' ? '🌤️ Selon les conditions' :
-                profile?.open_water === 'non'              ? '🏊 Non, piscine seulement' :
-                'Non renseigné'
-              }
-            >
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '.5rem' }}>
-                {[
-                  { v: 'oui',              l: '🌊 Oui, j\'ai accès à l\'eau libre' },
-                  { v: 'selon_conditions', l: '🌤️ Selon les conditions' },
-                  { v: 'non',              l: '🏊 Non, piscine uniquement' },
-                ].map(o => (
-                  <label key={o.v} style={{ display: 'flex', alignItems: 'center', gap: '.5rem', cursor: 'pointer', fontSize: '.875rem' }}>
-                    <input type="radio" name="open_water" value={o.v}
-                      checked={(editVal.open_water ?? profile?.open_water) === o.v}
-                      onChange={() => setEditVal(prev => ({ ...prev, open_water: o.v }))}
-                      style={{ accentColor: '#06B6D4' }} />
-                    {o.l}
-                  </label>
-                ))}
-              </div>
-            </FieldCard>
+              <FieldRow fieldKey="race_date" dbKey="race_date" label="Date de course"
+                displayVal={profile?.race_date
+                  ? new Date(profile.race_date).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })
+                  : 'Non définie'}>
+                <input type="date" className="form-input" style={{ fontSize: '.875rem', width: '100%' }}
+                  value={editVal.race_date ?? ''} autoFocus
+                  onChange={e => setEditVal(prev => ({ ...prev, race_date: e.target.value }))} />
+              </FieldRow>
 
-            <FieldCard
-              fieldKey="chrono_goal"
-              dbKey="chrono_goal"
-              label="🏃 Chrono course cible"
-              displayValue={profile?.chrono_goal || 'Non renseigné'}
-            >
-              <input
-                type="text"
-                className="form-input"
-                style={{ width: '100%', fontSize: '.875rem' }}
-                placeholder={profile?.objective === 'tri_sprint' ? 'ex: 22min' : profile?.objective === 'tri_olympic' ? 'ex: 45min' : profile?.objective === 'tri_half' ? 'ex: 1h50' : 'ex: 4h00'}
-                value={editVal.chrono_goal ?? ''}
-                onChange={e => setEditVal(prev => ({ ...prev, chrono_goal: e.target.value }))}
-                autoFocus
-              />
-            </FieldCard>
-          </>)}
+              <FieldRow fieldKey="intermediate_race_name" dbKey="intermediate_race_name" label="Course intermédiaire"
+                displayVal={profile?.intermediate_race_name || 'Aucune'}>
+                <input type="text" className="form-input" style={{ fontSize: '.875rem', width: '100%' }}
+                  placeholder="ex : Semi de Paris"
+                  value={editVal.intermediate_race_name ?? ''} autoFocus
+                  onChange={e => setEditVal(prev => ({ ...prev, intermediate_race_name: e.target.value }))} />
+              </FieldRow>
 
-        </div>
+              <FieldRow fieldKey="intermediate_race_date" dbKey="intermediate_race_date" label="Date intermédiaire"
+                displayVal={profile?.intermediate_race_date
+                  ? new Date(profile.intermediate_race_date).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })
+                  : 'Non définie'}>
+                <input type="date" className="form-input" style={{ fontSize: '.875rem', width: '100%' }}
+                  value={editVal.intermediate_race_date ?? ''} autoFocus
+                  onChange={e => setEditVal(prev => ({ ...prev, intermediate_race_date: e.target.value }))} />
+              </FieldRow>
+
+              {/* Jours préférés — toggles */}
+              {(() => {
+                const isEditing   = editField === 'preferred_days'
+                const currentDays = profile?.preferred_days || []
+                const editDaysSel = Array.isArray(editVal.preferred_days) ? editVal.preferred_days : currentDays
+                const toggle = d => setEditVal(prev => ({
+                  ...prev,
+                  preferred_days: editDaysSel.includes(d)
+                    ? editDaysSel.filter(x => x !== d)
+                    : [...editDaysSel, d],
+                }))
+                return (
+                  <div style={{ ...rowBase, cursor: isEditing ? 'default' : 'pointer', alignItems: isEditing ? 'flex-start' : 'center' }}
+                    onClick={() => { if (!isEditing) startEdit('preferred_days', currentDays) }}>
+                    <span style={{ fontSize: '.82rem', color: 'var(--text-muted)', flexShrink: 0, minWidth: 160 }}>
+                      Jours d'entraînement
+                    </span>
+                    {isEditing ? (
+                      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '.5rem' }}
+                        onClick={e => e.stopPropagation()}>
+                        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '.35rem', justifyContent: 'flex-end' }}>
+                          {DAYS.map(d => {
+                            const sel = editDaysSel.includes(d)
+                            return (
+                              <button key={d} type="button" onClick={() => toggle(d)} style={{
+                                padding: '.3rem .6rem', borderRadius: 8, fontWeight: 600, fontSize: '.8rem',
+                                border: sel ? '2px solid var(--primary)' : '1px solid var(--border)',
+                                background: sel ? 'rgba(139,47,201,.2)' : 'var(--surface)',
+                                color: sel ? '#fff' : 'var(--text-muted)', cursor: 'pointer', fontFamily: 'inherit',
+                              }}>{d}</button>
+                            )
+                          })}
+                        </div>
+                        <p style={{ fontSize: '.72rem', color: 'var(--text-muted)', margin: 0 }}>
+                          {editDaysSel.length} sélectionné{editDaysSel.length > 1 ? 's' : ''}
+                        </p>
+                        <div style={{ display: 'flex', gap: '.4rem' }}>
+                          <button className="btn btn-ghost btn-sm" style={{ fontSize: '.75rem', padding: '.22rem .55rem' }}
+                            onClick={cancelEdit} disabled={editSaving}>Annuler</button>
+                          <button className="btn btn-primary btn-sm" style={{ fontSize: '.75rem', padding: '.22rem .6rem' }}
+                            onClick={() => saveField('preferred_days', editVal.preferred_days ?? currentDays)} disabled={editSaving}>
+                            {editSaving ? '…' : '✓'}
+                          </button>
+                        </div>
+                      </div>
+                    ) : (
+                      <span style={{ fontWeight: 600, fontSize: '.875rem', textAlign: 'right' }}>
+                        {currentDays.length ? currentDays.join(' · ') : 'Non précisé'}
+                      </span>
+                    )}
+                  </div>
+                )
+              })()}
+
+              {/* ── Section 2 : Performance ── */}
+              <div style={sectionHdr}>Performance</div>
+
+              <FieldRow fieldKey="vma" dbKey="vma" label="VMA (km/h)"
+                displayVal={profile?.vma ? `${profile.vma} km/h` : 'À estimer'}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '.4rem', width: '100%' }}>
+                  <input type="number" className="form-input" style={{ flex: 1, fontSize: '.875rem' }}
+                    step={0.1} min={8} max={30} value={editVal.vma ?? ''} autoFocus
+                    onChange={e => setEditVal(prev => ({ ...prev, vma: e.target.value }))} />
+                  <span style={{ fontSize: '.8rem', color: 'var(--text-muted)', whiteSpace: 'nowrap' }}>km/h</span>
+                </div>
+              </FieldRow>
+
+              {!isTri && (
+                <FieldRow fieldKey="chrono_goal" dbKey="chrono_goal" label="Chrono cible"
+                  displayVal={profile?.chrono_goal || 'Progresser'}>
+                  <input type="text" className="form-input" style={{ fontSize: '.875rem', width: '100%' }}
+                    placeholder="ex: 1h45 au semi"
+                    value={editVal.chrono_goal ?? ''} autoFocus
+                    onChange={e => setEditVal(prev => ({ ...prev, chrono_goal: e.target.value }))} />
+                </FieldRow>
+              )}
+
+              {isTri && (<>
+                <FieldRow fieldKey="chrono_natation" dbKey="chrono_natation" label="🏊 Chrono nage"
+                  displayVal={profile?.chrono_natation || 'Non renseigné'}>
+                  <input type="text" className="form-input" style={{ fontSize: '.875rem', width: '100%' }}
+                    placeholder={profile?.objective === 'tri_sprint' ? 'ex: 15min' : profile?.objective === 'tri_olympic' ? 'ex: 28min' : profile?.objective === 'tri_half' ? 'ex: 38min' : 'ex: 1h15'}
+                    value={editVal.chrono_natation ?? ''} autoFocus
+                    onChange={e => setEditVal(prev => ({ ...prev, chrono_natation: e.target.value }))} />
+                </FieldRow>
+                <FieldRow fieldKey="chrono_velo" dbKey="chrono_velo" label="🚴 Chrono vélo"
+                  displayVal={profile?.chrono_velo || 'Non renseigné'}>
+                  <input type="text" className="form-input" style={{ fontSize: '.875rem', width: '100%' }}
+                    placeholder={profile?.objective === 'tri_sprint' ? 'ex: 40min' : profile?.objective === 'tri_olympic' ? 'ex: 1h15' : profile?.objective === 'tri_half' ? 'ex: 2h45' : 'ex: 5h30'}
+                    value={editVal.chrono_velo ?? ''} autoFocus
+                    onChange={e => setEditVal(prev => ({ ...prev, chrono_velo: e.target.value }))} />
+                </FieldRow>
+                <FieldRow fieldKey="chrono_goal" dbKey="chrono_goal" label="🏃 Chrono course"
+                  displayVal={profile?.chrono_goal || 'Non renseigné'}>
+                  <input type="text" className="form-input" style={{ fontSize: '.875rem', width: '100%' }}
+                    placeholder={profile?.objective === 'tri_sprint' ? 'ex: 22min' : profile?.objective === 'tri_olympic' ? 'ex: 45min' : profile?.objective === 'tri_half' ? 'ex: 1h50' : 'ex: 4h00'}
+                    value={editVal.chrono_goal ?? ''} autoFocus
+                    onChange={e => setEditVal(prev => ({ ...prev, chrono_goal: e.target.value }))} />
+                </FieldRow>
+              </>)}
+
+              <FieldRow fieldKey="best_recent_time" dbKey="best_recent_time" label="Meilleur chrono récent"
+                displayVal={profile?.best_recent_time || '—'}>
+                <input type="text" className="form-input" style={{ fontSize: '.875rem', width: '100%' }}
+                  placeholder="ex: 1h52 au semi"
+                  value={editVal.best_recent_time ?? ''} autoFocus
+                  onChange={e => setEditVal(prev => ({ ...prev, best_recent_time: e.target.value }))} />
+              </FieldRow>
+
+              {/* ── Section 3 : Organisation entraînement ── */}
+              <div style={sectionHdr}>Organisation entraînement</div>
+
+              {!isTri && (
+                <FieldRow fieldKey="days_per_week" dbKey="days_per_week" label="Séances / semaine"
+                  displayVal={profile?.days_per_week ? `${profile.days_per_week} jours` : '—'}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '.4rem', width: '100%' }}>
+                    <input type="number" className="form-input" style={{ flex: 1, fontSize: '.875rem' }}
+                      min={2} max={7} value={editVal.days_per_week ?? ''} autoFocus
+                      onChange={e => setEditVal(prev => ({ ...prev, days_per_week: e.target.value }))} />
+                    <span style={{ fontSize: '.8rem', color: 'var(--text-muted)', whiteSpace: 'nowrap' }}>j/sem.</span>
+                  </div>
+                </FieldRow>
+              )}
+
+              {isTri && [
+                { key: 'tri_swim_sessions', label: '🏊 Nage / semaine', max: 4 },
+                { key: 'tri_bike_sessions', label: '🚴 Vélo / semaine',  max: 5 },
+                { key: 'tri_run_sessions',  label: '🏃 Course / semaine', max: 4 },
+              ].map(({ key, label, max }) => (
+                <FieldRow key={key} fieldKey={key} dbKey={key} label={label}
+                  displayVal={profile?.[key] ? `${profile[key]} séance(s)` : '—'}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '.4rem', width: '100%' }}>
+                    <input type="number" className="form-input" style={{ flex: 1, fontSize: '.875rem' }}
+                      min={1} max={max} value={editVal[key] ?? ''} autoFocus
+                      onChange={e => setEditVal(prev => ({ ...prev, [key]: e.target.value }))} />
+                    <span style={{ fontSize: '.8rem', color: 'var(--text-muted)', whiteSpace: 'nowrap' }}>séance(s)</span>
+                  </div>
+                </FieldRow>
+              ))}
+
+              {/* ── Section 4 : Trail (conditionnel) ── */}
+              {isTrail && (<>
+                <div style={sectionHdr}>Trail</div>
+
+                <FieldRow fieldKey="training_terrain" dbKey="training_terrain" label="Zone d'habitation"
+                  displayVal={
+                    profile?.training_terrain === 'montagne'      ? '🏔️ Montagne' :
+                    profile?.training_terrain === 'semi_montagne' ? '⛰️ Semi-montagne' :
+                    profile?.training_terrain === 'ville_plat'    ? '🏙️ Ville / Plat' :
+                    'Non renseigné'
+                  }>
+                  <select className="form-input" style={{ fontSize: '.875rem', width: '100%' }}
+                    value={editVal.training_terrain ?? ''} autoFocus
+                    onChange={e => setEditVal(prev => ({ ...prev, training_terrain: e.target.value }))}>
+                    <option value="">— Choisir —</option>
+                    <option value="montagne">🏔️ Montagne (accès D+ direct)</option>
+                    <option value="semi_montagne">⛰️ Semi-montagne (relief modéré)</option>
+                    <option value="ville_plat">🏙️ Ville / Plat (peu de dénivelé)</option>
+                  </select>
+                </FieldRow>
+
+                <FieldRow fieldKey="race_denivele" dbKey="race_denivele" label="Dénivelé course (D+)"
+                  displayVal={profile?.race_denivele ? `${profile.race_denivele} m D+` : 'Non renseigné'}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '.4rem', width: '100%' }}>
+                    <input type="number" className="form-input" style={{ flex: 1, fontSize: '.875rem' }}
+                      min={0} max={25000} step={100} placeholder="ex: 2500"
+                      value={editVal.race_denivele ?? ''} autoFocus
+                      onChange={e => setEditVal(prev => ({ ...prev, race_denivele: e.target.value }))} />
+                    <span style={{ fontSize: '.8rem', color: 'var(--text-muted)', whiteSpace: 'nowrap' }}>m D+</span>
+                  </div>
+                </FieldRow>
+              </>)}
+
+              {/* ── Section 5 : Triathlon (conditionnel) ── */}
+              {isTri && (<>
+                <div style={sectionHdr}>Triathlon</div>
+
+                <FieldRow fieldKey="open_water" dbKey="open_water" label="🌊 Nage en eau libre"
+                  displayVal={
+                    profile?.open_water === 'oui'              ? '🌊 Oui, accès eau libre' :
+                    profile?.open_water === 'selon_conditions' ? '🌤️ Selon les conditions' :
+                    profile?.open_water === 'non'              ? '🏊 Piscine seulement' :
+                    'Non renseigné'
+                  }>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '.4rem', width: '100%' }}>
+                    {[
+                      { v: 'oui',              l: '🌊 Oui, accès eau libre' },
+                      { v: 'selon_conditions', l: '🌤️ Selon les conditions' },
+                      { v: 'non',              l: '🏊 Piscine uniquement' },
+                    ].map(o => (
+                      <label key={o.v} style={{ display: 'flex', alignItems: 'center', gap: '.5rem', cursor: 'pointer', fontSize: '.875rem' }}>
+                        <input type="radio" name="open_water" value={o.v}
+                          checked={(editVal.open_water ?? profile?.open_water) === o.v}
+                          onChange={() => setEditVal(prev => ({ ...prev, open_water: o.v }))}
+                          style={{ accentColor: '#06B6D4' }} />
+                        {o.l}
+                      </label>
+                    ))}
+                  </div>
+                </FieldRow>
+              </>)}
+
+              {/* ── Section 6 : Santé & Forme ── */}
+              <div style={sectionHdr}>Santé &amp; Forme</div>
+
+              <FieldRow fieldKey="current_form" dbKey="current_form" label="Forme actuelle"
+                displayVal={profile?.current_form || '—'}>
+                <input type="text" className="form-input" style={{ fontSize: '.875rem', width: '100%' }}
+                  placeholder="ex: Bonne, légère fatigue…"
+                  value={editVal.current_form ?? ''} autoFocus
+                  onChange={e => setEditVal(prev => ({ ...prev, current_form: e.target.value }))} />
+              </FieldRow>
+
+              <FieldRow fieldKey="injuries" dbKey="injuries" label="Blessures / douleurs"
+                displayVal={profile?.injuries || 'Aucune'}>
+                <input type="text" className="form-input" style={{ fontSize: '.875rem', width: '100%' }}
+                  placeholder="ex: Tendinite genou gauche"
+                  value={editVal.injuries ?? ''} autoFocus
+                  onChange={e => setEditVal(prev => ({ ...prev, injuries: e.target.value }))} />
+              </FieldRow>
+
+              {(profile?.gender === 'femme' || profile?.period_pain) && (
+                <FieldRow fieldKey="period_pain_days" dbKey="period_pain_days" label="Douleur cycle (j)"
+                  displayVal={profile?.period_pain_days ? `${profile.period_pain_days} jour(s)` : '—'}>
+                  <input type="number" className="form-input" style={{ fontSize: '.875rem', width: '100%' }}
+                    min={1} max={7} value={editVal.period_pain_days ?? ''} autoFocus
+                    onChange={e => setEditVal(prev => ({ ...prev, period_pain_days: e.target.value }))} />
+                </FieldRow>
+              )}
+
+            </div>
+          )
+        })()}
       </div>
 
       {/* Stats */}

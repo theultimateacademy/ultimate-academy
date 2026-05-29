@@ -487,6 +487,7 @@ function AthleteDetailPanel({ athlete, onClose, onUpdated, onAlertDismissed }) {
   const [local,         setLocal]         = useState(athlete)
   const [editField,     setEditField]     = useState(null)
   const [editVal,       setEditVal]       = useState('')
+  const [editDays,      setEditDays]      = useState([])
   const [editSaving,    setEditSaving]    = useState(false)
   const [editMsg,       setEditMsg]       = useState(false)
   const [msgVal,        setMsgVal]        = useState(athlete.coach_message || '')
@@ -544,15 +545,26 @@ function AthleteDetailPanel({ athlete, onClose, onUpdated, onAlertDismissed }) {
   function startEdit(field) {
     const f = PROFILE_FIELDS.find(f => f.key === field)
     setEditField(field)
-    setEditVal(local[field] ?? '')
-    if (f?.type === 'date' && local[field]) setEditVal(local[field].split('T')[0])
+    if (field === 'preferred_days') {
+      setEditDays(Array.isArray(local[field]) ? local[field] : [])
+    } else {
+      setEditVal(local[field] ?? '')
+      if (f?.type === 'date' && local[field]) setEditVal(local[field].split('T')[0])
+    }
   }
 
   async function saveField() {
     if (editSaving) return
     setEditSaving(true)
     try {
-      const update = { [editField]: editVal === '' ? null : editVal }
+      let raw = editField === 'preferred_days' ? editDays : editVal
+      let coerced = (raw === '' || (Array.isArray(raw) && raw.length === 0)) ? null : raw
+      if (coerced !== null) {
+        if (['days_per_week','tri_swim_sessions','tri_bike_sessions','tri_run_sessions','race_denivele','ftp_value'].includes(editField))
+          coerced = parseInt(coerced, 10)
+        if (editField === 'vma') coerced = parseFloat(coerced)
+      }
+      const update = { [editField]: coerced }
       const { error } = await supabase.from('profiles').update(update).eq('id', athlete.id)
       if (error) throw error
       const updated = { ...local, ...update }
@@ -680,88 +692,238 @@ function AthleteDetailPanel({ athlete, onClose, onUpdated, onAlertDismissed }) {
           <>
             {/* ══════════ PROFIL ══════════ */}
             {tab === 'profile' && (
-              <div className="coach-tab-pane" style={{ maxWidth:960, margin:'0 auto', padding:'1.5rem' }}>
+              <div className="coach-tab-pane" style={{ maxWidth:720, margin:'0 auto', padding:'1.5rem' }}>
 
-                {/* Field grid */}
-                <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fill, minmax(200px, 1fr))', gap:'.65rem', marginBottom:'1.25rem' }}>
-                  {PROFILE_FIELDS.map(f => (
-                    <div key={f.key}
-                      style={{ background: editField === f.key ? 'var(--surface)' : 'var(--surface-2)',
-                        padding:'.875rem', borderRadius:12,
-                        border: editField === f.key ? '2px solid var(--primary)' : '1px solid var(--border)',
-                        cursor: editField === f.key ? 'default' : 'pointer',
-                        transition:'border-color .15s' }}
-                      onClick={() => editField !== f.key && startEdit(f.key)}>
-                      <div style={{ fontSize:'.62rem', fontWeight:700, textTransform:'uppercase',
-                        letterSpacing:'.06em', color: editField === f.key ? 'var(--primary)' : 'var(--text-muted)',
-                        marginBottom:'.3rem' }}>
-                        {f.lbl}
-                      </div>
-                      {editField === f.key ? (
-                        <div onClick={e => e.stopPropagation()}>
-                          {f.type === 'select' ? (
-                            <select value={editVal} onChange={e => setEditVal(e.target.value)} style={inp} autoFocus>
-                              {f.opts.map(([k,val]) => <option key={k} value={k}>{val}</option>)}
-                            </select>
-                          ) : (
-                            <input type={f.type} value={editVal} onChange={e => setEditVal(e.target.value)}
-                              style={inp} autoFocus
-                              onKeyDown={e => { if (e.key === 'Enter') saveField(); if (e.key === 'Escape') setEditField(null) }} />
-                          )}
-                          <div style={{ display:'flex', gap:'.35rem', marginTop:'.5rem' }}>
-                            <button onClick={saveField} disabled={editSaving}
-                              style={{ padding:'.28rem .65rem', background:'var(--gradient)', color:'#fff',
-                                border:'none', borderRadius:6, fontWeight:700, fontSize:'.75rem',
-                                cursor:'pointer', fontFamily:'inherit' }}>
-                              {editSaving ? '…' : '✓'}
-                            </button>
-                            <button onClick={() => setEditField(null)}
-                              style={{ padding:'.28rem .55rem', background:'none',
-                                border:'1px solid var(--border)', borderRadius:6, fontSize:'.75rem',
-                                cursor:'pointer', fontFamily:'inherit', color:'var(--text-muted)' }}>
-                              ✕
-                            </button>
+                {/* ── helpers ── */}
+                {(() => {
+                  const isTri   = ['tri_sprint','tri_olympic','tri_half','tri_ironman'].includes(local.objective)
+                  const isTrail = ['trail_20k','trail_50k','trail_100k','trail_100m'].includes(local.objective)
+
+                  const sectionHdr = { fontSize:'.68rem', fontWeight:800, textTransform:'uppercase',
+                    letterSpacing:'.1em', color:'var(--text-muted)', padding:'.625rem 0',
+                    borderBottom:'1px solid var(--border)', marginBottom:'.125rem', marginTop:'1.5rem' }
+
+                  const rowStyle = { display:'flex', justifyContent:'space-between', alignItems:'center',
+                    padding:'.75rem 0', borderBottom:'1px solid rgba(255,255,255,.04)',
+                    cursor:'pointer', gap:'1rem' }
+
+                  const saveBtn = { padding:'.28rem .65rem', background:'var(--gradient)', color:'#fff',
+                    border:'none', borderRadius:6, fontWeight:700, fontSize:'.75rem',
+                    cursor:'pointer', fontFamily:'inherit' }
+
+                  const cancelBtn = { padding:'.28rem .55rem', background:'none',
+                    border:'1px solid var(--border)', borderRadius:6, fontSize:'.75rem',
+                    cursor:'pointer', fontFamily:'inherit', color:'var(--text-muted)' }
+
+                  function FieldRow({ field, label, show, opts, type: ftype = 'text' }) {
+                    const isEditing = editField === field
+                    return (
+                      <div style={{ ...rowStyle, cursor: isEditing ? 'default' : 'pointer' }}
+                        onClick={() => !isEditing && startEdit(field)}>
+                        <span style={{ fontSize:'.82rem', color:'var(--text-muted)', flexShrink:0, minWidth:140 }}>{label}</span>
+                        {isEditing ? (
+                          <div style={{ display:'flex', alignItems:'center', gap:'.4rem', flex:1, justifyContent:'flex-end' }}
+                            onClick={e => e.stopPropagation()}>
+                            {ftype === 'select' ? (
+                              <select value={editVal} onChange={e => setEditVal(e.target.value)} style={{ ...inp, width:'auto', flex:1, maxWidth:200 }} autoFocus>
+                                {opts.map(([k,v]) => <option key={k} value={k}>{v}</option>)}
+                              </select>
+                            ) : (
+                              <input type={ftype} value={editVal} onChange={e => setEditVal(e.target.value)}
+                                style={{ ...inp, width:'auto', flex:1, maxWidth:200 }} autoFocus
+                                onKeyDown={e => { if (e.key === 'Enter') saveField(); if (e.key === 'Escape') setEditField(null) }} />
+                            )}
+                            <button onClick={saveField} disabled={editSaving} style={saveBtn}>{editSaving ? '…' : '✓'}</button>
+                            <button onClick={() => setEditField(null)} style={cancelBtn}>✕</button>
                           </div>
-                        </div>
-                      ) : (
-                        <div style={{ fontWeight:600, fontSize:'.9rem' }}>{f.show(local[f.key])}</div>
+                        ) : (
+                          <span style={{ fontWeight:600, fontSize:'.875rem', textAlign:'right' }}>{show(local[field])}</span>
+                        )}
+                      </div>
+                    )
+                  }
+
+                  const DAYS = ['Lun','Mar','Mer','Jeu','Ven','Sam','Dim']
+
+                  return (
+                    <>
+                      {/* ── Section 1 : Objectif & Course ── */}
+                      <div style={sectionHdr}>Objectif &amp; Course</div>
+
+                      <FieldRow field="objective" label="Objectif" type="select"
+                        opts={Object.entries(OBJECTIVE_LABELS)}
+                        show={v => OBJECTIVE_LABELS[v] || '—'} />
+
+                      <FieldRow field="level" label="Niveau" type="select"
+                        opts={Object.entries(LEVEL_LABELS)}
+                        show={v => LEVEL_LABELS[v] || '—'} />
+
+                      <FieldRow field="race_date" label="Date de course" type="date"
+                        show={v => v ? new Date(v).toLocaleDateString('fr-FR') : '—'} />
+
+                      <FieldRow field="intermediate_race_name" label="Course intermédiaire" type="text"
+                        show={v => v || 'Aucune'} />
+
+                      <FieldRow field="intermediate_race_date" label="Date intermédiaire" type="date"
+                        show={v => v ? new Date(v).toLocaleDateString('fr-FR') : '—'} />
+
+                      {/* Jours préférés — toggles */}
+                      {(() => {
+                        const isEditing = editField === 'preferred_days'
+                        const current   = Array.isArray(local.preferred_days) ? local.preferred_days : []
+                        return (
+                          <div style={{ ...rowStyle, flexWrap: isEditing ? 'wrap' : 'nowrap',
+                            cursor: isEditing ? 'default' : 'pointer', alignItems: isEditing ? 'flex-start' : 'center' }}
+                            onClick={() => !isEditing && startEdit('preferred_days')}>
+                            <span style={{ fontSize:'.82rem', color:'var(--text-muted)', flexShrink:0, minWidth:140 }}>Jours préférés</span>
+                            {isEditing ? (
+                              <div style={{ flex:1, display:'flex', flexDirection:'column', gap:'.5rem', alignItems:'flex-end' }}
+                                onClick={e => e.stopPropagation()}>
+                                <div style={{ display:'flex', flexWrap:'wrap', gap:'.35rem', justifyContent:'flex-end' }}>
+                                  {DAYS.map(d => {
+                                    const sel = editDays.includes(d)
+                                    return (
+                                      <button key={d} type="button"
+                                        onClick={() => setEditDays(prev => prev.includes(d) ? prev.filter(x => x !== d) : [...prev, d])}
+                                        style={{ padding:'.28rem .55rem', borderRadius:7, fontWeight:600, fontSize:'.78rem',
+                                          border: sel ? '2px solid var(--primary)' : '1px solid var(--border)',
+                                          background: sel ? 'rgba(139,47,201,.2)' : 'var(--surface)',
+                                          color: sel ? '#fff' : 'var(--text-muted)', cursor:'pointer', fontFamily:'inherit' }}>
+                                        {d}
+                                      </button>
+                                    )
+                                  })}
+                                </div>
+                                <div style={{ display:'flex', gap:'.35rem' }}>
+                                  <button onClick={saveField} disabled={editSaving} style={saveBtn}>{editSaving ? '…' : '✓'}</button>
+                                  <button onClick={() => setEditField(null)} style={cancelBtn}>✕</button>
+                                </div>
+                              </div>
+                            ) : (
+                              <span style={{ fontWeight:600, fontSize:'.875rem', textAlign:'right' }}>
+                                {current.length ? current.join(' · ') : '—'}
+                              </span>
+                            )}
+                          </div>
+                        )
+                      })()}
+
+                      {/* ── Section 2 : Performance ── */}
+                      <div style={sectionHdr}>Performance</div>
+
+                      <FieldRow field="vma" label="VMA (km/h)" type="number"
+                        show={v => v ? `${v} km/h` : '—'} />
+
+                      <FieldRow field="vma_known" label="VMA mesurée ?" type="select"
+                        opts={[['true','Oui'],['false','Non']]}
+                        show={v => v === true || v === 'true' ? 'Oui' : 'Non'} />
+
+                      {!isTri && (
+                        <FieldRow field="chrono_goal" label="Chrono cible" type="text"
+                          show={v => v || 'Progresser'} />
                       )}
-                    </div>
-                  ))}
-                </div>
+
+                      {isTri && (<>
+                        <FieldRow field="chrono_natation" label="🏊 Chrono nage" type="text"
+                          show={v => v || '—'} />
+                        <FieldRow field="chrono_velo" label="🚴 Chrono vélo" type="text"
+                          show={v => v || '—'} />
+                        <FieldRow field="chrono_goal" label="🏃 Chrono course" type="text"
+                          show={v => v || '—'} />
+                      </>)}
+
+                      <FieldRow field="best_recent_time" label="Meilleur chrono récent" type="text"
+                        show={v => v || '—'} />
+
+                      {/* ── Section 3 : Organisation entraînement ── */}
+                      <div style={sectionHdr}>Organisation entraînement</div>
+
+                      {!isTri && (
+                        <FieldRow field="days_per_week" label="Séances / semaine" type="number"
+                          show={v => v ? `${v} j/sem` : '—'} />
+                      )}
+
+                      {isTri && (<>
+                        <FieldRow field="tri_swim_sessions" label="🏊 Nage / sem." type="number"
+                          show={v => v ? `${v} séance(s)` : '—'} />
+                        <FieldRow field="tri_bike_sessions" label="🚴 Vélo / sem." type="number"
+                          show={v => v ? `${v} séance(s)` : '—'} />
+                        <FieldRow field="tri_run_sessions" label="🏃 Course / sem." type="number"
+                          show={v => v ? `${v} séance(s)` : '—'} />
+                      </>)}
+
+                      {/* ── Section 4 : Trail (conditionnel) ── */}
+                      {isTrail && (<>
+                        <div style={sectionHdr}>Trail</div>
+                        <FieldRow field="training_terrain" label="Zone d'habitation" type="select"
+                          opts={[['','Non précisé'],['montagne','Montagne'],['semi_montagne','Semi-montagne'],['ville_plat','Ville/Plat']]}
+                          show={v => ({montagne:'Montagne',semi_montagne:'Semi-montagne',ville_plat:'Ville/Plat'})[v] || '—'} />
+                        <FieldRow field="race_denivele" label="Dénivelé course (m D+)" type="number"
+                          show={v => v ? `${v} m D+` : '—'} />
+                      </>)}
+
+                      {/* ── Section 5 : Triathlon (conditionnel) ── */}
+                      {isTri && (<>
+                        <div style={sectionHdr}>Triathlon</div>
+                        <FieldRow field="open_water" label="🌊 Nage en eau libre" type="select"
+                          opts={[['','—'],['oui','Oui, accès eau libre'],['selon_conditions','Selon les conditions'],['non','Non, piscine seulement']]}
+                          show={v => ({oui:'Oui',selon_conditions:'Selon conditions',non:'Piscine'})[v] || '—'} />
+                        <FieldRow field="bike_type" label="Type de vélo" type="select"
+                          opts={[['','—'],['route','Route'],['tt','Contre-la-montre'],['gravel','Gravel']]}
+                          show={v => ({route:'Route',tt:'Contre-la-montre',gravel:'Gravel'})[v] || '—'} />
+                      </>)}
+
+                      {/* ── Section 6 : Santé & Forme ── */}
+                      <div style={sectionHdr}>Santé &amp; Forme</div>
+
+                      <FieldRow field="current_form" label="Forme actuelle" type="text"
+                        show={v => v || '—'} />
+
+                      <FieldRow field="injuries" label="Blessures / douleurs" type="text"
+                        show={v => v || 'Aucune'} />
+
+                      {(local.gender === 'femme' || local.period_pain) && (
+                        <FieldRow field="period_pain_days" label="Douleur cycle (j)" type="number"
+                          show={v => v ? `${v} jour(s)` : '—'} />
+                      )}
+                    </>
+                  )
+                })()}
 
                 {/* Note coach */}
-                <div style={{ background: editMsg ? 'var(--surface)' : 'var(--surface-2)',
-                  padding:'.875rem', borderRadius:12, marginBottom:'1.25rem',
-                  border: editMsg ? '2px solid var(--primary)' : '1px solid var(--border)', cursor: editMsg ? 'default' : 'pointer' }}
-                  onClick={() => !editMsg && setEditMsg(true)}>
-                  <div style={{ fontSize:'.62rem', fontWeight:700, textTransform:'uppercase', letterSpacing:'.06em',
-                    color: editMsg ? 'var(--primary)' : 'var(--text-muted)', marginBottom:'.3rem' }}>
+                <div style={{ marginTop:'1.5rem', borderTop:'1px solid var(--border)', paddingTop:'1rem' }}>
+                  <div style={{ fontSize:'.68rem', fontWeight:800, textTransform:'uppercase', letterSpacing:'.1em',
+                    color:'var(--text-muted)', marginBottom:'.75rem' }}>
                     Note coach
                   </div>
-                  {editMsg ? (
-                    <div onClick={e => e.stopPropagation()}>
-                      <textarea value={msgVal} onChange={e => setMsgVal(e.target.value)}
-                        rows={4} autoFocus style={{ ...inp, resize:'vertical' }} />
-                      <div style={{ display:'flex', gap:'.4rem', marginTop:'.5rem' }}>
-                        <button onClick={saveCoachMessage} disabled={editSaving}
-                          style={{ padding:'.3rem .75rem', background:'var(--gradient)', color:'#fff',
-                            border:'none', borderRadius:7, fontWeight:700, fontSize:'.78rem', cursor:'pointer', fontFamily:'inherit' }}>
-                          {editSaving ? '…' : '✓ Enregistrer'}
-                        </button>
-                        <button onClick={() => setEditMsg(false)}
-                          style={{ padding:'.3rem .65rem', background:'none', border:'1px solid var(--border)',
-                            borderRadius:7, fontSize:'.78rem', cursor:'pointer', fontFamily:'inherit', color:'var(--text-muted)' }}>
-                          Annuler
-                        </button>
+                  <div style={{ background: editMsg ? 'var(--surface)' : 'var(--surface-2)',
+                    padding:'.875rem', borderRadius:12, marginBottom:'1.25rem',
+                    border: editMsg ? '2px solid var(--primary)' : '1px solid var(--border)', cursor: editMsg ? 'default' : 'pointer' }}
+                    onClick={() => !editMsg && setEditMsg(true)}>
+                    {editMsg ? (
+                      <div onClick={e => e.stopPropagation()}>
+                        <textarea value={msgVal} onChange={e => setMsgVal(e.target.value)}
+                          rows={4} autoFocus style={{ ...inp, resize:'vertical' }} />
+                        <div style={{ display:'flex', gap:'.4rem', marginTop:'.5rem' }}>
+                          <button onClick={saveCoachMessage} disabled={editSaving}
+                            style={{ padding:'.3rem .75rem', background:'var(--gradient)', color:'#fff',
+                              border:'none', borderRadius:7, fontWeight:700, fontSize:'.78rem', cursor:'pointer', fontFamily:'inherit' }}>
+                            {editSaving ? '…' : '✓ Enregistrer'}
+                          </button>
+                          <button onClick={() => setEditMsg(false)}
+                            style={{ padding:'.3rem .65rem', background:'none', border:'1px solid var(--border)',
+                              borderRadius:7, fontSize:'.78rem', cursor:'pointer', fontFamily:'inherit', color:'var(--text-muted)' }}>
+                            Annuler
+                          </button>
+                        </div>
                       </div>
-                    </div>
-                  ) : (
-                    <div style={{ fontSize:'.875rem', fontStyle: local.coach_message ? 'italic' : 'normal',
-                      color: local.coach_message ? 'var(--text)' : 'var(--text-muted)' }}>
-                      {local.coach_message || 'Ajouter une note…'}
-                    </div>
-                  )}
+                    ) : (
+                      <div style={{ fontSize:'.875rem', fontStyle: local.coach_message ? 'italic' : 'normal',
+                        color: local.coach_message ? 'var(--text)' : 'var(--text-muted)' }}>
+                        {local.coach_message || 'Ajouter une note…'}
+                      </div>
+                    )}
+                  </div>
                 </div>
 
                 {/* Generate */}
