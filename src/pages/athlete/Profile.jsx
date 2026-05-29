@@ -611,17 +611,23 @@ export default function AthleteProfile() {
               autoFocus
             >
               <option value="">— Choisir —</option>
-              <optgroup label="Course sur route">
+              <optgroup label="🏃 Course sur route">
                 <option value="5km">5 km</option>
                 <option value="10km">10 km</option>
                 <option value="semi">Semi-marathon</option>
                 <option value="marathon">Marathon</option>
               </optgroup>
-              <optgroup label="Trail">
+              <optgroup label="⛰️ Trail">
                 <option value="trail_20k">Trail 20K</option>
                 <option value="trail_50k">Trail 50K</option>
                 <option value="trail_100k">Trail 100K</option>
                 <option value="trail_100m">Trail 100M</option>
+              </optgroup>
+              <optgroup label="🦾 Triathlon">
+                <option value="tri_sprint">Triathlon Sprint</option>
+                <option value="tri_olympic">Triathlon Olympic</option>
+                <option value="tri_half">Half Ironman 70.3</option>
+                <option value="tri_ironman">Ironman</option>
               </optgroup>
             </select>
           </FieldCard>

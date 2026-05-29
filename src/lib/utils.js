@@ -75,14 +75,21 @@ export function getPlanWeeksElapsed(plan) {
 }
 
 export const OBJECTIVE_LABELS = {
+  // Running
   '5km':        '5 km',
   '10km':       '10 km',
   'semi':       'Semi-marathon',
   'marathon':   'Marathon',
+  // Trail
   'trail_20k':  'Trail 20K',
   'trail_50k':  'Trail 50K',
   'trail_100k': 'Trail 100K',
   'trail_100m': 'Trail 100M',
+  // Triathlon
+  'tri_sprint':  'Triathlon Sprint',
+  'tri_olympic': 'Triathlon Olympic',
+  'tri_half':    'Half Ironman 70.3',
+  'tri_ironman': 'Ironman',
 }
 
 export const LEVEL_LABELS = {
