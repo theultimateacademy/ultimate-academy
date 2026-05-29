@@ -341,7 +341,9 @@ JAMAIS augmenter volume ET intensité la même semaine.
 TOUJOURS une séance de récupération après une séance dure.
 
 RÈGLE 2 — ÉCHAUFFEMENT ET RETOUR AU CALME
-OBLIGATOIRE sur TOUTES les séances course :
+EXCEPTION ABSOLUE — ENDURANCE FONDAMENTALE (EF) : AUCUN échauffement, AUCUN retour au calme. Corps uniquement : {durée} min à 65-72% VMA ({allure_min}/km → {allure_max}/km) — allure au ressenti de l'athlète. Les champs "echauffement" et "retour_au_calme" DOIVENT être vides ("") pour toutes les séances EF.
+
+OBLIGATOIRE sur TOUTES les autres séances course :
 Échauffement MINIMUM 25 minutes : footing progressif. Sur séances dures (fractionné, tempo, côtes) : terminer par quelques accélérations progressives et la routine des gammes athlétiques.
 Retour au calme MINIMUM 10 minutes : footing très lent à 60-63% VMA.
 
@@ -391,8 +393,8 @@ Vérifier et renseigner le champ auto_validation :
 ✓ ratio_80_20_respecte : max 20% séances dures
 ✓ pas_seances_dures_consecutives : jamais 2 séances dures de suite
 ✓ progression_volume_ok : hausse max 10%
-✓ echauffement_min_25min : toutes séances course
-✓ retour_calme_min_10min : toutes séances course
+✓ echauffement_min_25min : toutes séances course SAUF EF (EF = corps uniquement, pas d'échauffement)
+✓ retour_calme_min_10min : toutes séances course SAUF EF (EF = corps uniquement, pas de retour au calme)
 ✓ variete_seances_ok : pas le même id_seance deux fois dans l'ensemble du plan de 4 semaines — chaque code est unique
 ✓ recuperations_variees : temps de récup variés
 ✓ allures_toujours_specifiques : aucune description vague d'allure
@@ -402,9 +404,9 @@ Si une règle n'est pas respectée → corriger avant soumission et documenter d
 RÈGLE 9 — ALLURES SPÉCIFIQUES OBLIGATOIRES
 TOUJOURS calculer et afficher des allures précises en min/km et km/h pour chaque phase de chaque séance.
 JAMAIS de formulations vagues du type : "allure très progressive", "allure confortable", "allure facile", "allure modérée".
-CHAQUE phase de la séance (échauffement, corps, retour au calme) doit avoir sa valeur exacte calculée depuis la VMA.
+CHAQUE phase de la séance (échauffement, corps, retour au calme) doit avoir sa valeur exacte calculée depuis la VMA — SAUF EF : corps uniquement avec plage 65-72% VMA (pas d'échauffement ni retour).
 Dans le champ "corps" et "echauffement", toujours écrire : "X'XX/km (Y% VMA)" après chaque allure mentionnée.
-Le tableau allures[] doit contenir TOUTES les zones distinctes de la séance.
+Le tableau allures[] doit contenir TOUTES les zones distinctes de la séance. Pour les EF : allures[] = [{zone: "Corps", pourcentage_vma: 65, ...}, {zone: "Corps max", pourcentage_vma: 72, ...}] — pas de zone Échauffement ni Retour.
 
 RÈGLE 10 — FRACTIONNÉ LONG : VOLUME PAR NIVEAU
 Ne jamais proposer les mêmes volumes pour tous les niveaux. Respecter l'échelle :
@@ -898,20 +900,17 @@ router.post('/plans/adjust-heat', async (req, res) => {
         };
       }
 
-      const mainMin   = Math.max(newDuration - 15, 10);
-      const efPaceStr = `${calcPace(vma, 0.65)}/km – ${calcPace(vma, 0.70)}/km`;
       return {
         ...s,
         type:            'Endurance fondamentale',
         titre:           'Footing allégé — Canicule 🌡️',
         duree_min:       newDuration, intensite: 'facile',
-        echauffement:    `10 min de footing léger à ${calcPace(vma, 0.63)}/km — progressif`,
-        corps:           `${mainMin} min de footing allégé à ${efPaceStr} — réduis l'allure si c'est trop dur`,
-        retour_au_calme: `5 min de footing très lent à ${calcPace(vma, 0.60)}/km + étirements doux`,
+        echauffement:    '',
+        corps:           `${newDuration} min à 65-72% VMA (${calcPace(vma, 0.65)}/km – ${calcPace(vma, 0.72)}/km) — allure au ressenti, réduis encore si c'est trop dur`,
+        retour_au_calme: '',
         allures: [
-          { zone: 'Échauffement',           pourcentage_vma: 63, vitesse_kmh: parseFloat((vma * 0.63).toFixed(1)), allure_min_km: calcPace(vma, 0.63) + '/km' },
-          { zone: 'Endurance fondamentale', pourcentage_vma: 67, vitesse_kmh: parseFloat((vma * 0.67).toFixed(1)), allure_min_km: calcPace(vma, 0.67) + '/km' },
-          { zone: 'Retour au calme',        pourcentage_vma: 60, vitesse_kmh: parseFloat((vma * 0.60).toFixed(1)), allure_min_km: calcPace(vma, 0.60) + '/km' },
+          { zone: 'Min (65% VMA)', pourcentage_vma: 65, vitesse_kmh: parseFloat((vma * 0.65).toFixed(1)), allure_min_km: calcPace(vma, 0.65) + '/km' },
+          { zone: 'Max (72% VMA)', pourcentage_vma: 72, vitesse_kmh: parseFloat((vma * 0.72).toFixed(1)), allure_min_km: calcPace(vma, 0.72) + '/km' },
         ],
         recuperation: null,
         notes_coach:  `Cours tôt le matin ou en soirée et hydrate-toi bien. Réduis l'allure si c'est trop dur.`,

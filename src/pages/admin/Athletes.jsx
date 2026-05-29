@@ -199,6 +199,89 @@ function CoachSessionModal({ session, weekNum, sessionIdx, completion, onClose, 
     )
   }
 
+  function CorpsVisual({ mainSet }) {
+    const sType = (session.type || '').toLowerCase()
+
+    // EF — clean centered display
+    if (sType.includes('endurance fondamentale') || sType === 'ef') {
+      const allOk   = (session.allures || []).filter(a => a?.allure_min_km)
+      const paceMin = allOk.find(a => (a.pourcentage_vma || 0) <= 66) || allOk[0]
+      const paceMax = allOk.find(a => (a.pourcentage_vma || 0) >= 70 && a !== paceMin) || null
+      return (
+        <div style={{ padding:'.75rem 0', textAlign:'center' }}>
+          <div style={{ fontSize:'3.2rem', fontWeight:900, lineHeight:1, color:'#fff' }}>{session.duree_min}</div>
+          <div style={{ fontSize:'.78rem', color:'rgba(255,255,255,.35)', marginBottom:'1.125rem', marginTop:'.15rem' }}>minutes</div>
+          <div style={{ display:'inline-flex', alignItems:'center', gap:'.5rem',
+            background:`${color}14`, borderRadius:99, padding:'.4rem 1rem',
+            border:`1px solid ${color}30`, marginBottom:'.75rem' }}>
+            {paceMin && <span style={{ fontSize:'.95rem', fontWeight:700, color }}>{paceMin.allure_min_km}</span>}
+            {paceMax && <>
+              <span style={{ color:'rgba(255,255,255,.22)', fontSize:'.8rem' }}>—</span>
+              <span style={{ fontSize:'.95rem', fontWeight:700, color }}>{paceMax.allure_min_km}</span>
+            </>}
+            <span style={{ fontSize:'.7rem', color:'rgba(255,255,255,.35)' }}>/km</span>
+          </div>
+          <div style={{ fontSize:'.75rem', color:'rgba(255,255,255,.35)', fontStyle:'italic' }}>
+            65–72% VMA · allure au ressenti
+          </div>
+        </div>
+      )
+    }
+
+    // BLOC / bullet structured session
+    const hasBloc   = /^BLOC\b/im.test(mainSet)
+    const hasBullet = mainSet.includes('•')
+    if (hasBloc || hasBullet) {
+      const nodes = []
+      for (const [i, line] of mainSet.split('\n').entries()) {
+        const trimmed = line.trim()
+        if (!trimmed) continue
+        if (/^BLOC\b/i.test(trimmed)) {
+          nodes.push(
+            <div key={i} style={{ display:'flex', alignItems:'center', gap:'.75rem', margin:nodes.length > 0 ? '1rem 0 0' : '0' }}>
+              <div style={{ flex:1, height:1, background:`${color}35` }} />
+              <span style={{ fontSize:'.65rem', fontWeight:800, letterSpacing:'.1em', flexShrink:0,
+                color, textTransform:'uppercase', padding:'.22rem .75rem',
+                background:`${color}18`, borderRadius:99, border:`1px solid ${color}35` }}>{trimmed}</span>
+              <div style={{ flex:1, height:1, background:`${color}35` }} />
+            </div>
+          )
+        } else if (trimmed.startsWith('•')) {
+          const content = trimmed.slice(1).trim()
+          const isRecov = /r[eé]cup|marche|trot|repos/i.test(content)
+          if (isRecov) {
+            nodes.push(
+              <div key={i} style={{ display:'flex', alignItems:'center', justifyContent:'center', gap:'.5rem', padding:'.2rem 0' }}>
+                <span style={{ fontSize:'.7rem', color:'#38BDF8' }}>⏸</span>
+                <span style={{ fontSize:'.78rem', color:'rgba(255,255,255,.4)', fontStyle:'italic' }}>{content}</span>
+              </div>
+            )
+          } else {
+            const mMatch = content.match(/^(\d+(?:[.,]\d+)?\s*(?:m\b|km\b|min\b))\s+/i)
+            const metric = mMatch ? mMatch[1].trim() : null
+            const rest   = mMatch ? content.slice(mMatch[0].length) : content
+            nodes.push(
+              <div key={i} style={{ background:`${color}0D`, border:`1px solid ${color}2A`, borderRadius:14, padding:'.875rem 1rem' }}>
+                {metric && <div style={{ fontSize:'1.4rem', fontWeight:900, color:'#fff', lineHeight:1, marginBottom:'.3rem' }}>{metric}</div>}
+                <div style={{ fontSize:'.85rem', lineHeight:1.55, color:'rgba(255,255,255,.72)' }}>{metric ? rest : content}</div>
+              </div>
+            )
+          }
+        } else {
+          nodes.push(
+            <div key={i} style={{ padding:'.55rem .75rem', marginTop:'.25rem',
+              background:'rgba(14,165,233,.06)', border:'1px solid rgba(14,165,233,.14)', borderRadius:10 }}>
+              <p style={{ fontSize:'.8rem', lineHeight:1.5, color:'rgba(255,255,255,.5)', margin:0, fontStyle:'italic' }}>{trimmed}</p>
+            </div>
+          )
+        }
+      }
+      return <div style={{ display:'flex', flexDirection:'column', gap:'.55rem' }}>{nodes}</div>
+    }
+
+    return <p style={{ fontSize:'.85rem', lineHeight:1.65, color:'rgba(255,255,255,.75)', whiteSpace:'pre-line', margin:0 }}>{mainSet}</p>
+  }
+
   return (
     <div
       style={{ position:'fixed', inset:0, zIndex:300,

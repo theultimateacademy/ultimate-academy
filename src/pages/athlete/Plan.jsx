@@ -174,19 +174,127 @@ function SessionDetailPage({ session, weekNum, sessionIdx, planId, vma, onClose,
   function MainSetVisual() {
     const mainSet = session.corps || ''
     const type    = (session.type || '').toLowerCase()
-    const isInterval = type.includes('fraction') || type.includes('côte') || type.includes('cote') || type.includes('vma') || /\d+\s*[xX×]/.test(mainSet)
+
+    // ── EF: endurance fondamentale — special clean display ───────
+    if (type.includes('endurance fondamentale') || type === 'ef') {
+      const allOk   = (session.allures || []).filter(a => a?.allure_min_km)
+      const paceMin = allOk.find(a => (a.pourcentage_vma || 0) <= 66) || allOk[0]
+      const paceMax = allOk.find(a => (a.pourcentage_vma || 0) >= 70 && a !== paceMin) || null
+      return (
+        <div style={{ padding: '.75rem 0', textAlign: 'center' }}>
+          <div style={{ fontSize: '3.8rem', fontWeight: 900, lineHeight: 1, color: '#fff' }}>
+            {session.duree_min}
+          </div>
+          <div style={{ fontSize: '.82rem', color: 'rgba(255,255,255,.35)', marginBottom: '1.375rem', marginTop: '.2rem' }}>
+            minutes
+          </div>
+          <div style={{ display: 'inline-flex', alignItems: 'center', gap: '.5rem',
+            background: typeColor + '14', borderRadius: 99, padding: '.45rem 1.125rem',
+            border: `1px solid ${typeColor}30`, marginBottom: '1rem' }}>
+            {paceMin && <span style={{ fontSize: '1rem', fontWeight: 700, color: typeColor }}>{paceMin.allure_min_km}</span>}
+            {paceMax && <>
+              <span style={{ color: 'rgba(255,255,255,.22)', fontSize: '.85rem' }}>—</span>
+              <span style={{ fontSize: '1rem', fontWeight: 700, color: typeColor }}>{paceMax.allure_min_km}</span>
+            </>}
+            <span style={{ fontSize: '.72rem', color: 'rgba(255,255,255,.35)' }}>/km</span>
+          </div>
+          <div style={{ fontSize: '.78rem', color: 'rgba(255,255,255,.35)', fontStyle: 'italic' }}>
+            65–72% VMA · allure au ressenti
+          </div>
+        </div>
+      )
+    }
+
+    // ── BLOC / bullet structured session ─────────────────────────
+    const hasBloc   = /^BLOC\b/im.test(mainSet)
+    const hasBullet = mainSet.includes('•')
+    if (hasBloc || hasBullet) {
+      const lines = mainSet.split('\n')
+      const nodes = []
+      for (let i = 0; i < lines.length; i++) {
+        const trimmed = lines[i].trim()
+        if (!trimmed) continue
+
+        if (/^BLOC\b/i.test(trimmed)) {
+          nodes.push(
+            <div key={i} style={{
+              display: 'flex', alignItems: 'center', gap: '.75rem',
+              margin: nodes.length > 0 ? '1rem 0 0' : '0',
+            }}>
+              <div style={{ flex: 1, height: 1, background: `${typeColor}35` }} />
+              <span style={{
+                fontSize: '.7rem', fontWeight: 800, letterSpacing: '.1em', flexShrink: 0,
+                color: typeColor, textTransform: 'uppercase',
+                padding: '.25rem .875rem',
+                background: `${typeColor}18`, borderRadius: 99,
+                border: `1px solid ${typeColor}35`,
+              }}>{trimmed}</span>
+              <div style={{ flex: 1, height: 1, background: `${typeColor}35` }} />
+            </div>
+          )
+          continue
+        }
+
+        if (trimmed.startsWith('•')) {
+          const content = trimmed.slice(1).trim()
+          const isRecov = /r[eé]cup|marche|trot|repos/i.test(content)
+
+          if (isRecov) {
+            nodes.push(
+              <div key={i} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '.5rem', padding: '.2rem 0' }}>
+                <span style={{ fontSize: '.75rem', color: '#38BDF8' }}>⏸</span>
+                <span style={{ fontSize: '.8rem', color: 'rgba(255,255,255,.4)', fontStyle: 'italic' }}>{content}</span>
+              </div>
+            )
+          } else {
+            const mMatch = content.match(/^(\d+(?:[.,]\d+)?\s*(?:m\b|km\b|min\b))\s+/i)
+            const metric = mMatch ? mMatch[1].trim() : null
+            const rest   = mMatch ? content.slice(mMatch[0].length) : content
+            nodes.push(
+              <div key={i} style={{
+                background: `${typeColor}0D`, border: `1px solid ${typeColor}2A`,
+                borderRadius: 16, padding: '1rem 1.125rem',
+              }}>
+                {metric && (
+                  <div style={{ fontSize: '1.6rem', fontWeight: 900, color: '#fff', lineHeight: 1, marginBottom: '.35rem' }}>
+                    {metric}
+                  </div>
+                )}
+                <div style={{ fontSize: '.875rem', lineHeight: 1.6, color: 'rgba(255,255,255,.72)' }}>
+                  {metric ? rest : content}
+                </div>
+              </div>
+            )
+          }
+          continue
+        }
+
+        // Plain prose line (e.g. "Récupération externe : 3 min footing lent...")
+        nodes.push(
+          <div key={i} style={{
+            padding: '.625rem .875rem', marginTop: '.375rem',
+            background: 'rgba(14,165,233,.06)', border: '1px solid rgba(14,165,233,.14)',
+            borderRadius: 10,
+          }}>
+            <p style={{ fontSize: '.82rem', lineHeight: 1.55, color: 'rgba(255,255,255,.5)', margin: 0, fontStyle: 'italic' }}>
+              {trimmed}
+            </p>
+          </div>
+        )
+      }
+      return <div style={{ display: 'flex', flexDirection: 'column', gap: '.625rem' }}>{nodes}</div>
+    }
+
+    // ── Simple intervals (N × Xm without BLOC structure) ─────────
+    const isInterval   = type.includes('fraction') || type.includes('côte') || type.includes('cote') || type.includes('vma') || /\d+\s*[xX×]/.test(mainSet)
     const isProgressif = !isInterval && (mainSet.includes('→') || type.includes('progressif'))
 
     const repMatch  = mainSet.match(/(\d+)\s*[xX×]\s*(\d+(?:[.,]\d+)?)\s*(m\b|km|min)/i)
     const reps      = repMatch ? parseInt(repMatch[1]) : 0
     const repVal    = repMatch ? `${repMatch[2].replace(',', '.')}${repMatch[3]}` : null
-
     const recovMMin = mainSet.match(/(\d+(?:[.,]\d+)?)\s*min[^\w]*r[eé]cup/i) || mainSet.match(/r[eé]cup[^\w]*(\d+(?:[.,]\d+)?)\s*min/i)
     const recovSec  = mainSet.match(/(\d+)\s*s(?:ec)?[^\w]*r[eé]cup/i) || mainSet.match(/r[eé]cup[^\w]*(\d+)\s*s(?:ec)?/i)
-    const recovText = recovMMin
-      ? `${recovMMin[1]} min`
-      : recovSec ? `${recovSec[1]}s`
-      : (session.recuperation?.description || session.recuperation || null)
+    const recovText = recovMMin ? `${recovMMin[1]} min` : recovSec ? `${recovSec[1]}s` : (session.recuperation?.description || session.recuperation || null)
 
     if (isInterval && reps >= 2) {
       return (
@@ -196,12 +304,12 @@ function SessionDetailPage({ session, weekNum, sessionIdx, planId, vma, onClose,
             <span style={{ fontSize: '1.3rem', color: 'rgba(255,255,255,.35)', lineHeight: 1 }}>×</span>
             {repVal && <span style={{ fontSize: '1.6rem', fontWeight: 800, color: '#fff', lineHeight: 1 }}>{repVal}</span>}
           </div>
-          <div style={{ display: 'flex', gap: 4, marginBottom: '.875rem' }}>
+          <div style={{ display: 'flex', gap: 4, marginBottom: '1rem' }}>
             {Array.from({ length: Math.min(reps, 14) }).map((_, i) => (
               <div key={i} style={{ flex: 1, height: 7, borderRadius: 99, background: typeColor, opacity: .55 + i * .02 }} />
             ))}
           </div>
-          <p style={{ fontSize: '.875rem', lineHeight: 1.65, color: 'rgba(255,255,255,.7)', marginBottom: recovText ? '.75rem' : 0 }}>{mainSet}</p>
+          <p style={{ fontSize: '.875rem', lineHeight: 1.7, color: 'rgba(255,255,255,.7)', whiteSpace: 'pre-line', marginBottom: recovText ? '.75rem' : 0 }}>{mainSet}</p>
           {recovText && (
             <div style={{ display: 'flex', alignItems: 'center', gap: '.5rem',
               background: 'rgba(14,165,233,.1)', border: '1px solid rgba(14,165,233,.25)',
@@ -218,19 +326,19 @@ function SessionDetailPage({ session, weekNum, sessionIdx, planId, vma, onClose,
       const phases = mainSet.split('→').map(p => p.trim()).filter(Boolean)
       const dotC   = ['#10B981', '#F59E0B', '#EF4444', '#8B5CF6']
       return (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '.75rem' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '.875rem' }}>
           {phases.map((phase, i) => (
-            <div key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: '.75rem' }}>
-              <div style={{ width: 8, height: 8, borderRadius: '50%', flexShrink: 0, marginTop: '.55rem',
-                background: dotC[Math.min(i, dotC.length - 1)], boxShadow: `0 0 6px ${dotC[Math.min(i, dotC.length - 1)]}80` }} />
-              <p style={{ fontSize: '.875rem', lineHeight: 1.6, color: 'rgba(255,255,255,.8)' }}>{phase}</p>
+            <div key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: '.875rem' }}>
+              <div style={{ width: 10, height: 10, borderRadius: '50%', flexShrink: 0, marginTop: '.5rem',
+                background: dotC[Math.min(i, dotC.length - 1)], boxShadow: `0 0 8px ${dotC[Math.min(i, dotC.length - 1)]}80` }} />
+              <p style={{ fontSize: '.9rem', lineHeight: 1.65, color: 'rgba(255,255,255,.82)', margin: 0 }}>{phase}</p>
             </div>
           ))}
         </div>
       )
     }
 
-    return <p style={{ fontSize: '.9rem', lineHeight: 1.7, color: 'rgba(255,255,255,.8)' }}>{mainSet}</p>
+    return <p style={{ fontSize: '.9rem', lineHeight: 1.7, color: 'rgba(255,255,255,.8)', whiteSpace: 'pre-line' }}>{mainSet}</p>
   }
 
   return (
@@ -328,15 +436,20 @@ function SessionDetailPage({ session, weekNum, sessionIdx, planId, vma, onClose,
           {session.echauffement && session.corps && <PhaseArrow />}
 
           {/* Corps — élément central */}
-          {session.corps && (
-            <div style={{ borderLeft: `3px solid ${typeColor}`, padding: '1.125rem 1.125rem 1.125rem 1rem', background: typeColor + '06' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '.875rem' }}>
-                <span style={{ fontWeight: 800, fontSize: '.76rem', color: typeColor, letterSpacing: '.1em', textTransform: 'uppercase' }}>⚡ Séance principale</span>
-                <PaceChip allure={spePace} color={typeColor} />
+          {session.corps && (() => {
+            const isEF = (session.type || '').toLowerCase().includes('endurance fondamentale') || (session.type || '').toLowerCase() === 'ef'
+            return (
+              <div style={{ borderLeft: `3px solid ${typeColor}`, padding: isEF ? '1.5rem 1.25rem' : '1.125rem 1.125rem 1.125rem 1rem', background: typeColor + '06' }}>
+                {!isEF && (
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '.875rem' }}>
+                    <span style={{ fontWeight: 800, fontSize: '.76rem', color: typeColor, letterSpacing: '.1em', textTransform: 'uppercase' }}>⚡ Séance principale</span>
+                    <PaceChip allure={spePace} color={typeColor} />
+                  </div>
+                )}
+                <MainSetVisual />
               </div>
-              <MainSetVisual />
-            </div>
-          )}
+            )
+          })()}
 
           {session.corps && session.retour_au_calme && <PhaseArrow />}
 

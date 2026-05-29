@@ -348,8 +348,32 @@ export default function AthleteHome() {
         </div>
       )}
 
-      {/* Last message from coach */}
-      {lastMessage && (
+      {/* Monthly message from coach (from plan_data) */}
+      {plan?.plan_data?.message_du_mois && (
+        <div style={{ marginBottom: '1.5rem' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '.75rem' }}>
+            <h3>Message du mois</h3>
+            <button className="btn btn-ghost btn-sm" onClick={() => navigate('/app/messages')}>
+              Messages →
+            </button>
+          </div>
+          <div className="card" style={{
+            background: 'linear-gradient(135deg, rgba(139,47,201,.12), rgba(190,24,93,.08))',
+            border: '1px solid rgba(139,47,201,.25)',
+          }}>
+            <div style={{ display: 'flex', gap: '.75rem', alignItems: 'flex-start' }}>
+              <img src="/Coach.JPG" alt="Alexis" style={{ width: 40, height: 40, borderRadius: '50%', objectFit: 'cover', flexShrink: 0, border: '2px solid rgba(139,47,201,.4)' }} />
+              <div>
+                <div style={{ fontWeight: 700, fontSize: '.875rem', marginBottom: '.375rem', color: 'var(--primary)' }}>Alexis — Message du mois</div>
+                <p style={{ fontSize: '.9375rem', lineHeight: 1.65, fontStyle: 'italic' }}>{plan.plan_data.message_du_mois}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Last message from coach (fallback when no monthly message) */}
+      {!plan?.plan_data?.message_du_mois && lastMessage && (
         <div style={{ marginBottom: '1.5rem' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '.75rem' }}>
             <h3>Message de ton coach</h3>
