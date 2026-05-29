@@ -7,12 +7,13 @@ import LoadingSpinner from '../../components/UI/LoadingSpinner'
 const TYPE_COLORS = {
   'fractionné court': '#E8237A', 'fractionné long': '#8B2FC9', 'fractionné': '#8B2FC9', 'vma': '#8B2FC9',
   'tempo': '#F59E0B', 'seuil': '#F59E0B',
+  'progressif': '#06B6D4',
   'endurance': '#10B981', 'footing': '#10B981',
   'sortie longue': '#0EA5E9',
   'renforcement': '#D97706',
   'repos': '#374151',
   'course intermédiaire': '#FB923C', 'course': '#FFD700',
-  'récupération': '#6B7280', 'côtes': '#EF4444', 'progressif': '#6366F1', 'spécifique': '#6366F1',
+  'récupération': '#6B7280', 'côtes': '#EF4444', 'spécifique': '#6366F1',
 }
 function typeColor(type) {
   const t = (type || '').toLowerCase()

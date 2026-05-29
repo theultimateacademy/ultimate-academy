@@ -1156,7 +1156,7 @@ export default function AthletePlan() {
                 Semaine {currentWeekData.numero} · {weekDateRange(planMonday, currentWeekData.numero)}
               </div>
               <div style={{ fontWeight: 700, fontSize: '1.1rem' }}>
-                {(currentWeekData.phase || '').replace(/^S\d+\s*[—–-]\s*/i, '')}
+                {(currentWeekData.phase || '').replace(/^S\d+\s*[—–-]\s*/i, '').replace(/\s*\(S\d+\)/gi, '')}
               </div>
               {(() => {
                 const courseCount = currentWeekData.seances?.filter(s => !String(s.type || '').toLowerCase().includes('renforcement')).length || 0
@@ -1179,7 +1179,7 @@ export default function AthletePlan() {
                 )
               })()}
               {(() => {
-                const raw   = (currentWeekData.charge || '').replace(/ — /g, ' · ')
+                const raw   = (currentWeekData.charge || '').replace(/ — /g, ' · ').replace(/\s*\(S\d+\)/gi, '')
                 const parenIdx = raw.indexOf('(')
                 const main  = parenIdx > 0 ? raw.slice(0, parenIdx).trim() : raw
                 const sub   = parenIdx > 0 ? raw.slice(parenIdx) : null

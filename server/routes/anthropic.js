@@ -357,9 +357,13 @@ OBLIGATOIRE sur TOUTES les autres séances course :
 Échauffement MINIMUM 25 minutes : footing progressif. Sur séances dures (fractionné, tempo, côtes) : terminer par quelques accélérations progressives et la routine des gammes athlétiques.
 Retour au calme MINIMUM 10 minutes : footing très lent à 60-63% VMA.
 
-RÈGLE 3 — PROGRESSION DU VOLUME
-Augmentation maximum 10% par semaine.
-Si RPE moyen > 7.5 deux semaines de suite → déclencher décharge immédiate.
+RÈGLE 3 — VOLUME HEBDOMADAIRE CIBLE
+OBJECTIF FIXE : chaque semaine normale doit totaliser environ 30 km (hors affûtage et décharge).
+- Semaines normales : 28 à 32 km au total
+- Semaines de décharge : 18 à 22 km
+- Semaines d'affûtage S-2 : ~18 km · S-1 (semaine course) : ~12 km
+- Répartis sur toutes les séances de la semaine via les durées × allure
+Augmentation maximum 10% par semaine. Si RPE moyen > 7.5 deux semaines de suite → déclencher décharge immédiate.
 
 RÈGLE 4 — SEMAINES DE DÉCHARGE
 JAMAIS de décharge automatique. La décharge est déclenchée UNIQUEMENT si l'athlète signale explicitement de la fatigue :
@@ -1048,52 +1052,33 @@ router.post('/plans/fatigue-adapt', async (req, res) => {
     currentWeek._adapted_for = 'fatigue';
     currentWeek.charge = 'Fatigue : Semaine allégée';
 
-    function isIntensityType(s) {
-      const t = (s.type || '').toLowerCase();
-      return t.includes('fractionné') || t.includes('vma') || t.includes('seuil') ||
-             t.includes('côtes') || t.includes('tempo') || t.includes('spécifique');
-    }
-
+    // Semaine fatigue = UNIQUEMENT des footings EF légers, aucune séance d'intensité
+    const footingDurations = [30, 35, 40, 45]; // durées EF selon la position dans la semaine
+    let footingIdx = 0;
     currentWeek.seances = currentWeek.seances.map(s => {
       const t = (s.type || '').toLowerCase();
+      // Repos, renforcement et courses restent intacts
       if (t.includes('renforcement') || t.includes('repos') || s.est_course) return s;
 
-      if (isIntensityType(s)) {
-        const dur = Math.max(25, Math.round((s.duree_min || 40) * 0.65));
-        return {
-          ...s,
-          type:            'Endurance fondamentale',
-          titre:           'Footing léger — semaine de récupération 😴',
-          duree_min:       dur,
-          intensite:       'très facile',
-          echauffement:    '',
-          corps:           `${dur} min à 65-72% VMA (${calcPace(vma, 0.65)}/km – ${calcPace(vma, 0.72)}/km) — allure au ressenti. Séance de récupération active.`,
-          retour_au_calme: '',
-          allures: [
-            { zone: 'Min (65% VMA)', pourcentage_vma: 65, vitesse_kmh: parseFloat((vma * 0.65).toFixed(1)), allure_min_km: calcPace(vma, 0.65) + '/km' },
-            { zone: 'Max (72% VMA)', pourcentage_vma: 72, vitesse_kmh: parseFloat((vma * 0.72).toFixed(1)), allure_min_km: calcPace(vma, 0.72) + '/km' },
-          ],
-          notes_coach:  'Ton corps a besoin de souffler cette semaine. Reste dans ta zone de confort, pas de forçage.',
-          rpe_cible:    3,
-          est_seance_cle: false,
-        };
-      } else {
-        const dur = Math.max(25, Math.round((s.duree_min || 40) * 0.75));
-        return {
-          ...s,
-          duree_min:       dur,
-          echauffement:    '',
-          retour_au_calme: '',
-          corps:           `${dur} min à 65-72% VMA (${calcPace(vma, 0.65)}/km – ${calcPace(vma, 0.72)}/km) — allure au ressenti, reste léger.`,
-          allures: [
-            { zone: 'Min (65% VMA)', pourcentage_vma: 65, vitesse_kmh: parseFloat((vma * 0.65).toFixed(1)), allure_min_km: calcPace(vma, 0.65) + '/km' },
-            { zone: 'Max (72% VMA)', pourcentage_vma: 72, vitesse_kmh: parseFloat((vma * 0.72).toFixed(1)), allure_min_km: calcPace(vma, 0.72) + '/km' },
-          ],
-          notes_coach:  'Semaine allégée — reste léger et ne te force pas.',
-          rpe_cible:    3,
-          est_seance_cle: false,
-        };
-      }
+      // Toutes les autres séances → footing EF léger
+      const dur = footingDurations[footingIdx++ % footingDurations.length];
+      return {
+        ...s,
+        type:            'Endurance fondamentale',
+        titre:           'Footing récupération 😴',
+        duree_min:       dur,
+        intensite:       'très facile',
+        echauffement:    '',
+        corps:           `${dur} min à 65-72% VMA (${calcPace(vma, 0.65)}/km à ${calcPace(vma, 0.72)}/km) — allure au ressenti. Séance de récupération active.`,
+        retour_au_calme: '',
+        allures: [
+          { zone: 'Min (65% VMA)', pourcentage_vma: 65, vitesse_kmh: parseFloat((vma * 0.65).toFixed(1)), allure_min_km: calcPace(vma, 0.65) + '/km' },
+          { zone: 'Max (72% VMA)', pourcentage_vma: 72, vitesse_kmh: parseFloat((vma * 0.72).toFixed(1)), allure_min_km: calcPace(vma, 0.72) + '/km' },
+        ],
+        notes_coach:    'Ton corps a besoin de souffler. Reste dans ta zone de confort, pas de forçage.',
+        rpe_cible:      3,
+        est_seance_cle: false,
+      };
     });
 
     recalculateDistances(updatedPlan, vma);
