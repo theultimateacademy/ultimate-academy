@@ -295,11 +295,34 @@ function injectRaceSessions(planData, profile) {
 
 // ─── Load session library from DB ─────────────────────────────────────────────
 
-async function loadSessionLibrary() {
-  const { data, error } = await supabase
+const TRIATHLON_OBJECTIVES = new Set(['tri_sprint', 'tri_olympic', 'tri_half', 'tri_ironman']);
+const TRAIL_OBJECTIVES     = new Set(['trail_20k', 'trail_50k', 'trail_100k', 'trail_100m']);
+
+function getDiscipline(objective) {
+  if (TRIATHLON_OBJECTIVES.has(objective)) return 'triathlon';
+  if (TRAIL_OBJECTIVES.has(objective))     return 'trail';
+  return 'running';
+}
+
+async function loadSessionLibrary(objective) {
+  const discipline = getDiscipline(objective);
+
+  // For running: only running sessions
+  // For trail: running (for the run leg) + trail sessions + montagne if applicable
+  // For triathlon: all sports (running + natation + velo + brique)
+  let query = supabase
     .from('session_library')
-    .select('code, category, name, duration_min, intensity_rpe, warmup, main_set, recovery, cooldown, coach_notes, compatible_goals')
+    .select('code, category, name, duration_min, intensity_rpe, warmup, main_set, recovery, cooldown, coach_notes, compatible_goals, sport, montagne_only')
     .order('code');
+
+  if (discipline === 'running') {
+    query = query.or('sport.eq.running,sport.is.null');
+  } else if (discipline === 'trail') {
+    query = query.in('sport', ['running', 'trail']);
+  }
+  // triathlon: no filter — all sports included
+
+  const { data, error } = await query;
 
   if (error || !data?.length) {
     console.warn('[session_library] Error or empty:', error?.message);
@@ -308,12 +331,26 @@ async function loadSessionLibrary() {
 
   const map = Object.fromEntries(data.map(s => [s.code, s]));
 
-  const text = data.map(s => {
-    const goals = (s.compatible_goals || []).join(', ');
-    const E  = s.warmup   ? `\n  É: ${s.warmup}`   : '';
-    const R  = s.recovery ? `\n  R: ${s.recovery}`  : '';
-    const RC = s.cooldown ? `\n  RC: ${s.cooldown}` : '';
-    return `[${s.code}] ${s.name} | ${s.duration_min}min | RPE${s.intensity_rpe}/10 | ${goals}${E}\n  C: ${s.main_set}${R}${RC}\n  📝 ${s.coach_notes}`;
+  // Group by sport for the prompt
+  const bySport = {};
+  for (const s of data) {
+    const sp = s.sport || 'running';
+    if (!bySport[sp]) bySport[sp] = [];
+    bySport[sp].push(s);
+  }
+
+  const sportLabels = { running: 'COURSE À PIED', natation: 'NATATION', velo: 'VÉLO', brique: 'BRIQUES (multi-sport)', trail: 'TRAIL', };
+  const text = Object.entries(bySport).map(([sport, sessions]) => {
+    const label = sportLabels[sport] || sport.toUpperCase();
+    const lines = sessions.map(s => {
+      const goals = (s.compatible_goals || []).join(', ');
+      const E  = s.warmup   ? `\n  É: ${s.warmup}`   : '';
+      const R  = s.recovery ? `\n  R: ${s.recovery}`  : '';
+      const RC = s.cooldown ? `\n  RC: ${s.cooldown}` : '';
+      const montagne = s.montagne_only ? ' [MONTAGNE UNIQUEMENT]' : '';
+      return `[${s.code}] ${s.name}${montagne} | ${s.duration_min}min | RPE${s.intensity_rpe}/10 | ${goals}${E}\n  C: ${s.main_set}${R}${RC}`;
+    }).join('\n\n');
+    return `── ${label} ──\n${lines}`;
   }).join('\n\n');
 
   return { text, map };
@@ -931,6 +968,54 @@ Forme actuelle : ${profile.current_form || 'Non renseignée'}
 Message coach : ${profile.coach_message || 'Aucun'}
 ${intermediateRaceInfo}
 ${terrainInfo}
+${(() => {
+  const discipline = getDiscipline(profile.objective);
+  if (discipline === 'triathlon') {
+    const ftpStr = profile.ftp_known && profile.ftp_value ? `${profile.ftp_value}W (connue)` : 'inconnue — travailler en RPE et % FC max';
+    const cssStr = profile.css_known && profile.css_value ? `${profile.css_value}/100m (connue)` : 'inconnue — programmer test CSS (NAT-13) en S1 ou S2';
+    return `
+PROFIL TRIATHLON :
+Discipline : ${profile.objective} (${profile.objective === 'tri_sprint' ? '750m/20km/5km' : profile.objective === 'tri_olympic' ? '1500m/40km/10km' : profile.objective === 'tri_half' ? '1900m/90km/21km' : '3800m/180km/42km'})
+Séances/semaine : ${profile.tri_swim_sessions || 2} natation · ${profile.tri_bike_sessions || 2} vélo · ${profile.tri_run_sessions || 2} course
+Niveau natation : ${profile.tri_swim_level || 'non précisé'}
+CSS : ${cssStr}
+FTP vélo : ${ftpStr}
+Eau libre : ${profile.open_water || 'non précisé'}
+Vélo : ${profile.bike_type || 'non précisé'}
+Expérience triathlon : ${profile.tri_experience || 'non précisée'}
+
+RÈGLES TRIATHLON OBLIGATOIRES :
+- Générer des séances pour LES 3 DISCIPLINES + briques
+- Chaque séance porte un id_seance de la bibliothèque (NAT-xx, VEL-xx, BRK-xx, ou codes running)
+- La course à pied est la PRIORITÉ — placer les séances course les jours clés
+- JAMAIS 2 séances dures le même jour (ex: pas de tempo vélo + fractionné course)
+- Les briques comptent comme 2 séances (vélo + course) dans le planning
+- 1 jour repos total minimum par semaine
+- Périodisation : ${profile.objective === 'tri_sprint' ? '8-12 semaines' : profile.objective === 'tri_olympic' ? '12-16 semaines' : profile.objective === 'tri_half' ? '16-20 semaines' : '20-30 semaines'}
+- Le champ "type" des séances natation = "Natation", vélo = "Vélo", brique = "Brique"`;
+  }
+  if (discipline === 'trail') {
+    const denivele = profile.race_denivele ? `${profile.race_denivele}m D+` : 'non précisé';
+    const terrain = profile.training_terrain || 'ville_plat';
+    const isMontagne = terrain === 'montagne';
+    return `
+PROFIL TRAIL :
+Distance objectif : ${profile.objective}
+Dénivelé course : ${denivele}
+Terrain entraînement : ${terrain}
+Expérience trail : ${profile.trail_experience || 'non précisée'}
+Bâtons : ${profile.trail_poles || 'non précisé'}
+
+RÈGLES TRAIL OBLIGATOIRES :
+- Plans en TEMPS (minutes/heures), pas en km (sauf courses objectif)
+- Inclure des séances spécifiques trail (TR-xx) dans toutes les semaines
+- ${isMontagne ? 'Utiliser les séances MON-xx (montagne) en priorité pour le travail de dénivelé' : 'Utiliser TR-05 et TR-07 pour simuler le D+. Séances MON-xx INTERDITES (réservées montagne)'}
+- Progresser le D+ accumulé semaine par semaine
+- Sortie longue trail = temps sur pied, marcher dans les côtes > 15%
+- Technique descente obligatoire (TR-06) 1x par plan minimum`;
+  }
+  return '';
+})()}
 
 ${calendarSection}
 
@@ -969,7 +1054,7 @@ CONTRAINTES ABSOLUES — vérifie et documente dans auto_validation avant de sou
 18. FRACTIONNÉ 2000m : OBLIGATOIREMENT à 85% VMA exactement = ${calcPace(vma, 0.85)}/km pour VMA ${vma}. JAMAIS à 80%, JAMAIS à 83%. Aucune exception.${profile.chrono_goal_known && calcTargetPace(profile.chrono_goal, profile.objective) ? `\n19. Allure objectif chrono = ${calcTargetPace(profile.chrono_goal, profile.objective)} (calculée depuis "${profile.chrono_goal}") — utilise cette valeur exacte pour tous les blocs spécifiques allure course` : ''}${hasIntermediateRace ? `\n${profile.chrono_goal_known && calcTargetPace(profile.chrono_goal, profile.objective) ? '20' : '19'}. RÉCUPÉRATION POST-COURSE INTERMÉDIAIRE (RÈGLE 14bis — ABSOLUE) : La semaine qui SUIT la course intermédiaire du ${new Date(profile.intermediate_race_date).toLocaleDateString('fr-FR')} doit être une semaine de récupération. J+1 et J+2 = repos complet. Aucun seuil/fractionné/tempo/côtes avant J+7. EF léger uniquement à partir de J+3 (25-35 min, 65-68% VMA). Charge = "Légère — Récupération post-course intermédiaire". JAMAIS de séance dure le lundi ou mardi après la course.` : ''}`;
 
   try {
-    const { text: libraryText, map: libraryMap } = await loadSessionLibrary();
+    const { text: libraryText, map: libraryMap } = await loadSessionLibrary(profile.objective);
     const message = await client.messages.create({
       model:      'claude-sonnet-4-6',
       max_tokens: 16000,

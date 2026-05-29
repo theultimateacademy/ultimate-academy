@@ -36,20 +36,32 @@ const TRAIL_OPTIONS = [
   { v: 'trail_100m', e: '🌋', l: 'Trail 100M', desc: "160km — l'épreuve ultime de l'endurance" },
 ]
 
-const TRAIL_VALUES = new Set(['trail_20k', 'trail_50k', 'trail_100k', 'trail_100m'])
+const TRAIL_VALUES     = new Set(['trail_20k', 'trail_50k', 'trail_100k', 'trail_100m'])
+const TRIATHLON_VALUES = new Set(['tri_sprint', 'tri_olympic', 'tri_half', 'tri_ironman'])
+
+const TRIATHLON_OPTIONS = [
+  { v: 'tri_sprint',  e: '⚡', l: 'Triathlon Sprint',    desc: '750m nage · 20km vélo · 5km course' },
+  { v: 'tri_olympic', e: '🏅', l: 'Triathlon Olympic',   desc: '1500m nage · 40km vélo · 10km course' },
+  { v: 'tri_half',    e: '🔥', l: 'Half Ironman 70.3',   desc: '1,9km nage · 90km vélo · 21km course' },
+  { v: 'tri_ironman', e: '🦾', l: 'Ironman',             desc: '3,8km nage · 180km vélo · 42km course' },
+]
 
 const OBJECTIVE_MAP = {
-  '5km':      '5km',
-  '10km':     '10km',
-  'semi':     'semi',
-  'marathon': 'marathon',
-  trail_20k:  'trail_20k',
-  trail_50k:  'trail_50k',
-  trail_100k: 'trail_100k',
-  trail_100m: 'trail_100m',
-  debutant:   '5km',
-  perf:       'semi',
-  route:      '10km',  // backward compat
+  '5km':       '5km',
+  '10km':      '10km',
+  'semi':      'semi',
+  'marathon':  'marathon',
+  trail_20k:   'trail_20k',
+  trail_50k:   'trail_50k',
+  trail_100k:  'trail_100k',
+  trail_100m:  'trail_100m',
+  tri_sprint:  'tri_sprint',
+  tri_olympic: 'tri_olympic',
+  tri_half:    'tri_half',
+  tri_ironman: 'tri_ironman',
+  debutant:    '5km',
+  perf:        'semi',
+  route:       '10km',
 }
 
 const LEVEL_OPTIONS = [
@@ -85,10 +97,22 @@ function getStepIds(data) {
     'gps_watch', 'vma', 'chrono_goal', 'current_form',
     'injuries', 'coach_message',
   ]
+
   if (TRAIL_VALUES.has(data.objective)) {
-    const intermediateIdx = base.indexOf('intermediate_race')
-    base.splice(intermediateIdx + 1, 0, 'training_terrain')
+    const interIdx = base.indexOf('intermediate_race')
+    // terrain + trail-specific questions after intermediate_race
+    base.splice(interIdx + 1, 0, 'training_terrain', 'trail_experience', 'trail_poles')
   }
+
+  if (TRIATHLON_VALUES.has(data.objective)) {
+    const interIdx = base.indexOf('intermediate_race')
+    // Triathlon-specific questions right after intermediate_race
+    base.splice(interIdx + 1, 0,
+      'tri_sessions', 'tri_swim_level', 'css', 'ftp', 'open_water', 'bike_type', 'tri_experience'
+    )
+    // For triathlon: VMA is still used for the run leg
+  }
+
   if (data.gender === 'femme') {
     const injIdx = base.indexOf('injuries')
     base.splice(injIdx + 1, 0, 'period')
@@ -116,7 +140,16 @@ export default function ProfileWizard() {
     current_form: '',
     period_pain: false, period_pain_days: '',
     race_denivele: '',
-    coach_message: ''
+    coach_message: '',
+    // Trail
+    trail_experience: '', trail_poles: '',
+    // Triathlon
+    tri_swim_sessions: 2, tri_bike_sessions: 2, tri_run_sessions: 2,
+    tri_swim_level: '',
+    css_known: false, css_value: '',
+    ftp_known: false, ftp_value: '',
+    open_water: '', bike_type: '',
+    tri_experience: '',
   })
 
   const [currentIdx, setCurrentIdx] = useState(0)
@@ -184,6 +217,8 @@ export default function ProfileWizard() {
   async function handleSubmit() {
     setSubmitting(true)
     setError('')
+    const isTri   = TRIATHLON_VALUES.has(data.objective)
+    const isTrail = TRAIL_VALUES.has(data.objective)
     const fields = {
       first_name:             data.first_name,
       gender:                 data.gender,
@@ -197,7 +232,7 @@ export default function ProfileWizard() {
       vma:                    data.vma_known ? parseFloat(data.vma) || null : null,
       chrono_goal_known:      data.chrono_goal_known,
       chrono_goal:            data.chrono_goal_known ? data.chrono_goal : '',
-      days_per_week:          data.days_per_week,
+      days_per_week:          isTri ? data.tri_run_sessions : data.days_per_week,
       preferred_days:         data.preferred_days,
       gps_watch:              data.gps_watch,
       injuries:               data.injuries === 'none' ? '' : `${data.injuries}${data.injury_detail ? ' — ' + data.injury_detail : ''}`,
@@ -206,6 +241,21 @@ export default function ProfileWizard() {
       period_pain_days:       data.period_pain_days ? parseInt(data.period_pain_days) : null,
       race_denivele:          data.race_denivele ? parseInt(data.race_denivele) : null,
       coach_message:          data.coach_message,
+      // Trail
+      trail_experience:       isTrail ? data.trail_experience || null : null,
+      trail_poles:            isTrail ? data.trail_poles || null : null,
+      // Triathlon
+      tri_swim_sessions:      isTri ? data.tri_swim_sessions : null,
+      tri_bike_sessions:      isTri ? data.tri_bike_sessions : null,
+      tri_run_sessions:       isTri ? data.tri_run_sessions : null,
+      tri_swim_level:         isTri ? data.tri_swim_level || null : null,
+      css_known:              isTri ? data.css_known : false,
+      css_value:              isTri && data.css_known ? data.css_value || null : null,
+      ftp_known:              isTri ? data.ftp_known : false,
+      ftp_value:              isTri && data.ftp_known ? parseInt(data.ftp_value) || null : null,
+      open_water:             isTri ? data.open_water || null : null,
+      bike_type:              isTri ? data.bike_type || null : null,
+      tri_experience:         isTri ? data.tri_experience || null : null,
       profile_completed:      true
     }
     if (!user?.id) {
@@ -441,6 +491,18 @@ export default function ProfileWizard() {
               </div>
             )}
 
+            {/* Triathlon */}
+            <div style={{ fontSize: '.72rem', fontWeight: 700, letterSpacing: '.08em', color: 'rgba(255,255,255,.35)', textTransform: 'uppercase', marginBottom: '.5rem' }}>Triathlon</div>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '.65rem', marginBottom: '1rem' }}>
+              {TRIATHLON_OPTIONS.map(o => (
+                <button key={o.v} onClick={() => selectCard('objective', o.v)} style={{ ...cardStyle(data.objective === o.v), alignItems: 'flex-start', padding: '.9rem 1rem' }}>
+                  <span style={{ fontSize: '1.4rem' }}>{o.e}</span>
+                  <div style={{ fontWeight: 700, fontSize: '.95rem' }}>{o.l}</div>
+                  <div style={{ fontSize: '.72rem', color: 'rgba(255,255,255,.45)', marginTop: '.1rem', lineHeight: 1.4 }}>{o.desc}</div>
+                </button>
+              ))}
+            </div>
+
             {/* General */}
             <div style={{ fontSize: '.72rem', fontWeight: 700, letterSpacing: '.08em', color: 'rgba(255,255,255,.35)', textTransform: 'uppercase', marginBottom: '.5rem' }}>Général</div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '.6rem', marginBottom: '.5rem' }}>
@@ -458,7 +520,7 @@ export default function ProfileWizard() {
               ))}
             </div>
 
-            {TRAIL_VALUES.has(data.objective) && <ContinueBtn onClick={advance} />}
+            {(TRAIL_VALUES.has(data.objective) || TRIATHLON_VALUES.has(data.objective)) && <ContinueBtn onClick={advance} />}
           </>}
 
           {/* ── race_date ── */}
@@ -525,6 +587,225 @@ export default function ProfileWizard() {
               ].map(o => (
                 <button key={o.v} onClick={() => selectCard('training_terrain', o.v)}
                   style={{ ...cardStyle(data.training_terrain === o.v), flexDirection: 'row', alignItems: 'center', gap: '1rem', padding: '1.1rem 1.25rem' }}>
+                  <span style={{ fontSize: '1.8rem', flexShrink: 0 }}>{o.e}</span>
+                  <div>
+                    <div style={{ fontWeight: 700, fontSize: '.975rem' }}>{o.l}</div>
+                    <div style={{ fontSize: '.82rem', color: 'rgba(255,255,255,.5)', marginTop: '.1rem' }}>{o.desc}</div>
+                  </div>
+                </button>
+              ))}
+            </div>
+          </>}
+
+          {/* ── trail_experience ── */}
+          {stepId === 'trail_experience' && <>
+            <StepLabel>Trail — Question {currentIdx + 1}</StepLabel>
+            <StepTitle>Ton expérience en trail ?</StepTitle>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '.75rem' }}>
+              {[
+                { v: 'jamais',       e: '🌱', l: 'Première course trail',     desc: 'Je viens du running sur route ou je débute' },
+                { v: 'quelques',     e: '🏕️', l: 'Quelques courses trail',    desc: 'Moins de 5 courses trail au compteur' },
+                { v: 'experimente',  e: '🏔️', l: 'Expérimenté',              desc: '5+ courses trail, je connais les codes' },
+              ].map(o => (
+                <button key={o.v} onClick={() => selectCard('trail_experience', o.v)}
+                  style={{ ...cardStyle(data.trail_experience === o.v), flexDirection: 'row', alignItems: 'center', gap: '1rem', padding: '1.1rem 1.25rem' }}>
+                  <span style={{ fontSize: '1.8rem', flexShrink: 0 }}>{o.e}</span>
+                  <div>
+                    <div style={{ fontWeight: 700, fontSize: '.975rem' }}>{o.l}</div>
+                    <div style={{ fontSize: '.82rem', color: 'rgba(255,255,255,.5)', marginTop: '.1rem' }}>{o.desc}</div>
+                  </div>
+                </button>
+              ))}
+            </div>
+          </>}
+
+          {/* ── trail_poles ── */}
+          {stepId === 'trail_poles' && <>
+            <StepLabel>Trail — Question {currentIdx + 1}</StepLabel>
+            <StepTitle>Tu as des bâtons de trail ?</StepTitle>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '.75rem' }}>
+              {[
+                { v: 'oui',     e: '🥢', l: 'Oui, j\'en ai',         desc: 'Je les utilise déjà en entraînement' },
+                { v: 'prevois', e: '🛒', l: 'Je prévois d\'en acheter', desc: 'Utiles pour les longues distances' },
+                { v: 'non',     e: '🙅', l: 'Non, sans bâtons',      desc: 'Je préfère courir sans' },
+              ].map(o => (
+                <button key={o.v} onClick={() => selectCard('trail_poles', o.v)}
+                  style={{ ...cardStyle(data.trail_poles === o.v), flexDirection: 'row', alignItems: 'center', gap: '1rem', padding: '1.1rem 1.25rem' }}>
+                  <span style={{ fontSize: '1.8rem', flexShrink: 0 }}>{o.e}</span>
+                  <div>
+                    <div style={{ fontWeight: 700, fontSize: '.975rem' }}>{o.l}</div>
+                    <div style={{ fontSize: '.82rem', color: 'rgba(255,255,255,.5)', marginTop: '.1rem' }}>{o.desc}</div>
+                  </div>
+                </button>
+              ))}
+            </div>
+          </>}
+
+          {/* ── tri_sessions ── */}
+          {stepId === 'tri_sessions' && <>
+            <StepLabel>Triathlon — Question {currentIdx + 1}</StepLabel>
+            <StepTitle>Combien de séances par semaine ?</StepTitle>
+            <p style={{ textAlign: 'center', color: 'rgba(255,255,255,.4)', fontSize: '.875rem', marginBottom: '1.5rem', lineHeight: 1.6 }}>
+              Ton volume d'entraînement triathlon hebdomadaire.
+            </p>
+            {[
+              { key: 'tri_swim_sessions', label: '🏊 Natation', min: 1, max: 4, emoji: '🏊' },
+              { key: 'tri_bike_sessions', label: '🚴 Vélo',     min: 1, max: 4, emoji: '🚴' },
+              { key: 'tri_run_sessions',  label: '🏃 Course',   min: 1, max: 3, emoji: '🏃' },
+            ].map(({ key, label, min, max }) => (
+              <div key={key} style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1rem', background: 'rgba(255,255,255,.05)', borderRadius: 14, padding: '.875rem 1.1rem' }}>
+                <span style={{ fontSize: '1.5rem', flexShrink: 0 }}>{label.split(' ')[0]}</span>
+                <span style={{ fontWeight: 600, flex: 1, fontSize: '.95rem' }}>{label.split(' ').slice(1).join(' ')}</span>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '.5rem' }}>
+                  <button onClick={() => set(key, Math.max(min, data[key] - 1))}
+                    style={{ width: 32, height: 32, borderRadius: 8, background: 'rgba(255,255,255,.1)', border: '1px solid rgba(255,255,255,.15)', color: '#fff', cursor: 'pointer', fontWeight: 700, fontSize: '1.1rem', fontFamily: 'inherit' }}>−</button>
+                  <span style={{ fontWeight: 800, fontSize: '1.4rem', minWidth: 28, textAlign: 'center' }}>{data[key]}</span>
+                  <button onClick={() => set(key, Math.min(max, data[key] + 1))}
+                    style={{ width: 32, height: 32, borderRadius: 8, background: 'rgba(255,255,255,.1)', border: '1px solid rgba(255,255,255,.15)', color: '#fff', cursor: 'pointer', fontWeight: 700, fontSize: '1.1rem', fontFamily: 'inherit' }}>+</button>
+                </div>
+              </div>
+            ))}
+            <ContinueBtn onClick={advance} />
+          </>}
+
+          {/* ── tri_swim_level ── */}
+          {stepId === 'tri_swim_level' && <>
+            <StepLabel>Triathlon — Question {currentIdx + 1}</StepLabel>
+            <StepTitle>Ton niveau en natation ?</StepTitle>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '.75rem' }}>
+              {[
+                { v: 'debutant',      e: '🤽', l: 'Débutant',      desc: 'Je nage mais pas régulièrement — je travaille les bases' },
+                { v: 'intermediaire', e: '🏊', l: 'Intermédiaire', desc: 'Je nage régulièrement, je suis à l\'aise en piscine' },
+                { v: 'confirme',      e: '🌊', l: 'Confirmé',      desc: 'Je nage en compétition ou en club' },
+              ].map(o => (
+                <button key={o.v} onClick={() => selectCard('tri_swim_level', o.v)}
+                  style={{ ...cardStyle(data.tri_swim_level === o.v), flexDirection: 'row', alignItems: 'center', gap: '1rem', padding: '1.1rem 1.25rem' }}>
+                  <span style={{ fontSize: '1.8rem', flexShrink: 0 }}>{o.e}</span>
+                  <div>
+                    <div style={{ fontWeight: 700, fontSize: '.975rem' }}>{o.l}</div>
+                    <div style={{ fontSize: '.82rem', color: 'rgba(255,255,255,.5)', marginTop: '.1rem' }}>{o.desc}</div>
+                  </div>
+                </button>
+              ))}
+            </div>
+          </>}
+
+          {/* ── css ── */}
+          {stepId === 'css' && <>
+            <StepLabel>Triathlon — Question {currentIdx + 1}</StepLabel>
+            <StepTitle>Tu connais ton CSS ?</StepTitle>
+            <p style={{ textAlign: 'center', color: 'rgba(255,255,255,.4)', fontSize: '.875rem', marginBottom: '1.5rem', lineHeight: 1.6 }}>
+              Le CSS (Critical Swim Speed) définit toutes tes allures de nage.
+            </p>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '.75rem', marginBottom: '1.25rem' }}>
+              {[{ v: true, e: '🎯', l: 'Je connais mon CSS', desc: 'Je vais le saisir' },
+                { v: false, e: '🧪', l: 'Je ne sais pas', desc: 'Test CSS prévu en S1-S2' }].map(o => (
+                <button key={String(o.v)} onClick={() => set('css_known', o.v)}
+                  style={{ ...cardStyle(data.css_known === o.v), alignItems: 'center', textAlign: 'center', padding: '1.25rem 1rem' }}>
+                  <span style={{ fontSize: '1.8rem' }}>{o.e}</span>
+                  <span style={{ fontWeight: 700, fontSize: '.875rem' }}>{o.l}</span>
+                  <span style={{ fontSize: '.75rem', color: 'rgba(255,255,255,.45)', lineHeight: 1.4 }}>{o.desc}</span>
+                </button>
+              ))}
+            </div>
+            {data.css_known && (
+              <div style={{ display: 'flex', alignItems: 'center', gap: '.75rem', justifyContent: 'center', marginBottom: '.5rem' }}>
+                <input style={{ width: 130, padding: '.9rem', background: 'rgba(255,255,255,.07)', border: '1.5px solid rgba(139,47,201,.35)', borderRadius: 14, color: '#fff', fontSize: '1.3rem', textAlign: 'center', outline: 'none', fontFamily: 'inherit' }}
+                  placeholder="1'45" value={data.css_value}
+                  onChange={e => set('css_value', e.target.value)} autoFocus />
+                <span style={{ fontWeight: 600, color: 'rgba(255,255,255,.5)', fontSize: '1rem' }}>/100m</span>
+              </div>
+            )}
+            <ContinueBtn onClick={advance} />
+          </>}
+
+          {/* ── ftp ── */}
+          {stepId === 'ftp' && <>
+            <StepLabel>Triathlon — Question {currentIdx + 1}</StepLabel>
+            <StepTitle>Tu as un capteur de puissance ?</StepTitle>
+            <p style={{ textAlign: 'center', color: 'rgba(255,255,255,.4)', fontSize: '.875rem', marginBottom: '1.5rem', lineHeight: 1.6 }}>
+              La FTP (seuil fonctionnel) calibre l'intensité de tes séances vélo.
+            </p>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '.75rem', marginBottom: '1.25rem' }}>
+              {[{ v: true, e: '⚡', l: 'Oui, j\'ai ma FTP', desc: 'Je vais la saisir en watts' },
+                { v: false, e: '❤️', l: 'Non', desc: 'On travaillera en RPE et % FC max' }].map(o => (
+                <button key={String(o.v)} onClick={() => set('ftp_known', o.v)}
+                  style={{ ...cardStyle(data.ftp_known === o.v), alignItems: 'center', textAlign: 'center', padding: '1.25rem 1rem' }}>
+                  <span style={{ fontSize: '1.8rem' }}>{o.e}</span>
+                  <span style={{ fontWeight: 700, fontSize: '.875rem' }}>{o.l}</span>
+                  <span style={{ fontSize: '.75rem', color: 'rgba(255,255,255,.45)', lineHeight: 1.4 }}>{o.desc}</span>
+                </button>
+              ))}
+            </div>
+            {data.ftp_known && (
+              <div style={{ display: 'flex', alignItems: 'center', gap: '.75rem', justifyContent: 'center', marginBottom: '.5rem' }}>
+                <input type="number" style={{ width: 130, padding: '.9rem', background: 'rgba(255,255,255,.07)', border: '1.5px solid rgba(139,47,201,.35)', borderRadius: 14, color: '#fff', fontSize: '1.3rem', textAlign: 'center', outline: 'none', fontFamily: 'inherit' }}
+                  placeholder="220" min={80} max={500}
+                  value={data.ftp_value}
+                  onChange={e => set('ftp_value', e.target.value)} autoFocus />
+                <span style={{ fontWeight: 600, color: 'rgba(255,255,255,.5)', fontSize: '1rem' }}>watts</span>
+              </div>
+            )}
+            <ContinueBtn onClick={advance} />
+          </>}
+
+          {/* ── open_water ── */}
+          {stepId === 'open_water' && <>
+            <StepLabel>Triathlon — Question {currentIdx + 1}</StepLabel>
+            <StepTitle>Tu veux t'entraîner en eau libre ?</StepTitle>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '.75rem' }}>
+              {[
+                { v: 'oui',                e: '🌊', l: 'Oui',                    desc: 'Lac, mer, rivière — j\'ai accès à l\'eau libre' },
+                { v: 'selon_conditions',   e: '🌤️', l: 'Selon les conditions',  desc: 'Quand c\'est possible et sécurisé' },
+                { v: 'non',                e: '🏊', l: 'Non, piscine uniquement', desc: 'Je n\'ai pas accès à l\'eau libre' },
+              ].map(o => (
+                <button key={o.v} onClick={() => selectCard('open_water', o.v)}
+                  style={{ ...cardStyle(data.open_water === o.v), flexDirection: 'row', alignItems: 'center', gap: '1rem', padding: '1.1rem 1.25rem' }}>
+                  <span style={{ fontSize: '1.8rem', flexShrink: 0 }}>{o.e}</span>
+                  <div>
+                    <div style={{ fontWeight: 700, fontSize: '.975rem' }}>{o.l}</div>
+                    <div style={{ fontSize: '.82rem', color: 'rgba(255,255,255,.5)', marginTop: '.1rem' }}>{o.desc}</div>
+                  </div>
+                </button>
+              ))}
+            </div>
+          </>}
+
+          {/* ── bike_type ── */}
+          {stepId === 'bike_type' && <>
+            <StepLabel>Triathlon — Question {currentIdx + 1}</StepLabel>
+            <StepTitle>Quel vélo tu utilises ?</StepTitle>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '.75rem' }}>
+              {[
+                { v: 'route',        e: '🚴', l: 'Vélo de route',         desc: 'Guidon courbé, position classique' },
+                { v: 'triathlon_tt', e: '⚡', l: 'Vélo triathlon / TT',   desc: 'Position aéro, extensions de guidon' },
+                { v: 'gravel_vtt',   e: '🌲', l: 'Vélo gravel / VTT',     desc: 'Terrain varié, position plus haute' },
+                { v: 'aucun',        e: '🛒', l: 'Pas encore de vélo',    desc: 'Je vais en acheter un' },
+              ].map(o => (
+                <button key={o.v} onClick={() => selectCard('bike_type', o.v)}
+                  style={{ ...cardStyle(data.bike_type === o.v), flexDirection: 'row', alignItems: 'center', gap: '1rem', padding: '1.1rem 1.25rem' }}>
+                  <span style={{ fontSize: '1.8rem', flexShrink: 0 }}>{o.e}</span>
+                  <div>
+                    <div style={{ fontWeight: 700, fontSize: '.975rem' }}>{o.l}</div>
+                    <div style={{ fontSize: '.82rem', color: 'rgba(255,255,255,.5)', marginTop: '.1rem' }}>{o.desc}</div>
+                  </div>
+                </button>
+              ))}
+            </div>
+          </>}
+
+          {/* ── tri_experience ── */}
+          {stepId === 'tri_experience' && <>
+            <StepLabel>Triathlon — Question {currentIdx + 1}</StepLabel>
+            <StepTitle>Ton expérience triathlon ?</StepTitle>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '.75rem' }}>
+              {[
+                { v: 'jamais',       e: '🌱', l: 'Premier triathlon',        desc: 'Je n\'en ai jamais fait, c\'est mon premier' },
+                { v: 'quelques',     e: '🏅', l: 'Quelques triathlons',     desc: 'Moins de 5 triathlons au compteur' },
+                { v: 'experimente',  e: '🏆', l: 'Expérimenté',             desc: '5+ triathlons, je connais les transitions' },
+              ].map(o => (
+                <button key={o.v} onClick={() => selectCard('tri_experience', o.v)}
+                  style={{ ...cardStyle(data.tri_experience === o.v), flexDirection: 'row', alignItems: 'center', gap: '1rem', padding: '1.1rem 1.25rem' }}>
                   <span style={{ fontSize: '1.8rem', flexShrink: 0 }}>{o.e}</span>
                   <div>
                     <div style={{ fontWeight: 700, fontSize: '.975rem' }}>{o.l}</div>

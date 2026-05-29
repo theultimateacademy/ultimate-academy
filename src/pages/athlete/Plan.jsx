@@ -786,6 +786,7 @@ export default function AthletePlan() {
   const [completions,    setCompletions]   = useState([])
   const [weekFeedbacks,  setWeekFeedbacks] = useState([])
   const [activeWeek,     setActiveWeek]    = useState(1)
+  const [triTab,         setTriTab]        = useState('all') // 'all' | 'natation' | 'velo' | 'course'
   const [modal,          setModal]         = useState(null)
   const [postFlow,       setPostFlow]      = useState(null)
   const [loading,        setLoading]       = useState(true)
@@ -1197,16 +1198,86 @@ export default function AthletePlan() {
         </div>
       )}
 
+      {/* Triathlon discipline tabs */}
+      {['tri_sprint','tri_olympic','tri_half','tri_ironman'].includes(profile?.objective) && (
+        <div style={{ display: 'flex', gap: '.4rem', marginBottom: '1rem', overflowX: 'auto', paddingBottom: '.25rem' }}>
+          {[
+            { v: 'all',      l: '🗓 Semaine complète' },
+            { v: 'natation', l: '🏊 Natation' },
+            { v: 'velo',     l: '🚴 Vélo' },
+            { v: 'course',   l: '🏃 Course' },
+          ].map(t => (
+            <button key={t.v} onClick={() => setTriTab(t.v)} style={{
+              padding: '.35rem .85rem', borderRadius: 99, fontWeight: 600, fontSize: '.8rem',
+              border: triTab === t.v ? '2px solid #8B2FC9' : '1px solid rgba(255,255,255,.15)',
+              background: triTab === t.v ? 'rgba(139,47,201,.25)' : 'rgba(255,255,255,.05)',
+              color: triTab === t.v ? '#fff' : 'rgba(255,255,255,.6)',
+              cursor: 'pointer', fontFamily: 'inherit', whiteSpace: 'nowrap', flexShrink: 0,
+            }}>{t.l}</button>
+          ))}
+        </div>
+      )}
+
       {/* Sessions — sorted by day (Mon→Sun), original idx preserved for completion tracking */}
       <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
         {(currentWeekData?.seances || [])
           .map((s, origIdx) => ({ ...s, _origIdx: origIdx }))
           .sort((a, b) => sessionDayOrder(a) - sessionDayOrder(b))
+          .filter(session => {
+            if (triTab === 'all') return true;
+            const t = (session.type || '').toLowerCase();
+            if (triTab === 'natation') return t.includes('natation');
+            if (triTab === 'velo')     return t.includes('vélo') || t.includes('velo');
+            if (triTab === 'course')   return !t.includes('natation') && !t.includes('vélo') && !t.includes('velo') && !t.includes('brique');
+            return true;
+          })
           .map((session) => {
           const idx   = session._origIdx
           const done  = isCompleted(currentWeekData.numero, idx)
           const isRace = session.est_course || session.id_seance === 'RACE' || session.id_seance === 'RACE_INT'
+          const isBrique = (session.type || '').toLowerCase().includes('brique')
           const color = SESSION_TYPE_COLORS[session.type] || 'var(--primary)'
+
+          // ── Brick session card ──────────────────────────────────────────────
+          if (isBrique && !isRace) {
+            const bColor = '#8B5CF6'
+            const dateLabel = sessionDate(planMonday, currentWeekData.numero, session.jour)
+            const parts = (session.corps || '').split(/BLOC\s+/i).filter(Boolean)
+            return (
+              <div key={idx} style={{
+                borderRadius: 'var(--radius)',
+                border: `2px solid ${done ? 'var(--success)' : bColor}`,
+                background: `linear-gradient(135deg, ${bColor}10, ${bColor}06)`,
+                padding: '1rem 1.25rem', cursor: 'pointer',
+                opacity: done ? .75 : 1,
+              }} onClick={() => setModal({ session: { ...session, _isDone: done, _dateLabel: dateLabel }, weekNum: currentWeekData.numero, sessionIdx: idx })}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '.5rem', marginBottom: '.5rem' }}>
+                  <span style={{ fontSize: '.75rem', fontWeight: 700, color: bColor, background: bColor+'25', padding: '.15rem .6rem', borderRadius: 99 }}>
+                    🔗 Brique
+                  </span>
+                  {done && <span className="badge badge-success">✅ Effectuée</span>}
+                </div>
+                <div style={{ fontWeight: 800, fontSize: '1.05rem', marginBottom: '.2rem' }}>{session.titre}</div>
+                <div style={{ fontSize: '.8rem', color: 'var(--text-muted)', marginBottom: '.75rem' }}>
+                  {dateLabel} · {session.duree_min} min
+                </div>
+                <div style={{ display: 'flex', gap: '.5rem', flexWrap: 'wrap' }}>
+                  {parts.slice(0, 3).map((part, i) => {
+                    const firstLine = part.split('\n')[0].trim()
+                    const isBikeBloc = /vélo|velo|bike/i.test(firstLine)
+                    const isRunBloc  = /course|run|footing/i.test(firstLine)
+                    const isNatBloc  = /nage|natation|swim/i.test(firstLine)
+                    const bloColor   = isBikeBloc ? '#F97316' : isRunBloc ? '#10B981' : isNatBloc ? '#06B6D4' : bColor
+                    return (
+                      <div key={i} style={{ background: bloColor+'18', border: `1px solid ${bloColor}35`, borderRadius: 8, padding: '.3rem .7rem', fontSize: '.75rem', fontWeight: 600, color: bloColor }}>
+                        {firstLine.replace(/\n.*/, '')}
+                      </div>
+                    )
+                  })}
+                </div>
+              </div>
+            )
+          }
 
           // ── Special race card ──────────────────────────────────────────────
           if (isRace) {

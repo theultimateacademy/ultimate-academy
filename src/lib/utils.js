@@ -98,6 +98,7 @@ export const DAY_LABELS = {
 }
 
 export const SESSION_TYPE_COLORS = {
+  // Running
   'Endurance fondamentale':  '#10B981',
   'Footing progressif':      '#84CC16',
   'Fractionné court':        '#E8237A',
@@ -113,4 +114,30 @@ export const SESSION_TYPE_COLORS = {
   'Renforcement musculaire': '#EC4899',
   'Course':                  '#FFD700',
   'Course intermédiaire':    '#FB923C',
+  // Trail
+  'Trail endurance':         '#22C55E',
+  'Trail côtes':             '#EF4444',
+  'Trail technique':         '#F97316',
+  'Trail fractionné':        '#A855F7',
+  'Trail montagne':          '#6366F1',
+  'Trail simulation':        '#0EA5E9',
+  // Triathlon — Natation
+  'Natation':                '#06B6D4',
+  'Natation endurance':      '#06B6D4',
+  'Natation vitesse':        '#0284C7',
+  'Natation seuil':          '#0369A1',
+  'Natation tempo':          '#0891B2',
+  'Natation technique':      '#67E8F9',
+  'Natation test':           '#F59E0B',
+  'Natation récupération':   '#6B7280',
+  // Triathlon — Vélo
+  'Vélo':                    '#F97316',
+  'Vélo endurance':          '#F97316',
+  'Vélo tempo':              '#EA580C',
+  'Vélo intervalles':        '#DC2626',
+  'Vélo côtes':              '#C2410C',
+  'Vélo test':               '#F59E0B',
+  'Vélo récupération':       '#6B7280',
+  // Triathlon — Brique
+  'Brique':                  '#8B5CF6',
 }
