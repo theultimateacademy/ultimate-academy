@@ -303,16 +303,109 @@ async function loadSessionLibrary() {
 
   if (error || !data?.length) {
     console.warn('[session_library] Error or empty:', error?.message);
-    return '(bibliothèque vide — vérifier la table session_library)';
+    return { text: '(bibliothèque vide — vérifier la table session_library)', map: {} };
   }
 
-  return data.map(s => {
+  const map = Object.fromEntries(data.map(s => [s.code, s]));
+
+  const text = data.map(s => {
     const goals = (s.compatible_goals || []).join(', ');
     const E  = s.warmup   ? `\n  É: ${s.warmup}`   : '';
     const R  = s.recovery ? `\n  R: ${s.recovery}`  : '';
     const RC = s.cooldown ? `\n  RC: ${s.cooldown}` : '';
     return `[${s.code}] ${s.name} | ${s.duration_min}min | RPE${s.intensity_rpe}/10 | ${goals}${E}\n  C: ${s.main_set}${R}${RC}\n  📝 ${s.coach_notes}`;
   }).join('\n\n');
+
+  return { text, map };
+}
+
+// ─── Inject library content into plan sessions ─────────────────────────────────
+// After AI picks codes, replace corps/echauffement/retour with library content
+// formatted as BLOC/bullet structure for the UI visual display.
+
+function subsPaces(text, vma) {
+  if (!text) return text;
+  // Single-pass: match "X-Y% VMA" ranges OR "X% VMA" singles — avoids double-replacement
+  return text.replace(/(\d{2,3})-(\d{2,3})%\s*VMA|(\d{2,3})%\s*VMA/g, (match, lo, hi, single) => {
+    if (lo && hi) {
+      return `${calcPace(vma, parseInt(lo) / 100)}/km – ${calcPace(vma, parseInt(hi) / 100)}/km (${lo}-${hi}% VMA)`;
+    }
+    return `${calcPace(vma, parseInt(single) / 100)}/km (${single}% VMA)`;
+  });
+}
+
+function buildCorps(libSession, vma) {
+  const main     = libSession.main_set || '';
+  const recovery = libSession.recovery || '';
+  const cat      = (libSession.category || '').toLowerCase();
+
+  // EF, RA: plain text — the EF display component handles them
+  if (cat === 'endurance_fondamentale' || cat === 'recuperation_active') {
+    return subsPaces(main, vma);
+  }
+
+  // Renforcement: keep reference text verbatim
+  if (cat === 'renforcement') return main;
+
+  // Sortie longue with phase splits (SL-07, SL-08, SL-09, SL-10)
+  if (cat === 'sortie_longue') {
+    // Split on "puis" or " → " to detect multi-phase
+    const phases = main.split(/\s+(?:puis|→)\s+/);
+    if (phases.length > 1) {
+      const phaseLabels = ['Endurance fondamentale', 'Blocs tempo / Allure spécifique', 'Allure course'];
+      return phases.map((p, i) =>
+        `BLOC ${phaseLabels[i] || 'Phase ' + (i + 1)}\n• ${subsPaces(p.trim(), vma)}`
+      ).join('\n\n');
+    }
+    // Pure SL: plain text (SL display component handles duration + pace range)
+    return subsPaces(main, vma);
+  }
+
+  // Fractionné, Tempo, Côtes, Spécifique, Footing progressif → BLOC structure
+  if (cat === 'footing_progressif') {
+    // "phase1 → phase2 → phase3"
+    const phases = main.split(/\s*→\s*/);
+    return phases.map((p, i) => `BLOC Phase ${i + 1}\n• ${subsPaces(p.trim(), vma)}`).join('\n\n');
+  }
+
+  // FC, FL, T, CO, SP — effort + récupération en deux BLOCs séparés (même style que SL)
+  const blocLabel = {
+    fractionne_court: 'Intervalles',
+    fractionne_long:  'Intervalles',
+    tempo_seuil:      'Tempo / Seuil',
+    cotes:            'Montées',
+    specifique:       'Allure course',
+  }[cat] || 'Effort';
+
+  let corps = `BLOC ${blocLabel}\n• ${subsPaces(main, vma)}`;
+  if (recovery) {
+    corps += `\n\nBLOC Récupération\n• ${subsPaces(recovery, vma)}`;
+  }
+  return corps;
+}
+
+function injectLibraryContent(planData, libMap, vma) {
+  if (!libMap || !planData?.semaines) return planData;
+  for (const sem of planData.semaines) {
+    for (const s of (sem.seances || [])) {
+      const lib = libMap[s.id_seance];
+      if (!lib) continue;
+
+      // Source of truth: duration from library
+      s.duree_min = lib.duration_min;
+
+      // Echauffement & retour from library (with paces substituted)
+      s.echauffement    = lib.warmup   ? subsPaces(lib.warmup,   vma) : '';
+      s.retour_au_calme = lib.cooldown ? subsPaces(lib.cooldown, vma) : '';
+
+      // Corps: structured BLOC/bullet format from library content
+      s.corps = buildCorps(lib, vma);
+
+      // Coach notes from library (keep AI's if library has none)
+      if (lib.coach_notes) s.notes_coach = lib.coach_notes;
+    }
+  }
+  return planData;
 }
 
 // ─── System prompt (rules) ────────────────────────────────────────────────────
@@ -385,10 +478,31 @@ RÉDUIRE à la fois le volume ET l'intensité — les deux ensemble, jamais l'un
 VEILLE DE COURSE (J-1) : séance d'activation OBLIGATOIRE = EXACTEMENT 20-25 min de footing très léger + 6 lignes droites 80m progressives + gammes athlétiques. JAMAIS 50 min la veille. JAMAIS de vraie séance. Code : EF-01 ou créer une séance d'activation spécifique si disponible dans la bibliothèque.
 
 RÈGLE 6 — VARIÉTÉ DES SÉANCES (RÈGLE ABSOLUE — AUCUNE EXCEPTION)
-INTERDIT de répéter le même id_seance PLUS D'UNE FOIS sur l'ensemble des 4 semaines du plan.
+
+SOURCE UNIQUE : Tu dois OBLIGATOIREMENT choisir TOUTES les séances depuis la bibliothèque ci-dessous.
+Il est STRICTEMENT INTERDIT d'inventer un code ou une séance absente de cette liste.
+Codes disponibles réels :
+  Fractionné court : FC-01 à FC-06
+  Fractionné long  : FL-01 à FL-14
+  Sortie longue    : SL-01 à SL-06
+  Tempo/Seuil      : T-01 à T-05
+  Côtes            : CO-01 à CO-03
+  Footing progressif : FP-01 à FP-03
+  Endurance fond.  : EF-01 à EF-04
+  Récupération act.: RA-01 à RA-02
+  Spécifique       : SP-01 à SP-05
+  Renforcement     : RENFO-01 à RENFO-05
+
+RÈGLE D'ALTERNANCE OBLIGATOIRE — JAMAIS LE MÊME TYPE DEUX SEMAINES CONSÉCUTIVES :
+  • Si semaine 1 contient un Fractionné court (FC-xx) → semaine 2 doit utiliser un Fractionné long (FL-xx) ou Côtes (CO-xx)
+  • Si semaine 1 contient un Tempo/Seuil (T-xx) → semaine 2 doit utiliser un Fractionné (FC-xx ou FL-xx) ou Côtes
+  • Si semaine impaire (S1, S3) contient VMA courte → semaines paires (S2, S4) doivent utiliser seuil/tempo
+  • Alterner systématiquement : FC ↔ FL ↔ T ↔ CO ↔ SP sur les 4 semaines
+  • La Sortie longue est obligatoire chaque semaine — alterner SL pure (S1/S3) et SL avec blocs tempo (S2/S4)
+
+UNICITÉ DES CODES : INTERDIT de répéter le même id_seance PLUS D'UNE FOIS sur l'ensemble des 4 semaines du plan.
 Chaque id_seance doit être UNIQUE sur les 4 semaines : si FL-03 est utilisé semaine 1, il est INTERDIT de l'utiliser en semaine 2, 3 ou 4.
 Varier obligatoirement : si un type de séance (ex: fractionné 1000m) apparaît plusieurs fois, utiliser des codes DIFFÉRENTS (FL-01 + FL-03, jamais FL-01 + FL-01).
-La bibliothèque contient suffisamment de codes pour garantir 4 semaines sans aucun doublon.
 Avant de soumettre : liste mentalement tous les id_seance utilisés et vérifie qu'il n'y a aucun doublon sur l'ensemble du plan.
 NOTE INTER-PLAN : un même id_seance PEUT être réutilisé dans un nouveau plan (mois suivant), à intervalle d'environ 1 mois, pour mesurer la progression — mais jamais de façon systématique.
 
@@ -453,10 +567,14 @@ Sur un plan de 4 semaines, proposer impérativement une palette variée parmi :
 • Seuil / Tempo en blocs continus (20-40 min à 82-88% VMA)
 • Allure spécifique course uniquement si l'objectif chrono est RÉALISTE pour le niveau et la VMA — ne pas forcer si hors-portée
 • Côtes (montées RPE 7-9, pas d'allure fixe)
-• Sorties longues EF avec alternance (EF pure S1/S3, EF + blocs tempo S2/S4)
+• Sorties longues EF AVEC ALTERNANCE OBLIGATOIRE :
+  - Semaines impaires (S1, S3) : SL pure EF (SL-01, SL-02, SL-03, SL-04, SL-06)
+  - Semaines paires (S2, S4) : SL avec blocs tempo ou allure spécifique (SL-07, SL-08, SL-09, SL-10 — OBLIGATOIRE)
+  - INTERDIT d'utiliser SL pure EF deux semaines de suite
+  - Pour semi/marathon : SL-08 et SL-10 incluent des blocs à allure objectif — utiliser en S2 et S4
 • Footings progressifs VRAIS : 3 phases décrites explicitement — phase 1 (65-68% VMA), phase 2 (72-75%), phase 3 (80-85% = seuil)
 • Footings EF simples (65-72% VMA) pour compléter le volume
-POUR 3 SÉANCES/SEMAINE : rendre l'entraînement ludique et complet — footing EF ou progressif + séance intensive (VMA semaines impaires, seuil semaines paires) + sortie longue. Ne jamais répéter le même type deux semaines de suite.
+POUR 3 SÉANCES/SEMAINE : rendre l'entraînement ludique et complet — footing EF ou progressif + séance intensive (FC, FL, T, CO ou SP en alternant) + sortie longue (pure ou avec blocs selon parité). Ne jamais répéter le même type deux semaines de suite.
 
 RÈGLE 13 — TERRAIN D'ENTRAÎNEMENT (trail uniquement)
 Si training_terrain est fourni dans le profil :
@@ -477,10 +595,11 @@ Si intermediate_race_date est fourni dans le profil et tombe dans la fenêtre du
 
 RÈGLE 14bis — SEMAINE APRÈS UNE COURSE INTERMÉDIAIRE (RÉCUPÉRATION OBLIGATOIRE)
 La semaine qui SUIT immédiatement une course intermédiaire = récupération obligatoire, pas de développement :
-• J+1 et J+2 après la course = REPOS COMPLET — jamais de reprise le lendemain d'une course (ex: si course dimanche → lundi et mardi = repos absolu)
-• Reprise uniquement à partir de J+3 : EF très léger uniquement, 25-35 min max (65-68% VMA) — jamais de sortie longue ni séance clé cette semaine-là
+• J+1 et J+2 après la course = REPOS COMPLET ABSOLU — jamais d'entraînement le lendemain d'une course (ex: course dimanche → lundi = repos total, mardi = repos total)
+• Pas de séance placée un lundi ou mardi si la course était le dimanche
+• Reprise uniquement à partir de J+3 : UNIQUEMENT EF-01 ou EF-02 (footing léger 35-45 min, 65-68% VMA) — jamais de sortie longue ni séance clé cette semaine-là
 • AUCUNE séance dure (seuil, fractionné, tempo, côtes, spécifique) avant J+7 après la course — aucune exception, même si l'athlète se sent bien
-• La séance RENFO peut être placée à J+2 ou J+3 — c'est la seule séance non-course autorisée précocement
+• Pas de RENFO pendant les 48h post-course
 • Charge de cette semaine = "Légère — Récupération post-course intermédiaire"
 • Si cette semaine est la dernière du plan, concentrer sur la récupération et ne pas forcer le volume
 
@@ -560,6 +679,7 @@ Exemple : days_per_week = 3 → 3 séances course + 1 RENFO = 4 séances au tota
 
 RÈGLE ABSOLUE : Tu dois OBLIGATOIREMENT choisir toutes les séances dans la bibliothèque ci-dessous.
 Il est INTERDIT d'inventer un code ou une séance absente de cette liste.
+INTERDIT d'utiliser un code qui n'existe pas dans la bibliothèque (ex: FC-07, FL-15, T-06, CO-04, EF-05, SL-07 n'existent PAS — ne les utilise jamais).
 Si la séance idéale n'existe pas, choisis le code le plus proche disponible dans la bibliothèque.
 Utilise le code exact de chaque séance dans le champ id_seance (ex: FL-04, T-03, EF-01, RENFO-02).
 Les codes RENFO-01 à RENFO-05 correspondent aux séances de renforcement disponibles dans l'application.
@@ -676,6 +796,23 @@ router.post('/plans/generate', async (req, res) => {
   const { data: dbProfile } = await supabase.from('profiles').select('*').eq('id', userId).single();
   const profile = { ...clientProfile, ...(dbProfile || {}) };
 
+  // Fetch codes used in the last active/archived plan to enforce variety
+  const { data: lastPlans } = await supabase
+    .from('training_plans')
+    .select('plan_data')
+    .eq('user_id', userId)
+    .in('status', ['active', 'archived'])
+    .order('created_at', { ascending: false })
+    .limit(1);
+  const recentlyUsedCodes = new Set();
+  if (lastPlans?.[0]?.plan_data?.semaines) {
+    for (const sem of lastPlans[0].plan_data.semaines) {
+      for (const s of (sem.seances || [])) {
+        if (s.id_seance && !['RACE', 'RACE_INT'].includes(s.id_seance)) recentlyUsedCodes.add(s.id_seance);
+      }
+    }
+  }
+
   const vma              = resolveVma(profile);
   const weeksUntilRace   = computeWeeksUntilRace(profile.race_date);
   const monthStructure   = computeMonthStructure(profile.objective, weeksUntilRace);
@@ -728,11 +865,25 @@ router.post('/plans/generate', async (req, res) => {
   const week1SessionCount = isPartialWeek ? remainingThisWeek.length : profile.days_per_week;
 
   // ── Calendar section for prompt ─────────────────────────────────────────────
+  // Pre-compute the 4 week date ranges for the prompt
+  const w1Mon = new Date(nextMonday); const w1Sun = new Date(w1Mon); w1Sun.setDate(w1Mon.getDate() + 6);
+  const w2Mon = new Date(w1Mon); w2Mon.setDate(w1Mon.getDate() + 7); const w2Sun = new Date(w2Mon); w2Sun.setDate(w2Mon.getDate() + 6);
+  const w3Mon = new Date(w1Mon); w3Mon.setDate(w1Mon.getDate() + 14); const w3Sun = new Date(w3Mon); w3Sun.setDate(w3Mon.getDate() + 6);
+  const w4Mon = new Date(w1Mon); w4Mon.setDate(w1Mon.getDate() + 21); const w4Sun = new Date(w4Mon); w4Sun.setDate(w4Mon.getDate() + 6);
+
   const calendarSection = isLateWeek
-    ? `CALENDRIER — PLAN DÉMARRE LUNDI PROCHAIN
-Aujourd'hui : ${todayISO} (${todayDayName}) — fin de semaine, trop tard pour démarrer maintenant.
-Le plan démarre le ${nextMondayISO} (lundi prochain).
-Semaines 1-4 : ${profile.days_per_week} séances course + 1 RENFO par semaine, toutes complètes, à partir du ${nextMondayISO}.`
+    ? `CALENDRIER — 4 SEMAINES COMPLÈTES
+Aujourd'hui ${todayISO} (${todayDayName}) — le plan démarre lundi prochain ${nextMondayISO}.
+
+DATES IMPOSÉES — copier exactement ces valeurs dans le JSON "dates" de chaque semaine :
+  Semaine 1 : debut="${localISO(w1Mon)}" fin="${localISO(w1Sun)}" → ${profile.days_per_week} séances course + 1 RENFO
+  Semaine 2 : debut="${localISO(w2Mon)}" fin="${localISO(w2Sun)}" → ${profile.days_per_week} séances course + 1 RENFO
+  Semaine 3 : debut="${localISO(w3Mon)}" fin="${localISO(w3Sun)}" → ${profile.days_per_week} séances course + 1 RENFO
+  Semaine 4 : debut="${localISO(w4Mon)}" fin="${localISO(w4Sun)}" → ${profile.days_per_week} séances course + 1 RENFO
+
+⛔ INTERDIT de créer une semaine avec debut="${todayISO}" ou toute date avant "${nextMondayISO}".
+⛔ INTERDIT de créer une semaine vide ou une semaine "partielle".
+Le plan contient EXACTEMENT 4 semaines, toutes avec des séances, toutes à partir du ${nextMondayISO}.`
     : isPartialWeek
     ? `CALENDRIER — SEMAINE 1 PARTIELLE
 Aujourd'hui : ${todayISO} (${todayDayName}).
@@ -756,7 +907,13 @@ Semaines 1-4 : ${profile.days_per_week} séances course + 1 RENFO par semaine.`;
     ? `Terrain d'entraînement : ${profile.training_terrain === 'montagne' ? 'Montagne (D+/descentes disponibles — RÈGLE 13)' : profile.training_terrain === 'semi_montagne' ? 'Semi-montagne (mix plat et pente — RÈGLE 13)' : 'Ville/Plat (escaliers, tapis incliné — RÈGLE 13)'}`
     : '';
 
-  const userPrompt = `Génère un plan d'entraînement running de EXACTEMENT 4 SEMAINES pour :
+  const recentCodesWarning = recentlyUsedCodes.size > 0
+    ? `\n⚠ VARIÉTÉ OBLIGATOIRE — ces codes étaient dans le plan précédent, choisis des codes DIFFÉRENTS :
+  ${[...recentlyUsedCodes].sort().join(', ')}
+  (ex: si FL-06 est listé → utilise FL-03, FL-04, FL-08, FL-09 ou FL-11 à la place)`
+    : '';
+
+  const userPrompt = `Génère un plan d'entraînement running de EXACTEMENT 4 SEMAINES pour :${recentCodesWarning}
 
 Prénom : ${profile.first_name}
 Objectif course : ${profile.objective}
@@ -785,8 +942,14 @@ ${buildPaceSection(vma, profile.objective, profile.chrono_goal_known ? profile.c
 STRUCTURE IMPOSÉE (respecte exactement) :
 ${structureDesc}
 
+DATES OBLIGATOIRES DES SEMAINES — utilise EXACTEMENT ces valeurs dans le champ "dates" de chaque semaine :
+  S1 : debut="${localISO(w1Mon)}" fin="${localISO(w1Sun)}"
+  S2 : debut="${localISO(w2Mon)}" fin="${localISO(w2Sun)}"
+  S3 : debut="${localISO(w3Mon)}" fin="${localISO(w3Sun)}"
+  S4 : debut="${localISO(w4Mon)}" fin="${localISO(w4Sun)}"
+
 CONTRAINTES ABSOLUES — vérifie et documente dans auto_validation avant de soumettre :
-1. EXACTEMENT 4 semaines avec les phases et charges ci-dessus
+1. EXACTEMENT 4 semaines avec les phases et charges ci-dessus — S1 debut="${localISO(w1Mon)}", S4 debut="${localISO(w4Mon)}"
 2. ${isLateWeek ? `Semaines 1-4 : EXACTEMENT ${profile.days_per_week} séances course + 1 RENFO chacune — toutes complètes.` : `Semaine 1 : ${week1SessionCount} séances course${week1SessionCount > 0 ? ' + 1 RENFO' : ' (partielle — adapter si peu de jours restants)'}. Semaines 2-4 : EXACTEMENT ${profile.days_per_week} séances course + 1 RENFO — ni plus, ni moins.`} Les séances RA (récupération active) comptent dans ce total.
 3. ${efMin} dans chaque semaine complète (Sortie longue compte comme EF — utilise EF-01/EF-02/EF-03, JAMAIS EF-04 par défaut). Varier les durées EF : alterner une session longue (65-80 min) et une session courte (40-50 min) pour reposer le système nerveux.
 4. Ratio 80/20 respecté : max 20% de séances dures (fractionné, tempo, côtes, spécifique)
@@ -806,7 +969,7 @@ CONTRAINTES ABSOLUES — vérifie et documente dans auto_validation avant de sou
 18. FRACTIONNÉ 2000m : OBLIGATOIREMENT à 85% VMA exactement = ${calcPace(vma, 0.85)}/km pour VMA ${vma}. JAMAIS à 80%, JAMAIS à 83%. Aucune exception.${profile.chrono_goal_known && calcTargetPace(profile.chrono_goal, profile.objective) ? `\n19. Allure objectif chrono = ${calcTargetPace(profile.chrono_goal, profile.objective)} (calculée depuis "${profile.chrono_goal}") — utilise cette valeur exacte pour tous les blocs spécifiques allure course` : ''}${hasIntermediateRace ? `\n${profile.chrono_goal_known && calcTargetPace(profile.chrono_goal, profile.objective) ? '20' : '19'}. RÉCUPÉRATION POST-COURSE INTERMÉDIAIRE (RÈGLE 14bis — ABSOLUE) : La semaine qui SUIT la course intermédiaire du ${new Date(profile.intermediate_race_date).toLocaleDateString('fr-FR')} doit être une semaine de récupération. J+1 et J+2 = repos complet. Aucun seuil/fractionné/tempo/côtes avant J+7. EF léger uniquement à partir de J+3 (25-35 min, 65-68% VMA). Charge = "Légère — Récupération post-course intermédiaire". JAMAIS de séance dure le lundi ou mardi après la course.` : ''}`;
 
   try {
-    const libraryText = await loadSessionLibrary();
+    const { text: libraryText, map: libraryMap } = await loadSessionLibrary();
     const message = await client.messages.create({
       model:      'claude-sonnet-4-6',
       max_tokens: 16000,
@@ -816,7 +979,18 @@ CONTRAINTES ABSOLUES — vérifie et documente dans auto_validation avant de sou
 
     const rawText  = message.content[0].text.trim();
     const jsonText = rawText.replace(/^```json\s*/i, '').replace(/^```\s*/i, '').replace(/\s*```$/i, '');
-    const planData = recalculateDistances(injectRaceSessions(JSON.parse(jsonText), profile), resolveVma(profile));
+    const parsed   = JSON.parse(jsonText);
+
+    // Strip any empty/partial semaines the AI creates for the current partial week
+    if (parsed.semaines) {
+      parsed.semaines = parsed.semaines.filter(s => (s.seances || []).length > 0);
+      parsed.semaines.forEach((s, i) => { s.numero = i + 1; });
+    }
+
+    // Inject library content (corps/echauffement/retour/duree_min) from DB — source of truth
+    injectLibraryContent(parsed, libraryMap, vma);
+
+    const planData = recalculateDistances(injectRaceSessions(parsed, profile), resolveVma(profile));
 
     const { data: plan, error } = await supabase
       .from('training_plans')

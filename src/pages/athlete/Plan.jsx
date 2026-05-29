@@ -237,7 +237,7 @@ function SessionDetailPage({ session, weekNum, sessionIdx, planId, vma, onClose,
 
         if (trimmed.startsWith('•')) {
           const content = trimmed.slice(1).trim()
-          const isRecov = /r[eé]cup|marche|trot|repos/i.test(content)
+          const isRecov = /r[eé]cup|marche|trot|repos|footing.*lent|lent.*footing/i.test(content)
 
           if (isRecov) {
             nodes.push(
@@ -247,7 +247,8 @@ function SessionDetailPage({ session, weekNum, sessionIdx, planId, vma, onClose,
               </div>
             )
           } else {
-            const mMatch = content.match(/^(\d+(?:[.,]\d+)?\s*(?:m\b|km\b|min\b))\s+/i)
+            // Matches "4x1500m", "3x10min", "10x400m" (NxM pattern) OR "55 min", "6 km" (simple)
+            const mMatch = content.match(/^(\d+\s*[×x]\s*\d+(?:[.,]\d+)?\s*(?:m\b|km\b|min\b)|\d+(?:[.,]\d+)?\s*(?:m\b|km\b|min\b))\s+/i)
             const metric = mMatch ? mMatch[1].trim() : null
             const rest   = mMatch ? content.slice(mMatch[0].length) : content
             nodes.push(
@@ -1249,10 +1250,15 @@ export default function AthletePlan() {
             )
           }
 
+          const isRenfo = (session.type || '').toLowerCase().includes('renforcement') || (session.id_seance || '').startsWith('RENFO')
+          const cardBorderStyle = isRenfo
+            ? { border: `2px solid ${done ? 'var(--success)' : color}`, background: done ? undefined : color + '0A' }
+            : { borderLeft: `4px solid ${done ? 'var(--success)' : color}` }
+
           return (
             <div key={idx} className="card"
               style={{
-                borderLeft: `4px solid ${done ? 'var(--success)' : color}`,
+                ...cardBorderStyle,
                 opacity: done ? .75 : 1, cursor: 'pointer',
                 transition: 'transform .15s, box-shadow .15s'
               }}
