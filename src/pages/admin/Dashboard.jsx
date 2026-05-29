@@ -339,7 +339,7 @@ function WeeklyAnalysisCard() {
         <div>
           <h3 style={{ marginBottom: '.15rem' }}>📈 Analyses hebdomadaires</h3>
           <div style={{ fontSize: '.8rem', color: 'var(--text-muted)' }}>
-            Normalement auto chaque dimanche à 18h — relancer manuellement si besoin
+            Normalement auto chaque dimanche à 18h. Relancer manuellement si besoin.
           </div>
         </div>
         <button className="btn btn-primary btn-sm" onClick={run} disabled={running}
@@ -349,7 +349,7 @@ function WeeklyAnalysisCard() {
       </div>
       {result !== null && !error && (
         <div className="alert alert-success" style={{ marginTop: '1rem' }}>
-          ✅ Analyse terminée — {result} athlète{result !== 1 ? 's' : ''} traité{result !== 1 ? 's' : ''}
+          ✅ Analyse terminée : {result} athlète{result !== 1 ? 's' : ''} traité{result !== 1 ? 's' : ''}
         </div>
       )}
       {error && (
@@ -389,7 +389,7 @@ export default function AdminDashboard() {
             loadData();
             // Browser notification
             if ('Notification' in window && Notification.permission === 'granted') {
-              new Notification('🏃 Nouvel inscrit — The Ultimate Academy', {
+              new Notification('🏃 Nouvel inscrit · The Ultimate Academy', {
                 body: `${name} vient de finaliser son profil !`,
                 icon: '/icon-192.png',
               });
@@ -453,7 +453,7 @@ export default function AdminDashboard() {
       {newAthlete && (
         <div className="alert alert-success" style={{ marginBottom: '1rem', justifyContent: 'space-between', cursor: 'pointer' }}
           onClick={() => { navigate('/admin/athletes'); setNewAthlete(null); }}>
-          <span>🎉 Nouvel inscrit : <strong>{newAthlete.name}</strong> ({newAthlete.email}) — {newAthlete.objective}</span>
+          <span>🎉 Nouvel inscrit : <strong>{newAthlete.name}</strong> ({newAthlete.email}) · {newAthlete.objective}</span>
           <span onClick={e => { e.stopPropagation(); setNewAthlete(null); }} style={{ opacity: .6 }}>✕</span>
         </div>
       )}

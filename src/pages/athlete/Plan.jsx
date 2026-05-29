@@ -1129,20 +1129,15 @@ export default function AthletePlan() {
             <button key={w.numero}
               onClick={() => setActiveWeek(w.numero)}
               style={{
-                flexShrink: 0, padding: '.45rem .875rem',
-                borderRadius: 12, border: `2px solid ${isActive ? 'var(--primary)' : 'var(--border)'}`,
+                flexShrink: 0, padding: '.5rem .875rem',
+                borderRadius: 99, border: `2px solid ${isActive ? 'var(--primary)' : 'var(--border)'}`,
                 background: isActive ? 'linear-gradient(135deg,rgba(139,47,201,.35),rgba(232,35,122,.25))' : 'var(--surface)',
                 color: isActive ? '#fff' : 'var(--text-muted)',
                 fontWeight: isActive ? 700 : 500,
                 fontSize: '.78rem', cursor: 'pointer', fontFamily: 'inherit',
-                whiteSpace: 'nowrap', textAlign: 'left', lineHeight: 1.35,
+                whiteSpace: 'nowrap',
               }}>
-              <div style={{ fontWeight: 700, fontSize: '.8rem', color: isActive ? '#fff' : 'var(--text)' }}>
-                Semaine {w.numero}{pct === 1 ? ' ✅' : ''}
-              </div>
-              <div style={{ fontSize: '.7rem', opacity: .6 }}>
-                {weekDateRange(planMonday, w.numero)}
-              </div>
+              {weekDateRange(planMonday, w.numero)}{pct === 1 ? ' ✅' : ''}
             </button>
           )
         })}

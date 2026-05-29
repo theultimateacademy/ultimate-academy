@@ -7,7 +7,7 @@ import LoadingSpinner from '../../components/UI/LoadingSpinner'
 const TYPE_COLORS = {
   'fractionné court': '#E8237A', 'fractionné long': '#8B2FC9', 'fractionné': '#8B2FC9', 'vma': '#8B2FC9',
   'tempo': '#F59E0B', 'seuil': '#F59E0B',
-  'progressif': '#06B6D4',
+  'progressif': '#84CC16',
   'endurance': '#10B981', 'footing': '#10B981',
   'sortie longue': '#0EA5E9',
   'renforcement': '#D97706',
@@ -532,7 +532,7 @@ function AthleteDetailPanel({ athlete, onClose, onUpdated, onAlertDismissed }) {
       })
       const body = await res.json()
       if (!res.ok) throw new Error(body.error || 'Erreur')
-      setGenerateMsg('Plan généré — valide-le dans l\'onglet Plans.')
+      setGenerateMsg('Plan généré. Valide-le dans l\'onglet Plans.')
       await loadDetail()
     } catch (err) {
       setGenerateMsg('Erreur : ' + err.message)

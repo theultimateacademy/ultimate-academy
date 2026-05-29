@@ -249,7 +249,7 @@ export default function PostSessionFlow({
                   <div key={r} style={{ display: 'flex', alignItems: 'center', gap: '.4rem',
                     fontSize: '.76rem', color: 'rgba(26,26,46,.5)' }}>
                     <div style={{ width: 8, height: 8, borderRadius: 99, background: c, flexShrink: 0 }} />
-                    <span style={{ fontWeight: 600 }}>{r}</span> — {l}
+                    <span style={{ fontWeight: 600 }}>{r}</span> : {l}
                   </div>
                 ))}
               </div>
@@ -371,7 +371,7 @@ export default function PostSessionFlow({
                 Ta semaine jusqu'ici 💪
               </h3>
               <p style={{ fontSize: '.85rem', color: 'rgba(26,26,46,.5)', marginBottom: '1.5rem' }}>
-                Séance enregistrée — voici le bilan.
+                Séance enregistrée. Voici le bilan.
               </p>
 
               {/* Stats */}

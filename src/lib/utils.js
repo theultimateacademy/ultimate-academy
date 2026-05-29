@@ -99,7 +99,7 @@ export const DAY_LABELS = {
 
 export const SESSION_TYPE_COLORS = {
   'Endurance fondamentale':  '#10B981',
-  'Footing progressif':      '#06B6D4',
+  'Footing progressif':      '#84CC16',
   'Fractionné court':        '#E8237A',
   'Fractionné long':         '#8B2FC9',
   'Tempo':                   '#F59E0B',

@@ -309,7 +309,7 @@ export default function AthleteProfile() {
       try {
         await api.fatigueAdapt({ userId: profile.id })
         setPlanAdaptedFor('fatigue')
-        showToast('Semaine allégée — repose-toi bien 😴')
+        showToast('Semaine allégée. Repose-toi bien 😴')
       } catch (err) {
         showToast((err?.message || 'Erreur') + ' ✗', 'error')
       } finally {
@@ -787,100 +787,125 @@ export default function AthleteProfile() {
 
       {/* Services connectés */}
       <div className="card" style={{ marginBottom: '1.25rem' }}>
-        <h4 style={{ marginBottom: '.875rem' }}>Mes services connectés</h4>
+        <h4 style={{ marginBottom: '.4rem' }}>Mes services connectés</h4>
+        <p style={{ fontSize: '.82rem', color: 'var(--text-muted)', marginBottom: '1.25rem', lineHeight: 1.5 }}>
+          Connecte tes montres et applications pour synchroniser tes séances automatiquement.
+        </p>
 
-        {/* Message général */}
-        <div style={{ background:'rgba(139,47,201,.08)', border:'1px solid rgba(139,47,201,.2)', borderRadius:12, padding:'.75rem 1rem', marginBottom:'1.25rem', fontSize:'.82rem', lineHeight:1.6 }}>
-          💡 Connecte Strava pour synchroniser automatiquement tes données depuis ta montre GPS après chaque séance.
-        </div>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '.75rem' }}>
 
-        {/* Strava */}
-        <ServiceRow
-          icon={<BrandLogo src="https://logo.clearbit.com/strava.com" bg="#FC4C02" fallback="🔶" />}
-          name="Strava"
-          connected={profile?.strava_connected}
-        >
-          {profile?.strava_connected ? (
-            <div>
-              <div style={{ display:'flex', gap:'.5rem', flexWrap:'wrap', marginBottom:'.625rem' }}>
-                <button className="btn btn-secondary btn-sm" onClick={importStrava} disabled={importing}>
-                  {importing ? <><div className="spinner spinner-sm" /> Importation…</> : '🔄 Synchroniser'}
-                </button>
-                <button className="btn btn-danger btn-sm" onClick={disconnectStrava} disabled={stravaLoading}>Déconnecter</button>
+          {/* Strava */}
+          <div style={{
+            borderRadius: 14,
+            border: `1.5px solid ${profile?.strava_connected ? 'rgba(252,76,2,.6)' : 'rgba(252,76,2,.25)'}`,
+            background: profile?.strava_connected ? 'rgba(252,76,2,.08)' : 'rgba(252,76,2,.03)',
+            padding: '1rem 1.125rem',
+          }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '1rem', marginBottom: profile?.strava_connected ? '.875rem' : 0 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '.75rem' }}>
+                <BrandLogo src="https://logo.clearbit.com/strava.com" bg="#FC4C02" fallback="🔶" />
+                <div>
+                  <div style={{ fontWeight: 700, fontSize: '.9rem', color: '#FC4C02' }}>Strava</div>
+                  <div style={{ fontSize: '.75rem', color: 'var(--text-muted)' }}>
+                    {profile?.strava_connected ? '● Connecté' : 'Synchronise ta montre GPS'}
+                  </div>
+                </div>
               </div>
-              <p style={{ fontSize:'.75rem', color:'var(--text-muted)', lineHeight:1.5 }}>
-                La connexion Strava synchronise automatiquement tes données depuis ta montre Garmin, Coros ou Suunto.
-              </p>
+              {profile?.strava_connected ? (
+                <div style={{ display: 'flex', gap: '.5rem', flexShrink: 0 }}>
+                  <button className="btn btn-sm" onClick={importStrava} disabled={importing}
+                    style={{ background: 'rgba(252,76,2,.15)', border: '1px solid rgba(252,76,2,.3)', color: '#FC4C02', fontFamily: 'inherit', fontSize: '.78rem' }}>
+                    {importing ? '…' : '🔄 Synchro'}
+                  </button>
+                  <button className="btn btn-sm" onClick={disconnectStrava} disabled={stravaLoading}
+                    style={{ background: 'transparent', border: '1px solid var(--border)', color: 'var(--text-muted)', fontFamily: 'inherit', fontSize: '.78rem' }}>
+                    Déconnecter
+                  </button>
+                </div>
+              ) : (
+                <button className="btn btn-sm" onClick={connectStrava} disabled={stravaLoading}
+                  style={{ flexShrink: 0, background: 'rgba(252,76,2,.15)', border: '1px solid rgba(252,76,2,.4)', color: '#FC4C02', fontFamily: 'inherit', fontWeight: 700, fontSize: '.8rem' }}>
+                  {stravaLoading ? '…' : 'Connecter'}
+                </button>
+              )}
             </div>
-          ) : (
-            <div>
-              <button className="btn btn-primary btn-sm" onClick={connectStrava} disabled={stravaLoading} style={{ marginBottom:'.625rem' }}>
-                {stravaLoading ? <><div className="spinner spinner-sm" /> Connexion…</> : '🔗 Connecter Strava'}
-              </button>
-              <p style={{ fontSize:'.75rem', color:'var(--text-muted)', lineHeight:1.5 }}>
-                La connexion Strava permet de synchroniser automatiquement tes données depuis ta montre Garmin, Coros ou Suunto.
-              </p>
+            {profile?.strava_connected && (
+              <div style={{ fontSize: '.75rem', color: 'var(--text-muted)', lineHeight: 1.45 }}>
+                Garmin, Coros et Suunto se synchronisent automatiquement via Strava.
+              </div>
+            )}
+          </div>
+
+          {/* Coros */}
+          <div style={{
+            borderRadius: 14,
+            border: '1.5px solid rgba(20,184,166,.25)',
+            background: 'rgba(20,184,166,.03)',
+            padding: '1rem 1.125rem',
+          }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '1rem', marginBottom: '.625rem' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '.75rem' }}>
+                <BrandLogo src="https://logo.clearbit.com/coros.com" bg="#0A0A0A" fallback="CO" />
+                <div>
+                  <div style={{ fontWeight: 700, fontSize: '.9rem', color: '#14B8A6' }}>Coros</div>
+                  <div style={{ fontSize: '.75rem', color: 'var(--text-muted)' }}>Export FIT par séance</div>
+                </div>
+              </div>
+              <span style={{ fontSize: '.7rem', background: 'rgba(20,184,166,.12)', color: '#14B8A6', border: '1px solid rgba(20,184,166,.25)', borderRadius: 99, padding: '.15rem .6rem', flexShrink: 0 }}>
+                Disponible
+              </span>
             </div>
-          )}
-        </ServiceRow>
-
-        <div style={{ height:1, background:'var(--border)', margin:'.875rem 0' }} />
-
-        {/* Coros */}
-        <ServiceRow
-          icon={<BrandLogo src="https://logo.clearbit.com/coros.com" bg="#0A0A0A" fallback="CO" />}
-          name="Coros"
-          connected={null}
-          badge={<span style={{ fontSize:'.72rem', background:'rgba(255,255,255,.07)', color:'rgba(255,255,255,.6)', border:'1px solid rgba(255,255,255,.12)', borderRadius:99, padding:'.1rem .5rem' }}>Export FIT</span>}
-        >
-          <p style={{ fontSize:'.8rem', color:'var(--text-muted)', marginBottom:'.75rem', lineHeight:1.5 }}>
-            Clique sur <strong style={{ color:'var(--text)' }}>Envoyer sur ma Coros</strong> sur chaque séance — le fichier se télécharge et les instructions s'affichent.
-          </p>
-          {profile?.strava_connected ? (
-            <div style={{ background:'rgba(252,76,2,.1)', border:'1px solid rgba(252,76,2,.2)', borderRadius:10, padding:'.6rem .75rem', fontSize:'.78rem', lineHeight:1.5 }}>
-              🔶 <strong style={{ color:'#FFA07A' }}>Strava connecté</strong> — Tes données Coros sont importées automatiquement via Strava ✓
+            <div style={{ fontSize: '.75rem', color: 'var(--text-muted)', lineHeight: 1.45 }}>
+              Utilise le bouton <strong style={{ color: 'var(--text)' }}>Envoyer sur ma Coros</strong> sur chaque séance.
+              {profile?.strava_connected && <span style={{ color: '#FC4C02' }}> Tes données sont aussi importées via Strava ✓</span>}
             </div>
-          ) : (
-            <div style={{ background:'rgba(139,47,201,.08)', border:'1px solid rgba(139,47,201,.2)', borderRadius:10, padding:'.6rem .75rem', fontSize:'.78rem', lineHeight:1.5 }}>
-              💡 <strong style={{ color:'#C084FC' }}>Astuce :</strong> Connecte Strava pour importer automatiquement tes données Coros :{' '}
-              <button style={{ background:'none', border:'none', cursor:'pointer', color:'var(--primary)', fontWeight:600, fontSize:'.78rem', fontFamily:'inherit', padding:0 }}
-                onClick={connectStrava}>
-                Connecter Strava
-              </button>
+          </div>
+
+          {/* Garmin */}
+          <div style={{
+            borderRadius: 14,
+            border: '1.5px solid rgba(99,102,241,.2)',
+            background: 'rgba(99,102,241,.03)',
+            padding: '1rem 1.125rem',
+            opacity: .75,
+          }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '1rem' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '.75rem' }}>
+                <BrandLogo src="https://logo.clearbit.com/garmin.com" bg="#1A1F6C" fallback="G" />
+                <div>
+                  <div style={{ fontWeight: 700, fontSize: '.9rem', color: '#818CF8' }}>Garmin Connect</div>
+                  <div style={{ fontSize: '.75rem', color: 'var(--text-muted)' }}>Connexion directe à la montre</div>
+                </div>
+              </div>
+              <span style={{ fontSize: '.7rem', background: 'rgba(255,255,255,.05)', color: 'rgba(255,255,255,.35)', border: '1px solid rgba(255,255,255,.1)', borderRadius: 99, padding: '.15rem .6rem', flexShrink: 0 }}>
+                Bientôt
+              </span>
             </div>
-          )}
-        </ServiceRow>
+          </div>
 
-        <div style={{ height:1, background:'var(--border)', margin:'.875rem 0' }} />
+          {/* Suunto */}
+          <div style={{
+            borderRadius: 14,
+            border: '1.5px solid rgba(239,68,68,.2)',
+            background: 'rgba(239,68,68,.03)',
+            padding: '1rem 1.125rem',
+            opacity: .75,
+          }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '1rem' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '.75rem' }}>
+                <BrandLogo src="https://logo.clearbit.com/suunto.com" bg="#CC0000" fallback="S" />
+                <div>
+                  <div style={{ fontWeight: 700, fontSize: '.9rem', color: '#F87171' }}>Suunto</div>
+                  <div style={{ fontSize: '.75rem', color: 'var(--text-muted)' }}>Connexion directe à la montre</div>
+                </div>
+              </div>
+              <span style={{ fontSize: '.7rem', background: 'rgba(255,255,255,.05)', color: 'rgba(255,255,255,.35)', border: '1px solid rgba(255,255,255,.1)', borderRadius: 99, padding: '.15rem .6rem', flexShrink: 0 }}>
+                Bientôt
+              </span>
+            </div>
+          </div>
 
-        {/* Garmin — Prochainement */}
-        <ServiceRow
-          icon={<BrandLogo src="https://logo.clearbit.com/garmin.com" bg="#1A1F6C" fallback="G" />}
-          name="Garmin Connect"
-          connected={null}
-          badge={<span style={{ fontSize:'.72rem', background:'rgba(255,255,255,.05)', color:'rgba(255,255,255,.35)', border:'1px solid rgba(255,255,255,.1)', borderRadius:99, padding:'.1rem .5rem' }}>🔜 Prochainement</span>}
-        >
-          <p style={{ fontSize:'.78rem', color:'var(--text-muted)', lineHeight:1.5 }}>
-            Synchronisation via Strava disponible.<br />
-            <span style={{ opacity:.65 }}>Connexion directe à la montre. Bientôt disponible.</span>
-          </p>
-        </ServiceRow>
-
-        <div style={{ height:1, background:'var(--border)', margin:'.875rem 0' }} />
-
-        {/* Suunto — Prochainement */}
-        <ServiceRow
-          icon={<BrandLogo src="https://logo.clearbit.com/suunto.com" bg="#CC0000" fallback="S" />}
-          name="Suunto"
-          connected={null}
-          badge={<span style={{ fontSize:'.72rem', background:'rgba(255,255,255,.05)', color:'rgba(255,255,255,.35)', border:'1px solid rgba(255,255,255,.1)', borderRadius:99, padding:'.1rem .5rem' }}>🔜 Prochainement</span>}
-        >
-          <p style={{ fontSize:'.78rem', color:'var(--text-muted)', lineHeight:1.5 }}>
-            Synchronisation via Strava disponible.<br />
-            <span style={{ opacity:.65 }}>Connexion directe à la montre. Bientôt disponible.</span>
-          </p>
-        </ServiceRow>
-
+        </div>
       </div>
 
       {/* Adapter mon plan */}
