@@ -22,6 +22,7 @@ export default function AthleteProfile() {
   const [heatLoading,    setHeatLoading]    = useState(false)
   const [fatigueLoading, setFatigueLoading] = useState(false)
   const [injuryLoading,  setInjuryLoading]  = useState(false)
+  const [cycleLoading,   setCycleLoading]   = useState(false)
   const [restoreLoading, setRestoreLoading] = useState(false)
   const [planAdaptedFor, setPlanAdaptedFor] = useState(null)  // synced from plan_data
   // Résiliation
@@ -340,6 +341,32 @@ export default function AthleteProfile() {
         showToast((err?.message || 'Erreur') + ' ✗', 'error')
       } finally {
         setInjuryLoading(false)
+      }
+    }
+  }
+
+  async function toggleCycle() {
+    if (planAdaptedFor === 'cycle') {
+      setRestoreLoading(true)
+      try {
+        await api.restoreWeek({ userId: profile.id })
+        setPlanAdaptedFor(null)
+        showToast('Plan restauré ✓')
+      } catch (err) {
+        showToast((err?.message || 'Erreur') + ' ✗', 'error')
+      } finally {
+        setRestoreLoading(false)
+      }
+    } else {
+      setCycleLoading(true)
+      try {
+        await api.periodAlert({ userId: profile.id })
+        setPlanAdaptedFor('cycle')
+        showToast('Plan adapté pour ton cycle 🌸')
+      } catch (err) {
+        showToast((err?.message || 'Erreur') + ' ✗', 'error')
+      } finally {
+        setCycleLoading(false)
       }
     }
   }
@@ -1034,41 +1061,72 @@ export default function AthleteProfile() {
           })()}
 
           {/* 🌸 Cycle — femmes uniquement */}
-          {profile?.gender === 'femme' && (
-            <div style={{
-              borderRadius: 14, border: '1.5px solid rgba(236,72,153,.25)',
-              background: 'rgba(236,72,153,.04)',
-              padding: '1rem 1.125rem',
-            }}>
-              <div style={{ fontWeight: 700, fontSize: '.9rem', color: '#F472B6', marginBottom: '.4rem' }}>🌸 Cycle menstruel</div>
-              <p style={{ fontSize: '.78rem', color: 'var(--text-muted)', marginBottom: '1rem', lineHeight: 1.5 }}>
-                Si tes règles impactent ton entraînement, active cette option pour que ton plan s'adapte automatiquement.
-              </p>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '.875rem' }}>
-                <label style={{ display: 'flex', alignItems: 'center', gap: '.5rem', cursor: 'pointer' }}>
-                  <input type="checkbox" checked={periodPain} onChange={e => setPeriodPain(e.target.checked)}
-                    style={{ width: 16, height: 16, accentColor: '#EC4899' }} />
-                  <span style={{ fontSize: '.875rem', fontWeight: 600 }}>Douleurs impactant l'entraînement</span>
-                </label>
-              </div>
-              {periodPain && (
-                <div style={{ marginBottom: '1rem' }}>
-                  <label style={{ fontSize: '.8rem', color: 'var(--text-muted)', display: 'block', marginBottom: '.35rem' }}>
-                    Durée habituelle : {periodDays} jour{periodDays > 1 ? 's' : ''}
-                  </label>
-                  <input type="range" min={1} max={5} value={periodDays} onChange={e => setPeriodDays(parseInt(e.target.value))}
-                    style={{ width: '100%', accentColor: '#EC4899' }} />
-                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '.72rem', color: 'var(--text-muted)' }}>
-                    <span>1 jour</span><span>5 jours</span>
+          {(profile?.gender === 'femme' || profile?.period_pain) && (() => {
+            const active  = planAdaptedFor === 'cycle'
+            const loading = cycleLoading || (restoreLoading && active)
+            const blocked = planAdaptedFor !== null && !active
+            return (
+              <div style={{
+                borderRadius: 14, border: `1.5px solid ${active ? 'rgba(236,72,153,.7)' : 'rgba(236,72,153,.25)'}`,
+                background: active ? 'rgba(236,72,153,.1)' : 'rgba(236,72,153,.04)',
+                padding: '1rem 1.125rem', opacity: blocked ? .45 : 1,
+              }}>
+                {/* Bouton activer — même pattern que fatigue/canicule */}
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '1rem', marginBottom: '1rem' }}>
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <div style={{ fontWeight: 700, fontSize: '.9rem', color: '#F472B6', marginBottom: '.2rem' }}>🌸 Cycle menstruel</div>
+                    <div style={{ fontSize: '.78rem', color: 'var(--text-muted)', lineHeight: 1.45 }}>
+                      Active quand tes règles impactent ton entraînement — le plan s'adapte automatiquement.
+                    </div>
+                    {active && (
+                      <div style={{ marginTop: '.4rem', fontSize: '.75rem', color: '#F9A8D4', fontWeight: 600 }}>
+                        Actif cette semaine
+                      </div>
+                    )}
                   </div>
+                  <button
+                    onClick={toggleCycle}
+                    disabled={loading || blocked}
+                    style={{
+                      flexShrink: 0, padding: '.42rem .9rem', borderRadius: 99, fontFamily: 'inherit',
+                      border: active ? '1.5px solid rgba(236,72,153,.7)' : '1.5px solid rgba(236,72,153,.4)',
+                      background: active ? 'rgba(236,72,153,.2)' : 'transparent',
+                      color: active ? '#F9A8D4' : '#F472B6',
+                      fontWeight: 700, fontSize: '.8rem', cursor: (loading || blocked) ? 'default' : 'pointer',
+                    }}>
+                    {loading ? '…' : active ? 'Désactiver' : 'Activer'}
+                  </button>
                 </div>
-              )}
-              <button className="btn btn-sm" disabled={savingPeriod} onClick={savePeriodSettings}
-                style={{ background: 'rgba(236,72,153,.15)', border: '1px solid rgba(236,72,153,.3)', color: '#F472B6', fontFamily: 'inherit' }}>
-                {savingPeriod ? 'Sauvegarde…' : '💾 Sauvegarder'}
-              </button>
-            </div>
-          )}
+
+                {/* Préférences — durée habituelle */}
+                <div style={{ borderTop: '1px solid rgba(236,72,153,.15)', paddingTop: '.875rem' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '.875rem' }}>
+                    <label style={{ display: 'flex', alignItems: 'center', gap: '.5rem', cursor: 'pointer' }}>
+                      <input type="checkbox" checked={periodPain} onChange={e => setPeriodPain(e.target.checked)}
+                        style={{ width: 16, height: 16, accentColor: '#EC4899' }} />
+                      <span style={{ fontSize: '.82rem', fontWeight: 600 }}>Douleurs habituelles</span>
+                    </label>
+                  </div>
+                  {periodPain && (
+                    <div style={{ marginBottom: '.875rem' }}>
+                      <label style={{ fontSize: '.78rem', color: 'var(--text-muted)', display: 'block', marginBottom: '.35rem' }}>
+                        Durée habituelle : {periodDays} jour{periodDays > 1 ? 's' : ''}
+                      </label>
+                      <input type="range" min={1} max={5} value={periodDays} onChange={e => setPeriodDays(parseInt(e.target.value))}
+                        style={{ width: '100%', accentColor: '#EC4899' }} />
+                      <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '.72rem', color: 'var(--text-muted)' }}>
+                        <span>1 jour</span><span>5 jours</span>
+                      </div>
+                    </div>
+                  )}
+                  <button className="btn btn-sm" disabled={savingPeriod} onClick={savePeriodSettings}
+                    style={{ background: 'rgba(236,72,153,.12)', border: '1px solid rgba(236,72,153,.25)', color: '#F472B6', fontFamily: 'inherit' }}>
+                    {savingPeriod ? 'Sauvegarde…' : '💾 Sauvegarder les préférences'}
+                  </button>
+                </div>
+              </div>
+            )
+          })()}
 
         </div>
       </div>
