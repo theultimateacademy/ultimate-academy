@@ -122,18 +122,18 @@ export const DAY_LABELS = {
 // Race          : or / pêche
 
 export const SESSION_TYPE_COLORS = {
-  // ── Course à pied ──────────────────────────────────────────
+  // ── Course à pied — toutes en vert ────────────────────────
   'Endurance fondamentale':  '#10B981',  // vert émeraude
-  'Footing progressif':      '#84CC16',  // vert lime
-  'Récupération active':     '#6B7280',  // gris neutre (running seulement)
-  'Sortie longue':           '#0EA5E9',  // bleu running
-  'Fractionné court':        '#E8237A',  // rose vif
-  'Fractionné long':         '#8B2FC9',  // violet
-  'Tempo':                   '#D97706',  // ambre
-  'Tempo / Seuil':           '#D97706',
-  'Tempo/Seuil':             '#D97706',
-  'Côtes':                   '#EF4444',  // rouge running
-  'Spécifique':              '#6366F1',  // indigo
+  'Footing progressif':      '#10B981',
+  'Récupération active':     '#34D399',  // vert clair
+  'Sortie longue':           '#10B981',
+  'Fractionné court':        '#059669',  // vert foncé
+  'Fractionné long':         '#059669',
+  'Tempo':                   '#065F46',  // vert très foncé
+  'Tempo / Seuil':           '#065F46',
+  'Tempo/Seuil':             '#065F46',
+  'Côtes':                   '#047857',
+  'Spécifique':              '#047857',
   // ── Renforcement ───────────────────────────────────────────
   'Renforcement':            '#EC4899',  // rose fuchsia
   'Renforcement musculaire': '#EC4899',
