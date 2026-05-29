@@ -227,7 +227,8 @@ export default function AthleteProfile() {
       const newValue = String(value ?? '')
       let coercedValue = value === '' ? null : value
       if (coercedValue !== null && dbKey === 'days_per_week') coercedValue = parseInt(coercedValue, 10)
-      if (coercedValue !== null && dbKey === 'vma') coercedValue = parseFloat(coercedValue)
+      if (coercedValue !== null && dbKey === 'vma')           coercedValue = parseFloat(coercedValue)
+      if (coercedValue !== null && dbKey === 'race_denivele') coercedValue = parseInt(coercedValue, 10)
 
       const { data: updated, error: dbErr } = await supabase
         .from('profiles').update({ [dbKey]: coercedValue }).eq('id', profile.id).select().single()
@@ -696,23 +697,25 @@ export default function AthleteProfile() {
             />
           </FieldCard>
 
-          {/* Chrono cible */}
-          <FieldCard
-            fieldKey="chrono_goal"
-            dbKey="chrono_goal"
-            label="Chrono cible"
-            displayValue={profile?.chrono_goal || 'Progresser'}
-          >
-            <input
-              type="text"
-              className="form-input"
-              style={{ width: '100%', fontSize: '.875rem' }}
-              placeholder="ex: 1h45 au semi"
-              value={editVal.chrono_goal ?? ''}
-              onChange={e => setEditVal(prev => ({ ...prev, chrono_goal: e.target.value }))}
-              autoFocus
-            />
-          </FieldCard>
+          {/* Chrono cible — masqué pour les triathlètes (remplacé par les 3 chronos spécifiques) */}
+          {!['tri_sprint','tri_olympic','tri_half','tri_ironman'].includes(profile?.objective) && (
+            <FieldCard
+              fieldKey="chrono_goal"
+              dbKey="chrono_goal"
+              label="Chrono cible"
+              displayValue={profile?.chrono_goal || 'Progresser'}
+            >
+              <input
+                type="text"
+                className="form-input"
+                style={{ width: '100%', fontSize: '.875rem' }}
+                placeholder="ex: 1h45 au semi"
+                value={editVal.chrono_goal ?? ''}
+                onChange={e => setEditVal(prev => ({ ...prev, chrono_goal: e.target.value }))}
+                autoFocus
+              />
+            </FieldCard>
+          )}
 
           {/* Jours/semaine */}
           <FieldCard
@@ -780,7 +783,7 @@ export default function AthleteProfile() {
             <FieldCard
               fieldKey="training_terrain"
               dbKey="training_terrain"
-              label="Terrain d'entraînement"
+              label="Zone d'habitation"
               displayValue={
                 profile?.training_terrain === 'montagne'      ? '🏔️ Montagne' :
                 profile?.training_terrain === 'semi_montagne' ? '⛰️ Semi-montagne' :
@@ -796,12 +799,88 @@ export default function AthleteProfile() {
                 autoFocus
               >
                 <option value="">— Choisir —</option>
-                <option value="montagne">🏔️ Montagne</option>
-                <option value="semi_montagne">⛰️ Semi-montagne</option>
-                <option value="ville_plat">🏙️ Ville / Plat</option>
+                <option value="montagne">🏔️ Montagne (accès D+ direct)</option>
+                <option value="semi_montagne">⛰️ Semi-montagne (relief modéré)</option>
+                <option value="ville_plat">🏙️ Ville / Plat (peu de dénivelé)</option>
               </select>
             </FieldCard>
           )}
+
+          {/* Dénivelé course — visible si trail */}
+          {['trail_20k','trail_50k','trail_100k','trail_100m'].includes(profile?.objective) && (
+            <FieldCard
+              fieldKey="race_denivele"
+              dbKey="race_denivele"
+              label="Dénivelé course (D+)"
+              displayValue={profile?.race_denivele ? `${profile.race_denivele} m D+` : 'Non renseigné'}
+            >
+              <div style={{ display: 'flex', alignItems: 'center', gap: '.4rem' }}>
+                <input
+                  type="number"
+                  className="form-input"
+                  style={{ flex: 1, fontSize: '.875rem' }}
+                  min={0} max={25000} step={100}
+                  placeholder="ex: 2500"
+                  value={editVal.race_denivele ?? ''}
+                  onChange={e => setEditVal(prev => ({ ...prev, race_denivele: e.target.value }))}
+                  autoFocus
+                />
+                <span style={{ fontSize: '.8rem', color: 'var(--text-muted)', whiteSpace: 'nowrap' }}>m D+</span>
+              </div>
+            </FieldCard>
+          )}
+
+          {/* Chronos triathlon — visibles uniquement si objectif triathlon */}
+          {['tri_sprint','tri_olympic','tri_half','tri_ironman'].includes(profile?.objective) && (<>
+            <FieldCard
+              fieldKey="chrono_natation"
+              dbKey="chrono_natation"
+              label="🏊 Chrono nage cible"
+              displayValue={profile?.chrono_natation || 'Non renseigné'}
+            >
+              <input
+                type="text"
+                className="form-input"
+                style={{ width: '100%', fontSize: '.875rem' }}
+                placeholder={profile?.objective === 'tri_sprint' ? 'ex: 15min' : profile?.objective === 'tri_olympic' ? 'ex: 28min' : profile?.objective === 'tri_half' ? 'ex: 38min' : 'ex: 1h15'}
+                value={editVal.chrono_natation ?? ''}
+                onChange={e => setEditVal(prev => ({ ...prev, chrono_natation: e.target.value }))}
+                autoFocus
+              />
+            </FieldCard>
+            <FieldCard
+              fieldKey="chrono_velo"
+              dbKey="chrono_velo"
+              label="🚴 Chrono vélo cible"
+              displayValue={profile?.chrono_velo || 'Non renseigné'}
+            >
+              <input
+                type="text"
+                className="form-input"
+                style={{ width: '100%', fontSize: '.875rem' }}
+                placeholder={profile?.objective === 'tri_sprint' ? 'ex: 40min' : profile?.objective === 'tri_olympic' ? 'ex: 1h15' : profile?.objective === 'tri_half' ? 'ex: 2h45' : 'ex: 5h30'}
+                value={editVal.chrono_velo ?? ''}
+                onChange={e => setEditVal(prev => ({ ...prev, chrono_velo: e.target.value }))}
+                autoFocus
+              />
+            </FieldCard>
+            <FieldCard
+              fieldKey="chrono_goal"
+              dbKey="chrono_goal"
+              label="🏃 Chrono course cible"
+              displayValue={profile?.chrono_goal || 'Non renseigné'}
+            >
+              <input
+                type="text"
+                className="form-input"
+                style={{ width: '100%', fontSize: '.875rem' }}
+                placeholder={profile?.objective === 'tri_sprint' ? 'ex: 22min' : profile?.objective === 'tri_olympic' ? 'ex: 45min' : profile?.objective === 'tri_half' ? 'ex: 1h50' : 'ex: 4h00'}
+                value={editVal.chrono_goal ?? ''}
+                onChange={e => setEditVal(prev => ({ ...prev, chrono_goal: e.target.value }))}
+                autoFocus
+              />
+            </FieldCard>
+          </>)}
 
         </div>
       </div>

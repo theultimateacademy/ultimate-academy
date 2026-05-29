@@ -18,7 +18,10 @@ ALTER TABLE public.profiles
   ADD COLUMN IF NOT EXISTS tri_experience       TEXT,
   ADD COLUMN IF NOT EXISTS trail_experience     TEXT,
   ADD COLUMN IF NOT EXISTS trail_poles          TEXT,
-  ADD COLUMN IF NOT EXISTS trail_terrain_dispo  TEXT[];
+  ADD COLUMN IF NOT EXISTS trail_terrain_dispo  TEXT[],
+  ADD COLUMN IF NOT EXISTS race_denivele        INTEGER,
+  ADD COLUMN IF NOT EXISTS chrono_natation      TEXT,
+  ADD COLUMN IF NOT EXISTS chrono_velo          TEXT;
 
 -- ── session_library: new columns ─────────────────────────────
 ALTER TABLE public.session_library
