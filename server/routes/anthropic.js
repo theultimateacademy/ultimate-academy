@@ -178,26 +178,33 @@ function recalculateDistances(planData, vma) {
         s.distance_km = 0;
         continue;
       }
+      // Natation / vélo / brique : distance non calculable sans CSS/FTP → null (affiché NC)
+      if (type.includes('natation') || type.includes('vélo') || type.includes('velo') || type.includes('brique')) {
+        s.distance_km = null;
+        continue;
+      }
       // Average speed from allures[] zones when available
       const validAllures = (s.allures || []).filter(a => typeof a.vitesse_kmh === 'number' && a.vitesse_kmh > 0);
       let avgSpeed;
       if (validAllures.length > 0) {
         avgSpeed = validAllures.reduce((sum, a) => sum + a.vitesse_kmh, 0) / validAllures.length;
-        // Fractionnés have rest periods — reduce effective speed
         if (type.includes('fractionné') || type.includes('vma')) avgSpeed *= 0.85;
       } else {
-        // Fallback: type-based % of VMA
         const pct = (type.includes('tempo') || type.includes('seuil')) ? 0.73
           : (type.includes('fractionné') || type.includes('vma'))     ? 0.70
           : (type.includes('côte') || type.includes('cote'))          ? 0.68
-          : 0.67; // EF, SL, footing progressif
+          : 0.67;
         avgSpeed = vma * pct;
       }
       s.distance_km = Math.round((s.duree_min / 60) * avgSpeed * 10) / 10;
     }
-    // Recalculate weekly volume
+    // volume_total_km = running/trail only; separate NC markers for swim/bike
     sem.volume_total_km = Math.round(
-      (sem.seances || []).reduce((sum, s) => sum + (s.distance_km || 0), 0) * 10
+      (sem.seances || []).reduce((sum, s) => {
+        const t = (s.type || '').toLowerCase();
+        if (t.includes('natation') || t.includes('vélo') || t.includes('velo') || t.includes('brique')) return sum;
+        return sum + (s.distance_km || 0);
+      }, 0) * 10
     ) / 10;
   }
   return planData;

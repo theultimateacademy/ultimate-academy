@@ -1162,22 +1162,31 @@ export default function AthletePlan() {
                 {(currentWeekData.phase || '').replace(/^S\d+\s*[—–-]\s*/i, '').replace(/\s*\(S\d+\)/gi, '')}
               </div>
               {(() => {
-                const courseCount = currentWeekData.seances?.filter(s => !String(s.type || '').toLowerCase().includes('renforcement')).length || 0
-                const renfoCount  = currentWeekData.seances?.filter(s =>  String(s.type || '').toLowerCase().includes('renforcement')).length || 0
-                const km  = currentWeekData.volume_total_km
-                const min = currentWeekData.temps_total_min
-                const timeLabel = min ? `${Math.floor(min/60)}h${String(min%60).padStart(2,'0')}` : null
+                const seances = currentWeekData.seances || []
+                const isTri = ['tri_sprint','tri_olympic','tri_half','tri_ironman'].includes(profile?.objective)
+                const nat   = seances.filter(s => String(s.type||'').toLowerCase().includes('natation')).length
+                const vel   = seances.filter(s => String(s.type||'').toLowerCase().includes('vélo') || String(s.type||'').toLowerCase().includes('velo')).length
+                const brk   = seances.filter(s => String(s.type||'').toLowerCase().includes('brique') || (s.id_seance||'').startsWith('BRK')).length
+                const renfo = seances.filter(s => String(s.type||'').toLowerCase().includes('renforcement') || (s.id_seance||'').startsWith('RENFO')).length
+                const course= seances.filter(s => {
+                  const t = String(s.type||'').toLowerCase()
+                  return !t.includes('natation') && !t.includes('vélo') && !t.includes('velo') && !t.includes('brique') && !t.includes('renforcement') && !s.est_course
+                }).length
+                const km = currentWeekData.volume_total_km
                 return (
                   <>
-                    <div style={{ fontSize: '.75rem', color: 'rgba(255,255,255,.55)', marginTop: '.2rem' }}>
-                      {courseCount} séance{courseCount > 1 ? 's' : ''} de course{renfoCount > 0 ? ` + ${renfoCount} renforcement` : ''}
+                    <div style={{ fontSize: '.75rem', color: 'rgba(255,255,255,.55)', marginTop: '.2rem', display: 'flex', flexWrap: 'wrap', gap: '.35rem' }}>
+                      {course > 0 && <span style={{ color: '#34D399' }}>🏃 {course}</span>}
+                      {nat    > 0 && <span style={{ color: '#06B6D4' }}>🏊 {nat}</span>}
+                      {vel    > 0 && <span style={{ color: '#F97316' }}>🚴 {vel}</span>}
+                      {brk    > 0 && <span style={{ color: '#8B5CF6' }}>🔗 {brk}</span>}
+                      {renfo  > 0 && <span style={{ color: '#EC4899' }}>💪 {renfo}</span>}
                     </div>
-                    {(km || timeLabel) && (
-                      <div style={{ fontSize: '.72rem', color: 'rgba(255,255,255,.4)', marginTop: '.15rem', display: 'flex', gap: '.5rem' }}>
-                        {km     && <span>📍 {km} km</span>}
-                        {timeLabel && <span>⏱ {timeLabel}</span>}
-                      </div>
-                    )}
+                    <div style={{ fontSize: '.72rem', color: 'rgba(255,255,255,.4)', marginTop: '.15rem', display: 'flex', flexWrap: 'wrap', gap: '.5rem' }}>
+                      {km > 0 && <span>🏃 {km} km</span>}
+                      {isTri && nat > 0 && <span>🏊 NC</span>}
+                      {isTri && vel > 0 && <span>🚴 NC</span>}
+                    </div>
                   </>
                 )
               })()}
