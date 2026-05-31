@@ -78,7 +78,7 @@ function AdminShell() {
       <div className="app-shell">
         <aside className="sidebar">
           <div className="sidebar-logo" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-            <img src="/Logo.png" alt="The Ultimate Academy" style={{ height: 80, width: 'auto', maxWidth: '100%', marginBottom: '.5rem' }} />
+            <img src="/Logo.png" alt="The Ultimate Academy" style={{ height: 80, width: 'auto', objectFit: 'contain', maxWidth: '100%', marginBottom: '.5rem' }} />
             <div style={{ fontSize: '.92rem', color: 'var(--primary)', fontWeight: 700, letterSpacing: '.02em', textAlign: 'center' }}>
               Espace Coach
             </div>
@@ -119,7 +119,7 @@ function AdminShell() {
       {/* Mobile top bar — logo + logout */}
       <div className="mobile-topbar">
         <Link to="/admin">
-          <img src="/Logo.png" alt="The Ultimate Academy" style={{ height: 64, width: 'auto' }} />
+          <img src="/Logo.png" alt="The Ultimate Academy" style={{ height: 64, width: 'auto', objectFit: 'contain' }} />
         </Link>
         <button
           onClick={async () => { await signOut(); navigate('/') }}

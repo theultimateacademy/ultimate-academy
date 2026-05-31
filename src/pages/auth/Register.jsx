@@ -93,7 +93,7 @@ export default function Register() {
     <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', background: 'var(--bg)' }}>
       <header style={{ padding: '1.25rem', display: 'flex', justifyContent: 'center' }}>
         <Link to="/">
-          <img src="/Logo.png" alt="The Ultimate Academy" style={{ height: 200, width: 'auto' }} />
+          <img src="/Logo.png" alt="The Ultimate Academy" style={{ height: 200, width: 'auto', objectFit: 'contain' }} />
         </Link>
       </header>
 

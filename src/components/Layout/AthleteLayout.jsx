@@ -62,7 +62,7 @@ export default function AthleteLayout() {
       {/* Desktop sidebar */}
       <aside className="sidebar">
         <div className="sidebar-logo" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-          <Link to="/app/home"><img src="/Logo.png" alt="The Ultimate Academy" style={{ height: 80, width: 'auto', maxWidth: '100%', marginBottom: '.5rem' }} /></Link>
+          <Link to="/app/home"><img src="/Logo.png" alt="The Ultimate Academy" style={{ height: 80, width: 'auto', objectFit: 'contain', maxWidth: '100%', marginBottom: '.5rem' }} /></Link>
           <div style={{ fontSize: '.92rem', color: 'var(--primary)', fontWeight: 700, letterSpacing: '.02em', textAlign: 'center' }}>
             Espace Athlète
           </div>
@@ -114,7 +114,7 @@ export default function AthleteLayout() {
       {/* Mobile top bar — logo + logout */}
       <div className="mobile-topbar">
         <Link to="/app/home">
-          <img src="/Logo.png" alt="The Ultimate Academy" style={{ height: 64, width: 'auto' }} />
+          <img src="/Logo.png" alt="The Ultimate Academy" style={{ height: 64, width: 'auto', objectFit: 'contain' }} />
         </Link>
         <button
           onClick={handleSignOut}

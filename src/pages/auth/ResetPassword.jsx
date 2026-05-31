@@ -39,7 +39,7 @@ export default function ResetPassword() {
     <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'var(--bg)', padding: '1.5rem' }}>
       <div style={{ width: '100%', maxWidth: 420, background: 'rgba(22,19,42,.85)', border: '1px solid rgba(139,47,201,.2)', borderRadius: 24, padding: '2.5rem 2rem', backdropFilter: 'blur(16px)' }}>
         <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
-          <Link to="/"><img src="/Logo.png" alt="The Ultimate Academy" style={{ height: 60, marginBottom: '1.5rem' }} /></Link>
+          <Link to="/"><img src="/Logo.png" alt="The Ultimate Academy" style={{ height: 60, width: 'auto', objectFit: 'contain', marginBottom: '1.5rem' }} /></Link>
           <h2 style={{ fontSize: '1.5rem', marginBottom: '.4rem' }}>Nouveau mot de passe</h2>
           <p style={{ color: 'var(--text-muted)', fontSize: '.88rem' }}>Choisis un nouveau mot de passe pour ton compte</p>
         </div>

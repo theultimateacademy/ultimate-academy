@@ -671,7 +671,7 @@ tr:hover td { background: rgba(255,255,255,.04); }
   .landing-nav-auth-desktop { display: flex !important; gap: .3rem; }
   .landing-nav-auth-desktop .btn { font-size: .72rem !important; padding: .3rem .55rem !important; }
 }
-.nav-logo { height: 60px; width: auto; display: block; flex-shrink: 0; }
+.nav-logo { height: 60px; width: auto; display: block; flex-shrink: 0; object-fit: contain; }
 
 /* ── Landing — bento grid ────────────────────────────────── */
 .bento-grid { display: grid; grid-template-columns: repeat(6,1fr); gap: 1rem; }
