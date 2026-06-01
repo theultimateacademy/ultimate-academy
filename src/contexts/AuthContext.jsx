@@ -47,9 +47,13 @@ export function AuthProvider({ children }) {
   }
 
   async function signUp(email, password, firstName, lastName) {
+    const redirectBase = typeof window !== 'undefined' ? window.location.origin : 'https://theultimateacademy.fr'
     const { data, error } = await supabase.auth.signUp({
       email, password,
-      options: { data: { first_name: firstName, last_name: lastName } }
+      options: {
+        data: { first_name: firstName, last_name: lastName },
+        emailRedirectTo: `${redirectBase}/app/home`
+      }
     })
     if (error) throw error
     return data

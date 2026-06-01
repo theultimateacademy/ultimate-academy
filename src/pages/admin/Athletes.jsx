@@ -493,6 +493,7 @@ function AthleteDetailPanel({ athlete, onClose, onUpdated, onAlertDismissed }) {
   const [msgVal,        setMsgVal]        = useState(athlete.coach_message || '')
   const [sessionSaving, setSessionSaving] = useState(false)
   const [openSession,   setOpenSession]   = useState(null)
+  const [coachWeekIdx, setCoachWeekIdx]  = useState(0)  // active week tab in plan view
 
   const currentWeekNum = getCurrentWeekNum(plan)
 
@@ -1013,10 +1014,10 @@ function AthleteDetailPanel({ athlete, onClose, onUpdated, onAlertDismissed }) {
                     {/* Week tabs */}
                     <div style={{ display:'flex', gap:'.35rem', overflowX:'auto', paddingBottom:'.5rem', marginBottom:'1rem' }}>
                       {(plan.plan_data?.semaines||[]).map((w,i) => (
-                        <button key={i} onClick={() => setOpenSession(s => ({ ...s, _activeWeekIdx: i }))}
+                        <button key={i} onClick={() => setCoachWeekIdx(i)}
                           style={{ flexShrink:0, padding:'.38rem .8rem', borderRadius:99, border:'none',
-                            background: (openSession?._activeWeekIdx ?? 0) === i ? 'var(--gradient)' : 'var(--surface-2)',
-                            color: (openSession?._activeWeekIdx ?? 0) === i ? '#fff' : 'var(--text-muted)',
+                            background: coachWeekIdx === i ? 'var(--gradient)' : 'var(--surface-2)',
+                            color: coachWeekIdx === i ? '#fff' : 'var(--text-muted)',
                             fontWeight:600, fontSize:'.8rem', cursor:'pointer', fontFamily:'inherit' }}>
                           S{w.numero}
                           {w.numero === currentWeekNum && <span style={{ marginLeft:'.3rem', fontSize:'.6rem', opacity:.8 }}>●</span>}
@@ -1025,7 +1026,7 @@ function AthleteDetailPanel({ athlete, onClose, onUpdated, onAlertDismissed }) {
                     </div>
 
                     {(plan.plan_data?.semaines||[]).map((week, wIdx) => {
-                      const activeWeekIdx = openSession?._activeWeekIdx ?? 0
+                      const activeWeekIdx = coachWeekIdx
                       if (wIdx !== activeWeekIdx) return null
                       const isCurrent = week.numero === currentWeekNum
                       const weekComps = completions.filter(c => c.week_number === week.numero)
