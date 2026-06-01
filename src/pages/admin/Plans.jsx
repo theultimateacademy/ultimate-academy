@@ -103,57 +103,85 @@ function PlanModal({ plan, athlete, onClose, onActivate }) {
 
         {currentWeek && (
           <div>
-            <div style={{ marginBottom: '1rem' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '.5rem', flexWrap: 'wrap', marginBottom: '.35rem' }}>
-                <span className="badge badge-primary">Semaine {currentWeek.numero}</span>
-                <span className="badge badge-info" style={{ maxWidth: '100%', whiteSpace: 'normal', lineHeight: 1.3 }}>{currentWeek.phase}</span>
-              </div>
-              {currentWeek.charge && (() => {
-                const parenIdx = currentWeek.charge.indexOf('(')
-                const main = parenIdx > 0 ? currentWeek.charge.slice(0, parenIdx).trim() : currentWeek.charge
-                const sub  = parenIdx > 0 ? currentWeek.charge.slice(parenIdx) : null
-                return (
-                  <div>
-                    <span className="badge badge-warning">{main}</span>
-                    {sub && <span style={{ fontSize: '.75rem', color: 'var(--text-muted)', marginLeft: '.4rem' }}>{sub}</span>}
+            {/* ── Week header — same design as athlete interface ── */}
+            {(() => {
+              const seances = currentWeek.seances || []
+              const nat   = seances.filter(s => String(s.type||'').toLowerCase().includes('natation')).length
+              const vel   = seances.filter(s => String(s.type||'').toLowerCase().includes('vélo') || String(s.type||'').toLowerCase().includes('velo')).length
+              const brk   = seances.filter(s => String(s.type||'').toLowerCase().includes('brique') || (s.id_seance||'').startsWith('BRK')).length
+              const renfo = seances.filter(s => String(s.type||'').toLowerCase().includes('renforcement') || (s.id_seance||'').startsWith('RENFO')).length
+              const course= seances.filter(s => { const t=String(s.type||'').toLowerCase(); return !t.includes('natation')&&!t.includes('vélo')&&!t.includes('velo')&&!t.includes('brique')&&!t.includes('renforcement')&&!s.est_course }).length
+              const km = currentWeek.volume_total_km
+              const chargeRaw = (currentWeek.charge||'').replace(/\s*\(S\d+\)/gi,'')
+              const chargeShort = chargeRaw.split(/[—–(]/)[0].trim()
+              const chargeSub = chargeRaw.includes('(') ? chargeRaw.slice(chargeRaw.indexOf('(')) : null
+              const chargeColor = chargeShort.toLowerCase().includes('élevée')?'#F97316':chargeShort.toLowerCase().includes('modérée')?'#06B6D4':chargeShort.toLowerCase().includes('affûtage')?'#8B2FC9':chargeShort.toLowerCase().includes('récup')?'#6B7280':'#10B981'
+              const chips = [
+                {cond:course>0,count:course,icon:'🏃',label:'course', color:'#10B981'},
+                {cond:nat>0,   count:nat,   icon:'🏊',label:'nage',   color:'#06B6D4'},
+                {cond:vel>0,   count:vel,   icon:'🚴',label:'vélo',   color:'#F97316'},
+                {cond:brk>0,   count:brk,   icon:'🔗',label:'brique', color:'#8B5CF6'},
+                {cond:renfo>0, count:renfo, icon:'💪',label:'renfo',  color:'#EC4899'},
+              ].filter(d=>d.cond)
+              return (
+                <div style={{ marginBottom:'1rem', borderRadius:14, overflow:'hidden', background:'linear-gradient(135deg,#1A1A2E,#2D1B4E)', color:'#fff' }}>
+                  <div style={{ padding:'.875rem 1.125rem .625rem', display:'flex', justifyContent:'space-between', alignItems:'flex-start', gap:'1rem' }}>
+                    <div>
+                      <div style={{ fontSize:'.68rem', fontWeight:700, textTransform:'uppercase', letterSpacing:'.1em', color:'rgba(255,255,255,.38)', marginBottom:'.2rem' }}>
+                        Semaine {currentWeek.numero} · {currentWeek.phase?.replace(/^S\d+\s*[—–-]\s*/i,'').replace(/\s*\(S\d+\)/gi,'')}
+                      </div>
+                      {chargeSub && <div style={{ fontSize:'.66rem', color:'rgba(255,255,255,.3)' }}>{chargeSub}</div>}
+                    </div>
+                    <span style={{ flexShrink:0, padding:'.2rem .65rem', borderRadius:99, fontSize:'.68rem', fontWeight:700,
+                      background:chargeColor+'25', border:`1px solid ${chargeColor}50`, color:chargeColor }}>{chargeShort}</span>
                   </div>
-                )
-              })()}
-            </div>
+                  <div style={{ padding:'.375rem 1.125rem .625rem', display:'flex', flexWrap:'wrap', gap:'.4rem', alignItems:'center', borderTop:'1px solid rgba(255,255,255,.06)' }}>
+                    {chips.map(d => (
+                      <div key={d.label} style={{ display:'flex', alignItems:'center', gap:'.28rem', background:d.color+'18', border:`1px solid ${d.color}35`, borderRadius:99, padding:'.2rem .6rem' }}>
+                        <span style={{ fontSize:'.78rem' }}>{d.icon}</span>
+                        <span style={{ fontWeight:800, fontSize:'.82rem', color:d.color }}>{d.count}</span>
+                        <span style={{ fontSize:'.68rem', color:'rgba(255,255,255,.35)' }}>{d.label}</span>
+                      </div>
+                    ))}
+                    {km > 0 && <span style={{ marginLeft:'auto', fontSize:'.72rem', color:'rgba(255,255,255,.4)' }}>📍 <strong style={{ color:'#fff' }}>{km} km</strong></span>}
+                  </div>
+                </div>
+              )
+            })()}
 
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '.75rem', maxHeight: '50vh', overflowY: 'auto' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '.5rem', maxHeight: '52vh', overflowY: 'auto' }}>
               {currentWeek.seances?.map((session, si) => {
                 const color = SESSION_TYPE_COLORS[session.type] || 'var(--primary)'
+                const isRenfo = (session.type||'').toLowerCase().includes('renforcement') || (session.id_seance||'').startsWith('RENFO')
                 const isEditing = editSession === `${activeWeek}-${si}`
                 return (
-                  <div key={si} className="card" style={{ borderLeft: `3px solid ${color}` }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-                      <div>
-                        <div style={{ fontSize: '.75rem', color, fontWeight: 700, marginBottom: '.2rem' }}>{session.type}</div>
+                  <div key={si} style={{
+                    borderRadius: 10, overflow: 'hidden',
+                    border: isRenfo ? `1.5px solid ${color}50` : `1px solid var(--border)`,
+                    background: isRenfo ? color+'08' : 'var(--surface-2)',
+                  }}>
+                    <div style={{ display:'flex', alignItems:'center', gap:'.75rem', padding:'.625rem .875rem', borderLeft:`4px solid ${color}` }}>
+                      <div style={{ flex:1, minWidth:0 }}>
+                        <div style={{ display:'flex', alignItems:'center', gap:'.4rem', marginBottom:'.15rem' }}>
+                          <span style={{ fontSize:'.65rem', fontWeight:700, color, background:color+'18', padding:'.1rem .45rem', borderRadius:99, whiteSpace:'nowrap' }}>{session.type}</span>
+                          <span style={{ fontSize:'.68rem', color:'var(--text-muted)' }}>{session.jour} · {session.duree_min} min</span>
+                        </div>
                         {isEditing ? (
                           <input className="form-input" value={session.titre}
                             onChange={e => updateSession(activeWeek, si, 'titre', e.target.value)}
-                            style={{ marginBottom: '.5rem' }} />
+                            style={{ marginBottom: '.25rem', fontSize:'.875rem' }} />
                         ) : (
-                          <h4 style={{ marginBottom: '.2rem' }}>{session.titre}</h4>
+                          <div style={{ fontWeight:700, fontSize:'.875rem', overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>{session.titre}</div>
                         )}
-                        <div style={{ fontSize: '.8rem', color: 'var(--text-muted)' }}>
-                          {session.jour} · {session.duree_min} min · RPE {session.rpe_cible}/10
-                        </div>
                       </div>
-                      <div style={{ display: 'flex', gap: '.35rem', flexShrink: 0 }}>
-                        <button className="btn btn-ghost btn-sm" onClick={() =>
+                      <div style={{ display:'flex', gap:'.3rem', flexShrink:0 }}>
+                        <span style={{ fontSize:'.72rem', fontWeight:700, color:'var(--text-muted)', background:'var(--surface)', padding:'.15rem .5rem', borderRadius:6, border:'1px solid var(--border)' }}>RPE {session.rpe_cible}</span>
+                        <button className="btn btn-ghost btn-sm" style={{ padding:'.25rem .5rem', fontSize:'.78rem' }} onClick={() =>
                           setEditSession(isEditing ? null : `${activeWeek}-${si}`)}>
-                          {isEditing ? 'Fermer' : '✏️'}
+                          {isEditing ? '✕' : '✏️'}
                         </button>
-                        <button
-                          className="btn btn-ghost btn-sm"
-                          style={{ color: 'var(--error)', borderColor: 'rgba(239,68,68,.3)' }}
-                          onClick={() => {
-                            if (window.confirm(`Supprimer "${session.titre}" ?`)) {
-                              deleteSession(activeWeek, si)
-                            }
-                          }}>
+                        <button className="btn btn-ghost btn-sm" style={{ padding:'.25rem .5rem', fontSize:'.78rem', color:'var(--error)', borderColor:'rgba(239,68,68,.3)' }}
+                          onClick={() => window.confirm(`Supprimer "${session.titre}" ?`) && deleteSession(activeWeek, si)}>
                           🗑️
                         </button>
                       </div>

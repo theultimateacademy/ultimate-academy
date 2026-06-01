@@ -1443,47 +1443,45 @@ export default function AthletePlan() {
           }
 
           const isRenfo = (session.type || '').toLowerCase().includes('renforcement') || (session.id_seance || '').startsWith('RENFO')
-          const cardBorderStyle = isRenfo
-            ? { border: `2px solid ${done ? 'var(--success)' : color}`, background: done ? undefined : color + '0A' }
-            : { borderLeft: `4px solid ${done ? 'var(--success)' : color}` }
-          const dayGridCol = DAY_COL[session.jour] || 'auto'
+          const dateLabel = sessionDate(planMonday, currentWeekData.numero, session.jour)
 
           return (
-            <div key={idx} className="card"
+            <div key={idx}
+              onClick={() => setModal({ session: { ...session, _isDone: done, _dateLabel: dateLabel }, weekNum: currentWeekData.numero, sessionIdx: idx })}
               style={{
-                ...cardBorderStyle,
-                opacity: done ? .75 : 1, cursor: 'pointer',
-                transition: 'transform .15s, box-shadow .15s',
-                gridColumn: dayGridCol,
+                borderRadius: 14, overflow: 'hidden', cursor: 'pointer', opacity: done ? .72 : 1,
+                background: 'var(--surface-2)',
+                border: isRenfo ? `1.5px solid ${color}45` : '1px solid var(--border)',
+                transition: 'transform .12s, box-shadow .12s',
               }}
-              onClick={() => setModal({ session: { ...session, _isDone: done, _dateLabel: sessionDate(planMonday, currentWeekData.numero, session.jour) }, weekNum: currentWeekData.numero, sessionIdx: idx })}
-              onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.boxShadow = 'var(--shadow-lg)' }}
-              onMouseLeave={e => { e.currentTarget.style.transform = ''; e.currentTarget.style.boxShadow = '' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-                <div style={{ flex: 1, minWidth: 0 }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '.5rem', marginBottom: '.3rem' }}>
-                    <span style={{ fontSize: '.75rem', fontWeight: 600, color, background: color + '18', padding: '.15rem .5rem', borderRadius: 99 }}>
+              onMouseEnter={e => { e.currentTarget.style.transform='translateY(-2px)'; e.currentTarget.style.boxShadow='var(--shadow-lg)' }}
+              onMouseLeave={e => { e.currentTarget.style.transform=''; e.currentTarget.style.boxShadow='' }}>
+              {/* Color accent strip top */}
+              <div style={{ height: 4, background: done ? 'var(--success)' : `linear-gradient(90deg, ${color}, ${color}88)` }} />
+              <div style={{ padding: '.75rem 1rem', display:'flex', justifyContent:'space-between', alignItems:'flex-start', gap:'.75rem' }}>
+                <div style={{ flex:1, minWidth:0 }}>
+                  <div style={{ display:'flex', alignItems:'center', gap:'.4rem', marginBottom:'.3rem', flexWrap:'wrap' }}>
+                    <span style={{ fontSize:'.68rem', fontWeight:700, color, background:color+'18', padding:'.12rem .5rem', borderRadius:99, whiteSpace:'nowrap' }}>
                       {session.type}
                     </span>
-                    {done && <span className="badge badge-success">✅ Effectué</span>}
+                    <span style={{ fontSize:'.72rem', color:'var(--text-muted)' }}>{dateLabel}</span>
+                    {done && <span style={{ fontSize:'.68rem', color:'var(--success)', fontWeight:700 }}>✅ Effectué</span>}
                   </div>
-                  <h4 style={{ marginBottom: '.2rem' }}>{session.titre}</h4>
-                  <div style={{ fontSize: '.8rem', color: 'var(--text-muted)' }}>
-                    {sessionDate(planMonday, currentWeekData.numero, session.jour)} · {session.duree_min} min
+                  <div style={{ fontWeight:700, fontSize:'.9rem', lineHeight:1.3, marginBottom:'.25rem',
+                    overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>
+                    {session.titre}
+                  </div>
+                  <div style={{ fontSize:'.75rem', color:'var(--text-muted)', display:'flex', gap:'.6rem' }}>
+                    <span>⏱ {session.duree_min} min</span>
+                    {session.rpe_cible && <span>💪 RPE {session.rpe_cible}</span>}
                   </div>
                 </div>
-                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '.4rem', flexShrink: 0 }}>
-                  <div style={{ textAlign: 'right' }}>
-                    <div style={{ fontSize: '.75rem', color: 'var(--text-muted)' }}>RPE cible</div>
-                    <div style={{ fontWeight: 700, color: 'var(--primary)' }}>{session.rpe_cible}/10</div>
-                  </div>
-                  <ExportBtn
-                    session={session}
-                    suuntoConnected={profile?.suunto_connected}
-                    garminConnected={profile?.garmin_connected}
-                    userId={profile?.id}
-                  />
-                </div>
+                <ExportBtn
+                  session={session}
+                  suuntoConnected={profile?.suunto_connected}
+                  garminConnected={profile?.garmin_connected}
+                  userId={profile?.id}
+                />
               </div>
             </div>
           )
