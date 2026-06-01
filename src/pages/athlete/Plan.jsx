@@ -1246,19 +1246,96 @@ export default function AthletePlan() {
       {/* Sessions — desktop: 7-day grid / mobile: vertical list */}
       <style>{`
         @media (min-width: 900px) {
-          .plan-day-grid { display: grid !important; grid-template-columns: repeat(7,1fr) !important; gap: .6rem !important; align-items: start !important; }
-          .plan-day-headers { display: grid !important; }
+          .plan-week-grid { display: grid !important; grid-template-columns: repeat(7,1fr) !important; gap: .5rem !important; align-items: start !important; }
+          .plan-week-grid-headers { display: grid !important; grid-template-columns: repeat(7,1fr); gap: .5rem; margin-bottom: .5rem; }
+          .plan-mobile-list { display: none !important; }
+          .plan-desktop-only { display: block !important; }
         }
-        .plan-day-headers { display: none; grid-template-columns: repeat(7,1fr); gap: .6rem; margin-bottom: .5rem; }
+        .plan-week-grid-headers { display: none; }
+        .plan-week-grid { display: none; }
+        .plan-desktop-only { display: none; }
       `}</style>
-      <div className="plan-day-headers">
+
+      {/* Desktop day headers */}
+      <div className="plan-week-grid-headers">
         {['Lun','Mar','Mer','Jeu','Ven','Sam','Dim'].map(d => (
           <div key={d} style={{ textAlign:'center', fontSize:'.66rem', fontWeight:800, textTransform:'uppercase',
-            letterSpacing:'.08em', color:'var(--text-muted)', paddingBottom:'.4rem', borderBottom:'1px solid var(--border)' }}>{d}</div>
+            letterSpacing:'.08em', color:'var(--text-muted)', paddingBottom:'.4rem',
+            borderBottom:'1px solid var(--border)' }}>{d}</div>
         ))}
       </div>
 
-      <div className="plan-day-grid" style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+      {/* Desktop: 7-column grid, sessions grouped by day */}
+      {(() => {
+        const DAY_NAMES = ['Lundi','Mardi','Mercredi','Jeudi','Vendredi','Samedi','Dimanche']
+        const allSessions = (currentWeekData?.seances || []).map((s, origIdx) => ({...s, _origIdx: origIdx}))
+        const filtered = allSessions.filter(session => {
+          if (triTab === 'all') return true;
+          const t = (session.type||'').toLowerCase();
+          const isRenfo = t.includes('renforcement') || (session.id_seance||'').startsWith('RENFO');
+          const isBrk = t.includes('brique') || (session.id_seance||'').startsWith('BRK');
+          if (triTab === 'natation') return t.includes('natation');
+          if (triTab === 'velo')     return t.includes('vélo') || t.includes('velo');
+          if (triTab === 'brique')   return isBrk;
+          if (triTab === 'renfo')    return isRenfo;
+          if (triTab === 'course')   return !t.includes('natation') && !t.includes('vélo') && !t.includes('velo') && !isBrk && !isRenfo;
+          return true;
+        })
+        const byDay = {}
+        DAY_NAMES.forEach(d => { byDay[d] = [] })
+        filtered.forEach(s => { if (byDay[s.jour]) byDay[s.jour].push(s) })
+
+        return (
+          <div className="plan-week-grid">
+            {DAY_NAMES.map(day => {
+              const daySessions = byDay[day]
+              return (
+                <div key={day} style={{ display:'flex', flexDirection:'column', gap:'.4rem' }}>
+                  {daySessions.length === 0 ? (
+                    <div style={{ minHeight:56, display:'flex', alignItems:'center', justifyContent:'center',
+                      border:'1px dashed rgba(255,255,255,.07)', borderRadius:10,
+                      fontSize:'.68rem', color:'rgba(255,255,255,.2)', fontStyle:'italic' }}>
+                      Repos
+                    </div>
+                  ) : daySessions.map(session => {
+                    const idx = session._origIdx
+                    const done = isCompleted(currentWeekData.numero, idx)
+                    const color = SESSION_TYPE_COLORS[session.type] || 'var(--primary)'
+                    const isRace = session.est_course || session.id_seance === 'RACE' || session.id_seance === 'RACE_INT'
+                    return (
+                      <div key={idx}
+                        onClick={() => setModal({ session: {...session, _isDone: done, _dateLabel: sessionDate(planMonday, currentWeekData.numero, session.jour)}, weekNum: currentWeekData.numero, sessionIdx: idx })}
+                        style={{ borderLeft:`3px solid ${done ? 'var(--success)' : color}`,
+                          background: isRace ? color+'15' : 'var(--surface-2)',
+                          borderRadius:8, padding:'.55rem .65rem', cursor:'pointer', opacity: done ? .7 : 1,
+                          transition:'transform .12s', minWidth:0 }}
+                        onMouseEnter={e => e.currentTarget.style.transform='translateY(-1px)'}
+                        onMouseLeave={e => e.currentTarget.style.transform=''}>
+                        <div style={{ fontSize:'.65rem', fontWeight:700, color, marginBottom:'.2rem',
+                          overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>
+                          {session.type}
+                        </div>
+                        <div style={{ fontSize:'.78rem', fontWeight:700, lineHeight:1.2,
+                          overflow:'hidden', textOverflow:'ellipsis',
+                          display:'-webkit-box', WebkitLineClamp:2, WebkitBoxOrient:'vertical' }}>
+                          {session.titre}
+                        </div>
+                        <div style={{ fontSize:'.68rem', color:'var(--text-muted)', marginTop:'.2rem' }}>
+                          {session.duree_min} min · RPE {session.rpe_cible}
+                        </div>
+                        {done && <div style={{ fontSize:'.6rem', color:'var(--success)', marginTop:'.15rem' }}>✅ Effectué</div>}
+                      </div>
+                    )
+                  })}
+                </div>
+              )
+            })}
+          </div>
+        )
+      })()}
+
+      {/* Mobile: flat vertical list */}
+      <div className="plan-mobile-list" style={{ display:'flex', flexDirection:'column', gap:'1rem' }}>
         {(currentWeekData?.seances || [])
           .map((s, origIdx) => ({ ...s, _origIdx: origIdx }))
           .sort((a, b) => sessionDayOrder(a) - sessionDayOrder(b))
@@ -1408,16 +1485,10 @@ export default function AthletePlan() {
                   />
                 </div>
               </div>
-              {session.notes_coach && (
-                <p style={{ marginTop: '.6rem', fontSize: '.8rem', color: 'var(--text-muted)', fontStyle: 'italic',
-                  overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                  💬 "{session.notes_coach}"
-                </p>
-              )}
             </div>
           )
         })}
-      </div>
+      </div>{/* end mobile list */}
 
       {/* Weekly feedback, appears when all sessions of active week are done */}
       {(() => {

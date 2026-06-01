@@ -642,11 +642,11 @@ export default function AthleteProfile() {
 
           const DAYS = ['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim']
 
-          // Colored section wrapper
+          // Colored section wrapper — visible but not overwhelming
           const sectionBlock = (color) => ({
-            background: color + '08', borderRadius: 14,
-            border: `1px solid ${color}18`,
-            padding: '.25rem 1rem .75rem', marginBottom: '.75rem',
+            background: color + '12', borderRadius: 14,
+            border: `1.5px solid ${color}35`,
+            padding: '.25rem 1rem .875rem', marginBottom: '.875rem',
           })
 
           return (

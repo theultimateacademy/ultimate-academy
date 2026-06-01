@@ -701,7 +701,13 @@ function AthleteDetailPanel({ athlete, onClose, onUpdated, onAlertDismissed }) {
 
                   const sectionHdr = { fontSize:'.68rem', fontWeight:800, textTransform:'uppercase',
                     letterSpacing:'.1em', color:'var(--text-muted)', padding:'.625rem 0',
-                    borderBottom:'1px solid var(--border)', marginBottom:'.125rem', marginTop:'1.5rem' }
+                    borderBottom:'1px solid var(--border)', marginBottom:'.125rem', marginTop:0 }
+
+                  const sectionBlock = (color) => ({
+                    background: color + '12', borderRadius: 14,
+                    border: `1.5px solid ${color}35`,
+                    padding: '.25rem 1rem .875rem', marginBottom: '.875rem',
+                  })
 
                   const rowStyle = { display:'flex', justifyContent:'space-between', alignItems:'center',
                     padding:'.75rem 0', borderBottom:'1px solid rgba(255,255,255,.04)',
@@ -748,7 +754,8 @@ function AthleteDetailPanel({ athlete, onClose, onUpdated, onAlertDismissed }) {
                   return (
                     <>
                       {/* ── Section 1 : Objectif & Course ── */}
-                      <div style={sectionHdr}>Objectif &amp; Course</div>
+                      <div style={sectionBlock('#8B2FC9')}>
+                      <div style={sectionHdr}>🎯 Objectif &amp; Course</div>
 
                       <FieldRow field="objective" label="Objectif" type="select"
                         opts={Object.entries(OBJECTIVE_LABELS)}
@@ -808,8 +815,10 @@ function AthleteDetailPanel({ athlete, onClose, onUpdated, onAlertDismissed }) {
                         )
                       })()}
 
+                      </div>{/* end s1 */}
                       {/* ── Section 2 : Performance ── */}
-                      <div style={sectionHdr}>Performance</div>
+                      <div style={sectionBlock('#0EA5E9')}>
+                      <div style={sectionHdr}>📊 Performance</div>
 
                       <FieldRow field="vma" label="VMA (km/h)" type="number"
                         show={v => v ? `${v} km/h` : '—'} />
@@ -835,8 +844,10 @@ function AthleteDetailPanel({ athlete, onClose, onUpdated, onAlertDismissed }) {
                       <FieldRow field="best_recent_time" label="Meilleur chrono récent" type="text"
                         show={v => v || '—'} />
 
+                      </div>{/* end s2 */}
                       {/* ── Section 3 : Organisation entraînement ── */}
-                      <div style={sectionHdr}>Organisation entraînement</div>
+                      <div style={sectionBlock('#10B981')}>
+                      <div style={sectionHdr}>📅 Organisation entraînement</div>
 
                       {!isTri && (
                         <FieldRow field="days_per_week" label="Séances / semaine" type="number"
@@ -852,29 +863,35 @@ function AthleteDetailPanel({ athlete, onClose, onUpdated, onAlertDismissed }) {
                           show={v => v ? `${v} séance(s)` : '—'} />
                       </>)}
 
+                      </div>{/* end s3 */}
                       {/* ── Section 4 : Trail (conditionnel) ── */}
                       {isTrail && (<>
-                        <div style={sectionHdr}>Trail</div>
+                        <div style={sectionBlock('#65A30D')}>
+                        <div style={sectionHdr}>⛰️ Trail</div>
                         <FieldRow field="training_terrain" label="Zone d'habitation" type="select"
                           opts={[['','Non précisé'],['montagne','Montagne'],['semi_montagne','Semi-montagne'],['ville_plat','Ville/Plat']]}
                           show={v => ({montagne:'Montagne',semi_montagne:'Semi-montagne',ville_plat:'Ville/Plat'})[v] || '—'} />
                         <FieldRow field="race_denivele" label="Dénivelé course (m D+)" type="number"
                           show={v => v ? `${v} m D+` : '—'} />
+                        </div>
                       </>)}
 
                       {/* ── Section 5 : Triathlon (conditionnel) ── */}
                       {isTri && (<>
-                        <div style={sectionHdr}>Triathlon</div>
+                        <div style={sectionBlock('#06B6D4')}>
+                        <div style={sectionHdr}>🦾 Triathlon</div>
                         <FieldRow field="open_water" label="🌊 Nage en eau libre" type="select"
                           opts={[['','—'],['oui','Oui, accès eau libre'],['selon_conditions','Selon les conditions'],['non','Non, piscine seulement']]}
                           show={v => ({oui:'Oui',selon_conditions:'Selon conditions',non:'Piscine'})[v] || '—'} />
                         <FieldRow field="bike_type" label="Type de vélo" type="select"
                           opts={[['','—'],['route','Route'],['tt','Contre-la-montre'],['gravel','Gravel']]}
                           show={v => ({route:'Route',tt:'Contre-la-montre',gravel:'Gravel'})[v] || '—'} />
+                        </div>
                       </>)}
 
                       {/* ── Section 6 : Santé & Forme ── */}
-                      <div style={sectionHdr}>Santé &amp; Forme</div>
+                      <div style={sectionBlock('#EC4899')}>
+                      <div style={sectionHdr}>💊 Santé &amp; Forme</div>
 
                       <FieldRow field="current_form" label="Forme actuelle" type="text"
                         show={v => v || '—'} />
@@ -886,6 +903,7 @@ function AthleteDetailPanel({ athlete, onClose, onUpdated, onAlertDismissed }) {
                         <FieldRow field="period_pain_days" label="Douleur cycle (j)" type="number"
                           show={v => v ? `${v} jour(s)` : '—'} />
                       )}
+                      </div>{/* end s6 */}
                     </>
                   )
                 })()}
