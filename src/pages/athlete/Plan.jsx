@@ -1152,76 +1152,85 @@ export default function AthletePlan() {
       </div>
 
       {/* Current week header */}
-      {currentWeekData && (
-        <div className="card" style={{ marginBottom: '1.25rem', background: 'linear-gradient(135deg,#1A1A2E,#2D1B4E)', color: '#fff' }}>
-          <div>
-              <div style={{ fontSize: '.8rem', opacity: .7, marginBottom: '.2rem' }}>
-                Semaine {currentWeekData.numero} · {weekDateRange(planMonday, currentWeekData.numero)}
+      {currentWeekData && (() => {
+        const seances = currentWeekData.seances || []
+        const isTri = ['tri_sprint','tri_olympic','tri_half','tri_ironman'].includes(profile?.objective)
+        const nat   = seances.filter(s => String(s.type||'').toLowerCase().includes('natation')).length
+        const vel   = seances.filter(s => String(s.type||'').toLowerCase().includes('vélo') || String(s.type||'').toLowerCase().includes('velo')).length
+        const brk   = seances.filter(s => String(s.type||'').toLowerCase().includes('brique') || (s.id_seance||'').startsWith('BRK')).length
+        const renfo = seances.filter(s => String(s.type||'').toLowerCase().includes('renforcement') || (s.id_seance||'').startsWith('RENFO')).length
+        const course= seances.filter(s => {
+          const t = String(s.type||'').toLowerCase()
+          return !t.includes('natation') && !t.includes('vélo') && !t.includes('velo') && !t.includes('brique') && !t.includes('renforcement') && !s.est_course
+        }).length
+        const km = currentWeekData.volume_total_km
+        const phase = (currentWeekData.phase || '').replace(/^S\d+\s*[—–-]\s*/i, '').replace(/\s*\(S\d+\)/gi, '')
+        const chargeRaw = (currentWeekData.charge || '').replace(/\s*\(S\d+\)/gi, '')
+        const chargeShort = chargeRaw.split(/[—–(]/)[0].trim()
+        const chargeSub = chargeRaw.includes('(') ? chargeRaw.slice(chargeRaw.indexOf('(')) : null
+        const chargeColor = chargeShort.toLowerCase().includes('élevée') ? '#F97316'
+          : chargeShort.toLowerCase().includes('modérée') ? '#06B6D4'
+          : chargeShort.toLowerCase().includes('affûtage') ? '#8B2FC9'
+          : chargeShort.toLowerCase().includes('récup') ? '#6B7280'
+          : '#10B981'
+
+        const chips = [
+          { cond: course > 0, count: course, icon: '🏃', label: 'course',  color: '#10B981' },
+          { cond: nat    > 0, count: nat,    icon: '🏊', label: 'nage',    color: '#06B6D4' },
+          { cond: vel    > 0, count: vel,    icon: '🚴', label: 'vélo',    color: '#F97316' },
+          { cond: brk    > 0, count: brk,    icon: '🔗', label: 'brique',  color: '#8B5CF6' },
+          { cond: renfo  > 0, count: renfo,  icon: '💪', label: 'renfo',   color: '#EC4899' },
+        ].filter(d => d.cond)
+
+        return (
+          <div style={{ marginBottom: '1.25rem', borderRadius: 18, overflow: 'hidden', background: 'linear-gradient(135deg,#1A1A2E,#2D1B4E)', color: '#fff' }}>
+            {/* Header row */}
+            <div style={{ padding: '1rem 1.25rem .75rem', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '1rem' }}>
+              <div>
+                <div style={{ fontSize: '.68rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '.1em', color: 'rgba(255,255,255,.38)', marginBottom: '.25rem' }}>
+                  Semaine {currentWeekData.numero} · {weekDateRange(planMonday, currentWeekData.numero)}
+                </div>
+                <div style={{ fontWeight: 800, fontSize: '1.05rem', lineHeight: 1.2 }}>{phase}</div>
+                {chargeSub && <div style={{ fontSize: '.68rem', color: 'rgba(255,255,255,.35)', marginTop: '.2rem' }}>{chargeSub}</div>}
               </div>
-              <div style={{ fontWeight: 700, fontSize: '1.1rem' }}>
-                {(currentWeekData.phase || '').replace(/^S\d+\s*[—–-]\s*/i, '').replace(/\s*\(S\d+\)/gi, '')}
-              </div>
-              {(() => {
-                const seances = currentWeekData.seances || []
-                const isTri = ['tri_sprint','tri_olympic','tri_half','tri_ironman'].includes(profile?.objective)
-                const nat   = seances.filter(s => String(s.type||'').toLowerCase().includes('natation')).length
-                const vel   = seances.filter(s => String(s.type||'').toLowerCase().includes('vélo') || String(s.type||'').toLowerCase().includes('velo')).length
-                const brk   = seances.filter(s => String(s.type||'').toLowerCase().includes('brique') || (s.id_seance||'').startsWith('BRK')).length
-                const renfo = seances.filter(s => String(s.type||'').toLowerCase().includes('renforcement') || (s.id_seance||'').startsWith('RENFO')).length
-                const course= seances.filter(s => {
-                  const t = String(s.type||'').toLowerCase()
-                  return !t.includes('natation') && !t.includes('vélo') && !t.includes('velo') && !t.includes('brique') && !t.includes('renforcement') && !s.est_course
-                }).length
-                const km = currentWeekData.volume_total_km
-                return (
-                  <>
-                    <div style={{ fontSize: '.75rem', color: 'rgba(255,255,255,.55)', marginTop: '.2rem', display: 'flex', flexWrap: 'wrap', gap: '.35rem' }}>
-                      {course > 0 && <span style={{ color: '#34D399' }}>🏃 {course}</span>}
-                      {nat    > 0 && <span style={{ color: '#06B6D4' }}>🏊 {nat}</span>}
-                      {vel    > 0 && <span style={{ color: '#F97316' }}>🚴 {vel}</span>}
-                      {brk    > 0 && <span style={{ color: '#8B5CF6' }}>🔗 {brk}</span>}
-                      {renfo  > 0 && <span style={{ color: '#EC4899' }}>💪 {renfo}</span>}
-                    </div>
-                    <div style={{ fontSize: '.72rem', color: 'rgba(255,255,255,.4)', marginTop: '.15rem', display: 'flex', flexWrap: 'wrap', gap: '.5rem' }}>
-                      {km > 0 && <span>🏃 {km} km</span>}
-                      {isTri && nat > 0 && <span>🏊 NC</span>}
-                      {isTri && vel > 0 && <span>🚴 NC</span>}
-                    </div>
-                  </>
-                )
-              })()}
-              {(() => {
-                const raw   = (currentWeekData.charge || '').replace(/ — /g, ' · ').replace(/\s*\(S\d+\)/gi, '')
-                const parenIdx = raw.indexOf('(')
-                const main  = parenIdx > 0 ? raw.slice(0, parenIdx).trim() : raw
-                const sub   = parenIdx > 0 ? raw.slice(parenIdx) : null
-                return (
-                  <div style={{ marginTop: '.5rem' }}>
-                    <span style={{ display: 'inline-block', padding: '.2rem .65rem', borderRadius: 99,
-                      background: 'rgba(255,255,255,.15)', fontSize: '.72rem', fontWeight: 700 }}>
-                      {main}
-                    </span>
-                    {sub && (
-                      <div style={{ fontSize: '.68rem', color: 'rgba(255,255,255,.4)', marginTop: '.2rem' }}>
-                        {sub}
-                      </div>
-                    )}
-                  </div>
-                )
-              })()}
+              <span style={{ flexShrink: 0, padding: '.22rem .75rem', borderRadius: 99, fontSize: '.7rem', fontWeight: 700,
+                background: chargeColor + '25', border: `1px solid ${chargeColor}50`, color: chargeColor }}>
+                {chargeShort}
+              </span>
             </div>
-        </div>
-      )}
+
+            {/* Discipline chips */}
+            <div style={{ padding: '.5rem 1.25rem .625rem', display: 'flex', flexWrap: 'wrap', gap: '.45rem',
+              borderTop: '1px solid rgba(255,255,255,.06)', alignItems: 'center' }}>
+              {chips.map(d => (
+                <div key={d.label} style={{ display: 'flex', alignItems: 'center', gap: '.3rem',
+                  background: d.color + '18', border: `1px solid ${d.color}35`, borderRadius: 99,
+                  padding: '.22rem .65rem' }}>
+                  <span style={{ fontSize: '.82rem' }}>{d.icon}</span>
+                  <span style={{ fontWeight: 800, fontSize: '.85rem', color: d.color }}>{d.count}</span>
+                  <span style={{ fontSize: '.7rem', color: 'rgba(255,255,255,.38)' }}>{d.label}</span>
+                </div>
+              ))}
+              {km > 0 && (
+                <span style={{ marginLeft: 'auto', fontSize: '.75rem', color: 'rgba(255,255,255,.45)' }}>
+                  📍 <strong style={{ color: '#fff', fontWeight: 700 }}>{km} km</strong>
+                </span>
+              )}
+            </div>
+          </div>
+        )
+      })()}
 
       {/* Triathlon discipline tabs */}
       {['tri_sprint','tri_olympic','tri_half','tri_ironman'].includes(profile?.objective) && (
         <div style={{ display: 'flex', gap: '.4rem', marginBottom: '1rem', overflowX: 'auto', paddingBottom: '.25rem' }}>
           {[
-            { v: 'all',       l: '🗓 Semaine',   color: '#8B2FC9' },
-            { v: 'natation',  l: '🏊 Natation',  color: '#06B6D4' },
-            { v: 'velo',      l: '🚴 Vélo',      color: '#F97316' },
-            { v: 'course',    l: '🏃 Course',    color: '#10B981' },
-            { v: 'renfo',     l: '💪 Renfo',     color: '#EC4899' },
+            { v: 'all',      l: '🗓 Semaine',  color: '#8B2FC9' },
+            { v: 'natation', l: '🏊 Natation', color: '#06B6D4' },
+            { v: 'velo',     l: '🚴 Vélo',     color: '#F97316' },
+            { v: 'brique',   l: '🔗 Brique',   color: '#8B5CF6' },
+            { v: 'course',   l: '🏃 Course',   color: '#10B981' },
+            { v: 'renfo',    l: '💪 Renfo',    color: '#EC4899' },
           ].map(t => (
             <button key={t.v} onClick={() => setTriTab(t.v)} style={{
               padding: '.35rem .85rem', borderRadius: 99, fontWeight: 600, fontSize: '.8rem',
@@ -1234,8 +1243,22 @@ export default function AthletePlan() {
         </div>
       )}
 
-      {/* Sessions — sorted by day (Mon→Sun), original idx preserved for completion tracking */}
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+      {/* Sessions — desktop: 7-day grid / mobile: vertical list */}
+      <style>{`
+        @media (min-width: 900px) {
+          .plan-day-grid { display: grid !important; grid-template-columns: repeat(7,1fr) !important; gap: .6rem !important; align-items: start !important; }
+          .plan-day-headers { display: grid !important; }
+        }
+        .plan-day-headers { display: none; grid-template-columns: repeat(7,1fr); gap: .6rem; margin-bottom: .5rem; }
+      `}</style>
+      <div className="plan-day-headers">
+        {['Lun','Mar','Mer','Jeu','Ven','Sam','Dim'].map(d => (
+          <div key={d} style={{ textAlign:'center', fontSize:'.66rem', fontWeight:800, textTransform:'uppercase',
+            letterSpacing:'.08em', color:'var(--text-muted)', paddingBottom:'.4rem', borderBottom:'1px solid var(--border)' }}>{d}</div>
+        ))}
+      </div>
+
+      <div className="plan-day-grid" style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
         {(currentWeekData?.seances || [])
           .map((s, origIdx) => ({ ...s, _origIdx: origIdx }))
           .sort((a, b) => sessionDayOrder(a) - sessionDayOrder(b))
@@ -1243,13 +1266,16 @@ export default function AthletePlan() {
             if (triTab === 'all') return true;
             const t = (session.type || '').toLowerCase();
             const isRenfo = t.includes('renforcement') || (session.id_seance || '').startsWith('RENFO');
+            const isBrk = t.includes('brique') || (session.id_seance || '').startsWith('BRK');
             if (triTab === 'natation') return t.includes('natation');
             if (triTab === 'velo')     return t.includes('vélo') || t.includes('velo');
+            if (triTab === 'brique')   return isBrk;
             if (triTab === 'renfo')    return isRenfo;
-            if (triTab === 'course')   return !t.includes('natation') && !t.includes('vélo') && !t.includes('velo') && !t.includes('brique') && !isRenfo;
+            if (triTab === 'course')   return !t.includes('natation') && !t.includes('vélo') && !t.includes('velo') && !isBrk && !isRenfo;
             return true;
           })
           .map((session) => {
+          const DAY_COL = { Lundi:1, Mardi:2, Mercredi:3, Jeudi:4, Vendredi:5, Samedi:6, Dimanche:7 }
           const idx   = session._origIdx
           const done  = isCompleted(currentWeekData.numero, idx)
           const isRace = session.est_course || session.id_seance === 'RACE' || session.id_seance === 'RACE_INT'
@@ -1343,13 +1369,15 @@ export default function AthletePlan() {
           const cardBorderStyle = isRenfo
             ? { border: `2px solid ${done ? 'var(--success)' : color}`, background: done ? undefined : color + '0A' }
             : { borderLeft: `4px solid ${done ? 'var(--success)' : color}` }
+          const dayGridCol = DAY_COL[session.jour] || 'auto'
 
           return (
             <div key={idx} className="card"
               style={{
                 ...cardBorderStyle,
                 opacity: done ? .75 : 1, cursor: 'pointer',
-                transition: 'transform .15s, box-shadow .15s'
+                transition: 'transform .15s, box-shadow .15s',
+                gridColumn: dayGridCol,
               }}
               onClick={() => setModal({ session: { ...session, _isDone: done, _dateLabel: sessionDate(planMonday, currentWeekData.numero, session.jour) }, weekNum: currentWeekData.numero, sessionIdx: idx })}
               onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.boxShadow = 'var(--shadow-lg)' }}

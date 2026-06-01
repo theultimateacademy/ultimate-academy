@@ -642,10 +642,18 @@ export default function AthleteProfile() {
 
           const DAYS = ['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim']
 
+          // Colored section wrapper
+          const sectionBlock = (color) => ({
+            background: color + '08', borderRadius: 14,
+            border: `1px solid ${color}18`,
+            padding: '.25rem 1rem .75rem', marginBottom: '.75rem',
+          })
+
           return (
             <div>
               {/* ── Section 1 : Objectif & Course ── */}
-              <div style={sectionHdr}>Objectif &amp; Course</div>
+              <div style={sectionBlock('#8B2FC9')}>
+              <div style={sectionHdr}>🎯 Objectif &amp; Course</div>
 
               <FieldRow fieldKey="objective" dbKey="objective" label="Objectif"
                 displayVal={OBJECTIVE_LABELS[profile?.objective] || 'Non renseigné'}>
@@ -767,8 +775,11 @@ export default function AthleteProfile() {
                 )
               })()}
 
+              </div>{/* end section 1 */}
+
               {/* ── Section 2 : Performance ── */}
-              <div style={sectionHdr}>Performance</div>
+              <div style={sectionBlock('#0EA5E9')}>
+              <div style={sectionHdr}>📊 Performance</div>
 
               <FieldRow fieldKey="vma" dbKey="vma" label="VMA (km/h)"
                 displayVal={profile?.vma ? `${profile.vma} km/h` : 'À estimer'}>
@@ -822,8 +833,11 @@ export default function AthleteProfile() {
                   onChange={e => setEditVal(prev => ({ ...prev, best_recent_time: e.target.value }))} />
               </FieldRow>
 
+              </div>{/* end section 2 */}
+
               {/* ── Section 3 : Organisation entraînement ── */}
-              <div style={sectionHdr}>Organisation entraînement</div>
+              <div style={sectionBlock('#10B981')}>
+              <div style={sectionHdr}>📅 Organisation entraînement</div>
 
               {!isTri && (
                 <FieldRow fieldKey="days_per_week" dbKey="days_per_week" label="Séances / semaine"
@@ -853,9 +867,12 @@ export default function AthleteProfile() {
                 </FieldRow>
               ))}
 
+              </div>{/* end section 3 */}
+
               {/* ── Section 4 : Trail (conditionnel) ── */}
               {isTrail && (<>
-                <div style={sectionHdr}>Trail</div>
+              <div style={sectionBlock('#65A30D')}>
+                <div style={sectionHdr}>⛰️ Trail</div>
 
                 <FieldRow fieldKey="training_terrain" dbKey="training_terrain" label="Zone d'habitation"
                   displayVal={
@@ -884,11 +901,12 @@ export default function AthleteProfile() {
                     <span style={{ fontSize: '.8rem', color: 'var(--text-muted)', whiteSpace: 'nowrap' }}>m D+</span>
                   </div>
                 </FieldRow>
-              </>)}
+              </div></>)}{/* end section 4 trail */}
 
               {/* ── Section 5 : Triathlon (conditionnel) ── */}
               {isTri && (<>
-                <div style={sectionHdr}>Triathlon</div>
+              <div style={sectionBlock('#06B6D4')}>
+                <div style={sectionHdr}>🦾 Triathlon</div>
 
                 <FieldRow fieldKey="open_water" dbKey="open_water" label="🌊 Nage en eau libre"
                   displayVal={
@@ -913,10 +931,11 @@ export default function AthleteProfile() {
                     ))}
                   </div>
                 </FieldRow>
-              </>)}
+              </div></>)}{/* end section 5 triathlon */}
 
               {/* ── Section 6 : Santé & Forme ── */}
-              <div style={sectionHdr}>Santé &amp; Forme</div>
+              <div style={sectionBlock('#EC4899')}>
+              <div style={sectionHdr}>💊 Santé &amp; Forme</div>
 
               <FieldRow fieldKey="current_form" dbKey="current_form" label="Forme actuelle"
                 displayVal={profile?.current_form || '—'}>
@@ -942,6 +961,7 @@ export default function AthleteProfile() {
                     onChange={e => setEditVal(prev => ({ ...prev, period_pain_days: e.target.value }))} />
                 </FieldRow>
               )}
+              </div>{/* end section 6 santé */}
 
             </div>
           )
