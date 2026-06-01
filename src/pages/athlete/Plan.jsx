@@ -811,10 +811,27 @@ export default function AthletePlan() {
   const [injuryDone,     setInjuryDone]    = useState(false)
   const [restoreLoading, setRestoreLoading] = useState(false)
   const [toast,          setToast]         = useState(null)
+  const [rescheduleIdx,  setRescheduleIdx] = useState(null) // { weekNum, sessionIdx } | null
 
   function showToast(message, type = 'success') {
     setToast({ message, type })
     setTimeout(() => setToast(null), 4500)
+  }
+
+  async function rescheduleSession(weekNum, sessionIdx, newDay) {
+    try {
+      const updated = JSON.parse(JSON.stringify(plan.plan_data))
+      updated.semaines[weekNum - 1].seances[sessionIdx].jour = newDay
+      const { error } = await supabase.from('training_plans').update({ plan_data: updated }).eq('id', plan.id)
+      if (error) throw error
+      setPlan(prev => prev ? { ...prev, plan_data: updated } : prev)
+      setRescheduleIdx(null)
+      const DAY_FR = { Lundi:'lundi', Mardi:'mardi', Mercredi:'mercredi', Jeudi:'jeudi', Vendredi:'vendredi', Samedi:'samedi', Dimanche:'dimanche' }
+      showToast(`Séance déplacée au ${DAY_FR[newDay] || newDay} ✓`)
+    } catch (err) {
+      console.error('[rescheduleSession]', err)
+      showToast('Erreur lors du déplacement ✗', 'error')
+    }
   }
 
   useEffect(() => {
@@ -1304,26 +1321,60 @@ export default function AthletePlan() {
                     const isRace = session.est_course || session.id_seance === 'RACE' || session.id_seance === 'RACE_INT'
                     return (
                       <div key={idx}
-                        onClick={() => setModal({ session: {...session, _isDone: done, _dateLabel: sessionDate(planMonday, currentWeekData.numero, session.jour)}, weekNum: currentWeekData.numero, sessionIdx: idx })}
                         style={{ borderLeft:`3px solid ${done ? 'var(--success)' : color}`,
                           background: isRace ? color+'15' : 'var(--surface-2)',
                           borderRadius:8, padding:'.55rem .65rem', cursor:'pointer', opacity: done ? .7 : 1,
-                          transition:'transform .12s', minWidth:0 }}
+                          transition:'transform .12s', minWidth:0, position:'relative' }}
                         onMouseEnter={e => e.currentTarget.style.transform='translateY(-1px)'}
                         onMouseLeave={e => e.currentTarget.style.transform=''}>
-                        <div style={{ fontSize:'.65rem', fontWeight:700, color, marginBottom:'.2rem',
-                          overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>
-                          {session.type}
+                        <div onClick={() => setModal({ session: {...session, _isDone: done, _dateLabel: sessionDate(planMonday, currentWeekData.numero, session.jour)}, weekNum: currentWeekData.numero, sessionIdx: idx })}>
+                          <div style={{ fontSize:'.65rem', fontWeight:700, color, marginBottom:'.2rem',
+                            overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>
+                            {session.type}
+                          </div>
+                          <div style={{ fontSize:'.78rem', fontWeight:700, lineHeight:1.2,
+                            overflow:'hidden', textOverflow:'ellipsis',
+                            display:'-webkit-box', WebkitLineClamp:2, WebkitBoxOrient:'vertical' }}>
+                            {session.titre}
+                          </div>
+                          <div style={{ fontSize:'.68rem', color:'var(--text-muted)', marginTop:'.2rem' }}>
+                            {session.duree_min} min · RPE {session.rpe_cible}
+                          </div>
+                          {done && <div style={{ fontSize:'.6rem', color:'var(--success)', marginTop:'.15rem' }}>✅ Effectué</div>}
                         </div>
-                        <div style={{ fontSize:'.78rem', fontWeight:700, lineHeight:1.2,
-                          overflow:'hidden', textOverflow:'ellipsis',
-                          display:'-webkit-box', WebkitLineClamp:2, WebkitBoxOrient:'vertical' }}>
-                          {session.titre}
-                        </div>
-                        <div style={{ fontSize:'.68rem', color:'var(--text-muted)', marginTop:'.2rem' }}>
-                          {session.duree_min} min · RPE {session.rpe_cible}
-                        </div>
-                        {done && <div style={{ fontSize:'.6rem', color:'var(--success)', marginTop:'.15rem' }}>✅ Effectué</div>}
+                        {/* Reschedule button */}
+                        <button
+                          onClick={e => { e.stopPropagation(); setRescheduleIdx(v => v && v.weekNum === currentWeekData.numero && v.sessionIdx === idx ? null : { weekNum: currentWeekData.numero, sessionIdx: idx }) }}
+                          style={{ marginTop:'.3rem', background:'none', border:'1px solid rgba(255,255,255,.12)', borderRadius:6,
+                            padding:'.15rem .35rem', fontSize:'.6rem', color:'rgba(255,255,255,.4)', cursor:'pointer',
+                            fontFamily:'inherit', width:'100%' }}>
+                          📅 Déplacer
+                        </button>
+                        {/* Day picker */}
+                        {rescheduleIdx && rescheduleIdx.weekNum === currentWeekData.numero && rescheduleIdx.sessionIdx === idx && (
+                          <div onClick={e => e.stopPropagation()} style={{
+                            position:'absolute', top:'calc(100% + .25rem)', left:0, right:0, zIndex:50,
+                            background:'var(--surface)', border:'1px solid var(--border)', borderRadius:8,
+                            padding:'.4rem', boxShadow:'var(--shadow-lg)',
+                          }}>
+                            <div style={{ fontSize:'.6rem', color:'var(--text-muted)', marginBottom:'.3rem', textAlign:'center' }}>Choisir le jour</div>
+                            <div style={{ display:'flex', flexWrap:'wrap', gap:'.25rem', justifyContent:'center' }}>
+                              {['Lundi','Mardi','Mercredi','Jeudi','Vendredi','Samedi','Dimanche'].map(day => (
+                                <button key={day}
+                                  onClick={() => rescheduleSession(currentWeekData.numero, idx, day)}
+                                  style={{
+                                    padding:'.22rem .4rem', borderRadius:5, fontSize:'.62rem', cursor:'pointer',
+                                    fontFamily:'inherit', fontWeight: session.jour === day ? 800 : 500,
+                                    background: session.jour === day ? color+'30' : 'var(--surface-2)',
+                                    border: session.jour === day ? `1px solid ${color}` : '1px solid var(--border)',
+                                    color: session.jour === day ? color : 'var(--text)',
+                                  }}>
+                                  {day.slice(0,3)}
+                                </button>
+                              ))}
+                            </div>
+                          </div>
+                        )}
                       </div>
                     )
                   })}
@@ -1445,20 +1496,23 @@ export default function AthletePlan() {
           const isRenfo = (session.type || '').toLowerCase().includes('renforcement') || (session.id_seance || '').startsWith('RENFO')
           const dateLabel = sessionDate(planMonday, currentWeekData.numero, session.jour)
 
+          const isRescheduling = rescheduleIdx && rescheduleIdx.weekNum === currentWeekData.numero && rescheduleIdx.sessionIdx === idx
           return (
             <div key={idx}
-              onClick={() => setModal({ session: { ...session, _isDone: done, _dateLabel: dateLabel }, weekNum: currentWeekData.numero, sessionIdx: idx })}
               style={{
-                borderRadius: 14, overflow: 'hidden', cursor: 'pointer', opacity: done ? .72 : 1,
+                borderRadius: 14, overflow: 'visible', opacity: done ? .72 : 1,
                 background: 'var(--surface-2)',
                 border: isRenfo ? `1.5px solid ${color}45` : '1px solid var(--border)',
                 transition: 'transform .12s, box-shadow .12s',
+                position: 'relative',
               }}
               onMouseEnter={e => { e.currentTarget.style.transform='translateY(-2px)'; e.currentTarget.style.boxShadow='var(--shadow-lg)' }}
               onMouseLeave={e => { e.currentTarget.style.transform=''; e.currentTarget.style.boxShadow='' }}>
               {/* Color accent strip top */}
-              <div style={{ height: 4, background: done ? 'var(--success)' : `linear-gradient(90deg, ${color}, ${color}88)` }} />
-              <div style={{ padding: '.75rem 1rem', display:'flex', justifyContent:'space-between', alignItems:'flex-start', gap:'.75rem' }}>
+              <div style={{ height: 4, background: done ? 'var(--success)' : `linear-gradient(90deg, ${color}, ${color}88)`, borderRadius:'14px 14px 0 0' }} />
+              <div
+                onClick={() => setModal({ session: { ...session, _isDone: done, _dateLabel: dateLabel }, weekNum: currentWeekData.numero, sessionIdx: idx })}
+                style={{ padding: '.75rem 1rem', display:'flex', justifyContent:'space-between', alignItems:'flex-start', gap:'.75rem', cursor:'pointer' }}>
                 <div style={{ flex:1, minWidth:0 }}>
                   <div style={{ display:'flex', alignItems:'center', gap:'.4rem', marginBottom:'.3rem', flexWrap:'wrap' }}>
                     <span style={{ fontSize:'.68rem', fontWeight:700, color, background:color+'18', padding:'.12rem .5rem', borderRadius:99, whiteSpace:'nowrap' }}>
@@ -1483,6 +1537,41 @@ export default function AthletePlan() {
                   userId={profile?.id}
                 />
               </div>
+              {/* Reschedule row */}
+              <div style={{ padding:'0 1rem .75rem', display:'flex', alignItems:'center', justifyContent:'flex-end', gap:'.5rem' }}>
+                <button
+                  onClick={e => { e.stopPropagation(); setRescheduleIdx(isRescheduling ? null : { weekNum: currentWeekData.numero, sessionIdx: idx }) }}
+                  style={{ background:'none', border:'1px solid rgba(255,255,255,.12)', borderRadius:8,
+                    padding:'.25rem .6rem', fontSize:'.72rem', color:'rgba(255,255,255,.45)', cursor:'pointer',
+                    fontFamily:'inherit' }}>
+                  📅 Déplacer
+                </button>
+              </div>
+              {/* Day picker overlay */}
+              {isRescheduling && (
+                <div onClick={e => e.stopPropagation()} style={{
+                  position:'absolute', bottom:'calc(100% + .3rem)', right:0, zIndex:50,
+                  background:'var(--surface)', border:'1px solid var(--border)', borderRadius:12,
+                  padding:'.75rem', boxShadow:'var(--shadow-lg)', minWidth:240,
+                }}>
+                  <div style={{ fontSize:'.72rem', color:'var(--text-muted)', marginBottom:'.5rem', fontWeight:600 }}>Déplacer au :</div>
+                  <div style={{ display:'flex', flexWrap:'wrap', gap:'.35rem' }}>
+                    {['Lundi','Mardi','Mercredi','Jeudi','Vendredi','Samedi','Dimanche'].map(day => (
+                      <button key={day}
+                        onClick={() => rescheduleSession(currentWeekData.numero, idx, day)}
+                        style={{
+                          padding:'.3rem .65rem', borderRadius:8, fontSize:'.75rem', cursor:'pointer',
+                          fontFamily:'inherit', fontWeight: session.jour === day ? 800 : 500,
+                          background: session.jour === day ? color+'30' : 'var(--surface-2)',
+                          border: session.jour === day ? `1.5px solid ${color}` : '1px solid var(--border)',
+                          color: session.jour === day ? color : 'var(--text)',
+                        }}>
+                        {day.slice(0,3)}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
           )
         })}

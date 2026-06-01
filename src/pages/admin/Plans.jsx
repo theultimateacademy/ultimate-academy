@@ -66,10 +66,21 @@ function PlanModal({ plan, athlete, onClose, onActivate }) {
   }
 
   const currentWeek = weeks[activeWeek]
+  const DAY_NAMES_GRID = ['Lundi','Mardi','Mercredi','Jeudi','Vendredi','Samedi','Dimanche']
 
   return (
     <div className="modal-overlay center" onClick={e => e.target === e.currentTarget && onClose()}>
-      <div className="modal center-modal" style={{ maxWidth: 780, width: '95vw' }}>
+      <div className="modal center-modal" style={{ maxWidth: 980, width: '98vw' }}>
+        <style>{`
+          @media (min-width: 900px) {
+            .coach-plan-grid { display: grid !important; grid-template-columns: repeat(7,1fr) !important; gap: .5rem !important; align-items: start !important; }
+            .coach-plan-grid-headers { display: grid !important; grid-template-columns: repeat(7,1fr); gap: .5rem; margin-bottom: .5rem; }
+            .coach-plan-mobile-list { display: none !important; }
+          }
+          .coach-plan-grid-headers { display: none; }
+          .coach-plan-grid { display: none; }
+        `}</style>
+
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1.25rem' }}>
           <div>
             <h3>Plan de {athlete?.first_name} {athlete?.last_name}</h3>
@@ -149,35 +160,144 @@ function PlanModal({ plan, athlete, onClose, onActivate }) {
               )
             })()}
 
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '.5rem', maxHeight: '52vh', overflowY: 'auto' }}>
+            {/* Desktop day headers */}
+            <div className="coach-plan-grid-headers">
+              {['Lun','Mar','Mer','Jeu','Ven','Sam','Dim'].map(d => (
+                <div key={d} style={{ textAlign:'center', fontSize:'.66rem', fontWeight:800, textTransform:'uppercase',
+                  letterSpacing:'.08em', color:'var(--text-muted)', paddingBottom:'.4rem',
+                  borderBottom:'1px solid var(--border)' }}>{d}</div>
+              ))}
+            </div>
+
+            {/* Desktop: 7-column grid */}
+            <div className="coach-plan-grid">
+              {DAY_NAMES_GRID.map(day => {
+                const daySessions = (currentWeek.seances || [])
+                  .map((s, si) => ({ ...s, _si: si }))
+                  .filter(s => s.jour === day)
+                return (
+                  <div key={day} style={{ display:'flex', flexDirection:'column', gap:'.4rem' }}>
+                    {daySessions.length === 0 ? (
+                      <div style={{ minHeight:56, display:'flex', alignItems:'center', justifyContent:'center',
+                        border:'1px dashed rgba(255,255,255,.07)', borderRadius:10,
+                        fontSize:'.68rem', color:'rgba(255,255,255,.2)', fontStyle:'italic' }}>
+                        Repos
+                      </div>
+                    ) : daySessions.map(session => {
+                      const si = session._si
+                      const color = SESSION_TYPE_COLORS[session.type] || 'var(--primary)'
+                      const isEditing = editSession === `${activeWeek}-${si}`
+                      return (
+                        <div key={si} style={{
+                          borderRadius: 8, overflow: 'hidden',
+                          border: `1px solid var(--border)`,
+                          background: 'var(--surface-2)',
+                          minWidth: 0,
+                        }}>
+                          <div style={{ borderLeft:`3px solid ${color}`, padding:'.55rem .65rem' }}>
+                            <div style={{ fontSize:'.65rem', fontWeight:700, color, marginBottom:'.2rem',
+                              overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>
+                              {session.type}
+                            </div>
+                            <div style={{ fontSize:'.78rem', fontWeight:700, lineHeight:1.2, marginBottom:'.2rem',
+                              overflow:'hidden', textOverflow:'ellipsis',
+                              display:'-webkit-box', WebkitLineClamp:2, WebkitBoxOrient:'vertical' }}>
+                              {session.titre}
+                            </div>
+                            <div style={{ fontSize:'.68rem', color:'var(--text-muted)', marginBottom:'.35rem' }}>
+                              {session.duree_min} min · RPE {session.rpe_cible}
+                            </div>
+                            <div style={{ display:'flex', gap:'.25rem', justifyContent:'flex-end' }}>
+                              <button className="btn btn-ghost btn-sm" style={{ padding:'.2rem .4rem', fontSize:'.72rem' }}
+                                onClick={() => setEditSession(isEditing ? null : `${activeWeek}-${si}`)}>
+                                {isEditing ? '✕' : '✏️'}
+                              </button>
+                              <button className="btn btn-ghost btn-sm" style={{ padding:'.2rem .4rem', fontSize:'.72rem', color:'var(--error)', borderColor:'rgba(239,68,68,.3)' }}
+                                onClick={() => window.confirm(`Supprimer "${session.titre}" ?`) && deleteSession(activeWeek, si)}>
+                                🗑️
+                              </button>
+                            </div>
+                          </div>
+                          {isEditing && (
+                            <div style={{ padding:'.75rem', borderTop:'1px solid var(--border)', display:'flex', flexDirection:'column', gap:'.5rem' }}>
+                              {[
+                                { label:'Échauffement', field:'echauffement' },
+                                { label:'Corps', field:'corps' },
+                                { label:'Retour au calme', field:'retour_au_calme' },
+                                { label:'Notes coach', field:'notes_coach' },
+                              ].map(({ label, field }) => (
+                                <div className="form-group" key={field} style={{ marginBottom:0 }}>
+                                  <label className="form-label" style={{ fontSize:'.68rem' }}>{label}</label>
+                                  <textarea className="form-textarea" style={{ minHeight:50, fontSize:'.78rem' }}
+                                    value={session[field] || ''}
+                                    onChange={e => updateSession(activeWeek, si, field, e.target.value)} />
+                                </div>
+                              ))}
+                              <div style={{ display:'flex', gap:'.35rem' }}>
+                                <div className="form-group" style={{ flex:1, marginBottom:0 }}>
+                                  <label className="form-label" style={{ fontSize:'.68rem' }}>Durée (min)</label>
+                                  <input type="number" className="form-input" style={{ fontSize:'.78rem' }} value={session.duree_min}
+                                    onChange={e => updateSession(activeWeek, si, 'duree_min', parseInt(e.target.value))} />
+                                </div>
+                                <div className="form-group" style={{ flex:1, marginBottom:0 }}>
+                                  <label className="form-label" style={{ fontSize:'.68rem' }}>RPE cible</label>
+                                  <input type="number" min={1} max={10} className="form-input" style={{ fontSize:'.78rem' }} value={session.rpe_cible}
+                                    onChange={e => updateSession(activeWeek, si, 'rpe_cible', parseInt(e.target.value))} />
+                                </div>
+                              </div>
+                              <button className="btn btn-primary btn-sm" disabled={saving} onClick={saveEdit}>
+                                {saving ? '…' : '💾'}
+                              </button>
+                            </div>
+                          )}
+                        </div>
+                      )
+                    })}
+                  </div>
+                )
+              })}
+            </div>
+
+            {/* Mobile: flat vertical list (same iOS-style cards as athlete interface) */}
+            <div className="coach-plan-mobile-list" style={{ display:'flex', flexDirection:'column', gap:'.5rem' }}>
               {currentWeek.seances?.map((session, si) => {
                 const color = SESSION_TYPE_COLORS[session.type] || 'var(--primary)'
                 const isRenfo = (session.type||'').toLowerCase().includes('renforcement') || (session.id_seance||'').startsWith('RENFO')
                 const isEditing = editSession === `${activeWeek}-${si}`
                 return (
                   <div key={si} style={{
-                    borderRadius: 10, overflow: 'hidden',
-                    border: isRenfo ? `1.5px solid ${color}50` : `1px solid var(--border)`,
-                    background: isRenfo ? color+'08' : 'var(--surface-2)',
+                    borderRadius: 14, overflow: 'hidden',
+                    border: isRenfo ? `1.5px solid ${color}45` : '1px solid var(--border)',
+                    background: 'var(--surface-2)',
                   }}>
-                    <div style={{ display:'flex', alignItems:'center', gap:'.75rem', padding:'.625rem .875rem', borderLeft:`4px solid ${color}` }}>
+                    {/* Color accent strip top */}
+                    <div style={{ height: 4, background: `linear-gradient(90deg, ${color}, ${color}88)` }} />
+                    <div style={{ padding:'.75rem 1rem', display:'flex', justifyContent:'space-between', alignItems:'flex-start', gap:'.75rem' }}>
                       <div style={{ flex:1, minWidth:0 }}>
-                        <div style={{ display:'flex', alignItems:'center', gap:'.4rem', marginBottom:'.15rem' }}>
-                          <span style={{ fontSize:'.65rem', fontWeight:700, color, background:color+'18', padding:'.1rem .45rem', borderRadius:99, whiteSpace:'nowrap' }}>{session.type}</span>
-                          <span style={{ fontSize:'.68rem', color:'var(--text-muted)' }}>{session.jour} · {session.duree_min} min</span>
+                        <div style={{ display:'flex', alignItems:'center', gap:'.4rem', marginBottom:'.3rem', flexWrap:'wrap' }}>
+                          <span style={{ fontSize:'.68rem', fontWeight:700, color, background:color+'18', padding:'.12rem .5rem', borderRadius:99, whiteSpace:'nowrap' }}>
+                            {session.type}
+                          </span>
+                          <span style={{ fontSize:'.72rem', color:'var(--text-muted)' }}>{session.jour}</span>
                         </div>
                         {isEditing ? (
                           <input className="form-input" value={session.titre}
                             onChange={e => updateSession(activeWeek, si, 'titre', e.target.value)}
-                            style={{ marginBottom: '.25rem', fontSize:'.875rem' }} />
+                            style={{ marginBottom:'.25rem', fontSize:'.875rem' }} />
                         ) : (
-                          <div style={{ fontWeight:700, fontSize:'.875rem', overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>{session.titre}</div>
+                          <div style={{ fontWeight:700, fontSize:'.9rem', lineHeight:1.3, marginBottom:'.25rem',
+                            overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>
+                            {session.titre}
+                          </div>
                         )}
+                        <div style={{ fontSize:'.75rem', color:'var(--text-muted)', display:'flex', gap:'.6rem' }}>
+                          <span>⏱ {session.duree_min} min</span>
+                          {session.rpe_cible && <span>💪 RPE {session.rpe_cible}</span>}
+                        </div>
                       </div>
                       <div style={{ display:'flex', gap:'.3rem', flexShrink:0 }}>
-                        <span style={{ fontSize:'.72rem', fontWeight:700, color:'var(--text-muted)', background:'var(--surface)', padding:'.15rem .5rem', borderRadius:6, border:'1px solid var(--border)' }}>RPE {session.rpe_cible}</span>
-                        <button className="btn btn-ghost btn-sm" style={{ padding:'.25rem .5rem', fontSize:'.78rem' }} onClick={() =>
-                          setEditSession(isEditing ? null : `${activeWeek}-${si}`)}>
+                        <button className="btn btn-ghost btn-sm" style={{ padding:'.25rem .5rem', fontSize:'.78rem' }}
+                          onClick={() => setEditSession(isEditing ? null : `${activeWeek}-${si}`)}>
                           {isEditing ? '✕' : '✏️'}
                         </button>
                         <button className="btn btn-ghost btn-sm" style={{ padding:'.25rem .5rem', fontSize:'.78rem', color:'var(--error)', borderColor:'rgba(239,68,68,.3)' }}
@@ -188,28 +308,28 @@ function PlanModal({ plan, athlete, onClose, onActivate }) {
                     </div>
 
                     {isEditing && (
-                      <div style={{ marginTop: '1rem', display: 'flex', flexDirection: 'column', gap: '.75rem' }}>
+                      <div style={{ padding:'0 1rem 1rem', display:'flex', flexDirection:'column', gap:'.75rem' }}>
                         {[
-                          { label: 'Échauffement', field: 'echauffement' },
-                          { label: 'Corps de séance', field: 'corps' },
-                          { label: 'Retour au calme', field: 'retour_au_calme' },
-                          { label: 'Notes coach', field: 'notes_coach' },
-                          { label: 'Allures', field: 'allures' },
+                          { label:'Échauffement', field:'echauffement' },
+                          { label:'Corps de séance', field:'corps' },
+                          { label:'Retour au calme', field:'retour_au_calme' },
+                          { label:'Notes coach', field:'notes_coach' },
+                          { label:'Allures', field:'allures' },
                         ].map(({ label, field }) => (
                           <div className="form-group" key={field}>
                             <label className="form-label">{label}</label>
-                            <textarea className="form-textarea" style={{ minHeight: 70 }}
+                            <textarea className="form-textarea" style={{ minHeight:70 }}
                               value={session[field] || ''}
                               onChange={e => updateSession(activeWeek, si, field, e.target.value)} />
                           </div>
                         ))}
-                        <div style={{ display: 'flex', gap: '.5rem', flexWrap: 'wrap' }}>
-                          <div className="form-group" style={{ flex: 1, minWidth: 80 }}>
+                        <div style={{ display:'flex', gap:'.5rem', flexWrap:'wrap' }}>
+                          <div className="form-group" style={{ flex:1, minWidth:80 }}>
                             <label className="form-label">Durée (min)</label>
                             <input type="number" className="form-input" value={session.duree_min}
                               onChange={e => updateSession(activeWeek, si, 'duree_min', parseInt(e.target.value))} />
                           </div>
-                          <div className="form-group" style={{ flex: 1, minWidth: 80 }}>
+                          <div className="form-group" style={{ flex:1, minWidth:80 }}>
                             <label className="form-label">RPE cible</label>
                             <input type="number" min={1} max={10} className="form-input" value={session.rpe_cible}
                               onChange={e => updateSession(activeWeek, si, 'rpe_cible', parseInt(e.target.value))} />
