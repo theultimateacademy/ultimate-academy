@@ -642,17 +642,24 @@ export default function AthleteProfile() {
 
           const DAYS = ['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim']
 
-          // Colored section wrapper — visible but not overwhelming
-          const sectionBlock = (color) => ({
-            background: color + '12', borderRadius: 14,
-            border: `1.5px solid ${color}35`,
+          // Pastel section blocks — light, distinct, not dark
+          const S = {
+            objectif:     { background:'rgba(210,170,255,.15)', border:'1.5px solid rgba(180,130,255,.35)' },
+            performance:  { background:'rgba(140,200,255,.15)', border:'1.5px solid rgba(90,160,255,.35)'  },
+            organisation: { background:'rgba(110,230,195,.14)', border:'1.5px solid rgba(60,195,155,.35)'  },
+            trail:        { background:'rgba(170,230,110,.14)', border:'1.5px solid rgba(130,200,70,.35)'  },
+            triathlon:    { background:'rgba(110,225,240,.14)', border:'1.5px solid rgba(60,195,220,.35)'  },
+            sante:        { background:'rgba(255,165,200,.14)', border:'1.5px solid rgba(240,110,165,.35)' },
+          }
+          const sectionBlock = (key) => ({
+            ...S[key], borderRadius: 14,
             padding: '.25rem 1rem .875rem', marginBottom: '.875rem',
           })
 
           return (
             <div>
               {/* ── Section 1 : Objectif & Course ── */}
-              <div style={sectionBlock('#8B2FC9')}>
+              <div style={sectionBlock('objectif')}>
               <div style={sectionHdr}>🎯 Objectif &amp; Course</div>
 
               <FieldRow fieldKey="objective" dbKey="objective" label="Objectif"
@@ -778,7 +785,7 @@ export default function AthleteProfile() {
               </div>{/* end section 1 */}
 
               {/* ── Section 2 : Performance ── */}
-              <div style={sectionBlock('#0EA5E9')}>
+              <div style={sectionBlock('performance')}>
               <div style={sectionHdr}>📊 Performance</div>
 
               <FieldRow fieldKey="vma" dbKey="vma" label="VMA (km/h)"
@@ -836,7 +843,7 @@ export default function AthleteProfile() {
               </div>{/* end section 2 */}
 
               {/* ── Section 3 : Organisation entraînement ── */}
-              <div style={sectionBlock('#10B981')}>
+              <div style={sectionBlock('organisation')}>
               <div style={sectionHdr}>📅 Organisation entraînement</div>
 
               {!isTri && (
@@ -871,7 +878,7 @@ export default function AthleteProfile() {
 
               {/* ── Section 4 : Trail (conditionnel) ── */}
               {isTrail && (<>
-              <div style={sectionBlock('#65A30D')}>
+              <div style={sectionBlock('trail')}>
                 <div style={sectionHdr}>⛰️ Trail</div>
 
                 <FieldRow fieldKey="training_terrain" dbKey="training_terrain" label="Zone d'habitation"
@@ -905,7 +912,7 @@ export default function AthleteProfile() {
 
               {/* ── Section 5 : Triathlon (conditionnel) ── */}
               {isTri && (<>
-              <div style={sectionBlock('#06B6D4')}>
+              <div style={sectionBlock('triathlon')}>
                 <div style={sectionHdr}>🦾 Triathlon</div>
 
                 <FieldRow fieldKey="open_water" dbKey="open_water" label="🌊 Nage en eau libre"
@@ -934,7 +941,7 @@ export default function AthleteProfile() {
               </div></>)}{/* end section 5 triathlon */}
 
               {/* ── Section 6 : Santé & Forme ── */}
-              <div style={sectionBlock('#EC4899')}>
+              <div style={sectionBlock('sante')}>
               <div style={sectionHdr}>💊 Santé &amp; Forme</div>
 
               <FieldRow fieldKey="current_form" dbKey="current_form" label="Forme actuelle"
