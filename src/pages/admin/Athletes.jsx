@@ -985,166 +985,142 @@ function AthleteDetailPanel({ athlete, onClose, onUpdated, onAlertDismissed }) {
                   .cplan-headers { display:none; }
                   .cplan-grid { display:none; }
                 `}</style>
+
                 {!plan || !plan.plan_data ? (
                   <div style={{ textAlign:'center', padding:'4rem 2rem', color:'var(--text-muted)' }}>
                     <div style={{ fontSize:'2rem', marginBottom:'.75rem' }}>📋</div>
-                    <p>Aucun plan. Génère-en un dans l'onglet Profil.</p>
+                    <p>Aucun plan actif. Génère-en un dans l'onglet Profil.</p>
                   </div>
-                ) : (
-                  <>
-                    {plan.plan_data?.message_du_mois && (
-                      <div style={{ background:'var(--surface)', border:'1px solid var(--border)',
-                        borderLeft:'4px solid var(--primary)', borderRadius:12, padding:'1rem 1.25rem',
-                        marginBottom:'1.5rem', fontSize:'.875rem', fontStyle:'italic', lineHeight:1.7 }}>
-                        {plan.plan_data.message_du_mois}
+                ) : (() => {
+                  const semaines = plan.plan_data.semaines || []
+                  const activeSem = semaines[coachWeekIdx] || semaines[0]
+                  if (!activeSem) return null
+                  const seances = activeSem.seances || []
+                  const weekComps = completions.filter(c => c.week_number === activeSem.numero)
+                  const DAY_NAMES = ['Lundi','Mardi','Mercredi','Jeudi','Vendredi','Samedi','Dimanche']
+
+                  const nat = seances.filter(s => (s.type||'').toLowerCase().includes('natation')).length
+                  const vel = seances.filter(s => (s.type||'').toLowerCase().includes('vélo')||(s.type||'').toLowerCase().includes('velo')).length
+                  const brk = seances.filter(s => (s.type||'').toLowerCase().includes('brique')||(s.id_seance||'').startsWith('BRK')).length
+                  const renfo = seances.filter(s => (s.type||'').toLowerCase().includes('renforcement')||(s.id_seance||'').startsWith('RENFO')).length
+                  const course = seances.filter(s => { const t=(s.type||'').toLowerCase(); return !t.includes('natation')&&!t.includes('vélo')&&!t.includes('velo')&&!t.includes('brique')&&!t.includes('renforcement')&&!s.est_course }).length
+                  const km = activeSem.volume_total_km
+                  const chargeRaw = (activeSem.charge||'').replace(/\s*\(S\d+\)/gi,'')
+                  const chargeShort = chargeRaw.split(/[—–(]/)[0].trim()
+                  const chargeColor = chargeShort.toLowerCase().includes('élevée')?'#F97316':chargeShort.toLowerCase().includes('modérée')?'#06B6D4':chargeShort.toLowerCase().includes('affûtage')?'#8B2FC9':'#10B981'
+                  const chips = [
+                    {c:course>0,n:course,i:'🏃',l:'course',col:'#10B981'},
+                    {c:nat>0,n:nat,i:'🏊',l:'nage',col:'#06B6D4'},
+                    {c:vel>0,n:vel,i:'🚴',l:'vélo',col:'#F97316'},
+                    {c:brk>0,n:brk,i:'🔗',l:'brique',col:'#8B5CF6'},
+                    {c:renfo>0,n:renfo,i:'💪',l:'renfo',col:'#EC4899'},
+                  ].filter(d=>d.c)
+
+                  return (
+                    <>
+                      {/* Week tabs */}
+                      <div style={{ display:'flex', gap:'.35rem', overflowX:'auto', paddingBottom:'.5rem', marginBottom:'1rem' }}>
+                        {semaines.map((w,i) => (
+                          <button key={i} onClick={() => setCoachWeekIdx(i)}
+                            style={{ flexShrink:0, padding:'.38rem .8rem', borderRadius:99, border:'none',
+                              background: coachWeekIdx === i ? 'var(--gradient)' : 'var(--surface-2)',
+                              color: coachWeekIdx === i ? '#fff' : 'var(--text-muted)',
+                              fontWeight:600, fontSize:'.8rem', cursor:'pointer', fontFamily:'inherit' }}>
+                            S{w.numero}{w.numero === currentWeekNum ? ' ●' : ''}
+                          </button>
+                        ))}
                       </div>
-                    )}
 
-                    {/* Week tabs */}
-                    <div style={{ display:'flex', gap:'.35rem', overflowX:'auto', paddingBottom:'.5rem', marginBottom:'1rem' }}>
-                      {(plan.plan_data?.semaines||[]).map((w,i) => (
-                        <button key={i} onClick={() => setCoachWeekIdx(i)}
-                          style={{ flexShrink:0, padding:'.38rem .8rem', borderRadius:99, border:'none',
-                            background: coachWeekIdx === i ? 'var(--gradient)' : 'var(--surface-2)',
-                            color: coachWeekIdx === i ? '#fff' : 'var(--text-muted)',
-                            fontWeight:600, fontSize:'.8rem', cursor:'pointer', fontFamily:'inherit' }}>
-                          S{w.numero}
-                          {w.numero === currentWeekNum && <span style={{ marginLeft:'.3rem', fontSize:'.6rem', opacity:.8 }}>●</span>}
-                        </button>
-                      ))}
-                    </div>
-
-                    {(plan.plan_data?.semaines||[]).map((week, wIdx) => {
-                      const activeWeekIdx = coachWeekIdx
-                      if (wIdx !== activeWeekIdx) return null
-                      const isCurrent = week.numero === currentWeekNum
-                      const weekComps = completions.filter(c => c.week_number === week.numero)
-                      const seances = week.seances || []
-
-                      // Same discipline counts as athlete
-                      const nat   = seances.filter(s=>String(s.type||'').toLowerCase().includes('natation')).length
-                      const vel   = seances.filter(s=>String(s.type||'').toLowerCase().includes('vélo')||String(s.type||'').toLowerCase().includes('velo')).length
-                      const brk   = seances.filter(s=>String(s.type||'').toLowerCase().includes('brique')||(s.id_seance||'').startsWith('BRK')).length
-                      const renfo = seances.filter(s=>String(s.type||'').toLowerCase().includes('renforcement')||(s.id_seance||'').startsWith('RENFO')).length
-                      const course= seances.filter(s=>{const t=String(s.type||'').toLowerCase();return !t.includes('natation')&&!t.includes('vélo')&&!t.includes('velo')&&!t.includes('brique')&&!t.includes('renforcement')&&!s.est_course}).length
-                      const km = week.volume_total_km
-                      const chargeRaw = (week.charge||'').replace(/\s*\(S\d+\)/gi,'')
-                      const chargeShort = chargeRaw.split(/[—–(]/)[0].trim()
-                      const chargeSub = chargeRaw.includes('(') ? chargeRaw.slice(chargeRaw.indexOf('(')) : null
-                      const chargeColor = chargeShort.toLowerCase().includes('élevée')?'#F97316':chargeShort.toLowerCase().includes('modérée')?'#06B6D4':chargeShort.toLowerCase().includes('affûtage')?'#8B2FC9':chargeShort.toLowerCase().includes('récup')?'#6B7280':'#10B981'
-                      const chips = [
-                        {cond:course>0,count:course,icon:'🏃',label:'course',color:'#10B981'},
-                        {cond:nat>0,count:nat,icon:'🏊',label:'nage',color:'#06B6D4'},
-                        {cond:vel>0,count:vel,icon:'🚴',label:'vélo',color:'#F97316'},
-                        {cond:brk>0,count:brk,icon:'🔗',label:'brique',color:'#8B5CF6'},
-                        {cond:renfo>0,count:renfo,icon:'💪',label:'renfo',color:'#EC4899'},
-                      ].filter(d=>d.cond)
-                      const DAY_NAMES = ['Lundi','Mardi','Mercredi','Jeudi','Vendredi','Samedi','Dimanche']
-
-                      return (
-                        <div key={week.numero}>
-                          {/* Week header — identical to athlete */}
-                          <div style={{ marginBottom:'1rem', borderRadius:18, overflow:'hidden',
-                            background: isCurrent ? 'linear-gradient(135deg,#1A1A2E,#2D1B4E)' : 'linear-gradient(135deg,#141428,#221840)',
-                            color:'#fff', border: isCurrent ? '1px solid rgba(139,47,201,.3)' : 'none' }}>
-                            <div style={{ padding:'.875rem 1.25rem .625rem', display:'flex', justifyContent:'space-between', alignItems:'flex-start', gap:'1rem' }}>
-                              <div>
-                                <div style={{ fontSize:'.68rem', fontWeight:700, textTransform:'uppercase', letterSpacing:'.1em', color:'rgba(255,255,255,.38)', marginBottom:'.2rem' }}>
-                                  Semaine {week.numero} · {week.phase?.replace(/^S\d+\s*[—–-]\s*/i,'').replace(/\s*\(S\d+\)/gi,'')}
-                                  {isCurrent && <span style={{ marginLeft:'.5rem', fontSize:'.6rem', background:'var(--gradient)', color:'#fff', padding:'.1rem .4rem', borderRadius:4, fontWeight:800 }}>EN COURS</span>}
-                                </div>
-                                {chargeSub && <div style={{ fontSize:'.66rem', color:'rgba(255,255,255,.3)' }}>{chargeSub}</div>}
-                              </div>
-                              <div style={{ display:'flex', alignItems:'center', gap:'.5rem', flexShrink:0 }}>
-                                <span style={{ fontSize:'.72rem', color:'rgba(255,255,255,.5)' }}>{weekComps.length}/{seances.length} ✓</span>
-                                <span style={{ padding:'.2rem .65rem', borderRadius:99, fontSize:'.68rem', fontWeight:700, background:chargeColor+'25', border:`1px solid ${chargeColor}50`, color:chargeColor }}>{chargeShort}</span>
-                              </div>
-                            </div>
-                            <div style={{ padding:'.375rem 1.25rem .625rem', display:'flex', flexWrap:'wrap', gap:'.4rem', alignItems:'center', borderTop:'1px solid rgba(255,255,255,.06)' }}>
-                              {chips.map(d => (
-                                <div key={d.label} style={{ display:'flex', alignItems:'center', gap:'.28rem', background:d.color+'18', border:`1px solid ${d.color}35`, borderRadius:99, padding:'.2rem .6rem' }}>
-                                  <span style={{ fontSize:'.78rem' }}>{d.icon}</span>
-                                  <span style={{ fontWeight:800, fontSize:'.82rem', color:d.color }}>{d.count}</span>
-                                  <span style={{ fontSize:'.68rem', color:'rgba(255,255,255,.35)' }}>{d.label}</span>
-                                </div>
-                              ))}
-                              {km > 0 && <span style={{ marginLeft:'auto', fontSize:'.72rem', color:'rgba(255,255,255,.4)' }}>📍 <strong style={{color:'#fff'}}>{km} km</strong></span>}
-                            </div>
+                      {/* Week header */}
+                      <div style={{ marginBottom:'1rem', borderRadius:16, overflow:'hidden', background:'linear-gradient(135deg,#1A1A2E,#2D1B4E)', color:'#fff' }}>
+                        <div style={{ padding:'.875rem 1.25rem .625rem', display:'flex', justifyContent:'space-between', alignItems:'flex-start', gap:'1rem' }}>
+                          <div style={{ fontSize:'.68rem', fontWeight:700, textTransform:'uppercase', letterSpacing:'.1em', color:'rgba(255,255,255,.38)' }}>
+                            Semaine {activeSem.numero} · {(activeSem.phase||'').replace(/^S\d+\s*[—–-]\s*/i,'').replace(/\s*\(S\d+\)/gi,'')}
+                            {activeSem.numero === currentWeekNum && <span style={{ marginLeft:'.5rem', fontSize:'.6rem', background:'var(--gradient)', color:'#fff', padding:'.1rem .4rem', borderRadius:4, fontWeight:800 }}> EN COURS</span>}
                           </div>
+                          <span style={{ flexShrink:0, padding:'.2rem .65rem', borderRadius:99, fontSize:'.68rem', fontWeight:700, background:chargeColor+'25', border:`1px solid ${chargeColor}50`, color:chargeColor }}>{chargeShort}</span>
+                        </div>
+                        <div style={{ padding:'.375rem 1.25rem .625rem', display:'flex', flexWrap:'wrap', gap:'.4rem', alignItems:'center', borderTop:'1px solid rgba(255,255,255,.06)' }}>
+                          {chips.map(d => (
+                            <div key={d.l} style={{ display:'flex', alignItems:'center', gap:'.28rem', background:d.col+'18', border:`1px solid ${d.col}35`, borderRadius:99, padding:'.2rem .6rem' }}>
+                              <span style={{ fontSize:'.78rem' }}>{d.i}</span>
+                              <span style={{ fontWeight:800, fontSize:'.82rem', color:d.col }}>{d.n}</span>
+                              <span style={{ fontSize:'.68rem', color:'rgba(255,255,255,.35)' }}>{d.l}</span>
+                            </div>
+                          ))}
+                          {km > 0 && <span style={{ marginLeft:'auto', fontSize:'.72rem', color:'rgba(255,255,255,.4)' }}>📍 <strong style={{color:'#fff'}}>{km} km</strong></span>}
+                        </div>
+                      </div>
 
-                          {/* Day headers — desktop only */}
-                          <div className="cplan-headers">
-                            {['Lun','Mar','Mer','Jeu','Ven','Sam','Dim'].map(d => (
-                              <div key={d} style={{ textAlign:'center', fontSize:'.66rem', fontWeight:800, textTransform:'uppercase', letterSpacing:'.08em', color:'var(--text-muted)', paddingBottom:'.4rem', borderBottom:'1px solid var(--border)' }}>{d}</div>
-                            ))}
-                          </div>
+                      {/* Day headers — desktop */}
+                      <div className="cplan-headers">
+                        {['Lun','Mar','Mer','Jeu','Ven','Sam','Dim'].map(d => (
+                          <div key={d} style={{ textAlign:'center', fontSize:'.66rem', fontWeight:800, textTransform:'uppercase', letterSpacing:'.08em', color:'var(--text-muted)', paddingBottom:'.4rem', borderBottom:'1px solid var(--border)' }}>{d}</div>
+                        ))}
+                      </div>
 
-                          {/* Desktop: 7-column grid */}
-                          <div className="cplan-grid">
-                            {DAY_NAMES.map(day => {
-                              const daySessions = seances.map((s,i) => ({...s,_si:i})).filter(s => s.jour === day)
-                              return (
-                                <div key={day} style={{ display:'flex', flexDirection:'column', gap:'.4rem' }}>
-                                  {daySessions.length === 0 ? (
-                                    <div style={{ minHeight:56, display:'flex', alignItems:'center', justifyContent:'center', border:'1px dashed rgba(255,255,255,.07)', borderRadius:10, fontSize:'.68rem', color:'rgba(255,255,255,.18)', fontStyle:'italic' }}>Repos</div>
-                                  ) : daySessions.map(session => {
-                                    const color = SESSION_TYPE_COLORS[session.type] || 'var(--primary)'
-                                    const comp = weekComps.find(c => c.session_index === session._si)
+                      {/* Desktop: 7-col grid */}
+                      <div className="cplan-grid">
+                        {DAY_NAMES.map(day => {
+                          const daySessions = seances.map((s,i)=>({...s,_si:i})).filter(s=>s.jour===day)
+                          return (
+                            <div key={day} style={{ display:'flex', flexDirection:'column', gap:'.4rem' }}>
+                              {daySessions.length === 0
+                                ? <div style={{ minHeight:56, display:'flex', alignItems:'center', justifyContent:'center', border:'1px dashed rgba(255,255,255,.07)', borderRadius:10, fontSize:'.68rem', color:'rgba(255,255,255,.18)', fontStyle:'italic' }}>Repos</div>
+                                : daySessions.map(session => {
+                                    const clr = SESSION_TYPE_COLORS[session.type] || 'var(--primary)'
+                                    const comp = weekComps.find(c=>c.session_index===session._si)
                                     return (
-                                      <div key={session._si} onClick={() => setOpenSession({session,weekNum:week.numero,sessionIdx:session._si,completion:comp})}
-                                        style={{ borderRadius:8, overflow:'hidden', border:'1px solid var(--border)', background:'var(--surface-2)', cursor:'pointer', transition:'transform .1s' }}
-                                        onMouseEnter={e=>e.currentTarget.style.transform='translateY(-1px)'}
-                                        onMouseLeave={e=>e.currentTarget.style.transform=''}>
-                                        <div style={{ borderLeft:`3px solid ${comp?'var(--success)':color}`, padding:'.5rem .6rem' }}>
-                                          <div style={{ fontSize:'.63rem', fontWeight:700, color, marginBottom:'.15rem', overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>{session.type}</div>
+                                      <div key={session._si} onClick={() => setOpenSession({session,weekNum:activeSem.numero,sessionIdx:session._si,completion:comp})}
+                                        style={{ borderRadius:8, overflow:'hidden', border:'1px solid var(--border)', background:'var(--surface-2)', cursor:'pointer' }}>
+                                        <div style={{ borderLeft:`3px solid ${comp?'var(--success)':clr}`, padding:'.5rem .6rem' }}>
+                                          <div style={{ fontSize:'.63rem', fontWeight:700, color:clr, marginBottom:'.15rem', overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>{session.type}</div>
                                           <div style={{ fontSize:'.77rem', fontWeight:700, lineHeight:1.2, overflow:'hidden', textOverflow:'ellipsis', display:'-webkit-box', WebkitLineClamp:2, WebkitBoxOrient:'vertical' }}>{session.titre}</div>
-                                          <div style={{ fontSize:'.67rem', color:'var(--text-muted)', marginTop:'.2rem' }}>{session.duree_min}min · RPE {session.rpe_cible}{comp ? ' ✓' : ''}</div>
+                                          <div style={{ fontSize:'.67rem', color:'var(--text-muted)', marginTop:'.2rem' }}>{session.duree_min}min{session.rpe_cible ? ' · RPE '+session.rpe_cible : ''}{comp ? ' ✓' : ''}</div>
                                         </div>
                                       </div>
                                     )
-                                  })}
-                                </div>
-                              )
-                            })}
-                          </div>
+                                  })
+                              }
+                            </div>
+                          )
+                        })}
+                      </div>
 
-                          {/* Mobile: flat list — hidden on desktop via .cplan-mobile */}
-                          <div className="cplan-mobile" style={{ display:'flex', flexDirection:'column', gap:'.5rem' }}>
-                            {seances.map((session, sIdx) => {
-                              const color = SESSION_TYPE_COLORS[session.type] || 'var(--primary)'
-                              const comp = weekComps.find(c => c.session_index === sIdx)
-                              return (
-                                <div key={sIdx} onClick={() => setOpenSession({session,weekNum:week.numero,sessionIdx:sIdx,completion:comp})}
-                                  style={{ borderRadius:14, overflow:'hidden', cursor:'pointer', background:'var(--surface-2)', border:'1px solid var(--border)', transition:'transform .12s' }}
-                                  onMouseEnter={e=>{e.currentTarget.style.transform='translateY(-2px)';e.currentTarget.style.boxShadow='var(--shadow-lg)'}}
-                                  onMouseLeave={e=>{e.currentTarget.style.transform='';e.currentTarget.style.boxShadow=''}}>
-                                  <div style={{ height:4, background:`linear-gradient(90deg,${comp?'var(--success)':color},${color}88)` }} />
-                                  <div style={{ padding:'.75rem 1rem', display:'flex', justifyContent:'space-between', alignItems:'flex-start', gap:'.75rem' }}>
-                                    <div style={{ flex:1, minWidth:0 }}>
-                                      <div style={{ display:'flex', alignItems:'center', gap:'.4rem', marginBottom:'.3rem', flexWrap:'wrap' }}>
-                                        <span style={{ fontSize:'.68rem', fontWeight:700, color, background:color+'18', padding:'.12rem .5rem', borderRadius:99 }}>{session.type}</span>
-                                        <span style={{ fontSize:'.72rem', color:'var(--text-muted)' }}>{session.jour}</span>
-                                        {comp && <span style={{ fontSize:'.68rem', color:'var(--success)', fontWeight:700 }}>✅ Effectué · RPE {comp.rpe}</span>}
-                                      </div>
-                                      <div style={{ fontWeight:700, fontSize:'.9rem', lineHeight:1.3, marginBottom:'.25rem', overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>{session.titre}</div>
-                                      <div style={{ fontSize:'.75rem', color:'var(--text-muted)', display:'flex', gap:'.6rem' }}>
-                                        <span>⏱ {session.duree_min} min</span>
-                                        {session.rpe_cible && <span>💪 RPE {session.rpe_cible}</span>}
-                                      </div>
-                                    </div>
-                                    <span style={{ color:'var(--text-muted)', fontSize:'.9rem', flexShrink:0, marginTop:'.25rem' }}>›</span>
+                      {/* Mobile list */}
+                      <div className="cplan-mobile" style={{ display:'flex', flexDirection:'column', gap:'.5rem' }}>
+                        {seances.map((session, sIdx) => {
+                          const clr = SESSION_TYPE_COLORS[session.type] || 'var(--primary)'
+                          const comp = weekComps.find(c=>c.session_index===sIdx)
+                          return (
+                            <div key={sIdx} onClick={() => setOpenSession({session,weekNum:activeSem.numero,sessionIdx:sIdx,completion:comp})}
+                              style={{ borderRadius:14, overflow:'hidden', cursor:'pointer', background:'var(--surface-2)', border:'1px solid var(--border)' }}>
+                              <div style={{ height:4, background:`linear-gradient(90deg,${comp?'var(--success)':clr},${clr}88)` }} />
+                              <div style={{ padding:'.75rem 1rem', display:'flex', justifyContent:'space-between', alignItems:'flex-start', gap:'.75rem' }}>
+                                <div style={{ flex:1, minWidth:0 }}>
+                                  <div style={{ display:'flex', alignItems:'center', gap:'.4rem', marginBottom:'.3rem', flexWrap:'wrap' }}>
+                                    <span style={{ fontSize:'.68rem', fontWeight:700, color:clr, background:clr+'18', padding:'.12rem .5rem', borderRadius:99 }}>{session.type}</span>
+                                    <span style={{ fontSize:'.72rem', color:'var(--text-muted)' }}>{session.jour}</span>
+                                    {comp && <span style={{ fontSize:'.68rem', color:'var(--success)', fontWeight:700 }}>✅ RPE {comp.rpe}</span>}
+                                  </div>
+                                  <div style={{ fontWeight:700, fontSize:'.9rem', lineHeight:1.3, overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>{session.titre}</div>
+                                  <div style={{ fontSize:'.75rem', color:'var(--text-muted)', display:'flex', gap:'.6rem', marginTop:'.25rem' }}>
+                                    <span>⏱ {session.duree_min}min</span>
+                                    {session.rpe_cible && <span>💪 RPE {session.rpe_cible}</span>}
                                   </div>
                                 </div>
-                              )
-                            })}
-                          </div>
-                        </div>
-                      )
-                    })}
-                  </>
-                )}
+                                <span style={{ color:'var(--text-muted)', fontSize:'.9rem', flexShrink:0 }}>›</span>
+                              </div>
+                            </div>
+                          )
+                        })}
+                      </div>
+                    </>
+                  )
+                })()}
               </div>
             )}
+
 
             {/* ══════════ RETOURS ══════════ */}
             {tab === 'retours' && (
