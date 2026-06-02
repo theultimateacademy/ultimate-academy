@@ -499,26 +499,14 @@ function AthleteDetailPanel({ athlete, onClose, onUpdated, onAlertDismissed }) {
 
   useEffect(() => { loadDetail() }, [])
 
-  // Real-time sync — reload plan when athlete modifies it (reschedule, etc.)
-  useEffect(() => {
-    const channel = supabase.channel(`plan-${athlete.id}`)
-      .on('postgres_changes', {
-        event: 'UPDATE', schema: 'public', table: 'training_plans',
-        filter: `user_id=eq.${athlete.id}`
-      }, () => loadDetail())
-      .subscribe()
-    return () => { supabase.removeChannel(channel) }
-  }, [athlete.id])
-
   async function loadDetail() {
     setLoading(true)
     try {
       const [{ data: c }, { data: p }, { data: al }] = await Promise.all([
         supabase.from('session_completions').select('*').eq('user_id', athlete.id)
           .order('completed_at', { ascending: false }),
-        // Prefer active plan (what the athlete sees); fall back to most recent pending
         supabase.from('training_plans').select('*').eq('user_id', athlete.id)
-          .eq('status', 'active').order('created_at', { ascending: false }).limit(1).maybeSingle(),
+          .in('status', ['active','pending']).order('created_at', { ascending: false }).limit(1).single(),
         supabase.from('messages').select('*').eq('user_id', athlete.id)
           .like('content', '⚠️ [PROFIL]%').order('created_at', { ascending: false }).limit(30),
       ])
