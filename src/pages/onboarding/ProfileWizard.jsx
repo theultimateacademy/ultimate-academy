@@ -123,7 +123,7 @@ function getStepIds(data) {
 const gd = { background: 'linear-gradient(135deg,#8B2FC9,#E8237A)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text' }
 
 export default function ProfileWizard() {
-  const { user, refreshProfile } = useAuth()
+  const { user, refreshProfile, updateProfile } = useAuth()
   const navigate = useNavigate()
 
   const [data, setData] = useState({
@@ -323,8 +323,10 @@ export default function ProfileWizard() {
       }
       console.error('[Plan] All attempts failed — server will self-heal on next wake-up')
     })().catch(() => {})
-    await refreshProfile()
-    setDone(true)
+    // Navigate directly — don't wait for refreshProfile to avoid race condition
+    // The profile_completed=true is in DB; RequireActive will see it on next load
+    updateProfile(savedProfile)  // update context synchronously with saved data
+    navigate('/app/home', { replace: true })
   }
 
   if (done) return (
