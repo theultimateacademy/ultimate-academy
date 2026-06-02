@@ -55,7 +55,7 @@ export default function PostSessionFlow({
   const [maxHr,    setMaxHr]    = useState('')
   const [comment,  setComment]  = useState('')
 
-  const hasAllures  = !!(session.allures?.trim())
+  const hasAllures  = Array.isArray(session.allures) ? session.allures.length > 0 : !!(session.allures?.trim?.())
   const pasTermine  = ressenti === 'pas_termine'
 
   // Which steps are active?

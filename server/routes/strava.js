@@ -28,8 +28,13 @@ router.get('/callback', async (req, res) => {
   const { code, state: userId, error } = req.query;
   const redirectBase = process.env.CLIENT_URL || 'http://localhost:3000';
 
+  console.log('[Strava callback] STRAVA_REDIRECT_URI:', process.env.STRAVA_REDIRECT_URI);
+  console.log('[Strava callback] CLIENT_URL:', process.env.CLIENT_URL);
+  console.log('[Strava callback] code:', !!code, '| userId:', userId, '| error:', error);
+
   if (error || !code) {
-    return res.redirect(`${redirectBase}/app/profile?strava=error`);
+    console.error('[Strava callback] OAuth error from Strava:', error);
+    return res.redirect(`${redirectBase}/app/profile?strava=error&reason=${encodeURIComponent(error || 'no_code')}`);
   }
 
   try {
@@ -61,8 +66,9 @@ router.get('/callback', async (req, res) => {
 
     res.redirect(`${redirectBase}/app/profile?strava=connected`);
   } catch (err) {
-    console.error('Strava callback error:', err.response?.data || err.message);
-    res.redirect(`${redirectBase}/app/profile?strava=error`);
+    const errDetail = err.response?.data || err.message;
+    console.error('[Strava callback] ERROR:', JSON.stringify(errDetail));
+    res.redirect(`${redirectBase}/app/profile?strava=error&reason=${encodeURIComponent(JSON.stringify(errDetail).substring(0, 200))}`);
   }
 });
 

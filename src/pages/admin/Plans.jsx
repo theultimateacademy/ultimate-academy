@@ -363,6 +363,8 @@ export default function AdminPlans() {
   const [selectedAthlete, setSelectedAthlete] = useState('')
   const [confirmDelPlan, setConfirmDelPlan] = useState(null)
   const [deletingPlan,   setDeletingPlan]   = useState(false)
+  const [selectedPlans,  setSelectedPlans]  = useState(new Set())
+  const [bulkDeleting,   setBulkDeleting]   = useState(false)
 
   useEffect(() => { loadPlans(); loadAllAthletes() }, [])
 
@@ -405,6 +407,23 @@ export default function AdminPlans() {
       alert('Erreur : ' + err.message)
     } finally {
       setGenerating(null)
+    }
+  }
+
+  async function bulkDelete() {
+    if (!selectedPlans.size) return
+    if (!window.confirm(`Supprimer ${selectedPlans.size} plan(s) ? Cette action est irréversible.`)) return
+    setBulkDeleting(true)
+    try {
+      const ids = [...selectedPlans]
+      const { error } = await supabase.from('training_plans').delete().in('id', ids)
+      if (error) throw error
+      setSelectedPlans(new Set())
+      await loadPlans()
+    } catch (err) {
+      alert('Erreur suppression : ' + err.message)
+    } finally {
+      setBulkDeleting(false)
     }
   }
 
@@ -461,7 +480,7 @@ export default function AdminPlans() {
         </div>
       )}
 
-      <div style={{ display: 'flex', gap: '.5rem', marginBottom: '1.25rem', flexWrap: 'wrap' }}>
+      <div style={{ display: 'flex', gap: '.5rem', marginBottom: '1rem', flexWrap: 'wrap', alignItems: 'center' }}>
         {[
           { v: 'pending',   l: `En attente (${plans.filter(p => p.status === 'pending').length})` },
           { v: 'active',    l: 'Actifs' },
@@ -471,6 +490,17 @@ export default function AdminPlans() {
           <button key={f.v} className={`btn btn-sm ${filter === f.v ? 'btn-primary' : 'btn-ghost'}`}
             onClick={() => setFilter(f.v)}>{f.l}</button>
         ))}
+        <div style={{ marginLeft: 'auto', display: 'flex', gap: '.4rem', alignItems: 'center' }}>
+          <button className="btn btn-ghost btn-sm" onClick={() => setSelectedPlans(prev => prev.size === filtered.length ? new Set() : new Set(filtered.map(p => p.id)))}>
+            {selectedPlans.size === filtered.length && filtered.length > 0 ? '☑ Tout désélectionner' : '☐ Tout sélectionner'}
+          </button>
+          {selectedPlans.size > 0 && (
+            <button className="btn btn-sm" onClick={bulkDelete} disabled={bulkDeleting}
+              style={{ background: 'rgba(239,68,68,.15)', border: '1px solid rgba(239,68,68,.4)', color: '#FCA5A5' }}>
+              {bulkDeleting ? '…' : `🗑️ Supprimer (${selectedPlans.size})`}
+            </button>
+          )}
+        </div>
       </div>
 
       <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
@@ -479,8 +509,13 @@ export default function AdminPlans() {
           const weeks   = plan.plan_data?.semaines?.length || 0
           return (
             <div key={plan.id} className="card"
-              style={{ borderLeft: plan.status === 'pending' ? '4px solid var(--warning)' : '4px solid var(--success)' }}>
+              style={{ borderLeft: selectedPlans.has(plan.id) ? '4px solid var(--primary)' : plan.status === 'pending' ? '4px solid var(--warning)' : '4px solid var(--success)',
+                background: selectedPlans.has(plan.id) ? 'rgba(139,47,201,.06)' : undefined }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '.75rem' }}>
+                {/* Checkbox */}
+                <input type="checkbox" checked={selectedPlans.has(plan.id)}
+                  onChange={() => setSelectedPlans(prev => { const n = new Set(prev); n.has(plan.id) ? n.delete(plan.id) : n.add(plan.id); return n })}
+                  style={{ marginTop: '.35rem', width: 16, height: 16, accentColor: 'var(--primary)', flexShrink: 0, cursor: 'pointer' }} />
                 {/* Athlete info + badges */}
                 <div style={{ display: 'flex', alignItems: 'flex-start', gap: '.75rem', minWidth: 0, flex: 1 }}>
                   <div className="chat-avatar" style={{ flexShrink: 0, marginTop: '.1rem' }}>{athlete?.first_name?.[0]?.toUpperCase()}</div>

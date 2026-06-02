@@ -946,6 +946,22 @@ router.post('/plans/generate', async (req, res) => {
   const { userId, profile: clientProfile, clientDate } = req.body;
   if (!userId || !clientProfile) return res.status(400).json({ error: 'Missing data' });
 
+  // ── Guard: never generate if active or pending plan already exists ─────────────
+  const { data: existingPlans } = await supabase
+    .from('training_plans')
+    .select('id,status')
+    .eq('user_id', userId)
+    .in('status', ['active', 'pending'])
+    .limit(1);
+  if (existingPlans?.length > 0) {
+    const existing = existingPlans[0];
+    return res.status(409).json({
+      error: `Cet athlète a déjà un plan ${existing.status === 'active' ? 'actif' : 'en attente de validation'}. Modifiez-le directement ou archivez-le avant d'en générer un nouveau.`,
+      existingPlanId: existing.id,
+      existingStatus: existing.status,
+    });
+  }
+
   // Always re-fetch the latest profile from DB so any modifications are taken into account
   const { data: dbProfile } = await supabase.from('profiles').select('*').eq('id', userId).single();
   const profile = { ...clientProfile, ...(dbProfile || {}) };
