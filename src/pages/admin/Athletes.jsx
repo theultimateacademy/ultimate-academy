@@ -990,13 +990,14 @@ function AthleteDetailPanel({ athlete, onClose, onUpdated, onAlertDismissed }) {
               <div className="coach-tab-pane" style={{ maxWidth:960, margin:'0 auto', padding:'1.5rem' }}>
                 <style>{`
                   @media (min-width: 900px) {
-                    .cplan-grid { display: grid !important; grid-template-columns: repeat(7,1fr) !important; gap:.5rem !important; align-items:start !important; }
-                    .cplan-headers { display: grid !important; grid-template-columns: repeat(7,1fr); gap:.5rem; margin-bottom:.5rem; }
+                    .cplan-grid { display:grid !important; grid-template-columns:repeat(7,1fr) !important; gap:.5rem !important; align-items:start !important; }
+                    .cplan-headers { display:grid !important; grid-template-columns:repeat(7,1fr); gap:.5rem; margin-bottom:.5rem; }
+                    .cplan-mobile { display:none !important; }
                   }
                   .cplan-headers { display:none; }
                   .cplan-grid { display:none; }
                 `}</style>
-                {!plan ? (
+                {!plan || !plan.plan_data ? (
                   <div style={{ textAlign:'center', padding:'4rem 2rem', color:'var(--text-muted)' }}>
                     <div style={{ fontSize:'2rem', marginBottom:'.75rem' }}>📋</div>
                     <p>Aucun plan. Génère-en un dans l'onglet Profil.</p>
@@ -1119,8 +1120,8 @@ function AthleteDetailPanel({ athlete, onClose, onUpdated, onAlertDismissed }) {
                             })}
                           </div>
 
-                          {/* Mobile: flat list — same iOS cards as athlete */}
-                          <div style={{ display:'flex', flexDirection:'column', gap:'.5rem' }}>
+                          {/* Mobile: flat list — hidden on desktop via .cplan-mobile */}
+                          <div className="cplan-mobile" style={{ display:'flex', flexDirection:'column', gap:'.5rem' }}>
                             {seances.map((session, sIdx) => {
                               const color = SESSION_TYPE_COLORS[session.type] || 'var(--primary)'
                               const comp = weekComps.find(c => c.session_index === sIdx)
