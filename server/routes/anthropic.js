@@ -2526,6 +2526,8 @@ router.post('/plans/schedule-regen', async (req, res) => {
 // Called by cron every 15 min — regenerates plans for athletes who modified key fields
 
 router.post('/plans/check-regen', async (req, res) => {
+  // Auto-regen disabled — coach generates plans manually
+  return res.json({ processed: 0, disabled: true });
   try {
     const now = new Date().toISOString();
     const { data: profiles } = await supabase

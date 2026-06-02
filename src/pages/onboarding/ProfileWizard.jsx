@@ -456,7 +456,7 @@ export default function ProfileWizard() {
             <div style={{ fontSize: '.72rem', fontWeight: 700, letterSpacing: '.08em', color: 'rgba(255,255,255,.35)', textTransform: 'uppercase', marginBottom: '.5rem' }}>Course sur route</div>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '.65rem', marginBottom: '1rem' }}>
               {ROAD_OPTIONS.map(o => (
-                <button key={o.v} onClick={() => selectCard('objective', o.v)} style={{ ...cardStyle(data.objective === o.v), alignItems: 'flex-start', padding: '.9rem 1rem' }}>
+                <button key={o.v} onClick={() => set('objective', o.v)} style={{ ...cardStyle(data.objective === o.v), alignItems: 'flex-start', padding: '.9rem 1rem' }}>
                   <div style={{ fontWeight: 700, fontSize: '.95rem' }}>{o.l}</div>
                   <div style={{ fontSize: '.75rem', color: 'rgba(255,255,255,.45)', marginTop: '.15rem', lineHeight: 1.4 }}>{o.desc}</div>
                 </button>
@@ -512,7 +512,7 @@ export default function ProfileWizard() {
                 { v: 'debutant', e: '🌱', l: 'Commencer à courir',      desc: 'Je débute et veux progresser sans me blesser' },
                 { v: 'perf',     e: '⚡', l: 'Progresser et performer', desc: 'Je cours déjà et veux passer au niveau supérieur' },
               ].map(o => (
-                <button key={o.v} onClick={() => selectCard('objective', o.v)} style={{ ...cardStyle(data.objective === o.v), flexDirection: 'row', alignItems: 'center', gap: '.9rem', padding: '.9rem 1rem' }}>
+                <button key={o.v} onClick={() => set('objective', o.v)} style={{ ...cardStyle(data.objective === o.v), flexDirection: 'row', alignItems: 'center', gap: '.9rem', padding: '.9rem 1rem' }}>
                   <span style={{ fontSize: '1.4rem', flexShrink: 0 }}>{o.e}</span>
                   <div>
                     <div style={{ fontWeight: 700, fontSize: '.9rem' }}>{o.l}</div>
@@ -522,7 +522,8 @@ export default function ProfileWizard() {
               ))}
             </div>
 
-            {(TRAIL_VALUES.has(data.objective) || TRIATHLON_VALUES.has(data.objective)) && <ContinueBtn onClick={advance} />}
+            {/* Always show Continuer once an objective is selected */}
+            {data.objective && <ContinueBtn onClick={advance} />}
           </>}
 
           {/* ── race_date ── */}

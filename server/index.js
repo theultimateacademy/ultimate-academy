@@ -327,6 +327,6 @@ app.listen(PORT, () => {
       console.log(`[NewAthlete] Realtime status: ${status}`);
     });
 
-  // Heal any athletes who registered while Render was sleeping (no plan generated)
-  setTimeout(healMissingPlans, 8000);
+  // Auto-generation disabled — coach manually generates plans via admin interface
+  // setTimeout(healMissingPlans, 8000);
 });
