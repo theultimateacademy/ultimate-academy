@@ -323,10 +323,9 @@ export default function ProfileWizard() {
       }
       console.error('[Plan] All attempts failed — server will self-heal on next wake-up')
     })().catch(() => {})
-    // Navigate directly — don't wait for refreshProfile to avoid race condition
-    // The profile_completed=true is in DB; RequireActive will see it on next load
-    updateProfile(savedProfile)  // update context synchronously with saved data
-    navigate('/app/home', { replace: true })
+    // Force a full page reload to /app/home — this re-reads the profile from Supabase
+    // which has profile_completed=true, so RequireActive will pass without race condition
+    window.location.replace('/app/home')
   }
 
   if (done) return (
