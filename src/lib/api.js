@@ -23,6 +23,7 @@ export const api = {
   fatigueAdapt:       (body)   => request('/api/plans/fatigue-adapt',          { method: 'POST', body }),
   generateResponse:   (body)   => request('/api/messages/generate-response',  { method: 'POST', body }),
   periodAlert:        (body)   => request('/api/admin/period-alert',          { method: 'POST', body }),
+  adminUpdateProfile: (id, patch) => request(`/api/admin/profile/${id}`,      { method: 'PATCH', body: patch }),
   revenue:            ()       => request('/api/stripe/revenue'),
   runWeekly:          ()       => request('/api/analyses/run-weekly',           { method: 'POST', body: {} }),
   stravaConnect:      (userId) => `${API_URL}/auth/strava?userId=${userId}`,

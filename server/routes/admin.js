@@ -58,6 +58,31 @@ const supabase = createClient(
   { auth: { autoRefreshToken: false, persistSession: false } }
 );
 
+// PATCH /api/admin/profile/:id — coach updates athlete profile (bypasses RLS via service key)
+router.patch('/profile/:id', async (req, res) => {
+  const { id } = req.params;
+  const patch = req.body;
+  if (!id || !patch || Object.keys(patch).length === 0)
+    return res.status(400).json({ error: 'Missing id or patch' });
+
+  // Coerce numeric fields
+  const intFields = ['days_per_week','tri_swim_sessions','tri_bike_sessions','tri_run_sessions','race_denivele','ftp_value'];
+  for (const k of intFields) {
+    if (k in patch && patch[k] !== null) patch[k] = parseInt(patch[k], 10);
+  }
+  if ('vma' in patch && patch.vma !== null) patch.vma = parseFloat(patch.vma);
+
+  try {
+    const { data, error } = await supabase
+      .from('profiles').update(patch).eq('id', id).select().single();
+    if (error) throw error;
+    res.json({ success: true, profile: data });
+  } catch (err) {
+    console.error('[Admin] Profile update error:', err.message);
+    res.status(500).json({ error: err.message });
+  }
+});
+
 // DELETE /api/admin/athlete/:id
 router.delete('/athlete/:id', async (req, res) => {
   const { id } = req.params;

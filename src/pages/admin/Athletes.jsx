@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { supabase } from '../../lib/supabase'
 import { OBJECTIVE_LABELS, LEVEL_LABELS, SESSION_TYPE_COLORS } from '../../lib/utils'
+import { api } from '../../lib/api'
 import LoadingSpinner from '../../components/UI/LoadingSpinner'
 
 // ─── Coach Plan View — isolated component so crashes don't black the whole panel ──
@@ -665,23 +666,21 @@ function AthleteDetailPanel({ athlete, onClose, onUpdated, onAlertDismissed }) {
   }
 
   async function saveField() {
-    if (editSaving) return
+    if (editSaving || !editField) return
     setEditSaving(true)
     try {
-      let raw = editField === 'preferred_days' ? editDays : editVal
-      let coerced = (raw === '' || (Array.isArray(raw) && raw.length === 0)) ? null : raw
-      if (coerced !== null) {
-        if (['days_per_week','tri_swim_sessions','tri_bike_sessions','tri_run_sessions','race_denivele','ftp_value'].includes(editField))
-          coerced = parseInt(coerced, 10)
-        if (editField === 'vma') coerced = parseFloat(coerced)
-      }
-      const update = { [editField]: coerced }
-      const { error } = await supabase.from('profiles').update(update).eq('id', athlete.id)
-      if (error) throw error
-      const updated = { ...local, ...update }
-      setLocal(updated); onUpdated?.(updated); setEditField(null)
+      const raw = editField === 'preferred_days' ? editDays : editVal
+      const patch = { [editField]: (raw === '' || (Array.isArray(raw) && raw.length === 0)) ? null : raw }
+
+      // Use server endpoint (service key) to bypass Supabase RLS on profiles table
+      const result = await api.adminUpdateProfile(athlete.id, patch)
+      const updated = { ...local, ...(result.profile || patch) }
+      setLocal(updated)
+      onUpdated?.(updated)
+      setEditField(null)
     } catch (err) {
-      alert('Erreur : ' + err.message)
+      console.error('[saveField]', err)
+      alert('Erreur lors de la sauvegarde : ' + (err.message || JSON.stringify(err)))
     } finally {
       setEditSaving(false)
     }
