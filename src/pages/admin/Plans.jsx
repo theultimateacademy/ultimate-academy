@@ -3,10 +3,17 @@ import { supabase } from '../../lib/supabase'
 import { SESSION_TYPE_COLORS } from '../../lib/utils'
 import LoadingSpinner from '../../components/UI/LoadingSpinner'
 
+const SESSION_TYPES_PLANS = [
+  'Endurance fondamentale','Footing progressif','Sortie longue','Fractionné court','Fractionné long',
+  'Tempo / Seuil','Côtes','Spécifique','Récupération active','Natation','Natation endurance',
+  'Natation vitesse','Vélo','Vélo endurance','Vélo tempo','Brique','Trail endurance',
+  'Trail technique','Renforcement',
+]
+
 function PlanModal({ plan, athlete, onClose, onActivate }) {
   const [planData, setPlanData]   = useState(plan.plan_data)
   const [activeWeek, setActiveWeek] = useState(0)
-  const [editSession, setEditSession] = useState(null)
+  const [editTarget, setEditTarget] = useState(null) // { weekIdx, sessionIdx } — full-page editor
   const [saving, setSaving]       = useState(false)
   const [activating, setActivating] = useState(false)
 
@@ -49,24 +56,40 @@ function PlanModal({ plan, athlete, onClose, onActivate }) {
     }
   }
 
-  function updateSession(weekIdx, sessionIdx, field, value) {
+  function updateSession(weekIdx, sessionIdx, updatedSession) {
     setPlanData(d => {
       const updated = JSON.parse(JSON.stringify(d))
-      updated.semaines[weekIdx].seances[sessionIdx][field] = value
+      updated.semaines[weekIdx].seances[sessionIdx] = { ...updated.semaines[weekIdx].seances[sessionIdx], ...updatedSession }
       return updated
     })
+  }
+
+  async function saveSession(weekIdx, sessionIdx, updatedSession) {
+    const updated = JSON.parse(JSON.stringify(planData))
+    updated.semaines[weekIdx].seances[sessionIdx] = { ...updated.semaines[weekIdx].seances[sessionIdx], ...updatedSession }
+    setPlanData(updated)
+    setEditTarget(null)
+    setSaving(true)
+    try {
+      await supabase.from('training_plans').update({ plan_data: updated }).eq('id', plan.id)
+    } finally {
+      setSaving(false)
+    }
   }
 
   async function deleteSession(weekIdx, sessionIdx) {
     const updated = JSON.parse(JSON.stringify(planData))
     updated.semaines[weekIdx].seances.splice(sessionIdx, 1)
     setPlanData(updated)
-    setEditSession(null)
+    setEditTarget(null)
     await supabase.from('training_plans').update({ plan_data: updated }).eq('id', plan.id)
   }
 
   const currentWeek = weeks[activeWeek]
   const DAY_NAMES_GRID = ['Lundi','Mardi','Mercredi','Jeudi','Vendredi','Samedi','Dimanche']
+
+  // Full-page session editor
+  const editSession = editTarget ? planData?.semaines?.[editTarget.weekIdx]?.seances?.[editTarget.sessionIdx] : null
 
   return (
     <div className="modal-overlay center" onClick={e => e.target === e.currentTarget && onClose()}>
@@ -186,7 +209,6 @@ function PlanModal({ plan, athlete, onClose, onActivate }) {
                     ) : daySessions.map(session => {
                       const si = session._si
                       const color = SESSION_TYPE_COLORS[session.type] || 'var(--primary)'
-                      const isEditing = editSession === `${activeWeek}-${si}`
                       return (
                         <div key={si} style={{
                           borderRadius: 8, overflow: 'hidden',
@@ -218,38 +240,7 @@ function PlanModal({ plan, athlete, onClose, onActivate }) {
                               </button>
                             </div>
                           </div>
-                          {isEditing && (
-                            <div style={{ padding:'.75rem', borderTop:'1px solid var(--border)', display:'flex', flexDirection:'column', gap:'.5rem' }}>
-                              {[
-                                { label:'Échauffement', field:'echauffement' },
-                                { label:'Corps', field:'corps' },
-                                { label:'Retour au calme', field:'retour_au_calme' },
-                                { label:'Notes coach', field:'notes_coach' },
-                              ].map(({ label, field }) => (
-                                <div className="form-group" key={field} style={{ marginBottom:0 }}>
-                                  <label className="form-label" style={{ fontSize:'.68rem' }}>{label}</label>
-                                  <textarea className="form-textarea" style={{ minHeight:50, fontSize:'.78rem' }}
-                                    value={session[field] || ''}
-                                    onChange={e => updateSession(activeWeek, si, field, e.target.value)} />
-                                </div>
-                              ))}
-                              <div style={{ display:'flex', gap:'.35rem' }}>
-                                <div className="form-group" style={{ flex:1, marginBottom:0 }}>
-                                  <label className="form-label" style={{ fontSize:'.68rem' }}>Durée (min)</label>
-                                  <input type="number" className="form-input" style={{ fontSize:'.78rem' }} value={session.duree_min}
-                                    onChange={e => updateSession(activeWeek, si, 'duree_min', parseInt(e.target.value))} />
-                                </div>
-                                <div className="form-group" style={{ flex:1, marginBottom:0 }}>
-                                  <label className="form-label" style={{ fontSize:'.68rem' }}>RPE cible</label>
-                                  <input type="number" min={1} max={10} className="form-input" style={{ fontSize:'.78rem' }} value={session.rpe_cible}
-                                    onChange={e => updateSession(activeWeek, si, 'rpe_cible', parseInt(e.target.value))} />
-                                </div>
-                              </div>
-                              <button className="btn btn-primary btn-sm" disabled={saving} onClick={saveEdit}>
-                                {saving ? '…' : '💾'}
-                              </button>
-                            </div>
-                          )}
+
                         </div>
                       )
                     })}
@@ -263,7 +254,6 @@ function PlanModal({ plan, athlete, onClose, onActivate }) {
               {currentWeek.seances?.map((session, si) => {
                 const color = SESSION_TYPE_COLORS[session.type] || 'var(--primary)'
                 const isRenfo = (session.type||'').toLowerCase().includes('renforcement') || (session.id_seance||'').startsWith('RENFO')
-                const isEditing = editSession === `${activeWeek}-${si}`
                 return (
                   <div key={si} style={{
                     borderRadius: 14, overflow: 'hidden',
@@ -280,16 +270,10 @@ function PlanModal({ plan, athlete, onClose, onActivate }) {
                           </span>
                           <span style={{ fontSize:'.72rem', color:'var(--text-muted)' }}>{session.jour}</span>
                         </div>
-                        {isEditing ? (
-                          <input className="form-input" value={session.titre}
-                            onChange={e => updateSession(activeWeek, si, 'titre', e.target.value)}
-                            style={{ marginBottom:'.25rem', fontSize:'.875rem' }} />
-                        ) : (
-                          <div style={{ fontWeight:700, fontSize:'.9rem', lineHeight:1.3, marginBottom:'.25rem',
-                            overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>
-                            {session.titre}
-                          </div>
-                        )}
+                        <div style={{ fontWeight:700, fontSize:'.9rem', lineHeight:1.3, marginBottom:'.25rem',
+                          overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>
+                          {session.titre}
+                        </div>
                         <div style={{ fontSize:'.75rem', color:'var(--text-muted)', display:'flex', gap:'.6rem' }}>
                           <span>⏱ {session.duree_min} min</span>
                           {session.rpe_cible && <span>💪 RPE {session.rpe_cible}</span>}
@@ -297,55 +281,98 @@ function PlanModal({ plan, athlete, onClose, onActivate }) {
                       </div>
                       <div style={{ display:'flex', gap:'.3rem', flexShrink:0 }}>
                         <button className="btn btn-ghost btn-sm" style={{ padding:'.25rem .5rem', fontSize:'.78rem' }}
-                          onClick={() => setEditSession(isEditing ? null : `${activeWeek}-${si}`)}>
-                          {isEditing ? '✕' : '✏️'}
-                        </button>
+                          onClick={() => setEditTarget({ weekIdx: activeWeek, sessionIdx: si })}>✏️</button>
                         <button className="btn btn-ghost btn-sm" style={{ padding:'.25rem .5rem', fontSize:'.78rem', color:'var(--error)', borderColor:'rgba(239,68,68,.3)' }}
-                          onClick={() => window.confirm(`Supprimer "${session.titre}" ?`) && deleteSession(activeWeek, si)}>
-                          🗑️
-                        </button>
+                          onClick={() => window.confirm(`Supprimer "${session.titre}" ?`) && deleteSession(activeWeek, si)}>🗑️</button>
                       </div>
                     </div>
 
-                    {isEditing && (
-                      <div style={{ padding:'0 1rem 1rem', display:'flex', flexDirection:'column', gap:'.75rem' }}>
-                        {[
-                          { label:'Échauffement', field:'echauffement' },
-                          { label:'Corps de séance', field:'corps' },
-                          { label:'Retour au calme', field:'retour_au_calme' },
-                          { label:'Notes coach', field:'notes_coach' },
-                          { label:'Allures', field:'allures' },
-                        ].map(({ label, field }) => (
-                          <div className="form-group" key={field}>
-                            <label className="form-label">{label}</label>
-                            <textarea className="form-textarea" style={{ minHeight:70 }}
-                              value={session[field] || ''}
-                              onChange={e => updateSession(activeWeek, si, field, e.target.value)} />
-                          </div>
-                        ))}
-                        <div style={{ display:'flex', gap:'.5rem', flexWrap:'wrap' }}>
-                          <div className="form-group" style={{ flex:1, minWidth:80 }}>
-                            <label className="form-label">Durée (min)</label>
-                            <input type="number" className="form-input" value={session.duree_min}
-                              onChange={e => updateSession(activeWeek, si, 'duree_min', parseInt(e.target.value))} />
-                          </div>
-                          <div className="form-group" style={{ flex:1, minWidth:80 }}>
-                            <label className="form-label">RPE cible</label>
-                            <input type="number" min={1} max={10} className="form-input" value={session.rpe_cible}
-                              onChange={e => updateSession(activeWeek, si, 'rpe_cible', parseInt(e.target.value))} />
-                          </div>
-                        </div>
-                        <button className="btn btn-primary btn-sm" disabled={saving} onClick={saveEdit}>
-                          {saving ? 'Sauvegarde…' : '💾 Sauvegarder'}
-                        </button>
-                      </div>
-                    )}
+
                   </div>
                 )
               })}
             </div>
           </div>
         )}
+
+        {/* Full-page session editor */}
+        {editTarget && editSession && (
+          <div style={{ position:'fixed', inset:0, zIndex:600, background:'rgba(0,0,0,.75)', backdropFilter:'blur(8px)',
+            display:'flex', alignItems:'center', justifyContent:'center', padding:'1rem' }}
+            onClick={e => e.target === e.currentTarget && setEditTarget(null)}>
+            <div style={{ width:'100%', maxWidth:780, maxHeight:'92vh', overflowY:'auto',
+              background:'var(--surface)', borderRadius:20, border:'1px solid var(--border)', boxShadow:'0 24px 60px rgba(0,0,0,.6)' }}>
+              <div style={{ padding:'1.25rem 1.5rem', borderBottom:'1px solid var(--border)',
+                display:'flex', justifyContent:'space-between', alignItems:'center',
+                position:'sticky', top:0, background:'var(--surface)', zIndex:10, borderRadius:'20px 20px 0 0' }}>
+                <h3 style={{ margin:0, fontSize:'1.05rem' }}>✏️ Modifier la séance</h3>
+                <button onClick={() => setEditTarget(null)} style={{ padding:'.35rem .75rem', background:'none', border:'1px solid var(--border)',
+                  borderRadius:8, cursor:'pointer', fontFamily:'inherit', color:'var(--text-muted)' }}>✕ Annuler</button>
+              </div>
+              <EditSessionForm
+                session={editSession}
+                onSave={updated => saveSession(editTarget.weekIdx, editTarget.sessionIdx, updated)}
+                onCancel={() => setEditTarget(null)}
+              />
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  )
+}
+
+function EditSessionForm({ session, onSave, onCancel }) {
+  const [v, setV] = useState({
+    titre: session.titre||'', type: session.type||'', jour: session.jour||'Lundi',
+    duree_min: session.duree_min??'', distance_km: session.distance_km??'',
+    intensite: session.intensite||'', echauffement: session.echauffement||'',
+    corps: session.corps||'', retour_au_calme: session.retour_au_calme||'',
+    notes_coach: session.notes_coach||'', rpe_cible: session.rpe_cible??''
+  })
+  const inp = { width:'100%', padding:'.5rem .75rem', border:'1px solid var(--border)', borderRadius:8,
+    fontSize:'.875rem', fontFamily:'inherit', background:'var(--bg)', color:'var(--text)', outline:'none', boxSizing:'border-box' }
+  const lbl = { fontSize:'.65rem', fontWeight:700, textTransform:'uppercase', letterSpacing:'.06em',
+    color:'var(--text-muted)', marginBottom:'.2rem', display:'block' }
+  const set = (k,val) => setV(p=>({...p,[k]:val}))
+  const num = (k,fb) => v[k]!=='' ? Number(v[k]) : fb
+  return (
+    <div style={{ padding:'1.5rem', display:'grid', gridTemplateColumns:'1fr 1fr', gap:'1rem' }}>
+      <div style={{ gridColumn:'1/-1' }}><label style={lbl}>Titre</label>
+        <input style={{ ...inp, fontSize:'1rem', fontWeight:600, padding:'.65rem .875rem' }} value={v.titre} onChange={e=>set('titre',e.target.value)} autoFocus /></div>
+      <div><label style={lbl}>Type</label>
+        <select style={inp} value={v.type} onChange={e=>set('type',e.target.value)}>
+          {SESSION_TYPES_PLANS.map(t=><option key={t}>{t}</option>)}
+        </select></div>
+      <div><label style={lbl}>Jour</label>
+        <select style={inp} value={v.jour} onChange={e=>set('jour',e.target.value)}>
+          {['Lundi','Mardi','Mercredi','Jeudi','Vendredi','Samedi','Dimanche'].map(d=><option key={d}>{d}</option>)}
+        </select></div>
+      <div><label style={lbl}>Durée (min)</label><input style={inp} type="number" value={v.duree_min} onChange={e=>set('duree_min',e.target.value)} /></div>
+      <div><label style={lbl}>RPE cible</label><input style={inp} type="number" min="1" max="10" value={v.rpe_cible} onChange={e=>set('rpe_cible',e.target.value)} /></div>
+      <div><label style={lbl}>Distance (km)</label><input style={inp} type="number" step=".1" value={v.distance_km??''} onChange={e=>set('distance_km',e.target.value)} /></div>
+      <div><label style={lbl}>Intensité</label>
+        <select style={inp} value={v.intensite} onChange={e=>set('intensite',e.target.value)}>
+          {['très facile','facile','modérée','dur','très dur','course'].map(i=><option key={i}>{i}</option>)}
+        </select></div>
+      <div style={{ gridColumn:'1/-1' }}><label style={lbl}>Échauffement</label>
+        <textarea style={{ ...inp, resize:'vertical' }} rows={3} value={v.echauffement} onChange={e=>set('echauffement',e.target.value)} /></div>
+      <div style={{ gridColumn:'1/-1' }}><label style={lbl}>Corps de séance</label>
+        <textarea style={{ ...inp, resize:'vertical', fontFamily:'monospace', fontSize:'.8rem' }} rows={8} value={v.corps} onChange={e=>set('corps',e.target.value)} /></div>
+      <div style={{ gridColumn:'1/-1' }}><label style={lbl}>Retour au calme</label>
+        <textarea style={{ ...inp, resize:'vertical' }} rows={2} value={v.retour_au_calme} onChange={e=>set('retour_au_calme',e.target.value)} /></div>
+      <div style={{ gridColumn:'1/-1' }}><label style={lbl}>Note coach</label>
+        <textarea style={{ ...inp, resize:'vertical' }} rows={3} value={v.notes_coach} onChange={e=>set('notes_coach',e.target.value)} /></div>
+      <div style={{ gridColumn:'1/-1', display:'flex', justifyContent:'flex-end', gap:'.75rem',
+        padding:'0 0 .5rem', borderTop:'1px solid var(--border)', paddingTop:'1rem' }}>
+        <button onClick={onCancel} style={{ padding:'.6rem 1.25rem', background:'none', border:'1px solid var(--border)',
+          borderRadius:10, cursor:'pointer', fontFamily:'inherit', color:'var(--text-muted)' }}>Annuler</button>
+        <button onClick={() => onSave({ ...session, ...v, duree_min:num('duree_min',session.duree_min),
+          distance_km:v.distance_km!==''?num('distance_km',session.distance_km):null, rpe_cible:num('rpe_cible',session.rpe_cible) })}
+          style={{ padding:'.6rem 1.5rem', background:'var(--gradient)', color:'#fff', border:'none',
+            borderRadius:10, fontWeight:700, cursor:'pointer', fontFamily:'inherit', boxShadow:'0 4px 16px rgba(232,35,122,.35)' }}>
+          ✓ Enregistrer
+        </button>
       </div>
     </div>
   )

@@ -694,6 +694,13 @@ function AthleteDetailPanel({ athlete, onClose, onUpdated, onAlertDismissed }) {
 
   const currentWeekNum = getCurrentWeekNum(plan)
 
+  // Auto-select current week when plan loads
+  useEffect(() => {
+    if (!plan?.plan_data?.semaines) return
+    const idx = plan.plan_data.semaines.findIndex(s => s.numero === currentWeekNum)
+    if (idx >= 0) setCoachWeekIdx(idx)
+  }, [plan?.id])
+
   useEffect(() => { loadDetail() }, [])
 
   async function loadDetail() {
