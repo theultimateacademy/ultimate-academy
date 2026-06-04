@@ -602,6 +602,12 @@ function AthleteDetailPanel({ athlete, onClose, onUpdated, onAlertDismissed }) {
   const [editSaving,    setEditSaving]    = useState(false)
   const [editMsg,       setEditMsg]       = useState(false)
   const [msgVal,        setMsgVal]        = useState(athlete.coach_message || '')
+  const [saveToast,     setSaveToast]     = useState(null) // { text, ok }
+
+  function showSaveToast(text, ok = true) {
+    setSaveToast({ text, ok })
+    setTimeout(() => setSaveToast(null), 3000)
+  }
   const [sessionSaving, setSessionSaving] = useState(false)
   const [openSession,   setOpenSession]   = useState(null)
   const [coachWeekIdx, setCoachWeekIdx]  = useState(0)  // active week tab in plan view
@@ -670,17 +676,21 @@ function AthleteDetailPanel({ athlete, onClose, onUpdated, onAlertDismissed }) {
     setEditSaving(true)
     try {
       const raw = editField === 'preferred_days' ? editDays : editVal
-      const patch = { [editField]: (raw === '' || (Array.isArray(raw) && raw.length === 0)) ? null : raw }
+      const value = (raw === '' || (Array.isArray(raw) && raw.length === 0)) ? null : raw
+      const patch = { [editField]: value }
 
-      // Use server endpoint (service key) to bypass Supabase RLS on profiles table
+      // Server endpoint uses service key — bypasses Supabase RLS
       const result = await api.adminUpdateProfile(athlete.id, patch)
+      if (!result.success) throw new Error(result.error || 'Échec de la sauvegarde')
+
       const updated = { ...local, ...(result.profile || patch) }
       setLocal(updated)
       onUpdated?.(updated)
       setEditField(null)
+      showSaveToast('✓ Enregistré')
     } catch (err) {
       console.error('[saveField]', err)
-      alert('Erreur lors de la sauvegarde : ' + (err.message || JSON.stringify(err)))
+      showSaveToast('✗ ' + (err.message || 'Erreur'), false)
     } finally {
       setEditSaving(false)
     }
@@ -689,12 +699,14 @@ function AthleteDetailPanel({ athlete, onClose, onUpdated, onAlertDismissed }) {
   async function saveCoachMessage() {
     setEditSaving(true)
     try {
-      const { error } = await supabase.from('profiles').update({ coach_message: msgVal }).eq('id', athlete.id)
-      if (error) throw error
+      // Also routes through server to bypass RLS
+      const result = await api.adminUpdateProfile(athlete.id, { coach_message: msgVal })
+      if (!result.success) throw new Error(result.error || 'Échec')
       const updated = { ...local, coach_message: msgVal }
       setLocal(updated); onUpdated?.(updated); setEditMsg(false)
+      showSaveToast('✓ Note enregistrée')
     } catch (err) {
-      alert('Erreur : ' + err.message)
+      showSaveToast('✗ ' + err.message, false)
     } finally {
       setEditSaving(false)
     }
@@ -776,6 +788,20 @@ function AthleteDetailPanel({ athlete, onClose, onUpdated, onAlertDismissed }) {
           {local.injury_mode && <span className="badge" style={{ background:'rgba(239,68,68,.12)', color:'#FCA5A5' }}>🩹</span>}
         </div>
       </div>
+
+      {/* ── Save toast ─────────────────────────────────────── */}
+      {saveToast && (
+        <div style={{
+          position:'fixed', top:'1rem', right:'1rem', zIndex:9999,
+          padding:'.65rem 1.1rem', borderRadius:10, fontWeight:700, fontSize:'.875rem',
+          background: saveToast.ok ? 'rgba(16,185,129,.15)' : 'rgba(239,68,68,.15)',
+          border: `1px solid ${saveToast.ok ? 'rgba(16,185,129,.4)' : 'rgba(239,68,68,.4)'}`,
+          color: saveToast.ok ? '#6EE7B7' : '#FCA5A5',
+          boxShadow:'0 4px 20px rgba(0,0,0,.3)',
+        }}>
+          {saveToast.text}
+        </div>
+      )}
 
       {/* ── Tab bar ────────────────────────────────────────── */}
       <div style={{ background:'var(--surface)', borderBottom:'1px solid var(--border)',
