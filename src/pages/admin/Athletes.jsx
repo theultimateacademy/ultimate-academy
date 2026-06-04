@@ -70,23 +70,27 @@ function PlanView({ plan, completions, coachWeekIdx, setCoachWeekIdx, currentWee
           )}
         </div>
 
-        {/* Session cards — flat list, always visible */}
+        {/* Session cards — same style as athlete interface, green when done */}
         <div style={{ display:'flex', flexDirection:'column', gap:'.5rem' }}>
           {seances.map((session, sIdx) => {
             const clr = SESSION_TYPE_COLORS[session.type] || '#8B5CF6'
             const comp = weekComps.find(c => c.session_index === sIdx)
+            const done = !!comp
             return (
               <div key={sIdx} onClick={() => onSessionClick(session, activeSem.numero, sIdx, comp)}
-                style={{ borderRadius:12, overflow:'hidden', cursor:'pointer', background:'var(--surface-2)', border:'1px solid var(--border)', transition:'transform .1s' }}
+                style={{ borderRadius:14, overflow:'hidden', cursor:'pointer',
+                  background: done ? 'rgba(16,185,129,.12)' : 'var(--surface-2)',
+                  border: done ? '1.5px solid rgba(16,185,129,.4)' : '1px solid var(--border)',
+                  transition:'transform .1s' }}
                 onMouseEnter={e => { e.currentTarget.style.transform='translateY(-1px)'; e.currentTarget.style.boxShadow='var(--shadow)' }}
                 onMouseLeave={e => { e.currentTarget.style.transform=''; e.currentTarget.style.boxShadow='' }}>
-                <div style={{ height:3, background:`linear-gradient(90deg,${comp?'var(--success)':clr},${clr}88)` }} />
+                <div style={{ height:4, background: done ? '#10B981' : `linear-gradient(90deg,${clr},${clr}88)` }} />
                 <div style={{ padding:'.75rem 1rem', display:'flex', justifyContent:'space-between', alignItems:'flex-start', gap:'.75rem' }}>
                   <div style={{ flex:1, minWidth:0 }}>
                     <div style={{ display:'flex', alignItems:'center', gap:'.4rem', marginBottom:'.3rem', flexWrap:'wrap' }}>
                       <span style={{ fontSize:'.68rem', fontWeight:700, color:clr, background:clr+'18', padding:'.1rem .5rem', borderRadius:99, whiteSpace:'nowrap' }}>{session.type || '—'}</span>
                       <span style={{ fontSize:'.7rem', color:'var(--text-muted)' }}>{session.jour}</span>
-                      {comp && <span style={{ fontSize:'.68rem', color:'var(--success)', fontWeight:700 }}>✅ RPE {comp.rpe}</span>}
+                      {done && <span style={{ fontSize:'.68rem', color:'var(--success)', fontWeight:700 }}>✅ Effectué · RPE {comp.rpe}</span>}
                     </div>
                     <div style={{ fontWeight:700, fontSize:'.875rem', overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>{session.titre || '—'}</div>
                     <div style={{ fontSize:'.75rem', color:'var(--text-muted)', marginTop:'.2rem', display:'flex', gap:'.6rem' }}>
@@ -179,10 +183,18 @@ function getCurrentWeekNum(plan) {
   return Math.floor(ms / (7 * 24 * 3600 * 1000)) + 1
 }
 
+const SESSION_TYPES = [
+  'Endurance fondamentale','Footing progressif','Sortie longue','Fractionné court','Fractionné long',
+  'Tempo / Seuil','Côtes','Spécifique','Récupération active','Natation','Natation endurance',
+  'Natation vitesse','Vélo','Vélo endurance','Vélo tempo','Brique','Trail endurance',
+  'Trail technique','Trail fractionné','Trail montagne','Renforcement',
+]
+
 // ─── Session edit form ────────────────────────────────────────────────────────
 function SessionEditForm({ session, onSave, onCancel }) {
   const [v, setV] = useState({
     titre: session.titre || '', type: session.type || '',
+    jour: session.jour || '',
     duree_min: session.duree_min ?? '', distance_km: session.distance_km ?? '',
     intensite: session.intensite || '', echauffement: session.echauffement || '',
     corps: session.corps || '', retour_au_calme: session.retour_au_calme || '',
@@ -196,38 +208,106 @@ function SessionEditForm({ session, onSave, onCancel }) {
   const set = (k, val) => setV(p => ({ ...p, [k]: val }))
   const num = (k, fallback) => v[k] !== '' ? Number(v[k]) : fallback
 
+  // Full-page overlay for editing
   return (
-    <div style={{ padding:'1rem', background:'var(--bg)', borderTop:'1px solid var(--border)' }}>
-      <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:'.6rem' }}>
-        <div style={{ gridColumn:'1/-1' }}>
-          <label style={lbl}>Titre</label>
-          <input style={inp} value={v.titre} onChange={e => set('titre', e.target.value)} />
+    <div style={{ position:'fixed', inset:0, zIndex:500, background:'rgba(0,0,0,.7)', backdropFilter:'blur(8px)',
+      display:'flex', alignItems:'center', justifyContent:'center', padding:'1rem' }}
+      onClick={e => e.target === e.currentTarget && onCancel()}>
+      <div style={{ width:'100%', maxWidth:780, maxHeight:'92vh', overflowY:'auto',
+        background:'var(--surface)', borderRadius:20, border:'1px solid var(--border)',
+        boxShadow:'0 24px 60px rgba(0,0,0,.6)' }}>
+        {/* Header */}
+        <div style={{ padding:'1.25rem 1.5rem', borderBottom:'1px solid var(--border)',
+          display:'flex', justifyContent:'space-between', alignItems:'center', position:'sticky', top:0,
+          background:'var(--surface)', zIndex:10, borderRadius:'20px 20px 0 0' }}>
+          <h3 style={{ margin:0, fontSize:'1.05rem' }}>✏️ Modifier la séance</h3>
+          <button onClick={onCancel} style={{ padding:'.35rem .75rem', background:'none', border:'1px solid var(--border)',
+            borderRadius:8, cursor:'pointer', fontFamily:'inherit', color:'var(--text-muted)', fontSize:'.85rem' }}>✕ Annuler</button>
         </div>
-        <div><label style={lbl}>Type</label><input style={inp} value={v.type} onChange={e => set('type', e.target.value)} /></div>
-        <div><label style={lbl}>Intensité</label><input style={inp} value={v.intensite} onChange={e => set('intensite', e.target.value)} /></div>
-        <div><label style={lbl}>Durée (min)</label><input style={inp} type="number" value={v.duree_min} onChange={e => set('duree_min', e.target.value)} /></div>
-        <div><label style={lbl}>Distance (km)</label><input style={inp} type="number" step=".1" value={v.distance_km} onChange={e => set('distance_km', e.target.value)} /></div>
-        <div><label style={lbl}>RPE cible</label><input style={inp} type="number" min="1" max="10" value={v.rpe_cible} onChange={e => set('rpe_cible', e.target.value)} /></div>
-        <div style={{ gridColumn:'1/-1' }}><label style={lbl}>Échauffement</label>
-          <textarea style={{ ...inp, resize:'vertical' }} rows={2} value={v.echauffement} onChange={e => set('echauffement', e.target.value)} /></div>
-        <div style={{ gridColumn:'1/-1' }}><label style={lbl}>Corps de séance</label>
-          <textarea style={{ ...inp, resize:'vertical' }} rows={5} value={v.corps} onChange={e => set('corps', e.target.value)} /></div>
-        <div style={{ gridColumn:'1/-1' }}><label style={lbl}>Retour au calme</label>
-          <textarea style={{ ...inp, resize:'vertical' }} rows={2} value={v.retour_au_calme} onChange={e => set('retour_au_calme', e.target.value)} /></div>
-        <div style={{ gridColumn:'1/-1' }}><label style={lbl}>Note coach</label>
-          <textarea style={{ ...inp, resize:'vertical' }} rows={3} value={v.notes_coach} onChange={e => set('notes_coach', e.target.value)} /></div>
-      </div>
-      <div style={{ display:'flex', gap:'.5rem', justifyContent:'flex-end', marginTop:'.875rem' }}>
-        <button onClick={onCancel}
-          style={{ padding:'.4rem .9rem', background:'none', border:'1px solid var(--border)', borderRadius:8,
-            fontSize:'.82rem', cursor:'pointer', fontFamily:'inherit', color:'var(--text-muted)' }}>
-          Annuler
-        </button>
-        <button onClick={() => onSave({ ...session, ...v, duree_min: num('duree_min', session.duree_min), distance_km: num('distance_km', session.distance_km), rpe_cible: num('rpe_cible', session.rpe_cible) })}
-          style={{ padding:'.4rem 1rem', background:'var(--gradient)', color:'#fff', border:'none',
-            borderRadius:8, fontWeight:700, fontSize:'.82rem', cursor:'pointer', fontFamily:'inherit' }}>
-          ✓ Enregistrer
-        </button>
+
+        <div style={{ padding:'1.5rem', display:'grid', gridTemplateColumns:'1fr 1fr', gap:'1rem' }}>
+          {/* Titre — full width */}
+          <div style={{ gridColumn:'1/-1' }}>
+            <label style={lbl}>Titre de la séance</label>
+            <input style={{ ...inp, fontSize:'1rem', fontWeight:600, padding:'.6rem .875rem' }}
+              value={v.titre} onChange={e => set('titre', e.target.value)} autoFocus />
+          </div>
+
+          {/* Type — dropdown */}
+          <div>
+            <label style={lbl}>Type / catégorie</label>
+            <select style={inp} value={v.type} onChange={e => set('type', e.target.value)}>
+              <option value="">— Choisir —</option>
+              {SESSION_TYPES.map(t => <option key={t} value={t}>{t}</option>)}
+              <option value={v.type}>{v.type !== '' && !SESSION_TYPES.includes(v.type) ? v.type : ''}</option>
+            </select>
+          </div>
+
+          {/* Jour */}
+          <div>
+            <label style={lbl}>Jour</label>
+            <select style={inp} value={v.jour} onChange={e => set('jour', e.target.value)}>
+              {['Lundi','Mardi','Mercredi','Jeudi','Vendredi','Samedi','Dimanche'].map(d => <option key={d}>{d}</option>)}
+            </select>
+          </div>
+
+          {/* Durée + RPE + Distance */}
+          <div>
+            <label style={lbl}>Durée (min)</label>
+            <input style={inp} type="number" value={v.duree_min} onChange={e => set('duree_min', e.target.value)} />
+          </div>
+          <div>
+            <label style={lbl}>RPE cible (1-10)</label>
+            <input style={inp} type="number" min="1" max="10" value={v.rpe_cible} onChange={e => set('rpe_cible', e.target.value)} />
+          </div>
+          <div>
+            <label style={lbl}>Distance (km) — laisser vide pour auto</label>
+            <input style={inp} type="number" step=".1" value={v.distance_km ?? ''} onChange={e => set('distance_km', e.target.value)} />
+          </div>
+          <div>
+            <label style={lbl}>Intensité</label>
+            <select style={inp} value={v.intensite} onChange={e => set('intensite', e.target.value)}>
+              {['très facile','facile','modérée','dur','très dur','course'].map(i => <option key={i}>{i}</option>)}
+            </select>
+          </div>
+
+          {/* Text areas — full width */}
+          <div style={{ gridColumn:'1/-1' }}>
+            <label style={lbl}>Échauffement</label>
+            <textarea style={{ ...inp, resize:'vertical' }} rows={3} value={v.echauffement} onChange={e => set('echauffement', e.target.value)} />
+          </div>
+          <div style={{ gridColumn:'1/-1' }}>
+            <label style={lbl}>Corps de séance</label>
+            <textarea style={{ ...inp, resize:'vertical', fontFamily:'monospace', fontSize:'.8rem' }} rows={8} value={v.corps} onChange={e => set('corps', e.target.value)} />
+          </div>
+          <div style={{ gridColumn:'1/-1' }}>
+            <label style={lbl}>Retour au calme</label>
+            <textarea style={{ ...inp, resize:'vertical' }} rows={2} value={v.retour_au_calme} onChange={e => set('retour_au_calme', e.target.value)} />
+          </div>
+          <div style={{ gridColumn:'1/-1' }}>
+            <label style={lbl}>Note coach (visible par l'athlète)</label>
+            <textarea style={{ ...inp, resize:'vertical' }} rows={3} value={v.notes_coach} onChange={e => set('notes_coach', e.target.value)} />
+          </div>
+        </div>
+
+        {/* Footer */}
+        <div style={{ padding:'1rem 1.5rem', borderTop:'1px solid var(--border)', display:'flex', justifyContent:'flex-end', gap:'.75rem',
+          position:'sticky', bottom:0, background:'var(--surface)', borderRadius:'0 0 20px 20px' }}>
+          <button onClick={onCancel}
+            style={{ padding:'.6rem 1.25rem', background:'none', border:'1px solid var(--border)',
+              borderRadius:10, cursor:'pointer', fontFamily:'inherit', fontSize:'.875rem', color:'var(--text-muted)' }}>
+            Annuler
+          </button>
+          <button onClick={() => onSave({ ...session, ...v,
+            duree_min: num('duree_min', session.duree_min),
+            distance_km: v.distance_km !== '' ? num('distance_km', session.distance_km) : null,
+            rpe_cible: num('rpe_cible', session.rpe_cible) })}
+            style={{ padding:'.6rem 1.5rem', background:'var(--gradient)', color:'#fff', border:'none',
+              borderRadius:10, fontWeight:700, fontSize:'.875rem', cursor:'pointer', fontFamily:'inherit',
+              boxShadow:'0 4px 16px rgba(232,35,122,.35)' }}>
+            ✓ Enregistrer les modifications
+          </button>
+        </div>
       </div>
     </div>
   )

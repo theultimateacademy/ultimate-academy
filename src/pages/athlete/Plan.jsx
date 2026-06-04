@@ -1322,8 +1322,9 @@ export default function AthletePlan() {
                     return (
                       <div key={idx}
                         style={{ borderLeft:`3px solid ${done ? 'var(--success)' : color}`,
-                          background: isRace ? color+'15' : 'var(--surface-2)',
-                          borderRadius:8, padding:'.55rem .65rem', cursor:'pointer', opacity: done ? .7 : 1,
+                          background: done ? 'rgba(16,185,129,.12)' : isRace ? color+'15' : 'var(--surface-2)',
+                          border: done ? '1px solid rgba(16,185,129,.35)' : undefined,
+                          borderRadius:8, padding:'.55rem .65rem', cursor:'pointer',
                           transition:'transform .12s', minWidth:0, position:'relative' }}
                         onMouseEnter={e => e.currentTarget.style.transform='translateY(-1px)'}
                         onMouseLeave={e => e.currentTarget.style.transform=''}>
@@ -1500,16 +1501,17 @@ export default function AthletePlan() {
           return (
             <div key={idx}
               style={{
-                borderRadius: 14, overflow: 'visible', opacity: done ? .72 : 1,
-                background: 'var(--surface-2)',
-                border: isRenfo ? `1.5px solid ${color}45` : '1px solid var(--border)',
+                borderRadius: 14, overflow: 'visible',
+                // Fully green when done
+                background: done ? 'rgba(16,185,129,.12)' : 'var(--surface-2)',
+                border: done ? '1.5px solid rgba(16,185,129,.4)' : isRenfo ? `1.5px solid ${color}45` : '1px solid var(--border)',
                 transition: 'transform .12s, box-shadow .12s',
                 position: 'relative',
               }}
               onMouseEnter={e => { e.currentTarget.style.transform='translateY(-2px)'; e.currentTarget.style.boxShadow='var(--shadow-lg)' }}
               onMouseLeave={e => { e.currentTarget.style.transform=''; e.currentTarget.style.boxShadow='' }}>
-              {/* Color accent strip top */}
-              <div style={{ height: 4, background: done ? 'var(--success)' : `linear-gradient(90deg, ${color}, ${color}88)`, borderRadius:'14px 14px 0 0' }} />
+              {/* Color accent strip top — green when done */}
+              <div style={{ height: 4, background: done ? '#10B981' : `linear-gradient(90deg, ${color}, ${color}88)`, borderRadius:'14px 14px 0 0' }} />
               <div
                 onClick={() => setModal({ session: { ...session, _isDone: done, _dateLabel: dateLabel }, weekNum: currentWeekData.numero, sessionIdx: idx })}
                 style={{ padding: '.75rem 1rem', display:'flex', justifyContent:'space-between', alignItems:'flex-start', gap:'.75rem', cursor:'pointer' }}>
