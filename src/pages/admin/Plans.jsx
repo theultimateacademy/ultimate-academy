@@ -13,108 +13,77 @@ const SESSION_TYPES_PLANS = [
 function PlanModal({ plan, athlete, onClose, onActivate }) {
   const [planData, setPlanData]   = useState(plan.plan_data)
   const [activeWeek, setActiveWeek] = useState(0)
-  const [editTarget, setEditTarget] = useState(null) // { weekIdx, sessionIdx } — full-page editor
+  const [editTarget, setEditTarget] = useState(null)
   const [saving, setSaving]       = useState(false)
   const [activating, setActivating] = useState(false)
 
   const weeks = planData?.semaines || []
-
-  async function saveEdit() {
-    setSaving(true)
-    try {
-      await supabase.from('training_plans').update({ plan_data: planData }).eq('id', plan.id)
-      setEditSession(null)
-    } finally {
-      setSaving(false)
-    }
-  }
+  const DAY_NAMES = ['Lundi','Mardi','Mercredi','Jeudi','Vendredi','Samedi','Dimanche']
+  const DAY_SHORT  = ['Lun','Mar','Mer','Jeu','Ven','Sam','Dim']
 
   async function activatePlan() {
     setActivating(true)
     try {
-      // Archive any existing active plan for this athlete
-      await supabase.from('training_plans')
-        .update({ status: 'completed' })
-        .eq('user_id', athlete.id)
-        .eq('status', 'active')
-
-      // Activate new plan
-      await supabase.from('training_plans').update({
-        status: 'active',
-        activated_at: new Date().toISOString()
-      }).eq('id', plan.id)
-
-      // Send welcome message
-      await supabase.from('messages').insert({
-        user_id: athlete.id,
-        sender: 'coach',
-        content: `${athlete.first_name} ! 🎉 Ton nouveau plan d'entraînement est prêt, tu peux le consulter dans "Mon plan". Si t'as des questions hésite pas.`
-      })
+      await supabase.from('training_plans').update({ status: 'completed' }).eq('user_id', athlete.id).eq('status', 'active')
+      await supabase.from('training_plans').update({ status: 'active', activated_at: new Date().toISOString() }).eq('id', plan.id)
+      await supabase.from('messages').insert({ user_id: athlete.id, sender: 'coach',
+        content: `${athlete.first_name} ! 🎉 Ton nouveau plan d'entraînement est prêt, tu peux le consulter dans "Mon plan". Si t'as des questions hésite pas.` })
       onActivate()
-    } finally {
-      setActivating(false)
-    }
-  }
-
-  function updateSession(weekIdx, sessionIdx, updatedSession) {
-    setPlanData(d => {
-      const updated = JSON.parse(JSON.stringify(d))
-      updated.semaines[weekIdx].seances[sessionIdx] = { ...updated.semaines[weekIdx].seances[sessionIdx], ...updatedSession }
-      return updated
-    })
+    } finally { setActivating(false) }
   }
 
   async function saveSession(weekIdx, sessionIdx, updatedSession) {
-    const updated = JSON.parse(JSON.stringify(planData))
-    updated.semaines[weekIdx].seances[sessionIdx] = { ...updated.semaines[weekIdx].seances[sessionIdx], ...updatedSession }
-    setPlanData(updated)
-    setEditTarget(null)
     setSaving(true)
     try {
-      await supabase.from('training_plans').update({ plan_data: updated }).eq('id', plan.id)
-    } finally {
-      setSaving(false)
-    }
+      const res = await fetch(`/api/admin/plans/${plan.id}/session`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ weekIdx, sessionIdx, updatedSession }),
+      })
+      const body = await res.json()
+      if (body.plan_data) setPlanData(body.plan_data)
+      setEditTarget(null)
+    } finally { setSaving(false) }
   }
 
   async function deleteSession(weekIdx, sessionIdx) {
-    const updated = JSON.parse(JSON.stringify(planData))
-    updated.semaines[weekIdx].seances.splice(sessionIdx, 1)
-    setPlanData(updated)
+    const ok = window.confirm('Supprimer cette séance ?')
+    if (!ok) return
+    const res = await fetch(`/api/admin/plans/${plan.id}/session`, {
+      method: 'DELETE',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ weekIdx, sessionIdx }),
+    })
+    const body = await res.json()
+    if (body.plan_data) setPlanData(body.plan_data)
     setEditTarget(null)
-    await supabase.from('training_plans').update({ plan_data: updated }).eq('id', plan.id)
   }
 
   const currentWeek = weeks[activeWeek]
-  const DAY_NAMES_GRID = ['Lundi','Mardi','Mercredi','Jeudi','Vendredi','Samedi','Dimanche']
-
-  // Full-page session editor
   const editSession = editTarget ? planData?.semaines?.[editTarget.weekIdx]?.seances?.[editTarget.sessionIdx] : null
 
   return (
     <div className="modal-overlay center" onClick={e => e.target === e.currentTarget && onClose()}>
-      <div className="modal center-modal" style={{ maxWidth: 980, width: '98vw' }}>
+      <div className="modal center-modal" style={{ maxWidth: 1020, width: '98vw' }}>
         <style>{`
-          @media (min-width: 900px) {
-            .coach-plan-grid { display: grid !important; grid-template-columns: repeat(7,1fr) !important; gap: .5rem !important; align-items: start !important; }
-            .coach-plan-grid-headers { display: grid !important; grid-template-columns: repeat(7,1fr); gap: .5rem; margin-bottom: .5rem; }
-            .coach-plan-mobile-list { display: none !important; }
+          .cpg { display: grid; grid-template-columns: repeat(7,1fr); gap: .4rem; align-items: start; }
+          @media (max-width: 700px) {
+            .cpg { grid-template-columns: repeat(4,1fr); }
           }
-          .coach-plan-grid-headers { display: none; }
-          .coach-plan-grid { display: none; }
         `}</style>
 
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1.25rem' }}>
+        {/* Header */}
+        <div style={{ display:'flex', justifyContent:'space-between', alignItems:'flex-start', marginBottom:'1rem' }}>
           <div>
-            <h3>Plan de {athlete?.first_name} {athlete?.last_name}</h3>
-            <div style={{ fontSize: '.875rem', color: 'var(--text-muted)' }}>
-              {weeks.length} semaines · Statut : <span style={{ fontWeight: 600 }}>{plan.status}</span>
+            <h3 style={{ margin:0 }}>Plan de {athlete?.first_name} {athlete?.last_name}</h3>
+            <div style={{ fontSize:'.8rem', color:'var(--text-muted)', marginTop:'.2rem' }}>
+              {weeks.length} semaines · <span style={{ fontWeight:600 }}>{plan.status}</span>
             </div>
           </div>
-          <div style={{ display: 'flex', gap: '.5rem' }}>
+          <div style={{ display:'flex', gap:'.5rem' }}>
             {plan.status === 'pending' && (
               <button className="btn btn-primary btn-sm" onClick={activatePlan} disabled={activating}>
-                {activating ? <><div className="spinner spinner-sm" /> Activation…</> : '✅ Valider et activer'}
+                {activating ? <><div className="spinner spinner-sm"/> Activation…</> : '✅ Activer'}
               </button>
             )}
             <button className="btn-icon" onClick={onClose}>✕</button>
@@ -122,180 +91,106 @@ function PlanModal({ plan, athlete, onClose, onActivate }) {
         </div>
 
         {/* Week tabs */}
-        <div style={{ display: 'flex', gap: '.35rem', overflowX: 'auto', paddingBottom: '.5rem', marginBottom: '1rem' }}>
-          {weeks.map((w, i) => (
-            <button key={i} onClick={() => setActiveWeek(i)}
-              style={{ flexShrink: 0, padding: '.4rem .75rem', borderRadius: 99, border: 'none',
-                whiteSpace: 'nowrap',
-                background: activeWeek === i ? 'var(--gradient)' : 'var(--surface-2)',
-                color: activeWeek === i ? '#fff' : 'var(--text-muted)',
-                fontWeight: 600, fontSize: '.8rem', cursor: 'pointer', fontFamily: 'inherit' }}>
-              S{w.numero}
-            </button>
+        <div style={{ display:'flex', gap:'.3rem', overflowX:'auto', paddingBottom:'.5rem', marginBottom:'.75rem' }}>
+          {weeks.map((w,i) => (
+            <button key={i} onClick={() => setActiveWeek(i)} style={{
+              flexShrink:0, padding:'.35rem .65rem', borderRadius:99, border:'none', whiteSpace:'nowrap',
+              background: activeWeek===i ? 'var(--gradient)' : 'var(--surface-2)',
+              color: activeWeek===i ? '#fff' : 'var(--text-muted)',
+              fontWeight:600, fontSize:'.78rem', cursor:'pointer', fontFamily:'inherit',
+            }}>S{w.numero} — {(w.charge||'').split(/[—–(]/)[0].trim()}</button>
           ))}
         </div>
 
-        {currentWeek && (
-          <div>
-            {/* ── Week header — same design as athlete interface ── */}
-            {(() => {
-              const seances = currentWeek.seances || []
-              const nat   = seances.filter(s => String(s.type||'').toLowerCase().includes('natation')).length
-              const vel   = seances.filter(s => String(s.type||'').toLowerCase().includes('vélo') || String(s.type||'').toLowerCase().includes('velo')).length
-              const brk   = seances.filter(s => String(s.type||'').toLowerCase().includes('brique') || (s.id_seance||'').startsWith('BRK')).length
-              const renfo = seances.filter(s => String(s.type||'').toLowerCase().includes('renforcement') || (s.id_seance||'').startsWith('RENFO')).length
-              const course= seances.filter(s => { const t=String(s.type||'').toLowerCase(); return !t.includes('natation')&&!t.includes('vélo')&&!t.includes('velo')&&!t.includes('brique')&&!t.includes('renforcement')&&!s.est_course }).length
-              const km = currentWeek.volume_total_km
-              const chargeRaw = (currentWeek.charge||'').replace(/\s*\(S\d+\)/gi,'')
-              const chargeShort = chargeRaw.split(/[—–(]/)[0].trim()
-              const chargeSub = chargeRaw.includes('(') ? chargeRaw.slice(chargeRaw.indexOf('(')) : null
-              const chargeColor = chargeShort.toLowerCase().includes('élevée')?'#F97316':chargeShort.toLowerCase().includes('modérée')?'#06B6D4':chargeShort.toLowerCase().includes('affûtage')?'#8B2FC9':chargeShort.toLowerCase().includes('récup')?'#6B7280':'#10B981'
-              const chips = [
-                {cond:course>0,count:course,icon:'🏃',label:'course', color:'#10B981'},
-                {cond:nat>0,   count:nat,   icon:'🏊',label:'nage',   color:'#06B6D4'},
-                {cond:vel>0,   count:vel,   icon:'🚴',label:'vélo',   color:'#F97316'},
-                {cond:brk>0,   count:brk,   icon:'🔗',label:'brique', color:'#8B5CF6'},
-                {cond:renfo>0, count:renfo, icon:'💪',label:'renfo',  color:'#EC4899'},
-              ].filter(d=>d.cond)
-              return (
-                <div style={{ marginBottom:'1rem', borderRadius:14, overflow:'hidden', background:'linear-gradient(135deg,#1A1A2E,#2D1B4E)', color:'#fff' }}>
-                  <div style={{ padding:'.875rem 1.125rem .625rem', display:'flex', justifyContent:'space-between', alignItems:'flex-start', gap:'1rem' }}>
-                    <div>
-                      <div style={{ fontSize:'.68rem', fontWeight:700, textTransform:'uppercase', letterSpacing:'.1em', color:'rgba(255,255,255,.38)', marginBottom:'.2rem' }}>
-                        Semaine {currentWeek.numero} · {currentWeek.phase?.replace(/^S\d+\s*[—–-]\s*/i,'').replace(/\s*\(S\d+\)/gi,'')}
-                      </div>
-                      {chargeSub && <div style={{ fontSize:'.66rem', color:'rgba(255,255,255,.3)' }}>{chargeSub}</div>}
-                    </div>
-                    <span style={{ flexShrink:0, padding:'.2rem .65rem', borderRadius:99, fontSize:'.68rem', fontWeight:700,
-                      background:chargeColor+'25', border:`1px solid ${chargeColor}50`, color:chargeColor }}>{chargeShort}</span>
-                  </div>
-                  <div style={{ padding:'.375rem 1.125rem .625rem', display:'flex', flexWrap:'wrap', gap:'.4rem', alignItems:'center', borderTop:'1px solid rgba(255,255,255,.06)' }}>
-                    {chips.map(d => (
-                      <div key={d.label} style={{ display:'flex', alignItems:'center', gap:'.28rem', background:d.color+'18', border:`1px solid ${d.color}35`, borderRadius:99, padding:'.2rem .6rem' }}>
-                        <span style={{ fontSize:'.78rem' }}>{d.icon}</span>
-                        <span style={{ fontWeight:800, fontSize:'.82rem', color:d.color }}>{d.count}</span>
-                        <span style={{ fontSize:'.68rem', color:'rgba(255,255,255,.35)' }}>{d.label}</span>
-                      </div>
-                    ))}
-                    {km > 0 && <span style={{ marginLeft:'auto', fontSize:'.72rem', color:'rgba(255,255,255,.4)' }}>📍 <strong style={{ color:'#fff' }}>{km} km</strong></span>}
-                  </div>
-                </div>
-              )
-            })()}
+        {currentWeek && (() => {
+          const seances = currentWeek.seances || []
+          const chargeRaw = (currentWeek.charge||'').replace(/\s*\(S\d+\)/gi,'')
+          const chargeShort = chargeRaw.split(/[—–(]/)[0].trim()
+          const chargeColor = chargeShort.toLowerCase().includes('élevée')?'#F97316':chargeShort.toLowerCase().includes('modérée')?'#06B6D4':chargeShort.toLowerCase().includes('affûtage')?'#8B2FC9':chargeShort.toLowerCase().includes('récup')?'#6B7280':'#10B981'
+          const byDay = {}
+          DAY_NAMES.forEach(d => { byDay[d] = [] })
+          seances.forEach((s,si) => { if (byDay[s.jour]) byDay[s.jour].push({...s, _si: si}) })
 
-            {/* Desktop day headers */}
-            <div className="coach-plan-grid-headers">
-              {['Lun','Mar','Mer','Jeu','Ven','Sam','Dim'].map(d => (
-                <div key={d} style={{ textAlign:'center', fontSize:'.66rem', fontWeight:800, textTransform:'uppercase',
-                  letterSpacing:'.08em', color:'var(--text-muted)', paddingBottom:'.4rem',
-                  borderBottom:'1px solid var(--border)' }}>{d}</div>
-              ))}
-            </div>
+          return (
+            <div>
+              {/* Week badge */}
+              <div style={{ display:'flex', alignItems:'center', gap:'.5rem', marginBottom:'.6rem' }}>
+                <span style={{ fontSize:'.72rem', fontWeight:700, color:'var(--text-muted)', textTransform:'uppercase', letterSpacing:'.08em' }}>
+                  S{currentWeek.numero} · {currentWeek.phase?.replace(/^S\d+\s*[—–-]\s*/i,'')}
+                </span>
+                <span style={{ padding:'.15rem .55rem', borderRadius:99, fontSize:'.68rem', fontWeight:700,
+                  background:chargeColor+'25', border:`1px solid ${chargeColor}50`, color:chargeColor }}>{chargeShort}</span>
+              </div>
 
-            {/* Desktop: 7-column grid */}
-            <div className="coach-plan-grid">
-              {DAY_NAMES_GRID.map(day => {
-                const daySessions = (currentWeek.seances || [])
-                  .map((s, si) => ({ ...s, _si: si }))
-                  .filter(s => s.jour === day)
-                return (
-                  <div key={day} style={{ display:'flex', flexDirection:'column', gap:'.4rem' }}>
-                    {daySessions.length === 0 ? (
-                      <div style={{ minHeight:56, display:'flex', alignItems:'center', justifyContent:'center',
-                        border:'1px dashed rgba(255,255,255,.07)', borderRadius:10,
-                        fontSize:'.68rem', color:'rgba(255,255,255,.2)', fontStyle:'italic' }}>
-                        Repos
-                      </div>
-                    ) : daySessions.map(session => {
-                      const si = session._si
-                      const color = SESSION_TYPE_COLORS[session.type] || 'var(--primary)'
-                      return (
-                        <div key={si} style={{
-                          borderRadius: 8, overflow: 'hidden',
-                          border: `1px solid var(--border)`,
-                          background: 'var(--surface-2)',
-                          minWidth: 0,
-                        }}>
-                          <div style={{ borderLeft:`3px solid ${color}`, padding:'.55rem .65rem' }}>
-                            <div style={{ fontSize:'.65rem', fontWeight:700, color, marginBottom:'.2rem',
-                              overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>
-                              {session.type}
-                            </div>
-                            <div style={{ fontSize:'.78rem', fontWeight:700, lineHeight:1.2, marginBottom:'.2rem',
-                              overflow:'hidden', textOverflow:'ellipsis',
-                              display:'-webkit-box', WebkitLineClamp:2, WebkitBoxOrient:'vertical' }}>
-                              {session.titre}
-                            </div>
-                            <div style={{ fontSize:'.68rem', color:'var(--text-muted)', marginBottom:'.35rem' }}>
-                              {session.duree_min} min · RPE {session.rpe_cible}
-                            </div>
-                            <div style={{ display:'flex', gap:'.25rem', justifyContent:'flex-end' }}>
-                              <button className="btn btn-ghost btn-sm" style={{ padding:'.2rem .4rem', fontSize:'.72rem' }}
-                                onClick={() => setEditTarget({ weekIdx: activeWeek, sessionIdx: si })}>
-                                ✏️
-                              </button>
-                              <button className="btn btn-ghost btn-sm" style={{ padding:'.2rem .4rem', fontSize:'.72rem', color:'var(--error)', borderColor:'rgba(239,68,68,.3)' }}
-                                onClick={() => window.confirm(`Supprimer "${session.titre}" ?`) && deleteSession(activeWeek, si)}>
-                                🗑️
-                              </button>
+              {/* Day headers */}
+              <div className="cpg" style={{ marginBottom:'.3rem' }}>
+                {DAY_SHORT.map((d,i) => (
+                  <div key={d} style={{ textAlign:'center', fontSize:'.62rem', fontWeight:800, textTransform:'uppercase',
+                    letterSpacing:'.07em', color:'var(--text-muted)', paddingBottom:'.3rem',
+                    borderBottom:'1px solid var(--border)' }}>{d}</div>
+                ))}
+              </div>
+
+              {/* 7-column session grid */}
+              <div className="cpg">
+                {DAY_NAMES.map((day,di) => {
+                  const daySessions = byDay[day]
+                  return (
+                    <div key={day} style={{ display:'flex', flexDirection:'column', gap:'.3rem' }}>
+                      {daySessions.length === 0 ? (
+                        <div style={{ minHeight:52, display:'flex', alignItems:'center', justifyContent:'center',
+                          border:'1px dashed rgba(255,255,255,.07)', borderRadius:8,
+                          fontSize:'.62rem', color:'rgba(255,255,255,.18)', fontStyle:'italic' }}>
+                          Repos
+                        </div>
+                      ) : daySessions.map(session => {
+                        const si = session._si
+                        const color = SESSION_TYPE_COLORS[session.type] || 'var(--primary)'
+                        const isRace = session.est_course || (session.id_seance||'').startsWith('RACE')
+                        return (
+                          <div key={si} style={{
+                            borderRadius:7, overflow:'hidden', minWidth:0, position:'relative',
+                            border:`1px solid var(--border)`, background: isRace ? color+'18' : 'var(--surface-2)',
+                          }}>
+                            <div style={{ borderLeft:`3px solid ${color}`, padding:'.45rem .5rem .4rem' }}>
+                              <div style={{ fontSize:'.6rem', fontWeight:700, color, marginBottom:'.15rem',
+                                overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>
+                                {session.type}
+                              </div>
+                              <div style={{ fontSize:'.73rem', fontWeight:700, lineHeight:1.2, marginBottom:'.15rem',
+                                overflow:'hidden', textOverflow:'ellipsis',
+                                display:'-webkit-box', WebkitLineClamp:2, WebkitBoxOrient:'vertical' }}>
+                                {session.titre}
+                              </div>
+                              <div style={{ fontSize:'.62rem', color:'var(--text-muted)' }}>
+                                {session.duree_min > 0 ? `${session.duree_min} min` : '—'}
+                              </div>
+                              {/* Edit / Delete */}
+                              <div style={{ display:'flex', gap:'.2rem', marginTop:'.3rem' }}>
+                                <button onClick={() => setEditTarget({ weekIdx: activeWeek, sessionIdx: si })}
+                                  style={{ flex:1, padding:'.18rem 0', background:'rgba(255,255,255,.06)', border:'1px solid rgba(255,255,255,.1)',
+                                    borderRadius:5, cursor:'pointer', fontSize:'.65rem', color:'rgba(255,255,255,.6)', fontFamily:'inherit' }}>
+                                  ✏️
+                                </button>
+                                <button onClick={() => deleteSession(activeWeek, si)}
+                                  style={{ flex:1, padding:'.18rem 0', background:'rgba(239,68,68,.12)', border:'1px solid rgba(239,68,68,.3)',
+                                    borderRadius:5, cursor:'pointer', fontSize:'.65rem', color:'#FCA5A5', fontFamily:'inherit' }}>
+                                  🗑️
+                                </button>
+                              </div>
                             </div>
                           </div>
-
-                        </div>
-                      )
-                    })}
-                  </div>
-                )
-              })}
-            </div>
-
-            {/* Mobile: flat vertical list (same iOS-style cards as athlete interface) */}
-            <div className="coach-plan-mobile-list" style={{ display:'flex', flexDirection:'column', gap:'.5rem' }}>
-              {currentWeek.seances?.map((session, si) => {
-                const color = SESSION_TYPE_COLORS[session.type] || 'var(--primary)'
-                const isRenfo = (session.type||'').toLowerCase().includes('renforcement') || (session.id_seance||'').startsWith('RENFO')
-                return (
-                  <div key={si} style={{
-                    borderRadius: 14, overflow: 'hidden',
-                    border: isRenfo ? `1.5px solid ${color}45` : '1px solid var(--border)',
-                    background: 'var(--surface-2)',
-                  }}>
-                    {/* Color accent strip top */}
-                    <div style={{ height: 4, background: `linear-gradient(90deg, ${color}, ${color}88)` }} />
-                    <div style={{ padding:'.75rem 1rem', display:'flex', justifyContent:'space-between', alignItems:'flex-start', gap:'.75rem' }}>
-                      <div style={{ flex:1, minWidth:0 }}>
-                        <div style={{ display:'flex', alignItems:'center', gap:'.4rem', marginBottom:'.3rem', flexWrap:'wrap' }}>
-                          <span style={{ fontSize:'.68rem', fontWeight:700, color, background:color+'18', padding:'.12rem .5rem', borderRadius:99, whiteSpace:'nowrap' }}>
-                            {session.type}
-                          </span>
-                          <span style={{ fontSize:'.72rem', color:'var(--text-muted)' }}>{session.jour}</span>
-                        </div>
-                        <div style={{ fontWeight:700, fontSize:'.9rem', lineHeight:1.3, marginBottom:'.25rem',
-                          overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>
-                          {session.titre}
-                        </div>
-                        <div style={{ fontSize:'.75rem', color:'var(--text-muted)', display:'flex', gap:'.6rem' }}>
-                          <span>⏱ {session.duree_min} min</span>
-                          {session.rpe_cible && <span>💪 RPE {session.rpe_cible}</span>}
-                        </div>
-                      </div>
-                      <div style={{ display:'flex', gap:'.3rem', flexShrink:0 }}>
-                        <button className="btn btn-ghost btn-sm" style={{ padding:'.25rem .5rem', fontSize:'.78rem' }}
-                          onClick={() => setEditTarget({ weekIdx: activeWeek, sessionIdx: si })}>✏️</button>
-                        <button className="btn btn-ghost btn-sm" style={{ padding:'.25rem .5rem', fontSize:'.78rem', color:'var(--error)', borderColor:'rgba(239,68,68,.3)' }}
-                          onClick={() => window.confirm(`Supprimer "${session.titre}" ?`) && deleteSession(activeWeek, si)}>🗑️</button>
-                      </div>
+                        )
+                      })}
                     </div>
-
-
-                  </div>
-                )
-              })}
+                  )
+                })}
+              </div>
             </div>
-          </div>
-        )}
+          )
+        })()}
 
-        {/* Full-page session editor */}
+        {/* Session editor overlay */}
         {editTarget && editSession && (
           <div style={{ position:'fixed', inset:0, zIndex:600, background:'rgba(0,0,0,.75)', backdropFilter:'blur(8px)',
             display:'flex', alignItems:'center', justifyContent:'center', padding:'1rem' }}
@@ -305,7 +200,7 @@ function PlanModal({ plan, athlete, onClose, onActivate }) {
               <div style={{ padding:'1.25rem 1.5rem', borderBottom:'1px solid var(--border)',
                 display:'flex', justifyContent:'space-between', alignItems:'center',
                 position:'sticky', top:0, background:'var(--surface)', zIndex:10, borderRadius:'20px 20px 0 0' }}>
-                <h3 style={{ margin:0, fontSize:'1.05rem' }}>✏️ Modifier la séance</h3>
+                <h3 style={{ margin:0, fontSize:'1.05rem' }}>✏️ Modifier la séance {saving && '— sauvegarde…'}</h3>
                 <button onClick={() => setEditTarget(null)} style={{ padding:'.35rem .75rem', background:'none', border:'1px solid var(--border)',
                   borderRadius:8, cursor:'pointer', fontFamily:'inherit', color:'var(--text-muted)' }}>✕ Annuler</button>
               </div>

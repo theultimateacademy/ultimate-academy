@@ -172,4 +172,40 @@ router.post('/period-alert', async (req, res) => {
   }
 });
 
+// PATCH /api/admin/plans/:planId/session  — update one session (coach, bypasses RLS)
+router.patch('/plans/:planId/session', async (req, res) => {
+  const { planId } = req.params;
+  const { weekIdx, sessionIdx, updatedSession } = req.body;
+  if (weekIdx == null || sessionIdx == null || !updatedSession)
+    return res.status(400).json({ error: 'Missing params' });
+  try {
+    const { data: row } = await supabase.from('training_plans').select('plan_data').eq('id', planId).single();
+    if (!row) return res.status(404).json({ error: 'Plan not found' });
+    const pd = JSON.parse(JSON.stringify(row.plan_data));
+    pd.semaines[weekIdx].seances[sessionIdx] = { ...pd.semaines[weekIdx].seances[sessionIdx], ...updatedSession };
+    await supabase.from('training_plans').update({ plan_data: pd }).eq('id', planId);
+    res.json({ success: true, plan_data: pd });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// DELETE /api/admin/plans/:planId/session  — delete one session (coach, bypasses RLS)
+router.delete('/plans/:planId/session', async (req, res) => {
+  const { planId } = req.params;
+  const { weekIdx, sessionIdx } = req.body;
+  if (weekIdx == null || sessionIdx == null)
+    return res.status(400).json({ error: 'Missing params' });
+  try {
+    const { data: row } = await supabase.from('training_plans').select('plan_data').eq('id', planId).single();
+    if (!row) return res.status(404).json({ error: 'Plan not found' });
+    const pd = JSON.parse(JSON.stringify(row.plan_data));
+    pd.semaines[weekIdx].seances.splice(sessionIdx, 1);
+    await supabase.from('training_plans').update({ plan_data: pd }).eq('id', planId);
+    res.json({ success: true, plan_data: pd });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 module.exports = router;
