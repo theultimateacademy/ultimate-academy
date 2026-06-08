@@ -340,6 +340,7 @@ function SessionDetailPage({ session, weekNum, sessionIdx, planId, vma, onClose,
     <div style={{
       position: 'fixed', inset: 0, zIndex: 200,
       background: 'var(--bg)',
+      display: 'flex', flexDirection: 'column',
       animation: 'slideUpFull .35s cubic-bezier(0.32, 0.72, 0, 1)',
     }}>
       <style>{`
@@ -353,8 +354,8 @@ function SessionDetailPage({ session, weekNum, sessionIdx, planId, vma, onClose,
         .detail-card:nth-child(4){animation-delay:.2s}
         .cta-pulse { animation: ctaPulse 2.5s ease-in-out infinite; }
       `}</style>
-      {/* Scrollable content area — separate from CTA so the fixed button stays pinned on iOS Safari */}
-      <div style={{ height: '100%', overflowY: 'auto', paddingBottom: 100 }}>
+      {/* scrollable zone — flex:1 so it never squeezes the CTA */}
+      <div style={{ flex: 1, overflowY: 'auto', minHeight: 0 }}>
 
       {/* ── HEADER ── */}
       <div style={{
@@ -665,12 +666,12 @@ function SessionDetailPage({ session, weekNum, sessionIdx, planId, vma, onClose,
         </div>
       )}
 
-      </div>{/* end scrollable content */}
+      </div>{/* end scrollable zone */}
 
-      {/* ── STICKY CTA — outside the scrollable div so it stays pinned on iOS Safari ── */}
+      {/* ── CTA — toujours visible en bas grâce au flex ── */}
       <div style={{
-        position: 'absolute', bottom: 0, left: 0, right: 0,
-        padding: '1rem 1.25rem max(1.75rem, env(safe-area-inset-bottom, 1.75rem))',
+        flexShrink: 0,
+        padding: '1rem 1.25rem max(env(safe-area-inset-bottom, 1.75rem), 1.75rem)',
         background: 'linear-gradient(to top, #0D0D0D 70%, transparent)',
         pointerEvents: isDone ? 'none' : 'auto',
       }}>

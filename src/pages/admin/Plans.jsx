@@ -231,8 +231,8 @@ function PlanModal({ plan, athlete, onClose, onActivate }) {
                             </div>
                             <div style={{ display:'flex', gap:'.25rem', justifyContent:'flex-end' }}>
                               <button className="btn btn-ghost btn-sm" style={{ padding:'.2rem .4rem', fontSize:'.72rem' }}
-                                onClick={() => setEditSession(isEditing ? null : `${activeWeek}-${si}`)}>
-                                {isEditing ? '✕' : '✏️'}
+                                onClick={() => setEditTarget({ weekIdx: activeWeek, sessionIdx: si })}>
+                                ✏️
                               </button>
                               <button className="btn btn-ghost btn-sm" style={{ padding:'.2rem .4rem', fontSize:'.72rem', color:'var(--error)', borderColor:'rgba(239,68,68,.3)' }}
                                 onClick={() => window.confirm(`Supprimer "${session.titre}" ?`) && deleteSession(activeWeek, si)}>
