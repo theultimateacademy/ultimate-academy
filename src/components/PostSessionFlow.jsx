@@ -55,7 +55,25 @@ export default function PostSessionFlow({
   const [maxHr,    setMaxHr]    = useState('')
   const [comment,  setComment]  = useState('')
 
-  const hasAllures  = Array.isArray(session.allures) ? session.allures.length > 0 : !!(session.allures?.trim?.())
+  const sessionTypeL = (session.type || '').toLowerCase()
+  const isNonRunningSession = sessionTypeL.includes('natation') || sessionTypeL.includes('vélo') ||
+    sessionTypeL.includes('velo') || sessionTypeL.includes('brique') || sessionTypeL.includes('renforcement')
+
+  function getAlluresText(allures) {
+    if (!allures) return ''
+    if (typeof allures === 'string') return allures.trim()
+    if (Array.isArray(allures)) {
+      const relevant = allures.filter(a => a?.allure_min_km && typeof a.allure_min_km === 'string')
+      if (!relevant.length) return ''
+      const main = relevant.filter(a => /corps|principal|seuil|vma|tempo/i.test(a.zone || ''))
+      return (main.length ? main : relevant).slice(0, 4)
+        .map(a => `${a.zone}: ${a.allure_min_km}`).join(' · ')
+    }
+    return ''
+  }
+
+  const alluresText = isNonRunningSession ? '' : getAlluresText(session.allures)
+  const hasAllures  = !!alluresText
   const pasTermine  = ressenti === 'pas_termine'
 
   // Which steps are active?
@@ -101,6 +119,7 @@ export default function PostSessionFlow({
       }, { onConflict: 'plan_id,week_number,session_index' })
 
       setSaved(true)
+      setStep(6)
       onDone?.()
 
       if (parseInt(rpe) > 8) {
@@ -110,7 +129,6 @@ export default function PostSessionFlow({
     } finally {
       setSaving(false)
     }
-    setStep(6)
   }
 
   async function goNext() {
@@ -269,7 +287,7 @@ export default function PostSessionFlow({
                 border: '1px solid rgba(139,47,201,.14)', marginBottom: '1.5rem' }}>
                 <div style={{ fontSize: '.7rem', textTransform: 'uppercase', letterSpacing: '.1em',
                   color: C.purple, fontWeight: 700, marginBottom: '.35rem' }}>Prévu</div>
-                <div style={{ fontSize: '.9rem', lineHeight: 1.65 }}>{session.allures}</div>
+                <div style={{ fontSize: '.9rem', lineHeight: 1.65 }}>{alluresText}</div>
               </div>
               <div style={{ marginBottom: '1.5rem' }}>
                 <div style={{ fontSize: '.78rem', fontWeight: 700, textTransform: 'uppercase',

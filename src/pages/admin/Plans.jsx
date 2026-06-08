@@ -313,6 +313,7 @@ function PlanModal({ plan, athlete, onClose, onActivate }) {
                 session={editSession}
                 onSave={updated => saveSession(editTarget.weekIdx, editTarget.sessionIdx, updated)}
                 onCancel={() => setEditTarget(null)}
+                onDelete={() => deleteSession(editTarget.weekIdx, editTarget.sessionIdx)}
               />
             </div>
           </div>
@@ -322,7 +323,17 @@ function PlanModal({ plan, athlete, onClose, onActivate }) {
   )
 }
 
-function EditSessionForm({ session, onSave, onCancel }) {
+const PRESET_TITLES = [
+  'Endurance fondamentale', 'Footing progressif', 'Sortie longue EF pure', 'Sortie longue avec blocs tempo',
+  'Récupération active', 'Tempo continu 2×15min', 'Tempo 3×10min seuil',
+  '10×400m VMA', '6×1000m', '8×200m', '5×3min VMA', '4×1500m',
+  'Côtes 10×30s', 'Côtes 8×1min', 'Test CSS', 'Natation endurance 1500m',
+  'Natation 10×100m', 'Natation séries pyramidales', 'Sortie vélo endurance',
+  'Vélo structuré blocs', 'Brique Vélo+Course', 'Renforcement gainage',
+  'Renforcement explosivité', 'Activation J-1', 'Mobilité & récupération',
+]
+
+function EditSessionForm({ session, onSave, onCancel, onDelete }) {
   const [v, setV] = useState({
     titre: session.titre||'', type: session.type||'', jour: session.jour||'Lundi',
     duree_min: session.duree_min??'', distance_km: session.distance_km??'',
@@ -338,8 +349,21 @@ function EditSessionForm({ session, onSave, onCancel }) {
   const num = (k,fb) => v[k]!=='' ? Number(v[k]) : fb
   return (
     <div style={{ padding:'1.5rem', display:'grid', gridTemplateColumns:'1fr 1fr', gap:'1rem' }}>
-      <div style={{ gridColumn:'1/-1' }}><label style={lbl}>Titre</label>
-        <input style={{ ...inp, fontSize:'1rem', fontWeight:600, padding:'.65rem .875rem' }} value={v.titre} onChange={e=>set('titre',e.target.value)} autoFocus /></div>
+      <div style={{ gridColumn:'1/-1' }}>
+        <label style={lbl}>Titre</label>
+        <input style={{ ...inp, fontSize:'1rem', fontWeight:600, padding:'.65rem .875rem' }} value={v.titre} onChange={e=>set('titre',e.target.value)} autoFocus />
+        <div style={{ display:'flex', flexWrap:'wrap', gap:'.3rem', marginTop:'.5rem' }}>
+          {PRESET_TITLES.map(t => (
+            <button key={t} type="button" onClick={() => set('titre', t)} style={{
+              padding:'.18rem .55rem', borderRadius:99, fontSize:'.72rem', fontWeight:600, cursor:'pointer',
+              fontFamily:'inherit', border:'1px solid var(--border)',
+              background: v.titre === t ? 'var(--primary)' : 'var(--surface-2)',
+              color: v.titre === t ? '#fff' : 'var(--text-muted)',
+              transition:'all .12s',
+            }}>{t}</button>
+          ))}
+        </div>
+      </div>
       <div><label style={lbl}>Type</label>
         <select style={inp} value={v.type} onChange={e=>set('type',e.target.value)}>
           {SESSION_TYPES_PLANS.map(t=><option key={t}>{t}</option>)}
@@ -363,16 +387,25 @@ function EditSessionForm({ session, onSave, onCancel }) {
         <textarea style={{ ...inp, resize:'vertical' }} rows={2} value={v.retour_au_calme} onChange={e=>set('retour_au_calme',e.target.value)} /></div>
       <div style={{ gridColumn:'1/-1' }}><label style={lbl}>Note coach</label>
         <textarea style={{ ...inp, resize:'vertical' }} rows={3} value={v.notes_coach} onChange={e=>set('notes_coach',e.target.value)} /></div>
-      <div style={{ gridColumn:'1/-1', display:'flex', justifyContent:'flex-end', gap:'.75rem',
+      <div style={{ gridColumn:'1/-1', display:'flex', justifyContent:'space-between', alignItems:'center', gap:'.75rem',
         padding:'0 0 .5rem', borderTop:'1px solid var(--border)', paddingTop:'1rem' }}>
-        <button onClick={onCancel} style={{ padding:'.6rem 1.25rem', background:'none', border:'1px solid var(--border)',
-          borderRadius:10, cursor:'pointer', fontFamily:'inherit', color:'var(--text-muted)' }}>Annuler</button>
-        <button onClick={() => onSave({ ...session, ...v, duree_min:num('duree_min',session.duree_min),
-          distance_km:v.distance_km!==''?num('distance_km',session.distance_km):null, rpe_cible:num('rpe_cible',session.rpe_cible) })}
-          style={{ padding:'.6rem 1.5rem', background:'var(--gradient)', color:'#fff', border:'none',
-            borderRadius:10, fontWeight:700, cursor:'pointer', fontFamily:'inherit', boxShadow:'0 4px 16px rgba(232,35,122,.35)' }}>
-          ✓ Enregistrer
-        </button>
+        {onDelete ? (
+          <button onClick={() => { if(window.confirm('Supprimer cette séance ?')) onDelete() }} style={{
+            padding:'.6rem 1rem', background:'rgba(239,68,68,.1)', border:'1px solid rgba(239,68,68,.35)',
+            borderRadius:10, cursor:'pointer', fontFamily:'inherit', color:'#FCA5A5', fontWeight:600 }}>
+            🗑️ Supprimer
+          </button>
+        ) : <div />}
+        <div style={{ display:'flex', gap:'.75rem' }}>
+          <button onClick={onCancel} style={{ padding:'.6rem 1.25rem', background:'none', border:'1px solid var(--border)',
+            borderRadius:10, cursor:'pointer', fontFamily:'inherit', color:'var(--text-muted)' }}>Annuler</button>
+          <button onClick={() => onSave({ ...session, ...v, duree_min:num('duree_min',session.duree_min),
+            distance_km:v.distance_km!==''?num('distance_km',session.distance_km):null, rpe_cible:num('rpe_cible',session.rpe_cible) })}
+            style={{ padding:'.6rem 1.5rem', background:'var(--gradient)', color:'#fff', border:'none',
+              borderRadius:10, fontWeight:700, cursor:'pointer', fontFamily:'inherit', boxShadow:'0 4px 16px rgba(232,35,122,.35)' }}>
+            ✓ Enregistrer
+          </button>
+        </div>
       </div>
     </div>
   )
