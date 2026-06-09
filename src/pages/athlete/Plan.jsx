@@ -1271,31 +1271,15 @@ export default function AthletePlan() {
         </div>
       )}
 
-      {/* Sessions — grid desktop / agenda mobile */}
-      <style>{`
-        @media (min-width: 700px) {
-          .plan-week-grid { display: grid !important; grid-template-columns: repeat(7,1fr) !important; gap: .4rem !important; align-items: start !important; }
-          .plan-week-grid-headers { display: grid !important; grid-template-columns: repeat(7,1fr); gap: .4rem; margin-bottom: .4rem; }
-          .plan-mobile-agenda { display: none !important; }
-          .plan-desktop-only { display: block !important; }
-        }
-        .plan-week-grid-headers { display: none; }
-        .plan-week-grid { display: none; }
-        .plan-mobile-list { display: none !important; }
-        .plan-desktop-only { display: none; }
-      `}</style>
-
-      {/* Desktop: day headers */}
-      <div className="plan-week-grid-headers">
+      {/* Desktop: 7-column grid ≥ 700px */}
+      {window.innerWidth >= 700 && <div style={{ display:'grid', gridTemplateColumns:'repeat(7,1fr)', gap:'.4rem', marginBottom:'.4rem' }}>
         {['Lun','Mar','Mer','Jeu','Ven','Sam','Dim'].map(d => (
           <div key={d} style={{ textAlign:'center', fontSize:'.66rem', fontWeight:800, textTransform:'uppercase',
             letterSpacing:'.08em', color:'var(--text-muted)', paddingBottom:'.4rem',
             borderBottom:'1px solid var(--border)' }}>{d}</div>
         ))}
-      </div>
-
-      {/* Desktop: 7-column grid, sessions grouped by day */}
-      {(() => {
+      </div>}
+      {window.innerWidth >= 700 && (() => {
         const DAY_NAMES = ['Lundi','Mardi','Mercredi','Jeudi','Vendredi','Samedi','Dimanche']
         const allSessions = (currentWeekData?.seances || []).map((s, origIdx) => ({...s, _origIdx: origIdx}))
         const filtered = allSessions.filter(session => {
@@ -1397,8 +1381,8 @@ export default function AthletePlan() {
         )
       })()}
 
-      {/* ── Mobile agenda view — one row per day ── */}
-      {(() => {
+      {/* Mobile agenda — vue agenda < 700px */}
+      {window.innerWidth < 700 && (() => {
         if (!currentWeekData) return null
         const DAY_NAMES = ['Lundi','Mardi','Mercredi','Jeudi','Vendredi','Samedi','Dimanche']
         const DAY_SHORT  = ['Lun','Mar','Mer','Jeu','Ven','Sam','Dim']
