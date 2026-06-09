@@ -48,77 +48,135 @@ function PlanView({ plan, completions, coachWeekIdx, setCoachWeekIdx, currentWee
             background:chargeColor+'25', border:`1px solid ${chargeColor}50`, color:chargeColor }}>{chargeShort}</span>
         </div>
 
-        {/* Day headers */}
-        <div style={{ display:'grid', gridTemplateColumns:'repeat(7,1fr)', gap:'.35rem', marginBottom:'.3rem' }}>
-          {DAY_SHORT.map(d => (
-            <div key={d} style={{ textAlign:'center', fontSize:'.61rem', fontWeight:800, textTransform:'uppercase',
-              letterSpacing:'.07em', color:'var(--text-muted)', paddingBottom:'.3rem',
-              borderBottom:'1px solid var(--border)' }}>{d}</div>
-          ))}
-        </div>
-
-        {/* 7-column compact grid */}
-        <div style={{ display:'grid', gridTemplateColumns:'repeat(7,1fr)', gap:'.35rem' }}>
-          {DAY_NAMES.map(day => {
-            const daySessions = byDay[day]
-            return (
-              <div key={day} style={{ display:'flex', flexDirection:'column', gap:'.3rem' }}>
-                {daySessions.length === 0 ? (
-                  <div style={{ minHeight:50, display:'flex', alignItems:'center', justifyContent:'center',
-                    border:'1px dashed rgba(255,255,255,.07)', borderRadius:7,
-                    fontSize:'.6rem', color:'rgba(255,255,255,.18)', fontStyle:'italic' }}>
-                    Repos
-                  </div>
-                ) : daySessions.map(session => {
-                  const si = session._si
-                  const clr = SESSION_TYPE_COLORS[session.type] || '#8B5CF6'
-                  const comp = weekComps.find(c => c.session_index === si)
-                  const done = !!comp
-                  const isRace = session.est_course || (session.id_seance||'').startsWith('RACE')
-                  return (
-                    <div key={si} style={{
-                      borderRadius:7, overflow:'hidden', minWidth:0, position:'relative',
-                      background: done ? 'rgba(16,185,129,.12)' : isRace ? clr+'18' : 'var(--surface-2)',
-                      border: done ? '1px solid rgba(16,185,129,.4)' : '1px solid var(--border)',
-                    }}>
-                      {/* Clickable session info */}
-                      <div onClick={() => onSessionClick(session, activeSem.numero, si, comp)}
-                        style={{ borderLeft:`3px solid ${done?'#10B981':clr}`, padding:'.42rem .45rem', cursor:'pointer' }}>
-                        <div style={{ fontSize:'.59rem', fontWeight:700, color:done?'#10B981':clr, marginBottom:'.12rem',
-                          overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>
-                          {session.type || '—'}
-                        </div>
-                        <div style={{ fontSize:'.71rem', fontWeight:700, lineHeight:1.2, marginBottom:'.12rem',
-                          overflow:'hidden', textOverflow:'ellipsis',
-                          display:'-webkit-box', WebkitLineClamp:2, WebkitBoxOrient:'vertical' }}>
-                          {session.titre || '—'}
-                        </div>
-                        <div style={{ fontSize:'.61rem', color:'var(--text-muted)' }}>
-                          {session.duree_min > 0 ? `${session.duree_min} min` : '—'}
-                          {done && <span style={{ color:'#10B981', marginLeft:'.3rem' }}>✅</span>}
-                        </div>
+        {/* ── Vue selon la taille d'écran ── */}
+        {window.innerWidth >= 700 ? (
+          <>
+            {/* Desktop : en-têtes + grille 7 colonnes */}
+            <div style={{ display:'grid', gridTemplateColumns:'repeat(7,1fr)', gap:'.35rem', marginBottom:'.3rem' }}>
+              {DAY_SHORT.map(d => (
+                <div key={d} style={{ textAlign:'center', fontSize:'.61rem', fontWeight:800, textTransform:'uppercase',
+                  letterSpacing:'.07em', color:'var(--text-muted)', paddingBottom:'.3rem',
+                  borderBottom:'1px solid var(--border)' }}>{d}</div>
+              ))}
+            </div>
+            <div style={{ display:'grid', gridTemplateColumns:'repeat(7,1fr)', gap:'.35rem' }}>
+              {DAY_NAMES.map(day => {
+                const daySessions = byDay[day]
+                return (
+                  <div key={day} style={{ display:'flex', flexDirection:'column', gap:'.3rem' }}>
+                    {daySessions.length === 0 ? (
+                      <div style={{ minHeight:50, display:'flex', alignItems:'center', justifyContent:'center',
+                        border:'1px dashed rgba(255,255,255,.07)', borderRadius:7,
+                        fontSize:'.6rem', color:'rgba(255,255,255,.18)', fontStyle:'italic' }}>
+                        Repos
                       </div>
-                      {/* Trash button */}
-                      {onDeleteSession && (
-                        <button
-                          onClick={e => { e.stopPropagation(); onDeleteSession(coachWeekIdx, si, session.titre) }}
-                          title="Supprimer la séance"
-                          style={{
-                            width:'100%', padding:'.2rem 0',
-                            background:'rgba(239,68,68,.1)', border:'none', borderTop:'1px solid rgba(239,68,68,.2)',
-                            cursor:'pointer', fontSize:'.65rem', color:'#FCA5A5', fontFamily:'inherit',
-                            display:'flex', alignItems:'center', justifyContent:'center', gap:'.2rem',
-                          }}>
-                          🗑️
-                        </button>
-                      )}
-                    </div>
-                  )
-                })}
-              </div>
-            )
-          })}
-        </div>
+                    ) : daySessions.map(session => {
+                      const si = session._si
+                      const clr = SESSION_TYPE_COLORS[session.type] || '#8B5CF6'
+                      const comp = weekComps.find(c => c.session_index === si)
+                      const done = !!comp
+                      const isRace = session.est_course || (session.id_seance||'').startsWith('RACE')
+                      return (
+                        <div key={si} style={{ borderRadius:7, overflow:'hidden', minWidth:0, position:'relative',
+                          background: done ? 'rgba(16,185,129,.12)' : isRace ? clr+'18' : 'var(--surface-2)',
+                          border: done ? '1px solid rgba(16,185,129,.4)' : '1px solid var(--border)' }}>
+                          <div onClick={() => onSessionClick(session, activeSem.numero, si, comp)}
+                            style={{ borderLeft:`3px solid ${done?'#10B981':clr}`, padding:'.42rem .45rem', cursor:'pointer' }}>
+                            <div style={{ fontSize:'.59rem', fontWeight:700, color:done?'#10B981':clr, marginBottom:'.12rem',
+                              overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>{session.type || '—'}</div>
+                            <div style={{ fontSize:'.71rem', fontWeight:700, lineHeight:1.2, marginBottom:'.12rem',
+                              overflow:'hidden', textOverflow:'ellipsis',
+                              display:'-webkit-box', WebkitLineClamp:2, WebkitBoxOrient:'vertical' }}>{session.titre || '—'}</div>
+                            <div style={{ fontSize:'.61rem', color:'var(--text-muted)' }}>
+                              {session.duree_min > 0 ? `${session.duree_min} min` : '—'}
+                              {done && <span style={{ color:'#10B981', marginLeft:'.3rem' }}>✅</span>}
+                            </div>
+                          </div>
+                          {onDeleteSession && (
+                            <button onClick={e => { e.stopPropagation(); onDeleteSession(coachWeekIdx, si, session.titre) }}
+                              style={{ width:'100%', padding:'.2rem 0', background:'rgba(239,68,68,.1)', border:'none',
+                                borderTop:'1px solid rgba(239,68,68,.2)', cursor:'pointer', fontSize:'.65rem',
+                                color:'#FCA5A5', fontFamily:'inherit', display:'flex', alignItems:'center',
+                                justifyContent:'center' }}>🗑️</button>
+                          )}
+                        </div>
+                      )
+                    })}
+                  </div>
+                )
+              })}
+            </div>
+          </>
+        ) : (
+          /* Mobile : vue agenda — une ligne par jour */
+          <div style={{ display:'flex', flexDirection:'column', gap:'.3rem' }}>
+            {DAY_NAMES.map((day, di) => {
+              const daySessions = byDay[day]
+              const hasSession = daySessions.length > 0
+              return (
+                <div key={day} style={{ display:'flex', gap:'.6rem', alignItems:'flex-start' }}>
+                  {/* Pill jour */}
+                  <div style={{ flexShrink:0, width:34, paddingTop: hasSession ? '.52rem' : '.55rem',
+                    display:'flex', alignItems:'center', justifyContent:'center' }}>
+                    <span style={{ fontSize:'.62rem', fontWeight:800, textTransform:'uppercase', letterSpacing:'.05em',
+                      color: hasSession ? '#fff' : 'rgba(255,255,255,.2)' }}>{DAY_SHORT[di]}</span>
+                  </div>
+                  {/* Séances ou repos */}
+                  <div style={{ flex:1, display:'flex', flexDirection:'column', gap:'.25rem' }}>
+                    {!hasSession ? (
+                      <div style={{ display:'flex', alignItems:'center', height:34 }}>
+                        <div style={{ flex:1, height:1, background:'rgba(255,255,255,.06)' }} />
+                        <span style={{ fontSize:'.6rem', color:'rgba(255,255,255,.2)', margin:'0 .5rem' }}>repos</span>
+                        <div style={{ flex:1, height:1, background:'rgba(255,255,255,.06)' }} />
+                      </div>
+                    ) : daySessions.map(session => {
+                      const si = session._si
+                      const clr = SESSION_TYPE_COLORS[session.type] || '#8B5CF6'
+                      const comp = weekComps.find(c => c.session_index === si)
+                      const done = !!comp
+                      const isRace = session.est_course || (session.id_seance||'').startsWith('RACE')
+                      return (
+                        <div key={si} style={{ borderRadius:10, overflow:'hidden',
+                          border:`1px solid ${done?'rgba(16,185,129,.3)':isRace?clr+'50':'rgba(255,255,255,.07)'}` }}>
+                          {/* Ligne cliquable */}
+                          <div onClick={() => onSessionClick(session, activeSem.numero, si, comp)}
+                            style={{ display:'flex', alignItems:'center', gap:'.6rem', padding:'.5rem .7rem',
+                              background: done?'rgba(16,185,129,.1)':isRace?clr+'12':'var(--surface-2)',
+                              borderLeft:`3px solid ${done?'#10B981':clr}`, cursor:'pointer' }}>
+                            <div style={{ width:7, height:7, borderRadius:'50%', background:done?'#10B981':clr, flexShrink:0 }} />
+                            <div style={{ flex:1, minWidth:0 }}>
+                              <div style={{ fontSize:'.62rem', fontWeight:700, color:done?'#10B981':clr,
+                                textTransform:'uppercase', letterSpacing:'.04em', marginBottom:'.06rem' }}>{session.type}</div>
+                              <div style={{ fontSize:'.86rem', fontWeight:700, overflow:'hidden',
+                                textOverflow:'ellipsis', whiteSpace:'nowrap' }}>{session.titre}</div>
+                            </div>
+                            <div style={{ flexShrink:0, textAlign:'right' }}>
+                              <div style={{ fontSize:'.72rem', fontWeight:700, color:'rgba(255,255,255,.45)' }}>
+                                {session.duree_min > 0 ? `${session.duree_min}m` : '🏁'}
+                              </div>
+                              {done && <div style={{ fontSize:'.62rem' }}>✅</div>}
+                            </div>
+                            <span style={{ color:'rgba(255,255,255,.2)', fontSize:'.85rem' }}>›</span>
+                          </div>
+                          {/* Bouton supprimer */}
+                          {onDeleteSession && (
+                            <button onClick={e => { e.stopPropagation(); onDeleteSession(coachWeekIdx, si, session.titre) }}
+                              style={{ width:'100%', padding:'.22rem 0', background:'rgba(239,68,68,.08)',
+                                border:'none', borderTop:'1px solid rgba(239,68,68,.15)', cursor:'pointer',
+                                fontSize:'.68rem', color:'#FCA5A5', fontFamily:'inherit',
+                                display:'flex', alignItems:'center', justifyContent:'center', gap:'.3rem' }}>
+                              🗑️ Supprimer
+                            </button>
+                          )}
+                        </div>
+                      )
+                    })}
+                  </div>
+                </div>
+              )
+            })}
+          </div>
+        )}
         {seances.length === 0 && <p style={{ color:'var(--text-muted)', textAlign:'center', padding:'2rem' }}>Aucune séance cette semaine.</p>}
       </>
     )
