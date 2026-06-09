@@ -5,7 +5,9 @@ import { api } from '../../lib/api'
 import LoadingSpinner from '../../components/UI/LoadingSpinner'
 
 // ─── Coach Plan View — isolated component so crashes don't black the whole panel ──
-function PlanView({ plan, completions, coachWeekIdx, setCoachWeekIdx, currentWeekNum, onSessionClick }) {
+function PlanView({ plan, completions, coachWeekIdx, setCoachWeekIdx, currentWeekNum, onSessionClick, onDeleteSession }) {
+  const DAY_NAMES = ['Lundi','Mardi','Mercredi','Jeudi','Vendredi','Samedi','Dimanche']
+  const DAY_SHORT  = ['Lun','Mar','Mer','Jeu','Ven','Sam','Dim']
   try {
     const semaines = (plan.plan_data?.semaines) || []
     const activeSem = semaines[coachWeekIdx] || semaines[0]
@@ -17,94 +19,107 @@ function PlanView({ plan, completions, coachWeekIdx, setCoachWeekIdx, currentWee
     const chargeShort = chargeRaw.split(/[—–(]/)[0].trim()
     const chargeColor = chargeShort.toLowerCase().includes('élevée')?'#F97316':chargeShort.toLowerCase().includes('modérée')?'#06B6D4':chargeShort.toLowerCase().includes('affûtage')?'#8B2FC9':'#10B981'
 
-    const counts = {
-      course: seances.filter(s=>{const t=(s.type||'').toLowerCase();return!t.includes('natation')&&!t.includes('vélo')&&!t.includes('velo')&&!t.includes('brique')&&!t.includes('renforcement')&&!s.est_course}).length,
-      nat: seances.filter(s=>(s.type||'').toLowerCase().includes('natation')).length,
-      vel: seances.filter(s=>(s.type||'').toLowerCase().includes('vélo')||(s.type||'').toLowerCase().includes('velo')).length,
-      brk: seances.filter(s=>(s.type||'').toLowerCase().includes('brique')||(s.id_seance||'').startsWith('BRK')).length,
-      renfo: seances.filter(s=>(s.type||'').toLowerCase().includes('renforcement')||(s.id_seance||'').startsWith('RENFO')).length,
-    }
-    const chips = [
-      {n:counts.course,i:'🏃',l:'course',col:'#10B981'},
-      {n:counts.nat,i:'🏊',l:'nage',col:'#06B6D4'},
-      {n:counts.vel,i:'🚴',l:'vélo',col:'#F97316'},
-      {n:counts.brk,i:'🔗',l:'brique',col:'#8B5CF6'},
-      {n:counts.renfo,i:'💪',l:'renfo',col:'#EC4899'},
-    ].filter(d=>d.n>0)
+    // Group sessions by day
+    const byDay = {}
+    DAY_NAMES.forEach(d => { byDay[d] = [] })
+    seances.forEach((s, si) => { if (byDay[s.jour]) byDay[s.jour].push({...s, _si: si}) })
 
     return (
       <>
         {/* Week tabs */}
-        <div style={{ display:'flex', gap:'.35rem', overflowX:'auto', paddingBottom:'.5rem', marginBottom:'1rem' }}>
+        <div style={{ display:'flex', gap:'.35rem', overflowX:'auto', paddingBottom:'.5rem', marginBottom:'.75rem' }}>
           {semaines.map((w,i) => (
             <button key={i} onClick={() => setCoachWeekIdx(i)}
               style={{ flexShrink:0, padding:'.38rem .8rem', borderRadius:99, border:'none', whiteSpace:'nowrap',
                 background: coachWeekIdx === i ? 'var(--gradient)' : 'var(--surface-2)',
                 color: coachWeekIdx === i ? '#fff' : 'var(--text-muted)',
-                fontWeight:600, fontSize:'.8rem', cursor:'pointer', fontFamily:'inherit' }}>
-              S{w.numero}{w.numero === currentWeekNum ? ' ●' : ''}
+                fontWeight:600, fontSize:'.78rem', cursor:'pointer', fontFamily:'inherit' }}>
+              S{w.numero}{w.numero === currentWeekNum ? ' ●' : ''} — {(w.charge||'').split(/[—–(]/)[0].trim()}
             </button>
           ))}
         </div>
 
-        {/* Week header */}
-        <div style={{ marginBottom:'1rem', borderRadius:16, overflow:'hidden', background:'linear-gradient(135deg,#1A1A2E,#2D1B4E)', color:'#fff' }}>
-          <div style={{ padding:'.875rem 1.25rem .625rem', display:'flex', justifyContent:'space-between', alignItems:'flex-start', gap:'1rem' }}>
-            <div style={{ fontSize:'.68rem', fontWeight:700, textTransform:'uppercase', letterSpacing:'.1em', color:'rgba(255,255,255,.38)' }}>
-              Semaine {activeSem.numero}{activeSem.numero === currentWeekNum ? ' · EN COURS' : ''}
-              {' · '}{(activeSem.phase||'').replace(/^S\d+\s*[—–-]\s*/i,'').replace(/\s*\(S\d+\)/gi,'')}
-            </div>
-            <span style={{ flexShrink:0, padding:'.2rem .65rem', borderRadius:99, fontSize:'.68rem', fontWeight:700, background:chargeColor+'25', border:`1px solid ${chargeColor}50`, color:chargeColor }}>{chargeShort}</span>
-          </div>
-          {chips.length > 0 && (
-            <div style={{ padding:'.375rem 1.25rem .625rem', display:'flex', flexWrap:'wrap', gap:'.4rem', alignItems:'center', borderTop:'1px solid rgba(255,255,255,.06)' }}>
-              {chips.map(d => (
-                <div key={d.l} style={{ display:'flex', alignItems:'center', gap:'.28rem', background:d.col+'18', border:`1px solid ${d.col}35`, borderRadius:99, padding:'.2rem .6rem' }}>
-                  <span style={{ fontSize:'.78rem' }}>{d.i}</span>
-                  <span style={{ fontWeight:800, fontSize:'.82rem', color:d.col }}>{d.n}</span>
-                  <span style={{ fontSize:'.68rem', color:'rgba(255,255,255,.35)' }}>{d.l}</span>
-                </div>
-              ))}
-              {(activeSem.volume_total_km||0) > 0 && <span style={{ marginLeft:'auto', fontSize:'.72rem', color:'rgba(255,255,255,.4)' }}>📍 <strong style={{color:'#fff'}}>{activeSem.volume_total_km} km</strong></span>}
-            </div>
-          )}
+        {/* Week badge */}
+        <div style={{ display:'flex', alignItems:'center', gap:'.5rem', marginBottom:'.5rem' }}>
+          <span style={{ fontSize:'.7rem', fontWeight:700, color:'var(--text-muted)', textTransform:'uppercase', letterSpacing:'.08em' }}>
+            S{activeSem.numero}{activeSem.numero === currentWeekNum ? ' · EN COURS' : ''} · {(activeSem.phase||'').replace(/^S\d+\s*[—–-]\s*/i,'').replace(/\s*\(S\d+\)/gi,'')}
+          </span>
+          <span style={{ padding:'.15rem .55rem', borderRadius:99, fontSize:'.67rem', fontWeight:700,
+            background:chargeColor+'25', border:`1px solid ${chargeColor}50`, color:chargeColor }}>{chargeShort}</span>
         </div>
 
-        {/* Session cards — same style as athlete interface, green when done */}
-        <div style={{ display:'flex', flexDirection:'column', gap:'.5rem' }}>
-          {seances.map((session, sIdx) => {
-            const clr = SESSION_TYPE_COLORS[session.type] || '#8B5CF6'
-            const comp = weekComps.find(c => c.session_index === sIdx)
-            const done = !!comp
+        {/* Day headers */}
+        <div style={{ display:'grid', gridTemplateColumns:'repeat(7,1fr)', gap:'.35rem', marginBottom:'.3rem' }}>
+          {DAY_SHORT.map(d => (
+            <div key={d} style={{ textAlign:'center', fontSize:'.61rem', fontWeight:800, textTransform:'uppercase',
+              letterSpacing:'.07em', color:'var(--text-muted)', paddingBottom:'.3rem',
+              borderBottom:'1px solid var(--border)' }}>{d}</div>
+          ))}
+        </div>
+
+        {/* 7-column compact grid */}
+        <div style={{ display:'grid', gridTemplateColumns:'repeat(7,1fr)', gap:'.35rem' }}>
+          {DAY_NAMES.map(day => {
+            const daySessions = byDay[day]
             return (
-              <div key={sIdx} onClick={() => onSessionClick(session, activeSem.numero, sIdx, comp)}
-                style={{ borderRadius:14, overflow:'hidden', cursor:'pointer',
-                  background: done ? 'rgba(16,185,129,.12)' : 'var(--surface-2)',
-                  border: done ? '1.5px solid rgba(16,185,129,.4)' : '1px solid var(--border)',
-                  transition:'transform .1s' }}
-                onMouseEnter={e => { e.currentTarget.style.transform='translateY(-1px)'; e.currentTarget.style.boxShadow='var(--shadow)' }}
-                onMouseLeave={e => { e.currentTarget.style.transform=''; e.currentTarget.style.boxShadow='' }}>
-                <div style={{ height:4, background: done ? '#10B981' : `linear-gradient(90deg,${clr},${clr}88)` }} />
-                <div style={{ padding:'.75rem 1rem', display:'flex', justifyContent:'space-between', alignItems:'flex-start', gap:'.75rem' }}>
-                  <div style={{ flex:1, minWidth:0 }}>
-                    <div style={{ display:'flex', alignItems:'center', gap:'.4rem', marginBottom:'.3rem', flexWrap:'wrap' }}>
-                      <span style={{ fontSize:'.68rem', fontWeight:700, color:clr, background:clr+'18', padding:'.1rem .5rem', borderRadius:99, whiteSpace:'nowrap' }}>{session.type || '—'}</span>
-                      <span style={{ fontSize:'.7rem', color:'var(--text-muted)' }}>{session.jour}</span>
-                      {done && <span style={{ fontSize:'.68rem', color:'var(--success)', fontWeight:700 }}>✅ Effectué · RPE {comp.rpe}</span>}
-                    </div>
-                    <div style={{ fontWeight:700, fontSize:'.875rem', overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>{session.titre || '—'}</div>
-                    <div style={{ fontSize:'.75rem', color:'var(--text-muted)', marginTop:'.2rem', display:'flex', gap:'.6rem' }}>
-                      <span>⏱ {session.duree_min || 0} min</span>
-                      {session.rpe_cible && <span>💪 RPE {session.rpe_cible}</span>}
-                    </div>
+              <div key={day} style={{ display:'flex', flexDirection:'column', gap:'.3rem' }}>
+                {daySessions.length === 0 ? (
+                  <div style={{ minHeight:50, display:'flex', alignItems:'center', justifyContent:'center',
+                    border:'1px dashed rgba(255,255,255,.07)', borderRadius:7,
+                    fontSize:'.6rem', color:'rgba(255,255,255,.18)', fontStyle:'italic' }}>
+                    Repos
                   </div>
-                  <span style={{ color:'var(--text-muted)', fontSize:'.9rem', flexShrink:0 }}>›</span>
-                </div>
+                ) : daySessions.map(session => {
+                  const si = session._si
+                  const clr = SESSION_TYPE_COLORS[session.type] || '#8B5CF6'
+                  const comp = weekComps.find(c => c.session_index === si)
+                  const done = !!comp
+                  const isRace = session.est_course || (session.id_seance||'').startsWith('RACE')
+                  return (
+                    <div key={si} style={{
+                      borderRadius:7, overflow:'hidden', minWidth:0, position:'relative',
+                      background: done ? 'rgba(16,185,129,.12)' : isRace ? clr+'18' : 'var(--surface-2)',
+                      border: done ? '1px solid rgba(16,185,129,.4)' : '1px solid var(--border)',
+                    }}>
+                      {/* Clickable session info */}
+                      <div onClick={() => onSessionClick(session, activeSem.numero, si, comp)}
+                        style={{ borderLeft:`3px solid ${done?'#10B981':clr}`, padding:'.42rem .45rem', cursor:'pointer' }}>
+                        <div style={{ fontSize:'.59rem', fontWeight:700, color:done?'#10B981':clr, marginBottom:'.12rem',
+                          overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>
+                          {session.type || '—'}
+                        </div>
+                        <div style={{ fontSize:'.71rem', fontWeight:700, lineHeight:1.2, marginBottom:'.12rem',
+                          overflow:'hidden', textOverflow:'ellipsis',
+                          display:'-webkit-box', WebkitLineClamp:2, WebkitBoxOrient:'vertical' }}>
+                          {session.titre || '—'}
+                        </div>
+                        <div style={{ fontSize:'.61rem', color:'var(--text-muted)' }}>
+                          {session.duree_min > 0 ? `${session.duree_min} min` : '—'}
+                          {done && <span style={{ color:'#10B981', marginLeft:'.3rem' }}>✅</span>}
+                        </div>
+                      </div>
+                      {/* Trash button */}
+                      {onDeleteSession && (
+                        <button
+                          onClick={e => { e.stopPropagation(); onDeleteSession(coachWeekIdx, si, session.titre) }}
+                          title="Supprimer la séance"
+                          style={{
+                            width:'100%', padding:'.2rem 0',
+                            background:'rgba(239,68,68,.1)', border:'none', borderTop:'1px solid rgba(239,68,68,.2)',
+                            cursor:'pointer', fontSize:'.65rem', color:'#FCA5A5', fontFamily:'inherit',
+                            display:'flex', alignItems:'center', justifyContent:'center', gap:'.2rem',
+                          }}>
+                          🗑️
+                        </button>
+                      )}
+                    </div>
+                  )
+                })}
               </div>
             )
           })}
-          {seances.length === 0 && <p style={{ color:'var(--text-muted)', textAlign:'center', padding:'2rem' }}>Aucune séance cette semaine.</p>}
         </div>
+        {seances.length === 0 && <p style={{ color:'var(--text-muted)', textAlign:'center', padding:'2rem' }}>Aucune séance cette semaine.</p>}
       </>
     )
   } catch (err) {
@@ -799,6 +814,21 @@ function AthleteDetailPanel({ athlete, onClose, onUpdated, onAlertDismissed }) {
     }
   }
 
+  async function deleteSessionFromPlan(weekIdx, sessionIdx, titre) {
+    if (!window.confirm(`Supprimer "${titre}" ?`)) return
+    try {
+      const res = await fetch(`/api/admin/plans/${plan.id}/session`, {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ weekIdx, sessionIdx }),
+      })
+      const body = await res.json()
+      if (body.plan_data) setPlan(p => ({ ...p, plan_data: body.plan_data }))
+    } catch (err) {
+      alert('Erreur suppression : ' + err.message)
+    }
+  }
+
   async function saveSession(weekNum, sessionIdx, updatedSession) {
     if (sessionSaving) return
     setSessionSaving(true)
@@ -1212,6 +1242,8 @@ function AthleteDetailPanel({ athlete, onClose, onUpdated, onAlertDismissed }) {
                     currentWeekNum={currentWeekNum}
                     onSessionClick={(session, weekNum, sessionIdx, completion) =>
                       setOpenSession({session, weekNum, sessionIdx, completion})}
+                    onDeleteSession={(weekIdx, sessionIdx, titre) =>
+                      deleteSessionFromPlan(weekIdx, sessionIdx, titre)}
                   />
                 )}
               </div>
