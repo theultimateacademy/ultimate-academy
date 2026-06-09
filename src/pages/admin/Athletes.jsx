@@ -108,63 +108,76 @@ function PlanView({ plan, completions, coachWeekIdx, setCoachWeekIdx, currentWee
             </div>
           </>
         ) : (
-          /* Mobile : vue agenda — une ligne par jour */
-          <div style={{ display:'flex', flexDirection:'column', gap:'.3rem' }}>
+          /* Mobile : vue agenda — une ligne par jour, cartes uniformes */
+          <div style={{ display:'flex', flexDirection:'column', gap:'.25rem' }}>
             {DAY_NAMES.map((day, di) => {
               const daySessions = byDay[day]
               const hasSession = daySessions.length > 0
               return (
-                <div key={day} style={{ display:'flex', gap:'.6rem', alignItems:'flex-start' }}>
-                  {/* Pill jour */}
-                  <div style={{ flexShrink:0, width:34, paddingTop: hasSession ? '.52rem' : '.55rem',
-                    display:'flex', alignItems:'center', justifyContent:'center' }}>
-                    <span style={{ fontSize:'.62rem', fontWeight:800, textTransform:'uppercase', letterSpacing:'.05em',
+                <div key={day} style={{ display:'flex', gap:'.5rem', alignItems:'flex-start' }}>
+                  {/* Pill jour — largeur fixe, aligné en haut */}
+                  <div style={{ flexShrink:0, width:32, paddingTop:'.5rem',
+                    display:'flex', justifyContent:'center' }}>
+                    <span style={{ fontSize:'.63rem', fontWeight:800, textTransform:'uppercase', letterSpacing:'.05em',
                       color: hasSession ? '#fff' : 'rgba(255,255,255,.2)' }}>{DAY_SHORT[di]}</span>
                   </div>
-                  {/* Séances ou repos */}
-                  <div style={{ flex:1, display:'flex', flexDirection:'column', gap:'.25rem' }}>
+                  {/* Zone séances */}
+                  <div style={{ flex:1, display:'flex', flexDirection:'column', gap:'.2rem' }}>
                     {!hasSession ? (
-                      <div style={{ display:'flex', alignItems:'center', height:34 }}>
+                      /* Repos — même hauteur qu'une carte (58px) */
+                      <div style={{ height:58, display:'flex', alignItems:'center' }}>
                         <div style={{ flex:1, height:1, background:'rgba(255,255,255,.06)' }} />
-                        <span style={{ fontSize:'.6rem', color:'rgba(255,255,255,.2)', margin:'0 .5rem' }}>repos</span>
+                        <span style={{ fontSize:'.6rem', color:'rgba(255,255,255,.18)', margin:'0 .5rem' }}>repos</span>
                         <div style={{ flex:1, height:1, background:'rgba(255,255,255,.06)' }} />
                       </div>
                     ) : daySessions.map(session => {
-                      const si = session._si
+                      const si  = session._si
                       const clr = SESSION_TYPE_COLORS[session.type] || '#8B5CF6'
                       const comp = weekComps.find(c => c.session_index === si)
                       const done = !!comp
-                      const isRace = session.est_course || (session.id_seance||'').startsWith('RACE')
                       return (
-                        <div key={si} style={{ borderRadius:10, overflow:'hidden',
-                          border:`1px solid ${done?'rgba(16,185,129,.3)':isRace?clr+'50':'rgba(255,255,255,.07)'}` }}>
-                          {/* Ligne cliquable */}
+                        /* Carte uniforme : même structure pour toutes les séances */
+                        <div key={si} style={{
+                          borderRadius:10, overflow:'hidden',
+                          border:`1px solid ${done ? 'rgba(16,185,129,.3)' : 'rgba(255,255,255,.08)'}`,
+                          background: done ? 'rgba(16,185,129,.08)' : 'var(--surface-2)',
+                        }}>
+                          {/* Barre colorée top */}
+                          <div style={{ height:3, background:`linear-gradient(90deg,${done?'#10B981':clr},${done?'#10B981':clr}66)` }} />
+                          {/* Contenu cliquable */}
                           <div onClick={() => onSessionClick(session, activeSem.numero, si, comp)}
-                            style={{ display:'flex', alignItems:'center', gap:'.6rem', padding:'.5rem .7rem',
-                              background: done?'rgba(16,185,129,.1)':isRace?clr+'12':'var(--surface-2)',
-                              borderLeft:`3px solid ${done?'#10B981':clr}`, cursor:'pointer' }}>
-                            <div style={{ width:7, height:7, borderRadius:'50%', background:done?'#10B981':clr, flexShrink:0 }} />
+                            style={{ display:'flex', alignItems:'center', gap:'.5rem',
+                              padding:'.45rem .65rem', cursor:'pointer', minHeight:44 }}>
                             <div style={{ flex:1, minWidth:0 }}>
-                              <div style={{ fontSize:'.62rem', fontWeight:700, color:done?'#10B981':clr,
-                                textTransform:'uppercase', letterSpacing:'.04em', marginBottom:'.06rem' }}>{session.type}</div>
-                              <div style={{ fontSize:'.86rem', fontWeight:700, overflow:'hidden',
-                                textOverflow:'ellipsis', whiteSpace:'nowrap' }}>{session.titre}</div>
-                            </div>
-                            <div style={{ flexShrink:0, textAlign:'right' }}>
-                              <div style={{ fontSize:'.72rem', fontWeight:700, color:'rgba(255,255,255,.45)' }}>
-                                {session.duree_min > 0 ? `${session.duree_min}m` : '🏁'}
+                              <div style={{ fontSize:'.62rem', fontWeight:700,
+                                color: done ? '#10B981' : clr,
+                                textTransform:'uppercase', letterSpacing:'.04em', marginBottom:'.06rem',
+                                overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>
+                                {session.type}
                               </div>
-                              {done && <div style={{ fontSize:'.62rem' }}>✅</div>}
+                              <div style={{ fontSize:'.84rem', fontWeight:700,
+                                overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>
+                                {session.titre}
+                              </div>
                             </div>
-                            <span style={{ color:'rgba(255,255,255,.2)', fontSize:'.85rem' }}>›</span>
+                            <div style={{ flexShrink:0, display:'flex', flexDirection:'column',
+                              alignItems:'flex-end', gap:'.1rem' }}>
+                              <span style={{ fontSize:'.72rem', fontWeight:700, color:'rgba(255,255,255,.4)' }}>
+                                {session.duree_min > 0 ? `${session.duree_min}m` : '🏁'}
+                              </span>
+                              {done && <span style={{ fontSize:'.6rem' }}>✅</span>}
+                            </div>
+                            <span style={{ color:'rgba(255,255,255,.2)', fontSize:'.8rem', flexShrink:0 }}>›</span>
                           </div>
-                          {/* Bouton supprimer */}
+                          {/* Bouton supprimer — toujours en bas, aligné */}
                           {onDeleteSession && (
-                            <button onClick={e => { e.stopPropagation(); onDeleteSession(coachWeekIdx, si, session.titre) }}
-                              style={{ width:'100%', padding:'.22rem 0', background:'rgba(239,68,68,.08)',
-                                border:'none', borderTop:'1px solid rgba(239,68,68,.15)', cursor:'pointer',
-                                fontSize:'.68rem', color:'#FCA5A5', fontFamily:'inherit',
-                                display:'flex', alignItems:'center', justifyContent:'center', gap:'.3rem' }}>
+                            <button
+                              onClick={e => { e.stopPropagation(); onDeleteSession(coachWeekIdx, si, session.titre) }}
+                              style={{ width:'100%', padding:'.2rem 0',
+                                background:'rgba(239,68,68,.07)', border:'none',
+                                borderTop:'1px solid rgba(239,68,68,.13)', cursor:'pointer',
+                                fontSize:'.67rem', color:'#FCA5A5', fontFamily:'inherit',
+                                display:'flex', alignItems:'center', justifyContent:'center', gap:'.25rem' }}>
                               🗑️ Supprimer
                             </button>
                           )}
