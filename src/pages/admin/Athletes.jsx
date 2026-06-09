@@ -958,7 +958,7 @@ function AthleteDetailPanel({ athlete, onClose, onUpdated, onAlertDismissed }) {
   async function deleteSessionFromPlan(weekIdx, sessionIdx, titre) {
     if (!window.confirm(`Supprimer "${titre}" ?`)) return
     try {
-      const res = await fetch(`/api/admin/plans/${plan.id}/session`, {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/admin/plans/${plan.id}/session`, {
         method: 'DELETE',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ weekIdx, sessionIdx }),

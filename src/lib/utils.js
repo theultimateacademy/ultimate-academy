@@ -167,11 +167,19 @@ export const SESSION_TYPE_COLORS = {
   'Course':                  '#FFD700',  // or
   'Course intermédiaire':    '#FB923C',  // pêche/orange clair
   'Compétition':             '#FFD700',  // or — même famille que Course
-  // ── Générique running ──────────────────────────────────────
-  'Récupération':            '#34D399',  // vert clair — même famille que Récupération active
-  'Activation':              '#10B981',  // vert — activation légère avant course
-  'Footing tempo':           '#065F46',  // vert foncé — famille tempo
-  'Sortie trail':            '#22C55E',  // vert forêt — trail
+  // ── Générique running — toutes en vert (jamais violet) ──────
+  'Récupération':            '#34D399',
+  'Activation':              '#10B981',
+  'Footing tempo':           '#065F46',
+  'Footing tempo / seuil':   '#065F46',
+  'Tempo seuil':             '#065F46',
+  'Seuil':                   '#065F46',
+  'Sortie trail':            '#22C55E',
   'Sortie longue trail':     '#22C55E',
-  'Marche nordique / Trail spécifique': '#CA8A04',  // doré / trail technique
+  'Marche nordique / Trail spécifique': '#CA8A04',
+  // Renforcement — variantes roses
+  'Renforcement gainage':    '#EC4899',
+  'Renforcement trail':      '#EC4899',
+  'Mobilité & Récupération': '#EC4899',
+  'Mobilité':                '#EC4899',
 }

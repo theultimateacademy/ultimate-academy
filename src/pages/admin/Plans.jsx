@@ -35,7 +35,7 @@ function PlanModal({ plan, athlete, onClose, onActivate }) {
   async function saveSession(weekIdx, sessionIdx, updatedSession) {
     setSaving(true)
     try {
-      const res = await fetch(`/api/admin/plans/${plan.id}/session`, {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/admin/plans/${plan.id}/session`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ weekIdx, sessionIdx, updatedSession }),
@@ -49,7 +49,7 @@ function PlanModal({ plan, athlete, onClose, onActivate }) {
   async function deleteSession(weekIdx, sessionIdx) {
     const ok = window.confirm('Supprimer cette séance ?')
     if (!ok) return
-    const res = await fetch(`/api/admin/plans/${plan.id}/session`, {
+    const res = await fetch(`${import.meta.env.VITE_API_URL}/api/admin/plans/${plan.id}/session`, {
       method: 'DELETE',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ weekIdx, sessionIdx }),

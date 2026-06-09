@@ -1299,7 +1299,7 @@ export default function AthletePlan() {
         filtered.forEach(s => { if (byDay[s.jour]) byDay[s.jour].push(s) })
 
         return (
-          <div className="plan-week-grid">
+          <div className="plan-week-grid" style={{ display:'grid', gridTemplateColumns:'repeat(7,1fr)', gap:'.4rem', alignItems:'start' }}>
             {DAY_NAMES.map(day => {
               const daySessions = byDay[day]
               return (
