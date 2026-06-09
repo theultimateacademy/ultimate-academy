@@ -160,7 +160,6 @@ function PlanView({ plan, completions, coachWeekIdx, setCoachWeekIdx, currentWee
                   {/* Colonne droite : séances ou repos */}
                   <div style={{ flex:1, display:'flex', flexDirection:'column', gap:'.3rem', minWidth:0 }}>
                     {!hasSession ? (
-                      /* Repos — hauteur identique à une carte */}
                       <div style={{ height:62, display:'flex', alignItems:'center' }}>
                         <div style={{ flex:1, height:1, background:'rgba(255,255,255,.05)' }} />
                         <span style={{ fontSize:'.62rem', color:'rgba(255,255,255,.18)',
