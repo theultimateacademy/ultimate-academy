@@ -340,7 +340,6 @@ function SessionDetailPage({ session, weekNum, sessionIdx, planId, vma, onClose,
     <div style={{
       position: 'fixed', inset: 0, zIndex: 200,
       background: 'var(--bg)',
-      display: 'flex', flexDirection: 'column',
       animation: 'slideUpFull .35s cubic-bezier(0.32, 0.72, 0, 1)',
     }}>
       <style>{`
@@ -354,8 +353,13 @@ function SessionDetailPage({ session, weekNum, sessionIdx, planId, vma, onClose,
         .detail-card:nth-child(4){animation-delay:.2s}
         .cta-pulse { animation: ctaPulse 2.5s ease-in-out infinite; }
       `}</style>
-      {/* scrollable zone — flex:1 so it never squeezes the CTA */}
-      <div style={{ flex: 1, overflowY: 'auto', minHeight: 0 }}>
+      {/* Zone scrollable — position absolute inset:0 avec padding-bottom pour le CTA */}
+      <div style={{
+        position: 'absolute', inset: 0,
+        overflowY: 'auto', overflowX: 'hidden',
+        WebkitOverflowScrolling: 'touch',
+        paddingBottom: 90,
+      }}>
 
       {/* ── HEADER ── */}
       <div style={{
@@ -668,9 +672,9 @@ function SessionDetailPage({ session, weekNum, sessionIdx, planId, vma, onClose,
 
       </div>{/* end scrollable zone */}
 
-      {/* ── CTA — toujours visible en bas grâce au flex ── */}
+      {/* ── CTA — position absolute bottom:0 dans le conteneur fixed, toujours visible ── */}
       <div style={{
-        flexShrink: 0,
+        position: 'absolute', bottom: 0, left: 0, right: 0,
         padding: '1rem 1.25rem max(env(safe-area-inset-bottom, 1.75rem), 1.75rem)',
         background: 'linear-gradient(to top, #0D0D0D 70%, transparent)',
         pointerEvents: isDone ? 'none' : 'auto',
