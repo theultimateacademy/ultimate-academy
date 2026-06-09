@@ -6,8 +6,27 @@ import LoadingSpinner from '../../components/UI/LoadingSpinner'
 
 // ─── Coach Plan View — isolated component so crashes don't black the whole panel ──
 function PlanView({ plan, completions, coachWeekIdx, setCoachWeekIdx, currentWeekNum, onSessionClick, onDeleteSession }) {
-  const DAY_NAMES = ['Lundi','Mardi','Mercredi','Jeudi','Vendredi','Samedi','Dimanche']
+  const DAY_NAMES  = ['Lundi','Mardi','Mercredi','Jeudi','Vendredi','Samedi','Dimanche']
   const DAY_SHORT  = ['Lun','Mar','Mer','Jeu','Ven','Sam','Dim']
+  const DAY_OFFSET = { Lundi:0, Mardi:1, Mercredi:2, Jeudi:3, Vendredi:4, Samedi:5, Dimanche:6 }
+
+  // Compute plan start monday
+  const planMonday = (() => {
+    const d = new Date(plan.activated_at || plan.created_at)
+    d.setHours(0,0,0,0)
+    const dow = d.getDay()
+    if (dow !== 1) d.setDate(d.getDate() + (dow === 0 ? 1 : 8 - dow))
+    return d
+  })()
+
+  function dayDate(weekNumber, dayName) {
+    const offset = DAY_OFFSET[dayName]
+    if (offset === undefined) return ''
+    const d = new Date(planMonday)
+    d.setDate(d.getDate() + (weekNumber - 1) * 7 + offset)
+    return d.toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' })
+  }
+
   try {
     const semaines = (plan.plan_data?.semaines) || []
     const activeSem = semaines[coachWeekIdx] || semaines[0]
@@ -108,50 +127,69 @@ function PlanView({ plan, completions, coachWeekIdx, setCoachWeekIdx, currentWee
             </div>
           </>
         ) : (
-          /* Mobile : vue agenda — une ligne par jour, cartes uniformes */
-          <div style={{ display:'flex', flexDirection:'column', gap:'.25rem' }}>
+          /* Mobile : vue agenda — une ligne par jour avec date */
+          <div style={{ display:'flex', flexDirection:'column', gap:'.5rem' }}>
             {DAY_NAMES.map((day, di) => {
               const daySessions = byDay[day]
-              const hasSession = daySessions.length > 0
+              const hasSession  = daySessions.length > 0
+              const dateStr     = dayDate(activeSem.numero, day)
+
               return (
-                <div key={day} style={{ display:'flex', gap:'.5rem', alignItems:'flex-start' }}>
-                  {/* Pill jour — largeur fixe, aligné en haut */}
-                  <div style={{ flexShrink:0, width:32, paddingTop:'.5rem',
-                    display:'flex', justifyContent:'center' }}>
-                    <span style={{ fontSize:'.63rem', fontWeight:800, textTransform:'uppercase', letterSpacing:'.05em',
-                      color: hasSession ? '#fff' : 'rgba(255,255,255,.2)' }}>{DAY_SHORT[di]}</span>
+                <div key={day} style={{
+                  display:'flex', gap:'.6rem', alignItems:'flex-start',
+                  /* séparateur visuel entre jours */
+                  borderTop: di > 0 ? '1px solid rgba(255,255,255,.05)' : 'none',
+                  paddingTop: di > 0 ? '.5rem' : '0',
+                }}>
+
+                  {/* Colonne gauche : jour + date — largeur fixe 42px */}
+                  <div style={{ flexShrink:0, width:42, display:'flex', flexDirection:'column',
+                    alignItems:'center', paddingTop:'.45rem', gap:'.1rem' }}>
+                    <span style={{ fontSize:'.68rem', fontWeight:800, textTransform:'uppercase',
+                      letterSpacing:'.06em',
+                      color: hasSession ? '#fff' : 'rgba(255,255,255,.25)' }}>
+                      {DAY_SHORT[di]}
+                    </span>
+                    <span style={{ fontSize:'.6rem', fontWeight:500,
+                      color: hasSession ? 'rgba(255,255,255,.45)' : 'rgba(255,255,255,.18)',
+                      textAlign:'center', lineHeight:1.2 }}>
+                      {dateStr}
+                    </span>
                   </div>
-                  {/* Zone séances */}
-                  <div style={{ flex:1, display:'flex', flexDirection:'column', gap:'.2rem' }}>
+
+                  {/* Colonne droite : séances ou repos */}
+                  <div style={{ flex:1, display:'flex', flexDirection:'column', gap:'.3rem', minWidth:0 }}>
                     {!hasSession ? (
-                      /* Repos — même hauteur qu'une carte (58px) */
-                      <div style={{ height:58, display:'flex', alignItems:'center' }}>
-                        <div style={{ flex:1, height:1, background:'rgba(255,255,255,.06)' }} />
-                        <span style={{ fontSize:'.6rem', color:'rgba(255,255,255,.18)', margin:'0 .5rem' }}>repos</span>
-                        <div style={{ flex:1, height:1, background:'rgba(255,255,255,.06)' }} />
+                      /* Repos — hauteur identique à une carte */}
+                      <div style={{ height:62, display:'flex', alignItems:'center' }}>
+                        <div style={{ flex:1, height:1, background:'rgba(255,255,255,.05)' }} />
+                        <span style={{ fontSize:'.62rem', color:'rgba(255,255,255,.18)',
+                          margin:'0 .6rem', fontStyle:'italic' }}>repos</span>
+                        <div style={{ flex:1, height:1, background:'rgba(255,255,255,.05)' }} />
                       </div>
                     ) : daySessions.map(session => {
-                      const si  = session._si
-                      const clr = SESSION_TYPE_COLORS[session.type] || '#8B5CF6'
+                      const si   = session._si
+                      const clr  = SESSION_TYPE_COLORS[session.type] || '#8B5CF6'
                       const comp = weekComps.find(c => c.session_index === si)
                       const done = !!comp
+
                       return (
-                        /* Carte uniforme : même structure pour toutes les séances */
                         <div key={si} style={{
-                          borderRadius:10, overflow:'hidden',
-                          border:`1px solid ${done ? 'rgba(16,185,129,.3)' : 'rgba(255,255,255,.08)'}`,
+                          borderRadius:10, overflow:'hidden', width:'100%',
+                          border:`1px solid ${done ? 'rgba(16,185,129,.3)' : 'rgba(255,255,255,.09)'}`,
                           background: done ? 'rgba(16,185,129,.08)' : 'var(--surface-2)',
                         }}>
-                          {/* Barre colorée top */}
-                          <div style={{ height:3, background:`linear-gradient(90deg,${done?'#10B981':clr},${done?'#10B981':clr}66)` }} />
-                          {/* Contenu cliquable */}
+                          {/* Barre colorée top — 3px */}
+                          <div style={{ height:3,
+                            background:`linear-gradient(90deg,${done?'#10B981':clr},${done?'#10B981':clr}55)` }} />
+
+                          {/* Corps de la carte — hauteur fixe 56px */}
                           <div onClick={() => onSessionClick(session, activeSem.numero, si, comp)}
                             style={{ display:'flex', alignItems:'center', gap:'.5rem',
-                              padding:'.45rem .65rem', cursor:'pointer', minHeight:44 }}>
+                              padding:'.5rem .7rem', cursor:'pointer', height:56, boxSizing:'border-box' }}>
                             <div style={{ flex:1, minWidth:0 }}>
-                              <div style={{ fontSize:'.62rem', fontWeight:700,
-                                color: done ? '#10B981' : clr,
-                                textTransform:'uppercase', letterSpacing:'.04em', marginBottom:'.06rem',
+                              <div style={{ fontSize:'.62rem', fontWeight:700, letterSpacing:'.04em',
+                                color: done ? '#10B981' : clr, marginBottom:'.1rem',
                                 overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>
                                 {session.type}
                               </div>
@@ -161,23 +199,27 @@ function PlanView({ plan, completions, coachWeekIdx, setCoachWeekIdx, currentWee
                               </div>
                             </div>
                             <div style={{ flexShrink:0, display:'flex', flexDirection:'column',
-                              alignItems:'flex-end', gap:'.1rem' }}>
-                              <span style={{ fontSize:'.72rem', fontWeight:700, color:'rgba(255,255,255,.4)' }}>
-                                {session.duree_min > 0 ? `${session.duree_min}m` : '🏁'}
+                              alignItems:'flex-end', gap:'.08rem' }}>
+                              <span style={{ fontSize:'.7rem', fontWeight:700,
+                                color:'rgba(255,255,255,.4)' }}>
+                                {session.duree_min > 0 ? `${session.duree_min} min` : '🏁'}
                               </span>
                               {done && <span style={{ fontSize:'.6rem' }}>✅</span>}
                             </div>
-                            <span style={{ color:'rgba(255,255,255,.2)', fontSize:'.8rem', flexShrink:0 }}>›</span>
+                            <span style={{ color:'rgba(255,255,255,.2)', fontSize:'.8rem',
+                              flexShrink:0 }}>›</span>
                           </div>
-                          {/* Bouton supprimer — toujours en bas, aligné */}
+
+                          {/* Bouton supprimer — toujours en bas, même hauteur */}
                           {onDeleteSession && (
                             <button
                               onClick={e => { e.stopPropagation(); onDeleteSession(coachWeekIdx, si, session.titre) }}
-                              style={{ width:'100%', padding:'.2rem 0',
+                              style={{ width:'100%', height:28, padding:0,
                                 background:'rgba(239,68,68,.07)', border:'none',
-                                borderTop:'1px solid rgba(239,68,68,.13)', cursor:'pointer',
+                                borderTop:'1px solid rgba(239,68,68,.12)', cursor:'pointer',
                                 fontSize:'.67rem', color:'#FCA5A5', fontFamily:'inherit',
-                                display:'flex', alignItems:'center', justifyContent:'center', gap:'.25rem' }}>
+                                display:'flex', alignItems:'center', justifyContent:'center',
+                                gap:'.25rem' }}>
                               🗑️ Supprimer
                             </button>
                           )}
