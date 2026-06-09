@@ -45,27 +45,56 @@ function PlanView({ plan, completions, coachWeekIdx, setCoachWeekIdx, currentWee
 
     return (
       <>
-        {/* Week tabs */}
+        {/* Week tabs avec dates */}
         <div style={{ display:'flex', gap:'.35rem', overflowX:'auto', paddingBottom:'.5rem', marginBottom:'.75rem' }}>
-          {semaines.map((w,i) => (
-            <button key={i} onClick={() => setCoachWeekIdx(i)}
-              style={{ flexShrink:0, padding:'.38rem .8rem', borderRadius:99, border:'none', whiteSpace:'nowrap',
-                background: coachWeekIdx === i ? 'var(--gradient)' : 'var(--surface-2)',
-                color: coachWeekIdx === i ? '#fff' : 'var(--text-muted)',
-                fontWeight:600, fontSize:'.78rem', cursor:'pointer', fontFamily:'inherit' }}>
-              S{w.numero}{w.numero === currentWeekNum ? ' ●' : ''} — {(w.charge||'').split(/[—–(]/)[0].trim()}
-            </button>
-          ))}
+          {semaines.map((w,i) => {
+            const wStart = new Date(planMonday); wStart.setDate(planMonday.getDate() + i*7)
+            const wEnd   = new Date(wStart);     wEnd.setDate(wStart.getDate() + 6)
+            const fmtShort = d => d.toLocaleDateString('fr-FR', { day:'numeric', month:'short' })
+            return (
+              <button key={i} onClick={() => setCoachWeekIdx(i)}
+                style={{ flexShrink:0, padding:'.38rem .9rem', borderRadius:12, border:'none',
+                  whiteSpace:'nowrap', textAlign:'left',
+                  background: coachWeekIdx === i ? 'var(--gradient)' : 'var(--surface-2)',
+                  color: coachWeekIdx === i ? '#fff' : 'var(--text-muted)',
+                  fontWeight:600, cursor:'pointer', fontFamily:'inherit' }}>
+                <div style={{ fontSize:'.78rem' }}>
+                  S{w.numero}{w.numero === currentWeekNum ? ' ●' : ''}
+                </div>
+                <div style={{ fontSize:'.65rem', opacity:.75, marginTop:'.1rem' }}>
+                  {fmtShort(wStart)} – {fmtShort(wEnd)}
+                </div>
+              </button>
+            )
+          })}
         </div>
 
-        {/* Week badge */}
-        <div style={{ display:'flex', alignItems:'center', gap:'.5rem', marginBottom:'.5rem' }}>
-          <span style={{ fontSize:'.7rem', fontWeight:700, color:'var(--text-muted)', textTransform:'uppercase', letterSpacing:'.08em' }}>
-            S{activeSem.numero}{activeSem.numero === currentWeekNum ? ' · EN COURS' : ''} · {(activeSem.phase||'').replace(/^S\d+\s*[—–-]\s*/i,'').replace(/\s*\(S\d+\)/gi,'')}
-          </span>
-          <span style={{ padding:'.15rem .55rem', borderRadius:99, fontSize:'.67rem', fontWeight:700,
-            background:chargeColor+'25', border:`1px solid ${chargeColor}50`, color:chargeColor }}>{chargeShort}</span>
-        </div>
+        {/* Week header avec dates */}
+        {(() => {
+          const wStart = new Date(planMonday); wStart.setDate(planMonday.getDate() + coachWeekIdx*7)
+          const wEnd   = new Date(wStart);     wEnd.setDate(wStart.getDate() + 6)
+          const fmtLong = d => d.toLocaleDateString('fr-FR', { day:'numeric', month:'long' })
+          return (
+            <div style={{ marginBottom:'.75rem', borderRadius:14, overflow:'hidden',
+              background:'linear-gradient(135deg,#1A1A2E,#2D1B4E)', color:'#fff' }}>
+              <div style={{ padding:'.75rem 1rem', display:'flex', justifyContent:'space-between',
+                alignItems:'center', gap:'1rem' }}>
+                <div>
+                  <div style={{ fontSize:'.62rem', fontWeight:700, textTransform:'uppercase',
+                    letterSpacing:'.1em', color:'rgba(255,255,255,.38)', marginBottom:'.2rem' }}>
+                    Semaine {activeSem.numero}{activeSem.numero === currentWeekNum ? ' · EN COURS' : ''} · {(activeSem.phase||'').replace(/^S\d+\s*[—–-]\s*/i,'').replace(/\s*\(S\d+\)/gi,'')}
+                  </div>
+                  <div style={{ fontSize:'.82rem', fontWeight:700, color:'#fff' }}>
+                    {fmtLong(wStart)} – {fmtLong(wEnd)}
+                  </div>
+                </div>
+                <span style={{ flexShrink:0, padding:'.2rem .65rem', borderRadius:99, fontSize:'.68rem',
+                  fontWeight:700, background:chargeColor+'25', border:`1px solid ${chargeColor}50`,
+                  color:chargeColor }}>{chargeShort}</span>
+              </div>
+            </div>
+          )
+        })()}
 
         {/* ── Vue selon la taille d'écran ── */}
         {window.innerWidth >= 700 ? (
