@@ -234,8 +234,10 @@ function EditSessionForm({ session, onSave, onCancel, onDelete }) {
     duree_min: session.duree_min??'', distance_km: session.distance_km??'',
     intensite: session.intensite||'', echauffement: session.echauffement||'',
     corps: session.corps||'', retour_au_calme: session.retour_au_calme||'',
-    notes_coach: session.notes_coach||'', rpe_cible: session.rpe_cible??''
+    notes_coach: session.notes_coach||'', rpe_cible: session.rpe_cible??'',
+    alluresJson: JSON.stringify(session.allures||[], null, 2),
   })
+  const [alluresError, setAlluresError] = useState('')
   const inp = { width:'100%', padding:'.5rem .75rem', border:'1px solid var(--border)', borderRadius:8,
     fontSize:'.875rem', fontFamily:'inherit', background:'var(--bg)', color:'var(--text)', outline:'none', boxSizing:'border-box' }
   const lbl = { fontSize:'.65rem', fontWeight:700, textTransform:'uppercase', letterSpacing:'.06em',
@@ -282,6 +284,20 @@ function EditSessionForm({ session, onSave, onCancel, onDelete }) {
         <textarea style={{ ...inp, resize:'vertical' }} rows={2} value={v.retour_au_calme} onChange={e=>set('retour_au_calme',e.target.value)} /></div>
       <div style={{ gridColumn:'1/-1' }}><label style={lbl}>Note coach</label>
         <textarea style={{ ...inp, resize:'vertical' }} rows={3} value={v.notes_coach} onChange={e=>set('notes_coach',e.target.value)} /></div>
+      <div style={{ gridColumn:'1/-1' }}>
+        <label style={lbl}>Allures (JSON — zone, pourcentage_vma, vitesse_kmh, allure_min_km)</label>
+        <textarea
+          style={{ ...inp, resize:'vertical', fontFamily:'monospace', fontSize:'.78rem',
+            borderColor: alluresError ? 'rgba(239,68,68,.6)' : undefined }}
+          rows={6}
+          value={v.alluresJson}
+          onChange={e => {
+            set('alluresJson', e.target.value)
+            try { JSON.parse(e.target.value); setAlluresError('') }
+            catch { setAlluresError('JSON invalide') }
+          }} />
+        {alluresError && <div style={{ fontSize:'.72rem', color:'#FCA5A5', marginTop:'.25rem' }}>⚠️ {alluresError}</div>}
+      </div>
       <div style={{ gridColumn:'1/-1', display:'flex', justifyContent:'space-between', alignItems:'center', gap:'.75rem',
         padding:'0 0 .5rem', borderTop:'1px solid var(--border)', paddingTop:'1rem' }}>
         {onDelete ? (
@@ -294,10 +310,16 @@ function EditSessionForm({ session, onSave, onCancel, onDelete }) {
         <div style={{ display:'flex', gap:'.75rem' }}>
           <button onClick={onCancel} style={{ padding:'.6rem 1.25rem', background:'none', border:'1px solid var(--border)',
             borderRadius:10, cursor:'pointer', fontFamily:'inherit', color:'var(--text-muted)' }}>Annuler</button>
-          <button onClick={() => onSave({ ...session, ...v, duree_min:num('duree_min',session.duree_min),
-            distance_km:v.distance_km!==''?num('distance_km',session.distance_km):null, rpe_cible:num('rpe_cible',session.rpe_cible) })}
-            style={{ padding:'.6rem 1.5rem', background:'var(--gradient)', color:'#fff', border:'none',
-              borderRadius:10, fontWeight:700, cursor:'pointer', fontFamily:'inherit', boxShadow:'0 4px 16px rgba(232,35,122,.35)' }}>
+          <button disabled={!!alluresError} onClick={() => {
+            let allures = session.allures||[]
+            try { allures = JSON.parse(v.alluresJson) } catch {}
+            onSave({ ...session, ...v, allures,
+              duree_min:num('duree_min',session.duree_min),
+              distance_km:v.distance_km!==''?num('distance_km',session.distance_km):null,
+              rpe_cible:num('rpe_cible',session.rpe_cible) })
+          }} style={{ padding:'.6rem 1.5rem', background: alluresError?'rgba(255,255,255,.1)':'var(--gradient)',
+            color:'#fff', border:'none', borderRadius:10, fontWeight:700, cursor: alluresError?'default':'pointer',
+            fontFamily:'inherit', boxShadow: alluresError?'none':'0 4px 16px rgba(232,35,122,.35)' }}>
             ✓ Enregistrer
           </button>
         </div>

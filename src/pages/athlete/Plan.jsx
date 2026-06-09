@@ -139,7 +139,7 @@ function SessionDetailPage({ session, weekNum, sessionIdx, planId, vma, onClose,
   }, [])
 
   // Helpers
-  const typeColor    = SESSION_TYPE_COLORS[session.type] || '#8B5CF6'
+  const typeColor    = SESSION_TYPE_COLORS[session.type] || '#10B981'
   const sessionTypeL = (session.type || '').toLowerCase()
   // Natation/vélo/brique : pas d'allure en min/km
   const isNonRunning = sessionTypeL.includes('natation') || sessionTypeL.includes('vélo') || sessionTypeL.includes('velo') || sessionTypeL.includes('brique')
@@ -1271,16 +1271,10 @@ export default function AthletePlan() {
         </div>
       )}
 
-      {/* Desktop: 7-column grid ≥ 700px */}
-      {window.innerWidth >= 700 && <div style={{ display:'grid', gridTemplateColumns:'repeat(7,1fr)', gap:'.4rem', marginBottom:'.4rem' }}>
-        {['Lun','Mar','Mer','Jeu','Ven','Sam','Dim'].map(d => (
-          <div key={d} style={{ textAlign:'center', fontSize:'.66rem', fontWeight:800, textTransform:'uppercase',
-            letterSpacing:'.08em', color:'var(--text-muted)', paddingBottom:'.4rem',
-            borderBottom:'1px solid var(--border)' }}>{d}</div>
-        ))}
-      </div>}
+      {/* Desktop: en-têtes + grille dans le même conteneur pour alignement parfait */}
       {window.innerWidth >= 700 && (() => {
         const DAY_NAMES = ['Lundi','Mardi','Mercredi','Jeudi','Vendredi','Samedi','Dimanche']
+        const DAY_SHORT  = ['Lun','Mar','Mer','Jeu','Ven','Sam','Dim']
         const allSessions = (currentWeekData?.seances || []).map((s, origIdx) => ({...s, _origIdx: origIdx}))
         const filtered = allSessions.filter(session => {
           if (triTab === 'all') return true;
@@ -1298,8 +1292,19 @@ export default function AthletePlan() {
         DAY_NAMES.forEach(d => { byDay[d] = [] })
         filtered.forEach(s => { if (byDay[s.jour]) byDay[s.jour].push(s) })
 
+        const G = { display:'grid', gridTemplateColumns:'repeat(7,1fr)', gap:'.4rem' }
         return (
-          <div className="plan-week-grid" style={{ display:'grid', gridTemplateColumns:'repeat(7,1fr)', gap:'.4rem', alignItems:'start' }}>
+          <>
+            {/* En-têtes jours */}
+            <div style={{ ...G, marginBottom:'.4rem' }}>
+              {DAY_SHORT.map(d => (
+                <div key={d} style={{ textAlign:'center', fontSize:'.66rem', fontWeight:800, textTransform:'uppercase',
+                  letterSpacing:'.08em', color:'var(--text-muted)', paddingBottom:'.4rem',
+                  borderBottom:'1px solid var(--border)' }}>{d}</div>
+              ))}
+            </div>
+            {/* Grille sessions */}
+            <div style={{ ...G, alignItems:'start' }}>
             {DAY_NAMES.map(day => {
               const daySessions = byDay[day]
               return (
@@ -1313,7 +1318,7 @@ export default function AthletePlan() {
                   ) : daySessions.map(session => {
                     const idx = session._origIdx
                     const done = isCompleted(currentWeekData.numero, idx)
-                    const color = SESSION_TYPE_COLORS[session.type] || 'var(--primary)'
+                    const color = SESSION_TYPE_COLORS[session.type] || '#10B981'
                     const isRace = session.est_course || session.id_seance === 'RACE' || session.id_seance === 'RACE_INT'
                     return (
                       <div key={idx}
@@ -1378,6 +1383,7 @@ export default function AthletePlan() {
               )
             })}
           </div>
+          </>
         )
       })()}
 
@@ -1433,7 +1439,7 @@ export default function AthletePlan() {
                       const idx   = session._origIdx
                       const done  = isCompleted(currentWeekData.numero, idx)
                       const isRace = session.est_course || session.id_seance === 'RACE' || session.id_seance === 'RACE_INT'
-                      const color = SESSION_TYPE_COLORS[session.type] || 'var(--primary)'
+                      const color = SESSION_TYPE_COLORS[session.type] || '#10B981'
                       const dateLabel = sessionDate(planMonday, currentWeekData.numero, session.jour)
                       return (
                         <div key={idx}
@@ -1501,7 +1507,7 @@ export default function AthletePlan() {
           const done  = isCompleted(currentWeekData.numero, idx)
           const isRace = session.est_course || session.id_seance === 'RACE' || session.id_seance === 'RACE_INT'
           const isBrique = (session.type || '').toLowerCase().includes('brique')
-          const color = SESSION_TYPE_COLORS[session.type] || 'var(--primary)'
+          const color = SESSION_TYPE_COLORS[session.type] || '#10B981'
 
           // ── Brick session card ──────────────────────────────────────────────
           if (isBrique && !isRace) {

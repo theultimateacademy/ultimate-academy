@@ -165,7 +165,7 @@ export const SESSION_TYPE_COLORS = {
   'Brique':                  '#8B5CF6',  // violet
   // ── Courses / Race ─────────────────────────────────────────
   'Course':                  '#FFD700',  // or
-  'Course intermédiaire':    '#FB923C',  // pêche/orange clair
+  'Course intermédiaire':    '#FFD700',  // jaune or — même famille que Course
   'Compétition':             '#FFD700',  // or — même famille que Course
   // ── Générique running — toutes en vert (jamais violet) ──────
   'Récupération':            '#34D399',
