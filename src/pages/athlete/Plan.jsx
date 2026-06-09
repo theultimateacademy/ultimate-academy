@@ -1271,24 +1271,19 @@ export default function AthletePlan() {
         </div>
       )}
 
-      {/* Sessions — desktop: 7-day grid / mobile: vertical list */}
+      {/* Sessions — 7-day grid (always, all screen sizes) */}
       <style>{`
-        @media (min-width: 900px) {
-          .plan-week-grid { display: grid !important; grid-template-columns: repeat(7,1fr) !important; gap: .5rem !important; align-items: start !important; }
-          .plan-week-grid-headers { display: grid !important; grid-template-columns: repeat(7,1fr); gap: .5rem; margin-bottom: .5rem; }
-          .plan-mobile-list { display: none !important; }
-          .plan-desktop-only { display: block !important; }
-        }
-        .plan-week-grid-headers { display: none; }
-        .plan-week-grid { display: none; }
-        .plan-desktop-only { display: none; }
+        .plan-week-grid { display: grid; grid-template-columns: repeat(7,1fr); gap: .35rem; align-items: start; }
+        .plan-week-grid-headers { display: grid; grid-template-columns: repeat(7,1fr); gap: .35rem; margin-bottom: .35rem; }
+        .plan-mobile-list { display: none !important; }
+        .plan-desktop-only { display: block; }
       `}</style>
 
-      {/* Desktop day headers */}
+      {/* Day headers */}
       <div className="plan-week-grid-headers">
         {['Lun','Mar','Mer','Jeu','Ven','Sam','Dim'].map(d => (
-          <div key={d} style={{ textAlign:'center', fontSize:'.66rem', fontWeight:800, textTransform:'uppercase',
-            letterSpacing:'.08em', color:'var(--text-muted)', paddingBottom:'.4rem',
+          <div key={d} style={{ textAlign:'center', fontSize:'.6rem', fontWeight:800, textTransform:'uppercase',
+            letterSpacing:'.06em', color:'var(--text-muted)', paddingBottom:'.3rem',
             borderBottom:'1px solid var(--border)' }}>{d}</div>
         ))}
       </div>
@@ -1335,32 +1330,32 @@ export default function AthletePlan() {
                         style={{ borderLeft:`3px solid ${done ? 'var(--success)' : color}`,
                           background: done ? 'rgba(16,185,129,.12)' : isRace ? color+'15' : 'var(--surface-2)',
                           border: done ? '1px solid rgba(16,185,129,.35)' : undefined,
-                          borderRadius:8, padding:'.55rem .65rem', cursor:'pointer',
+                          borderRadius:7, padding:'.42rem .4rem', cursor:'pointer',
                           transition:'transform .12s', minWidth:0, position:'relative' }}
                         onMouseEnter={e => e.currentTarget.style.transform='translateY(-1px)'}
                         onMouseLeave={e => e.currentTarget.style.transform=''}>
                         <div onClick={() => setModal({ session: {...session, _isDone: done, _dateLabel: sessionDate(planMonday, currentWeekData.numero, session.jour)}, weekNum: currentWeekData.numero, sessionIdx: idx })}>
-                          <div style={{ fontSize:'.65rem', fontWeight:700, color, marginBottom:'.2rem',
+                          <div style={{ fontSize:'.58rem', fontWeight:700, color, marginBottom:'.1rem',
                             overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>
                             {session.type}
                           </div>
-                          <div style={{ fontSize:'.78rem', fontWeight:700, lineHeight:1.2,
+                          <div style={{ fontSize:'.7rem', fontWeight:700, lineHeight:1.2, marginBottom:'.1rem',
                             overflow:'hidden', textOverflow:'ellipsis',
                             display:'-webkit-box', WebkitLineClamp:2, WebkitBoxOrient:'vertical' }}>
                             {session.titre}
                           </div>
-                          <div style={{ fontSize:'.68rem', color:'var(--text-muted)', marginTop:'.2rem' }}>
-                            {session.duree_min} min · RPE {session.rpe_cible}
+                          <div style={{ fontSize:'.6rem', color:'var(--text-muted)' }}>
+                            {session.duree_min > 0 ? `${session.duree_min} min` : '🏁'}
                           </div>
-                          {done && <div style={{ fontSize:'.6rem', color:'var(--success)', marginTop:'.15rem' }}>✅ Effectué</div>}
+                          {done && <div style={{ fontSize:'.58rem', color:'var(--success)', marginTop:'.1rem' }}>✅</div>}
                         </div>
-                        {/* Reschedule button */}
+                        {/* Reschedule button — hidden on very small screens */}
                         <button
                           onClick={e => { e.stopPropagation(); setRescheduleIdx(v => v && v.weekNum === currentWeekData.numero && v.sessionIdx === idx ? null : { weekNum: currentWeekData.numero, sessionIdx: idx }) }}
-                          style={{ marginTop:'.3rem', background:'none', border:'1px solid rgba(255,255,255,.12)', borderRadius:6,
-                            padding:'.15rem .35rem', fontSize:'.6rem', color:'rgba(255,255,255,.4)', cursor:'pointer',
+                          style={{ marginTop:'.25rem', background:'none', border:'1px solid rgba(255,255,255,.1)', borderRadius:5,
+                            padding:'.12rem .2rem', fontSize:'.56rem', color:'rgba(255,255,255,.35)', cursor:'pointer',
                             fontFamily:'inherit', width:'100%' }}>
-                          📅 Déplacer
+                          📅
                         </button>
                         {/* Day picker */}
                         {rescheduleIdx && rescheduleIdx.weekNum === currentWeekData.numero && rescheduleIdx.sessionIdx === idx && (
