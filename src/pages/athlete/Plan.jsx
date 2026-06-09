@@ -1478,8 +1478,8 @@ export default function AthletePlan() {
         )
       })()}
 
-      {/* Mobile: flat vertical list (hidden — kept for safety) */}
-      <div className="plan-mobile-list" style={{ display:'flex', flexDirection:'column', gap:'1rem' }}>
+      {/* Mobile: flat vertical list — HIDDEN, remplacée par l'agenda ci-dessus */}
+      <div className="plan-mobile-list" style={{ display:'none' }}>
         {(currentWeekData?.seances || [])
           .map((s, origIdx) => ({ ...s, _origIdx: origIdx }))
           .sort((a, b) => sessionDayOrder(a) - sessionDayOrder(b))
