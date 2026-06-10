@@ -382,7 +382,7 @@ function SessionDetailPage({ session, weekNum, sessionIdx, planId, vma, onClose,
         position: 'absolute', inset: 0,
         overflowY: 'auto', overflowX: 'hidden',
         WebkitOverflowScrolling: 'touch',
-        paddingBottom: 90,
+        paddingBottom: 120,
       }}>
 
       {/* ── HEADER avec fond coloré ── */}
@@ -735,9 +735,9 @@ function SessionDetailPage({ session, weekNum, sessionIdx, planId, vma, onClose,
 
       {/* ── CTA — position absolute bottom:0 dans le conteneur fixed, toujours visible ── */}
       <div style={{
-        position: 'absolute', bottom: 0, left: 0, right: 0,
-        padding: '1rem 1.25rem max(env(safe-area-inset-bottom, 1.75rem), 1.75rem)',
-        background: 'linear-gradient(to top, #0D0D0D 70%, transparent)',
+        position: 'absolute', bottom: 0, left: 0, right: 0, zIndex: 20,
+        padding: '1.25rem 1.25rem max(env(safe-area-inset-bottom, 0px) + 1.25rem, 1.5rem)',
+        background: 'linear-gradient(to top, #0D0D0D 65%, rgba(13,13,13,.92) 80%, transparent)',
         pointerEvents: isDone ? 'none' : 'auto',
       }}>
         {isDone ? (

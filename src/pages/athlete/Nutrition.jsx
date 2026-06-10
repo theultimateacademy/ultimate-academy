@@ -984,15 +984,22 @@ export default function AthleteNutrition() {
       {!searchQuery && (
         <>
           {/* Tabs */}
-          <div style={{ display: 'flex', gap: '.5rem', overflowX: 'auto', paddingBottom: '.25rem', marginBottom: '1.5rem' }}>
+          <style>{`
+            .nutri-tabs { display: flex; flex-wrap: wrap; gap: .45rem; }
+            @media (max-width: 699px) {
+              .nutri-tabs { display: grid; grid-template-columns: repeat(3, 1fr); }
+            }
+          `}</style>
+          <div className="nutri-tabs" style={{ marginBottom: '1.5rem' }}>
             {TABS.map(t => (
               <button key={t.id} onClick={() => setActiveTab(t.id)}
                 style={{
-                  flexShrink: 0, padding: '.5rem 1.1rem', borderRadius: 99, cursor: 'pointer',
+                  padding: '.48rem .8rem', borderRadius: 10, cursor: 'pointer',
                   border: `2px solid ${activeTab === t.id ? t.color : 'var(--border)'}`,
                   background: activeTab === t.id ? t.color + '18' : 'var(--surface)',
                   color: activeTab === t.id ? t.color : 'var(--text-muted)',
                   fontWeight: 600, fontSize: '.875rem', fontFamily: 'inherit',
+                  textAlign: 'center', whiteSpace: 'nowrap',
                 }}>
                 {t.icon} {t.label}
               </button>

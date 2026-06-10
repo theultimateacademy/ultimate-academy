@@ -353,7 +353,8 @@ const SESSION_TYPES = [
 ]
 
 // ─── Session edit form ────────────────────────────────────────────────────────
-function SessionEditForm({ session, onSave, onCancel }) {
+// inline=true : rendu direct sans overlay fixe (ex: dans CoachSessionModal qui a déjà un backdrop-filter)
+function SessionEditForm({ session, onSave, onCancel, inline = false }) {
   const [v, setV] = useState({
     titre: session.titre || '', type: session.type || '',
     jour: session.jour || '',
@@ -370,107 +371,105 @@ function SessionEditForm({ session, onSave, onCancel }) {
   const set = (k, val) => setV(p => ({ ...p, [k]: val }))
   const num = (k, fallback) => v[k] !== '' ? Number(v[k]) : fallback
 
-  // Full-page overlay for editing
+  const formContent = (
+    <div style={{ width:'100%', maxWidth: inline ? '100%' : 780, maxHeight: inline ? 'none' : '92vh',
+      overflowY: inline ? 'visible' : 'auto',
+      background:'var(--surface)', borderRadius: inline ? 0 : 20,
+      border: inline ? 'none' : '1px solid var(--border)',
+      boxShadow: inline ? 'none' : '0 24px 60px rgba(0,0,0,.6)' }}>
+      {/* Header */}
+      <div style={{ padding:'1.25rem 1.5rem', borderBottom:'1px solid var(--border)',
+        display:'flex', justifyContent:'space-between', alignItems:'center',
+        position: inline ? 'static' : 'sticky', top:0,
+        background:'var(--surface)', zIndex:10, borderRadius: inline ? 0 : '20px 20px 0 0' }}>
+        <h3 style={{ margin:0, fontSize:'1.05rem' }}>✏️ Modifier la séance</h3>
+        <button onClick={onCancel} style={{ padding:'.35rem .75rem', background:'none', border:'1px solid var(--border)',
+          borderRadius:8, cursor:'pointer', fontFamily:'inherit', color:'var(--text-muted)', fontSize:'.85rem' }}>✕ Annuler</button>
+      </div>
+
+      <div style={{ padding:'1.5rem', display:'grid', gridTemplateColumns:'1fr 1fr', gap:'1rem' }}>
+        <div style={{ gridColumn:'1/-1' }}>
+          <label style={lbl}>Titre de la séance</label>
+          <input style={{ ...inp, fontSize:'1rem', fontWeight:600, padding:'.6rem .875rem' }}
+            value={v.titre} onChange={e => set('titre', e.target.value)} autoFocus />
+        </div>
+        <div>
+          <label style={lbl}>Type / catégorie</label>
+          <select style={inp} value={v.type} onChange={e => set('type', e.target.value)}>
+            <option value="">— Choisir —</option>
+            {SESSION_TYPES.map(t => <option key={t} value={t}>{t}</option>)}
+            <option value={v.type}>{v.type !== '' && !SESSION_TYPES.includes(v.type) ? v.type : ''}</option>
+          </select>
+        </div>
+        <div>
+          <label style={lbl}>Jour</label>
+          <select style={inp} value={v.jour} onChange={e => set('jour', e.target.value)}>
+            {['Lundi','Mardi','Mercredi','Jeudi','Vendredi','Samedi','Dimanche'].map(d => <option key={d}>{d}</option>)}
+          </select>
+        </div>
+        <div>
+          <label style={lbl}>Durée (min)</label>
+          <input style={inp} type="number" value={v.duree_min} onChange={e => set('duree_min', e.target.value)} />
+        </div>
+        <div>
+          <label style={lbl}>RPE cible (1-10)</label>
+          <input style={inp} type="number" min="1" max="10" value={v.rpe_cible} onChange={e => set('rpe_cible', e.target.value)} />
+        </div>
+        <div>
+          <label style={lbl}>Distance (km) — laisser vide pour auto</label>
+          <input style={inp} type="number" step=".1" value={v.distance_km ?? ''} onChange={e => set('distance_km', e.target.value)} />
+        </div>
+        <div>
+          <label style={lbl}>Intensité</label>
+          <select style={inp} value={v.intensite} onChange={e => set('intensite', e.target.value)}>
+            {['très facile','facile','modérée','dur','très dur','course'].map(i => <option key={i}>{i}</option>)}
+          </select>
+        </div>
+        <div style={{ gridColumn:'1/-1' }}>
+          <label style={lbl}>Échauffement</label>
+          <textarea style={{ ...inp, resize:'vertical' }} rows={3} value={v.echauffement} onChange={e => set('echauffement', e.target.value)} />
+        </div>
+        <div style={{ gridColumn:'1/-1' }}>
+          <label style={lbl}>Corps de séance</label>
+          <textarea style={{ ...inp, resize:'vertical', fontFamily:'monospace', fontSize:'.8rem' }} rows={8} value={v.corps} onChange={e => set('corps', e.target.value)} />
+        </div>
+        <div style={{ gridColumn:'1/-1' }}>
+          <label style={lbl}>Retour au calme</label>
+          <textarea style={{ ...inp, resize:'vertical' }} rows={2} value={v.retour_au_calme} onChange={e => set('retour_au_calme', e.target.value)} />
+        </div>
+        <div style={{ gridColumn:'1/-1' }}>
+          <label style={lbl}>Note coach (visible par l'athlète)</label>
+          <textarea style={{ ...inp, resize:'vertical' }} rows={3} value={v.notes_coach} onChange={e => set('notes_coach', e.target.value)} />
+        </div>
+      </div>
+
+      <div style={{ padding:'1rem 1.5rem', borderTop:'1px solid var(--border)', display:'flex', justifyContent:'flex-end', gap:'.75rem',
+        position: inline ? 'static' : 'sticky', bottom:0, background:'var(--surface)', borderRadius: inline ? 0 : '0 0 20px 20px' }}>
+        <button onClick={onCancel}
+          style={{ padding:'.6rem 1.25rem', background:'none', border:'1px solid var(--border)',
+            borderRadius:10, cursor:'pointer', fontFamily:'inherit', fontSize:'.875rem', color:'var(--text-muted)' }}>
+          Annuler
+        </button>
+        <button onClick={() => onSave({ ...session, ...v,
+          duree_min: num('duree_min', session.duree_min),
+          distance_km: v.distance_km !== '' ? num('distance_km', session.distance_km) : null,
+          rpe_cible: num('rpe_cible', session.rpe_cible) })}
+          style={{ padding:'.6rem 1.5rem', background:'var(--gradient)', color:'#fff', border:'none',
+            borderRadius:10, fontWeight:700, fontSize:'.875rem', cursor:'pointer', fontFamily:'inherit',
+            boxShadow:'0 4px 16px rgba(232,35,122,.35)' }}>
+          ✓ Enregistrer les modifications
+        </button>
+      </div>
+    </div>
+  )
+
+  if (inline) return formContent
+
   return (
     <div style={{ position:'fixed', inset:0, zIndex:500, background:'rgba(0,0,0,.7)', backdropFilter:'blur(8px)',
       display:'flex', alignItems:'center', justifyContent:'center', padding:'1rem' }}
       onClick={e => e.target === e.currentTarget && onCancel()}>
-      <div style={{ width:'100%', maxWidth:780, maxHeight:'92vh', overflowY:'auto',
-        background:'var(--surface)', borderRadius:20, border:'1px solid var(--border)',
-        boxShadow:'0 24px 60px rgba(0,0,0,.6)' }}>
-        {/* Header */}
-        <div style={{ padding:'1.25rem 1.5rem', borderBottom:'1px solid var(--border)',
-          display:'flex', justifyContent:'space-between', alignItems:'center', position:'sticky', top:0,
-          background:'var(--surface)', zIndex:10, borderRadius:'20px 20px 0 0' }}>
-          <h3 style={{ margin:0, fontSize:'1.05rem' }}>✏️ Modifier la séance</h3>
-          <button onClick={onCancel} style={{ padding:'.35rem .75rem', background:'none', border:'1px solid var(--border)',
-            borderRadius:8, cursor:'pointer', fontFamily:'inherit', color:'var(--text-muted)', fontSize:'.85rem' }}>✕ Annuler</button>
-        </div>
-
-        <div style={{ padding:'1.5rem', display:'grid', gridTemplateColumns:'1fr 1fr', gap:'1rem' }}>
-          {/* Titre — full width */}
-          <div style={{ gridColumn:'1/-1' }}>
-            <label style={lbl}>Titre de la séance</label>
-            <input style={{ ...inp, fontSize:'1rem', fontWeight:600, padding:'.6rem .875rem' }}
-              value={v.titre} onChange={e => set('titre', e.target.value)} autoFocus />
-          </div>
-
-          {/* Type — dropdown */}
-          <div>
-            <label style={lbl}>Type / catégorie</label>
-            <select style={inp} value={v.type} onChange={e => set('type', e.target.value)}>
-              <option value="">— Choisir —</option>
-              {SESSION_TYPES.map(t => <option key={t} value={t}>{t}</option>)}
-              <option value={v.type}>{v.type !== '' && !SESSION_TYPES.includes(v.type) ? v.type : ''}</option>
-            </select>
-          </div>
-
-          {/* Jour */}
-          <div>
-            <label style={lbl}>Jour</label>
-            <select style={inp} value={v.jour} onChange={e => set('jour', e.target.value)}>
-              {['Lundi','Mardi','Mercredi','Jeudi','Vendredi','Samedi','Dimanche'].map(d => <option key={d}>{d}</option>)}
-            </select>
-          </div>
-
-          {/* Durée + RPE + Distance */}
-          <div>
-            <label style={lbl}>Durée (min)</label>
-            <input style={inp} type="number" value={v.duree_min} onChange={e => set('duree_min', e.target.value)} />
-          </div>
-          <div>
-            <label style={lbl}>RPE cible (1-10)</label>
-            <input style={inp} type="number" min="1" max="10" value={v.rpe_cible} onChange={e => set('rpe_cible', e.target.value)} />
-          </div>
-          <div>
-            <label style={lbl}>Distance (km) — laisser vide pour auto</label>
-            <input style={inp} type="number" step=".1" value={v.distance_km ?? ''} onChange={e => set('distance_km', e.target.value)} />
-          </div>
-          <div>
-            <label style={lbl}>Intensité</label>
-            <select style={inp} value={v.intensite} onChange={e => set('intensite', e.target.value)}>
-              {['très facile','facile','modérée','dur','très dur','course'].map(i => <option key={i}>{i}</option>)}
-            </select>
-          </div>
-
-          {/* Text areas — full width */}
-          <div style={{ gridColumn:'1/-1' }}>
-            <label style={lbl}>Échauffement</label>
-            <textarea style={{ ...inp, resize:'vertical' }} rows={3} value={v.echauffement} onChange={e => set('echauffement', e.target.value)} />
-          </div>
-          <div style={{ gridColumn:'1/-1' }}>
-            <label style={lbl}>Corps de séance</label>
-            <textarea style={{ ...inp, resize:'vertical', fontFamily:'monospace', fontSize:'.8rem' }} rows={8} value={v.corps} onChange={e => set('corps', e.target.value)} />
-          </div>
-          <div style={{ gridColumn:'1/-1' }}>
-            <label style={lbl}>Retour au calme</label>
-            <textarea style={{ ...inp, resize:'vertical' }} rows={2} value={v.retour_au_calme} onChange={e => set('retour_au_calme', e.target.value)} />
-          </div>
-          <div style={{ gridColumn:'1/-1' }}>
-            <label style={lbl}>Note coach (visible par l'athlète)</label>
-            <textarea style={{ ...inp, resize:'vertical' }} rows={3} value={v.notes_coach} onChange={e => set('notes_coach', e.target.value)} />
-          </div>
-        </div>
-
-        {/* Footer */}
-        <div style={{ padding:'1rem 1.5rem', borderTop:'1px solid var(--border)', display:'flex', justifyContent:'flex-end', gap:'.75rem',
-          position:'sticky', bottom:0, background:'var(--surface)', borderRadius:'0 0 20px 20px' }}>
-          <button onClick={onCancel}
-            style={{ padding:'.6rem 1.25rem', background:'none', border:'1px solid var(--border)',
-              borderRadius:10, cursor:'pointer', fontFamily:'inherit', fontSize:'.875rem', color:'var(--text-muted)' }}>
-            Annuler
-          </button>
-          <button onClick={() => onSave({ ...session, ...v,
-            duree_min: num('duree_min', session.duree_min),
-            distance_km: v.distance_km !== '' ? num('distance_km', session.distance_km) : null,
-            rpe_cible: num('rpe_cible', session.rpe_cible) })}
-            style={{ padding:'.6rem 1.5rem', background:'var(--gradient)', color:'#fff', border:'none',
-              borderRadius:10, fontWeight:700, fontSize:'.875rem', cursor:'pointer', fontFamily:'inherit',
-              boxShadow:'0 4px 16px rgba(232,35,122,.35)' }}>
-            ✓ Enregistrer les modifications
-          </button>
-        </div>
-      </div>
+      {formContent}
     </div>
   )
 }
@@ -825,13 +824,12 @@ function CoachSessionModal({ session, weekNum, sessionIdx, completion, onClose, 
             )}
           </div>
         ) : (
-          <div style={{ padding:'1rem 1.25rem 2.5rem' }}>
-            <SessionEditForm
-              session={session}
-              onSave={updated => { onSave(weekNum, sessionIdx, updated); onClose() }}
-              onCancel={() => setEditing(false)}
-            />
-          </div>
+          <SessionEditForm
+            session={session}
+            onSave={updated => { onSave(weekNum, sessionIdx, updated); onClose() }}
+            onCancel={() => setEditing(false)}
+            inline={true}
+          />
         )}
       </div>
     </div>

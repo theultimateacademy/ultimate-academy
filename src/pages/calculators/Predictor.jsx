@@ -88,10 +88,10 @@ export default function PredictorCalculator() {
 
   useEffect(() => {
     const prev = document.title
-    document.title = 'Prédicteur de chrono running | The Ultimate Academy'
+    document.title = 'Estime ton chrono running | The Ultimate Academy'
     const meta = document.querySelector('meta[name="description"]')
     const prevM = meta?.content
-    if (meta) meta.content = "Prédit ton temps sur 10km, semi-marathon ou marathon depuis ton dernier chrono. Outil gratuit basé sur la formule de Riegel."
+    if (meta) meta.content = "Estime ton temps sur 10km, semi-marathon ou marathon depuis ton dernier chrono. Outil gratuit basé sur la formule de Riegel."
     return () => { document.title = prev; if (meta && prevM != null) meta.content = prevM }
   }, [])
 
@@ -125,7 +125,7 @@ export default function PredictorCalculator() {
         <div style={{ position: 'relative', zIndex: 1, maxWidth: 760 }}>
           <h1 style={{ fontSize: 'clamp(2.2rem,6vw,4rem)', fontWeight: 900, lineHeight: 1.05,
             color: '#fff', letterSpacing: '-0.03em', marginBottom: '1.25rem' }}>
-            Prédit ton chrono sur<br />
+            Estime ton chrono sur<br />
             <span style={{ background: `linear-gradient(135deg,${C.purple},${C.pink})`,
               WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
               n'importe quelle distance
@@ -152,7 +152,7 @@ export default function PredictorCalculator() {
         <div style={{ maxWidth: 800, margin: '0 auto' }}>
           <div style={{ textAlign: 'center', marginBottom: '2.5rem' }}>
             <h2 style={{ fontSize: 'clamp(1.6rem,4vw,2.4rem)', fontWeight: 900, letterSpacing: '-0.02em', marginBottom: '.6rem' }}>
-              Prédis ton chrono cible
+              Estime ton chrono cible
             </h2>
             <p style={{ color: 'rgba(26,26,46,.5)', fontSize: '1rem' }}>
               Entre un chrono récent et choisis la distance que tu vises

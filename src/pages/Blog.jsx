@@ -206,7 +206,7 @@ export default function Blog() {
                   <div style={{ display: 'flex', gap: '.5rem', alignItems: 'center', fontSize: '.75rem', color: 'rgba(255,255,255,.25)' }}>
                     <span>{formatDate(article.published_at)}</span>
                     <span style={{ width: 3, height: 3, borderRadius: '50%', background: 'rgba(255,255,255,.18)', flexShrink: 0 }} />
-                    <span>⏱ {article.reading_time || 4} min</span>
+                    <span>⏱ {article.reading_time || 4} min de lecture</span>
                   </div>
                 </div>
               </article>

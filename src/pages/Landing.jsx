@@ -8,7 +8,7 @@ const TOOLS = [
   { label: 'Calculateur de VMA',   path: '/calculateur/vma' },
   { label: 'Test de Cooper & VO2max', path: '/calculateur/vo2max' },
   { label: 'Allures & zones FC',   path: '/calculateur/allures' },
-  { label: 'Prédicteur de chrono', path: '/calculateur/predicteur' },
+  { label: 'Estime ton chrono', path: '/calculateur/predicteur' },
 ]
 
 const FEATURES = [
