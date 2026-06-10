@@ -330,6 +330,14 @@ function SessionDetailPage({ session, weekNum, sessionIdx, planId, vma, onClose,
                   : `${paceMin.pourcentage_vma}% VMA · allure au ressenti`}
             </div>
           )}
+          {/* Texte du corps si contenu significatif (ex: sortie longue avec description tempo) */}
+          {mainSet && mainSet.length > 40 && (
+            <div style={{ marginTop: '1.125rem', fontSize: '.875rem', lineHeight: 1.75,
+              color: 'rgba(255,255,255,.72)', textAlign: 'left', whiteSpace: 'pre-line',
+              borderTop: `1px solid ${typeColor}20`, paddingTop: '.875rem' }}>
+              {mainSet}
+            </div>
+          )}
         </div>
       )
     }
@@ -1138,6 +1146,7 @@ export default function AthletePlan() {
         @keyframes toastIn { from { opacity:0; transform:translateX(-50%) translateY(12px); } to { opacity:1; transform:translateX(-50%) translateY(0); } }
         @media (max-width: 699px) { .plan-grid-desktop { display: none !important; } }
         @media (min-width: 700px) { .plan-grid-mobile  { display: none !important; } }
+        @media (max-width: 699px) { .week-label-desktop { display: none !important; } .week-label-mobile { display: inline-block !important; } }
       `}</style>
       {toast && (
         <div style={{
@@ -1217,7 +1226,7 @@ export default function AthletePlan() {
       </div>
 
       {/* Week selector */}
-      <div style={{ display: 'flex', gap: '.5rem', overflowX: 'auto', paddingBottom: '.5rem', marginBottom: '1.5rem' }}>
+      <div className="plan-week-tabs" style={{ display: 'flex', gap: '.4rem', marginBottom: '1.5rem', flexWrap: 'wrap' }}>
         {weeks.map(w => {
           const doneInWeek  = completions.filter(c => c.week_number === w.numero).length
           const totalInWeek = w.seances?.length || 0
@@ -1227,15 +1236,20 @@ export default function AthletePlan() {
             <button key={w.numero}
               onClick={() => setActiveWeek(w.numero)}
               style={{
-                flexShrink: 0, padding: '.5rem .875rem',
+                flexShrink: 0,
                 borderRadius: 99, border: `2px solid ${isActive ? 'var(--primary)' : 'var(--border)'}`,
                 background: isActive ? 'linear-gradient(135deg,rgba(139,47,201,.35),rgba(232,35,122,.25))' : 'var(--surface)',
                 color: isActive ? '#fff' : 'var(--text-muted)',
                 fontWeight: isActive ? 700 : 500,
-                fontSize: '.78rem', cursor: 'pointer', fontFamily: 'inherit',
-                whiteSpace: 'nowrap',
+                cursor: 'pointer', fontFamily: 'inherit',
               }}>
-              {weekDateRange(planMonday, w.numero)}{pct === 1 ? ' ✅' : ''}
+              {/* Desktop : date range / Mobile : S{n} */}
+              <span className="week-label-desktop" style={{ padding: '.5rem .875rem', display: 'inline-block', fontSize: '.78rem', whiteSpace: 'nowrap' }}>
+                {weekDateRange(planMonday, w.numero)}{pct === 1 ? ' ✅' : ''}
+              </span>
+              <span className="week-label-mobile" style={{ padding: '.45rem .7rem', display: 'none', fontSize: '.82rem' }}>
+                S{w.numero}{pct === 1 ? ' ✅' : ''}
+              </span>
             </button>
           )
         })}
@@ -1313,7 +1327,7 @@ export default function AthletePlan() {
 
       {/* Triathlon discipline tabs */}
       {['tri_sprint','tri_olympic','tri_half','tri_ironman'].includes(profile?.objective) && (
-        <div style={{ display: 'flex', gap: '.4rem', marginBottom: '1rem', overflowX: 'auto', paddingBottom: '.25rem' }}>
+        <div style={{ display: 'flex', gap: '.4rem', marginBottom: '1rem', flexWrap: 'wrap' }}>
           {[
             { v: 'all',      l: '🗓 Semaine',  color: '#8B2FC9' },
             { v: 'natation', l: '🏊 Natation', color: '#06B6D4' },
@@ -1323,11 +1337,11 @@ export default function AthletePlan() {
             { v: 'renfo',    l: '💪 Renfo',    color: '#EC4899' },
           ].map(t => (
             <button key={t.v} onClick={() => setTriTab(t.v)} style={{
-              padding: '.35rem .85rem', borderRadius: 99, fontWeight: 600, fontSize: '.8rem',
+              padding: '.38rem .85rem', borderRadius: 99, fontWeight: 600, fontSize: '.8rem',
               border: triTab === t.v ? `2px solid ${t.color}` : '1px solid rgba(255,255,255,.15)',
               background: triTab === t.v ? t.color + '30' : 'rgba(255,255,255,.05)',
               color: triTab === t.v ? '#fff' : 'rgba(255,255,255,.6)',
-              cursor: 'pointer', fontFamily: 'inherit', whiteSpace: 'nowrap', flexShrink: 0,
+              cursor: 'pointer', fontFamily: 'inherit', whiteSpace: 'nowrap',
             }}>{t.l}</button>
           ))}
         </div>
