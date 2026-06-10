@@ -116,13 +116,14 @@ function ExportBtn({ session, suuntoConnected, garminConnected, userId }) {
   )
 }
 
-function SessionDetailPage({ session, weekNum, sessionIdx, planId, vma, onClose, onDone, onStartFlow }) {
+function SessionDetailPage({ session, weekNum, sessionIdx, planId, vma, onClose, onDone, onStartFlow, onReschedule }) {
   const { profile } = useAuth()
-  const [isDone,      setIsDone]      = useState(session._isDone || false)
-  const [stravaAct,   setStravaAct]   = useState(null)
-  const [exportInfo,  setExportInfo]  = useState('')
-  const [corosModal,  setCorosModal]  = useState(false)
-  const [corosCopied, setCorosCopied] = useState(false)
+  const [isDone,        setIsDone]        = useState(session._isDone || false)
+  const [stravaAct,     setStravaAct]     = useState(null)
+  const [exportInfo,    setExportInfo]    = useState('')
+  const [corosModal,    setCorosModal]    = useState(false)
+  const [corosCopied,   setCorosCopied]   = useState(false)
+  const [showDayPicker, setShowDayPicker] = useState(false)
 
   useEffect(() => {
     document.body.style.overflow = 'hidden'
@@ -336,24 +337,39 @@ function SessionDetailPage({ session, weekNum, sessionIdx, planId, vma, onClose,
     return <p style={{ fontSize: '.9rem', lineHeight: 1.7, color: 'rgba(255,255,255,.8)', whiteSpace: 'pre-line' }}>{mainSet}</p>
   }
 
+  const DAYS = ['Lundi','Mardi','Mercredi','Jeudi','Vendredi','Samedi','Dimanche']
+
   return (
+    /* ── Overlay sombre ── */
     <div style={{
       position: 'fixed', inset: 0, zIndex: 200,
-      background: 'var(--bg)',
-      animation: 'slideUpFull .35s cubic-bezier(0.32, 0.72, 0, 1)',
-    }}>
+      background: 'rgba(0,0,0,.55)', backdropFilter: 'blur(4px)',
+      display: 'flex', alignItems: 'flex-end', justifyContent: 'center',
+    }} onClick={e => e.target === e.currentTarget && onClose()}>
+
       <style>{`
-        @keyframes slideUpFull { from { transform: translateY(100%); } to { transform: translateY(0); } }
-        @keyframes fadeInCard  { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-        @keyframes ctaPulse    { 0%,100% { box-shadow: 0 4px 20px rgba(139,47,201,.45); } 50% { box-shadow: 0 4px 32px rgba(139,47,201,.7); } }
-        .detail-card { animation: fadeInCard .38s ease both; }
+        @keyframes slideUpModal { from { transform:translateY(100%) } to { transform:translateY(0) } }
+        @keyframes fadeInCard   { from { opacity:0; transform:translateY(10px) } to { opacity:1; transform:translateY(0) } }
+        @keyframes ctaPulse     { 0%,100%{box-shadow:0 4px 20px rgba(139,47,201,.45)} 50%{box-shadow:0 4px 32px rgba(139,47,201,.7)} }
+        .detail-card  { animation: fadeInCard .35s ease both; }
         .detail-card:nth-child(1){animation-delay:.05s}
         .detail-card:nth-child(2){animation-delay:.1s}
         .detail-card:nth-child(3){animation-delay:.15s}
         .detail-card:nth-child(4){animation-delay:.2s}
         .cta-pulse { animation: ctaPulse 2.5s ease-in-out infinite; }
       `}</style>
-      {/* Zone scrollable — position absolute inset:0 avec padding-bottom pour le CTA */}
+
+      {/* ── Carte centrée max 560px ── */}
+      <div style={{
+        width: '100%', maxWidth: 560,
+        height: '94dvh', maxHeight: '94dvh',
+        background: 'var(--bg)',
+        borderRadius: '20px 20px 0 0',
+        position: 'relative', overflow: 'hidden',
+        animation: 'slideUpModal .35s cubic-bezier(0.32,0.72,0,1)',
+      }}>
+
+      {/* Zone scrollable */}
       <div style={{
         position: 'absolute', inset: 0,
         overflowY: 'auto', overflowX: 'hidden',
@@ -361,57 +377,94 @@ function SessionDetailPage({ session, weekNum, sessionIdx, planId, vma, onClose,
         paddingBottom: 90,
       }}>
 
-      {/* ── HEADER ── */}
+      {/* ── HEADER avec fond coloré ── */}
       <div style={{
-        padding: 'max(env(safe-area-inset-top, 0px), 1rem) 1.25rem 1.25rem',
-        borderBottom: '1px solid var(--border)',
+        background: `linear-gradient(160deg, ${typeColor}28 0%, ${typeColor}08 60%, transparent 100%)`,
+        borderBottom: `1px solid ${typeColor}25`,
+        padding: '1rem 1.25rem 1.25rem',
       }}>
         {/* Nav row */}
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem' }}>
-          <button onClick={onClose} style={{
-            background: 'none', border: 'none', cursor: 'pointer',
-            color: 'var(--text-muted)', fontSize: '.9rem', fontFamily: 'inherit',
-            display: 'flex', alignItems: 'center', gap: '.3rem', padding: 0,
-          }}>‹ Retour</button>
-          {isDone && (
-            <span style={{ background: 'rgba(16,185,129,.15)', border: '1px solid rgba(16,185,129,.3)',
-              borderRadius: 99, padding: '.2rem .75rem', fontSize: '.72rem', fontWeight: 700, color: '#6EE7B7' }}>
-              ✅ Effectuée
-            </span>
-          )}
+        <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:'1rem' }}>
+          <button onClick={onClose} style={{ background:'none', border:'none', cursor:'pointer',
+            color:'var(--text-muted)', fontSize:'.9rem', fontFamily:'inherit',
+            display:'flex', alignItems:'center', gap:'.3rem', padding:0 }}>
+            ‹ Retour
+          </button>
+          <div style={{ display:'flex', gap:'.5rem', alignItems:'center' }}>
+            {isDone && (
+              <span style={{ background:'rgba(16,185,129,.15)', border:'1px solid rgba(16,185,129,.3)',
+                borderRadius:99, padding:'.2rem .75rem', fontSize:'.72rem', fontWeight:700, color:'#6EE7B7' }}>
+                ✅ Effectuée
+              </span>
+            )}
+          </div>
         </div>
 
         {/* Type badge */}
-        <span style={{
-          display: 'inline-block', marginBottom: '.625rem',
-          background: typeColor + '18', border: `1px solid ${typeColor}40`,
-          borderRadius: 99, padding: '.2rem .75rem',
-          fontSize: '.7rem', fontWeight: 800, color: typeColor,
-          letterSpacing: '.08em', textTransform: 'uppercase',
-        }}>{session.type || 'Séance'}</span>
+        <span style={{ display:'inline-block', marginBottom:'.5rem',
+          background:typeColor+'22', border:`1px solid ${typeColor}45`,
+          borderRadius:99, padding:'.22rem .8rem',
+          fontSize:'.7rem', fontWeight:800, color:typeColor,
+          letterSpacing:'.08em', textTransform:'uppercase' }}>
+          {session.type || 'Séance'}
+        </span>
 
-        {/* Title */}
-        <h2 style={{ fontSize: 'clamp(1.15rem, 4vw, 1.4rem)', lineHeight: 1.25, marginBottom: '.4rem' }}>
+        {/* Titre */}
+        <h2 style={{ fontSize:'clamp(1.1rem,4vw,1.35rem)', lineHeight:1.25, marginBottom:'.35rem' }}>
           {session.titre}
         </h2>
 
-        {/* Date */}
-        <p style={{ fontSize: '.82rem', color: 'var(--text-muted)', marginBottom: '1rem' }}>
-          📅 {session._dateLabel || session.jour}
-        </p>
+        {/* Date + bouton déplacer */}
+        <div style={{ display:'flex', alignItems:'center', gap:'.6rem', marginBottom:'.9rem', flexWrap:'wrap' }}>
+          <span style={{ fontSize:'.82rem', color:'var(--text-muted)' }}>
+            📅 {session._dateLabel || session.jour}
+          </span>
+          {onReschedule && (
+            <button onClick={() => setShowDayPicker(v => !v)} style={{
+              background: showDayPicker ? typeColor+'30' : typeColor+'15',
+              border: `1px solid ${typeColor}40`,
+              borderRadius: 99, padding:'.2rem .75rem',
+              fontSize:'.72rem', fontWeight:700, color:typeColor,
+              cursor:'pointer', fontFamily:'inherit',
+            }}>
+              📅 Déplacer
+            </button>
+          )}
+        </div>
+
+        {/* Day picker */}
+        {showDayPicker && onReschedule && (
+          <div style={{ background:'var(--surface-2)', borderRadius:14, padding:'.75rem',
+            border:`1px solid ${typeColor}30`, marginBottom:'.75rem' }}>
+            <div style={{ fontSize:'.68rem', color:'var(--text-muted)', marginBottom:'.5rem', fontWeight:600 }}>
+              Choisir le nouveau jour :
+            </div>
+            <div style={{ display:'flex', flexWrap:'wrap', gap:'.35rem' }}>
+              {DAYS.map(day => (
+                <button key={day} onClick={() => { onReschedule(day); setShowDayPicker(false) }} style={{
+                  padding:'.35rem .7rem', borderRadius:8, fontSize:'.8rem', cursor:'pointer',
+                  fontFamily:'inherit', fontWeight: session.jour === day ? 800 : 500,
+                  background: session.jour === day ? typeColor+'35' : 'var(--surface)',
+                  border: session.jour === day ? `1.5px solid ${typeColor}` : '1px solid var(--border)',
+                  color: session.jour === day ? typeColor : 'var(--text)',
+                }}>
+                  {day.slice(0,3)}
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
 
         {/* Stats chips */}
-        <div style={{ display: 'flex', gap: '.4rem', flexWrap: 'wrap' }}>
+        <div style={{ display:'flex', gap:'.35rem', flexWrap:'wrap' }}>
           {[
-            { icon: '⏱', val: `${session.duree_min} min` },
-            session.distance_km ? { icon: '📍', val: `${session.distance_km} km` } : null,
-            { icon: '💪', val: `RPE ${session.rpe_cible}` },
+            { icon:'⏱', val:`${session.duree_min} min` },
+            session.distance_km ? { icon:'📍', val:`${session.distance_km} km` } : null,
+            { icon:'💪', val:`RPE ${session.rpe_cible}` },
           ].filter(Boolean).map(({ icon, val }) => (
-            <div key={val} style={{
-              background: 'var(--surface-2)', border: '1px solid var(--border)',
-              borderRadius: 99, padding: '.28rem .75rem',
-              fontSize: '.8rem', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '.3rem',
-            }}>
+            <div key={val} style={{ background:'var(--surface-2)', border:'1px solid var(--border)',
+              borderRadius:99, padding:'.25rem .7rem',
+              fontSize:'.78rem', fontWeight:600, display:'flex', alignItems:'center', gap:'.3rem' }}>
               <span>{icon}</span><span>{val}</span>
             </div>
           ))}
@@ -695,7 +748,8 @@ function SessionDetailPage({ session, weekNum, sessionIdx, planId, vma, onClose,
           </button>
         )}
       </div>
-    </div>
+      </div>{/* fin carte centrée */}
+    </div>/* fin overlay */
   )
 }
 
@@ -1709,6 +1763,7 @@ export default function AthletePlan() {
           vma={profile?.vma}
           onClose={() => setModal(null)}
           onDone={() => { setModal(null); loadPlan() }}
+          onReschedule={(day) => rescheduleSession(modal.weekNum, modal.sessionIdx, day)}
           onStartFlow={() => setPostFlow({
             session:         modal.session,
             weekNum:         modal.weekNum,
