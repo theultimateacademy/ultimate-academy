@@ -1327,24 +1327,32 @@ export default function AthletePlan() {
 
       {/* Triathlon discipline tabs */}
       {['tri_sprint','tri_olympic','tri_half','tri_ironman'].includes(profile?.objective) && (
-        <div style={{ display: 'flex', gap: '.4rem', marginBottom: '1rem', flexWrap: 'wrap' }}>
-          {[
-            { v: 'all',      l: '🗓 Semaine',  color: '#8B2FC9' },
-            { v: 'natation', l: '🏊 Natation', color: '#06B6D4' },
-            { v: 'velo',     l: '🚴 Vélo',     color: '#F97316' },
-            { v: 'brique',   l: '🔗 Brique',   color: '#8B5CF6' },
-            { v: 'course',   l: '🏃 Course',   color: '#10B981' },
-            { v: 'renfo',    l: '💪 Renfo',    color: '#EC4899' },
-          ].map(t => (
-            <button key={t.v} onClick={() => setTriTab(t.v)} style={{
-              padding: '.38rem .85rem', borderRadius: 99, fontWeight: 600, fontSize: '.8rem',
-              border: triTab === t.v ? `2px solid ${t.color}` : '1px solid rgba(255,255,255,.15)',
-              background: triTab === t.v ? t.color + '30' : 'rgba(255,255,255,.05)',
-              color: triTab === t.v ? '#fff' : 'rgba(255,255,255,.6)',
-              cursor: 'pointer', fontFamily: 'inherit', whiteSpace: 'nowrap',
-            }}>{t.l}</button>
-          ))}
-        </div>
+        <>
+          <style>{`
+            .tri-tabs-grid { display: flex; flex-wrap: wrap; gap: .4rem; }
+            @media (max-width: 699px) {
+              .tri-tabs-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: .4rem; }
+            }
+          `}</style>
+          <div className="tri-tabs-grid" style={{ marginBottom: '1rem' }}>
+            {[
+              { v: 'all',      l: '🗓 Semaine',  color: '#8B2FC9' },
+              { v: 'natation', l: '🏊 Natation', color: '#06B6D4' },
+              { v: 'velo',     l: '🚴 Vélo',     color: '#F97316' },
+              { v: 'brique',   l: '🔗 Brique',   color: '#8B5CF6' },
+              { v: 'course',   l: '🏃 Course',   color: '#10B981' },
+              { v: 'renfo',    l: '💪 Renfo',    color: '#EC4899' },
+            ].map(t => (
+              <button key={t.v} onClick={() => setTriTab(t.v)} style={{
+                padding: '.42rem .5rem', borderRadius: 10, fontWeight: 600, fontSize: '.8rem',
+                border: triTab === t.v ? `2px solid ${t.color}` : '1px solid rgba(255,255,255,.15)',
+                background: triTab === t.v ? t.color + '30' : 'rgba(255,255,255,.05)',
+                color: triTab === t.v ? '#fff' : 'rgba(255,255,255,.6)',
+                cursor: 'pointer', fontFamily: 'inherit', whiteSpace: 'nowrap', textAlign: 'center',
+              }}>{t.l}</button>
+            ))}
+          </div>
+        </>
       )}
 
       {/* Plan grid — responsive via CSS (desktop: 7 colonnes, mobile: liste verticale) */}

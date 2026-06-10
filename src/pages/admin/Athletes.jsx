@@ -5,7 +5,7 @@ import { api } from '../../lib/api'
 import LoadingSpinner from '../../components/UI/LoadingSpinner'
 
 // ─── Coach Plan View — isolated component so crashes don't black the whole panel ──
-function PlanView({ plan, completions, coachWeekIdx, setCoachWeekIdx, currentWeekNum, onSessionClick, onDeleteSession, onRescheduleSession }) {
+function PlanView({ plan, completions, coachWeekIdx, setCoachWeekIdx, currentWeekNum, onSessionClick, onDeleteSession, onRescheduleSession, objective }) {
   const DAY_NAMES  = ['Lundi','Mardi','Mercredi','Jeudi','Vendredi','Samedi','Dimanche']
   const DAY_SHORT  = ['Lun','Mar','Mer','Jeu','Ven','Sam','Dim']
   const DAY_OFFSET = { Lundi:0, Mardi:1, Mercredi:2, Jeudi:3, Vendredi:4, Samedi:5, Dimanche:6 }
@@ -38,6 +38,12 @@ function PlanView({ plan, completions, coachWeekIdx, setCoachWeekIdx, currentWee
     const chargeRaw = (activeSem.charge||'').replace(/\s*\(S\d+\)/gi,'')
     const chargeShort = chargeRaw.split(/[—–(]/)[0].trim()
     const chargeColor = chargeShort.toLowerCase().includes('élevée')?'#F97316':chargeShort.toLowerCase().includes('modérée')?'#06B6D4':chargeShort.toLowerCase().includes('affûtage')?'#8B2FC9':'#10B981'
+
+    // Km course à pied seulement (jamais natation/vélo/brique pour triathlon)
+    const runKm = Math.round(seances.filter(s => {
+      const t = (s.type||'').toLowerCase()
+      return !t.includes('natation') && !t.includes('vélo') && !t.includes('velo') && !t.includes('brique') && !t.includes('renforcement')
+    }).reduce((sum, s) => sum + (s.distance_km || 0), 0) * 10) / 10
 
     // Group sessions by day
     const byDay = {}
@@ -89,16 +95,28 @@ function PlanView({ plan, completions, coachWeekIdx, setCoachWeekIdx, currentWee
                     {fmtLong(wStart)} – {fmtLong(wEnd)}
                   </div>
                 </div>
-                <span style={{ flexShrink:0, padding:'.2rem .65rem', borderRadius:99, fontSize:'.68rem',
-                  fontWeight:700, background:chargeColor+'25', border:`1px solid ${chargeColor}50`,
-                  color:chargeColor }}>{chargeShort}</span>
+                <div style={{ display:'flex', flexDirection:'column', alignItems:'flex-end', gap:'.3rem', flexShrink:0 }}>
+                  <span style={{ padding:'.2rem .65rem', borderRadius:99, fontSize:'.68rem',
+                    fontWeight:700, background:chargeColor+'25', border:`1px solid ${chargeColor}50`,
+                    color:chargeColor }}>{chargeShort}</span>
+                  {runKm > 0 && (
+                    <span style={{ fontSize:'.65rem', fontWeight:700, color:'rgba(255,255,255,.55)' }}>
+                      🏃 <strong style={{ color:'#fff' }}>{runKm} km</strong> course
+                    </span>
+                  )}
+                </div>
               </div>
             </div>
           )
         })()}
 
-        {/* ── Grille unique : headers + cells dans le même grid pour alignement parfait ── */}
-        <div style={{ display:'grid', gridTemplateColumns:'repeat(7,1fr)', gap:'.35rem' }}>
+        <style>{`
+          @media (max-width: 699px) { .coach-plan-desktop { display: none !important; } }
+          @media (min-width: 700px) { .coach-plan-mobile  { display: none !important; } }
+        `}</style>
+
+        {/* ── DESKTOP : grille unique headers+cells, cartes hauteur uniforme ── */}
+        <div className="coach-plan-desktop" style={{ display:'grid', gridTemplateColumns:'repeat(7,1fr)', gap:'.35rem' }}>
           {/* Row 1 : en-têtes jours */}
           {DAY_SHORT.map(d => (
             <div key={d} style={{ textAlign:'center', fontSize:'.61rem', fontWeight:800, textTransform:'uppercase',
@@ -111,7 +129,7 @@ function PlanView({ plan, completions, coachWeekIdx, setCoachWeekIdx, currentWee
             return (
               <div key={day} style={{ display:'flex', flexDirection:'column', gap:'.3rem' }}>
                 {daySessions.length === 0 ? (
-                  <div style={{ minHeight:50, display:'flex', alignItems:'center', justifyContent:'center',
+                  <div style={{ height:88, display:'flex', alignItems:'center', justifyContent:'center',
                     border:'1px dashed rgba(255,255,255,.07)', borderRadius:7,
                     fontSize:'.6rem', color:'rgba(255,255,255,.18)', fontStyle:'italic' }}>
                     Repos
@@ -126,26 +144,28 @@ function PlanView({ plan, completions, coachWeekIdx, setCoachWeekIdx, currentWee
                   return (
                     <div key={si} style={{ borderRadius:7, overflow:'visible', minWidth:0, position:'relative',
                       border: done ? '1px solid rgba(16,185,129,.35)' : '1px solid var(--border)',
-                      background: done ? 'rgba(16,185,129,.12)' : isRace ? clr+'18' : 'var(--surface-2)' }}>
-                      <div style={{ borderLeft:`3px solid ${done?'#10B981':clr}`, overflow:'hidden', borderRadius:'6px 0 0 6px' }}>
+                      background: done ? 'rgba(16,185,129,.12)' : isRace ? clr+'18' : 'var(--surface-2)',
+                      height:88, display:'flex', flexDirection:'column' }}>
+                      <div style={{ borderLeft:`3px solid ${done?'#10B981':clr}`, flex:1, display:'flex', flexDirection:'column', overflow:'hidden', borderRadius:'6px 0 0 6px' }}>
                         <div onClick={() => onSessionClick(session, activeSem.numero, si, comp)}
-                          style={{ padding:'.42rem .45rem', cursor:'pointer' }}>
-                          <div style={{ fontSize:'.59rem', fontWeight:700, color:done?'#10B981':clr, marginBottom:'.12rem',
+                          style={{ padding:'.42rem .45rem', cursor:'pointer', flex:1 }}>
+                          <div style={{ fontSize:'.59rem', fontWeight:700, color:done?'#10B981':clr, marginBottom:'.1rem',
                             overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>{session.type || '—'}</div>
-                          <div style={{ fontSize:'.71rem', fontWeight:700, lineHeight:1.2, marginBottom:'.12rem',
+                          <div style={{ fontSize:'.71rem', fontWeight:700, lineHeight:1.2,
                             overflow:'hidden', textOverflow:'ellipsis',
-                            display:'-webkit-box', WebkitLineClamp:2, WebkitBoxOrient:'vertical' }}>{session.titre || '—'}</div>
-                          <div style={{ fontSize:'.61rem', color:'var(--text-muted)' }}>
+                            display:'-webkit-box', WebkitLineClamp:2, WebkitBoxOrient:'vertical',
+                            height:'2.4em' }}>{session.titre || '—'}</div>
+                          <div style={{ fontSize:'.6rem', color:'var(--text-muted)', marginTop:'.1rem' }}>
                             {session.duree_min > 0 ? `${session.duree_min} min` : '—'}
-                            {done && <span style={{ color:'#10B981', marginLeft:'.3rem' }}>✅</span>}
+                            {done && <span style={{ color:'#10B981', marginLeft:'.25rem' }}>✅</span>}
                           </div>
                         </div>
                         {/* Actions */}
-                        <div style={{ display:'flex', borderTop:'1px solid rgba(255,255,255,.06)' }}>
+                        <div style={{ display:'flex', borderTop:'1px solid rgba(255,255,255,.06)', flexShrink:0 }}>
                           {onRescheduleSession && (
                             <button
                               onClick={e => { e.stopPropagation(); setRescheduleCell(isRescheduling ? null : si) }}
-                              style={{ flex:1, padding:'.18rem 0', background: isRescheduling ? 'rgba(139,47,201,.2)' : 'rgba(255,255,255,.04)',
+                              style={{ flex:1, padding:'.16rem 0', background: isRescheduling ? 'rgba(139,47,201,.2)' : 'rgba(255,255,255,.04)',
                                 border:'none', cursor:'pointer', fontSize:'.6rem',
                                 color: isRescheduling ? '#C084FC' : 'rgba(255,255,255,.38)', fontFamily:'inherit' }}>
                               📅
@@ -153,7 +173,7 @@ function PlanView({ plan, completions, coachWeekIdx, setCoachWeekIdx, currentWee
                           )}
                           {onDeleteSession && (
                             <button onClick={e => { e.stopPropagation(); onDeleteSession(coachWeekIdx, si, session.titre) }}
-                              style={{ flex:1, padding:'.18rem 0', background:'rgba(239,68,68,.08)',
+                              style={{ flex:1, padding:'.16rem 0', background:'rgba(239,68,68,.08)',
                                 border:'none', borderLeft: onRescheduleSession ? '1px solid rgba(255,255,255,.06)' : 'none',
                                 cursor:'pointer', fontSize:'.6rem', color:'#FCA5A5', fontFamily:'inherit' }}>
                               🗑️
@@ -193,6 +213,59 @@ function PlanView({ plan, completions, coachWeekIdx, setCoachWeekIdx, currentWee
             )
           })}
         </div>
+
+        {/* ── MOBILE : liste verticale propre par jour (identique interface athlète) ── */}
+        <div className="coach-plan-mobile" style={{ display:'flex', flexDirection:'column', gap:'.625rem' }}>
+          {DAY_NAMES.map(day => {
+            const daySessions = byDay[day]
+            if (!daySessions.length) return null
+            return (
+              <div key={day}>
+                <div style={{ display:'flex', alignItems:'center', gap:'.5rem', marginBottom:'.4rem' }}>
+                  <span style={{ fontSize:'.65rem', fontWeight:800, textTransform:'uppercase',
+                    letterSpacing:'.1em', color:'var(--text-muted)', flexShrink:0 }}>{day}</span>
+                  <div style={{ flex:1, height:1, background:'var(--border)' }} />
+                </div>
+                <div style={{ display:'flex', flexDirection:'column', gap:'.4rem' }}>
+                  {daySessions.map(session => {
+                    const si   = session._si
+                    const clr  = SESSION_TYPE_COLORS[session.type] || '#10B981'
+                    const comp = weekComps.find(c => c.session_index === si)
+                    const done = !!comp
+                    const isRace = session.est_course || (session.id_seance||'').startsWith('RACE')
+                    return (
+                      <div key={si}
+                        onClick={() => onSessionClick(session, activeSem.numero, si, comp)}
+                        style={{ borderRadius:12, overflow:'hidden', cursor:'pointer',
+                          background: done ? 'rgba(16,185,129,.1)' : isRace ? clr+'12' : 'var(--surface-2)',
+                          border:`1px solid ${done?'rgba(16,185,129,.3)':isRace?clr+'45':'rgba(255,255,255,.08)'}` }}>
+                        <div style={{ display:'flex', alignItems:'center', gap:'.65rem',
+                          padding:'.7rem .875rem', borderLeft:`3px solid ${done?'#10B981':clr}` }}>
+                          <div style={{ flex:1, minWidth:0 }}>
+                            <div style={{ fontSize:'.62rem', fontWeight:700, textTransform:'uppercase',
+                              letterSpacing:'.04em', marginBottom:'.15rem', color:done?'#10B981':clr }}>
+                              {session.type}
+                            </div>
+                            <div style={{ fontSize:'.875rem', fontWeight:700, overflow:'hidden',
+                              textOverflow:'ellipsis', whiteSpace:'nowrap' }}>{session.titre}</div>
+                            <div style={{ fontSize:'.72rem', color:'var(--text-muted)', marginTop:'.12rem' }}>
+                              ⏱ {session.duree_min > 0 ? `${session.duree_min} min` : '🏁'}
+                            </div>
+                          </div>
+                          <div style={{ flexShrink:0, display:'flex', alignItems:'center', gap:'.4rem' }}>
+                            {done && <span style={{ fontSize:'.8rem' }}>✅</span>}
+                            <span style={{ color:'rgba(255,255,255,.3)', fontSize:'1rem' }}>›</span>
+                          </div>
+                        </div>
+                      </div>
+                    )
+                  })}
+                </div>
+              </div>
+            )
+          })}
+        </div>
+
         {seances.length === 0 && <p style={{ color:'var(--text-muted)', textAlign:'center', padding:'2rem' }}>Aucune séance cette semaine.</p>}
       </>
     )
@@ -1347,6 +1420,7 @@ function AthleteDetailPanel({ athlete, onClose, onUpdated, onAlertDismissed }) {
                       deleteSessionFromPlan(weekIdx, sessionIdx, titre)}
                     onRescheduleSession={(weekIdx, weekNum, sessionIdx, newDay) =>
                       rescheduleSession(weekIdx, weekNum, sessionIdx, newDay)}
+                    objective={local.objective}
                   />
                 )}
               </div>
