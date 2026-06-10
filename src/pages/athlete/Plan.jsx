@@ -1134,7 +1134,11 @@ export default function AthletePlan() {
 
   return (
     <div className="page">
-      <style>{`@keyframes toastIn { from { opacity:0; transform:translateX(-50%) translateY(12px); } to { opacity:1; transform:translateX(-50%) translateY(0); } }`}</style>
+      <style>{`
+        @keyframes toastIn { from { opacity:0; transform:translateX(-50%) translateY(12px); } to { opacity:1; transform:translateX(-50%) translateY(0); } }
+        @media (max-width: 699px) { .plan-grid-desktop { display: none !important; } }
+        @media (min-width: 700px) { .plan-grid-mobile  { display: none !important; } }
+      `}</style>
       {toast && (
         <div style={{
           position: 'fixed', bottom: '5.5rem', left: '50%', transform: 'translateX(-50%)',
@@ -1329,411 +1333,181 @@ export default function AthletePlan() {
         </div>
       )}
 
-      {/* Desktop: en-têtes + grille dans le même conteneur pour alignement parfait */}
-      {window.innerWidth >= 700 && (() => {
+      {/* Plan grid — responsive via CSS (desktop: 7 colonnes, mobile: liste verticale) */}
+      {currentWeekData && (() => {
         const DAY_NAMES = ['Lundi','Mardi','Mercredi','Jeudi','Vendredi','Samedi','Dimanche']
         const DAY_SHORT  = ['Lun','Mar','Mer','Jeu','Ven','Sam','Dim']
-        const allSessions = (currentWeekData?.seances || []).map((s, origIdx) => ({...s, _origIdx: origIdx}))
-        const filtered = allSessions.filter(session => {
-          if (triTab === 'all') return true;
-          const t = (session.type||'').toLowerCase();
-          const isRenfo = t.includes('renforcement') || (session.id_seance||'').startsWith('RENFO');
-          const isBrk = t.includes('brique') || (session.id_seance||'').startsWith('BRK');
-          if (triTab === 'natation') return t.includes('natation');
-          if (triTab === 'velo')     return t.includes('vélo') || t.includes('velo');
-          if (triTab === 'brique')   return isBrk;
-          if (triTab === 'renfo')    return isRenfo;
-          if (triTab === 'course')   return !t.includes('natation') && !t.includes('vélo') && !t.includes('velo') && !isBrk && !isRenfo;
-          return true;
+        const allSessions = (currentWeekData.seances || []).map((s, origIdx) => ({...s, _origIdx: origIdx}))
+        const filtered = allSessions.filter(s => {
+          if (triTab === 'all') return true
+          const t = (s.type||'').toLowerCase()
+          const isRenfo = t.includes('renforcement') || (s.id_seance||'').startsWith('RENFO')
+          const isBrk   = t.includes('brique')       || (s.id_seance||'').startsWith('BRK')
+          if (triTab === 'natation') return t.includes('natation')
+          if (triTab === 'velo')     return t.includes('vélo') || t.includes('velo')
+          if (triTab === 'brique')   return isBrk
+          if (triTab === 'renfo')    return isRenfo
+          if (triTab === 'course')   return !t.includes('natation') && !t.includes('vélo') && !t.includes('velo') && !isBrk && !isRenfo
+          return true
         })
         const byDay = {}
         DAY_NAMES.forEach(d => { byDay[d] = [] })
         filtered.forEach(s => { if (byDay[s.jour]) byDay[s.jour].push(s) })
 
-        const G = { display:'grid', gridTemplateColumns:'repeat(7,1fr)', gap:'.4rem' }
         return (
           <>
-            {/* En-têtes jours */}
-            <div style={{ ...G, marginBottom:'.4rem' }}>
-              {DAY_SHORT.map(d => (
-                <div key={d} style={{ textAlign:'center', fontSize:'.66rem', fontWeight:800, textTransform:'uppercase',
-                  letterSpacing:'.08em', color:'var(--text-muted)', paddingBottom:'.4rem',
-                  borderBottom:'1px solid var(--border)' }}>{d}</div>
-              ))}
-            </div>
-            {/* Grille sessions */}
-            <div style={{ ...G, alignItems:'start' }}>
-            {DAY_NAMES.map(day => {
-              const daySessions = byDay[day]
-              return (
-                <div key={day} style={{ display:'flex', flexDirection:'column', gap:'.4rem' }}>
-                  {daySessions.length === 0 ? (
-                    <div style={{ minHeight:56, display:'flex', alignItems:'center', justifyContent:'center',
-                      border:'1px dashed rgba(255,255,255,.07)', borderRadius:10,
-                      fontSize:'.68rem', color:'rgba(255,255,255,.2)', fontStyle:'italic' }}>
-                      Repos
-                    </div>
-                  ) : daySessions.map(session => {
-                    const idx = session._origIdx
-                    const done = isCompleted(currentWeekData.numero, idx)
-                    const color = SESSION_TYPE_COLORS[session.type] || '#10B981'
-                    const isRace = session.est_course || session.id_seance === 'RACE' || session.id_seance === 'RACE_INT'
-                    return (
-                      <div key={idx}
-                        style={{ borderLeft:`3px solid ${done ? 'var(--success)' : color}`,
-                          background: done ? 'rgba(16,185,129,.12)' : isRace ? color+'15' : 'var(--surface-2)',
-                          border: done ? '1px solid rgba(16,185,129,.35)' : undefined,
-                          borderRadius:8, padding:'.55rem .65rem', cursor:'pointer',
-                          transition:'transform .12s', minWidth:0, position:'relative' }}
-                        onMouseEnter={e => e.currentTarget.style.transform='translateY(-1px)'}
-                        onMouseLeave={e => e.currentTarget.style.transform=''}>
-                        <div onClick={() => setModal({ session: {...session, _isDone: done, _dateLabel: sessionDate(planMonday, currentWeekData.numero, session.jour)}, weekNum: currentWeekData.numero, sessionIdx: idx })}>
-                          <div style={{ fontSize:'.65rem', fontWeight:700, color, marginBottom:'.2rem',
-                            overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>
-                            {session.type}
-                          </div>
-                          <div style={{ fontSize:'.78rem', fontWeight:700, lineHeight:1.2,
-                            overflow:'hidden', textOverflow:'ellipsis',
-                            display:'-webkit-box', WebkitLineClamp:2, WebkitBoxOrient:'vertical' }}>
-                            {session.titre}
-                          </div>
-                          <div style={{ fontSize:'.68rem', color:'var(--text-muted)', marginTop:'.2rem' }}>
-                            {session.duree_min > 0 ? `${session.duree_min} min` : '🏁'}
-                          </div>
-                          {done && <div style={{ fontSize:'.6rem', color:'var(--success)', marginTop:'.15rem' }}>✅ Effectué</div>}
+            {/* ── DESKTOP : grille 7 colonnes ── */}
+            <div className="plan-grid-desktop">
+              <div style={{ display:'grid', gridTemplateColumns:'repeat(7,1fr)', gap:'.4rem', marginBottom:'.4rem' }}>
+                {DAY_SHORT.map(d => (
+                  <div key={d} style={{ textAlign:'center', fontSize:'.66rem', fontWeight:800, textTransform:'uppercase',
+                    letterSpacing:'.08em', color:'var(--text-muted)', paddingBottom:'.4rem',
+                    borderBottom:'1px solid var(--border)' }}>{d}</div>
+                ))}
+              </div>
+              <div style={{ display:'grid', gridTemplateColumns:'repeat(7,1fr)', gap:'.4rem', alignItems:'start' }}>
+                {DAY_NAMES.map(day => {
+                  const daySessions = byDay[day]
+                  return (
+                    <div key={day} style={{ display:'flex', flexDirection:'column', gap:'.4rem' }}>
+                      {daySessions.length === 0 ? (
+                        <div style={{ minHeight:56, display:'flex', alignItems:'center', justifyContent:'center',
+                          border:'1px dashed rgba(255,255,255,.07)', borderRadius:10,
+                          fontSize:'.68rem', color:'rgba(255,255,255,.2)', fontStyle:'italic' }}>
+                          Repos
                         </div>
-                        <button
-                          onClick={e => { e.stopPropagation(); setRescheduleIdx(v => v && v.weekNum === currentWeekData.numero && v.sessionIdx === idx ? null : { weekNum: currentWeekData.numero, sessionIdx: idx }) }}
-                          style={{ marginTop:'.3rem', background:'none', border:'1px solid rgba(255,255,255,.12)', borderRadius:6,
-                            padding:'.15rem .35rem', fontSize:'.6rem', color:'rgba(255,255,255,.4)', cursor:'pointer',
-                            fontFamily:'inherit', width:'100%' }}>
-                          📅 Déplacer
-                        </button>
-                        {/* Day picker */}
-                        {rescheduleIdx && rescheduleIdx.weekNum === currentWeekData.numero && rescheduleIdx.sessionIdx === idx && (
-                          <div onClick={e => e.stopPropagation()} style={{
-                            position:'absolute', top:'calc(100% + .25rem)', left:0, right:0, zIndex:50,
-                            background:'var(--surface)', border:'1px solid var(--border)', borderRadius:8,
-                            padding:'.4rem', boxShadow:'var(--shadow-lg)',
-                          }}>
-                            <div style={{ fontSize:'.6rem', color:'var(--text-muted)', marginBottom:'.3rem', textAlign:'center' }}>Choisir le jour</div>
-                            <div style={{ display:'flex', flexWrap:'wrap', gap:'.25rem', justifyContent:'center' }}>
-                              {['Lundi','Mardi','Mercredi','Jeudi','Vendredi','Samedi','Dimanche'].map(day => (
-                                <button key={day}
-                                  onClick={() => rescheduleSession(currentWeekData.numero, idx, day)}
-                                  style={{
-                                    padding:'.22rem .4rem', borderRadius:5, fontSize:'.62rem', cursor:'pointer',
-                                    fontFamily:'inherit', fontWeight: session.jour === day ? 800 : 500,
-                                    background: session.jour === day ? color+'30' : 'var(--surface-2)',
-                                    border: session.jour === day ? `1px solid ${color}` : '1px solid var(--border)',
-                                    color: session.jour === day ? color : 'var(--text)',
-                                  }}>
-                                  {day.slice(0,3)}
-                                </button>
-                              ))}
+                      ) : daySessions.map(session => {
+                        const idx   = session._origIdx
+                        const done  = isCompleted(currentWeekData.numero, idx)
+                        const color = SESSION_TYPE_COLORS[session.type] || '#10B981'
+                        const isRace = session.est_course || session.id_seance === 'RACE' || session.id_seance === 'RACE_INT'
+                        return (
+                          <div key={idx}
+                            style={{ borderRadius:8, minWidth:0, position:'relative', overflow:'hidden',
+                              border: done ? '1px solid rgba(16,185,129,.35)' : '1px solid var(--border)',
+                              background: done ? 'rgba(16,185,129,.12)' : isRace ? color+'15' : 'var(--surface-2)',
+                              cursor:'pointer', transition:'transform .12s' }}
+                            onMouseEnter={e => e.currentTarget.style.transform='translateY(-1px)'}
+                            onMouseLeave={e => e.currentTarget.style.transform=''}>
+                            <div style={{ borderLeft:`3px solid ${done ? 'var(--success)' : color}`, padding:'.55rem .65rem' }}>
+                              <div onClick={() => setModal({ session: {...session, _isDone: done, _dateLabel: sessionDate(planMonday, currentWeekData.numero, session.jour)}, weekNum: currentWeekData.numero, sessionIdx: idx })}>
+                                <div style={{ fontSize:'.65rem', fontWeight:700, color, marginBottom:'.2rem',
+                                  overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>
+                                  {session.type}
+                                </div>
+                                <div style={{ fontSize:'.78rem', fontWeight:700, lineHeight:1.2,
+                                  overflow:'hidden', textOverflow:'ellipsis',
+                                  display:'-webkit-box', WebkitLineClamp:2, WebkitBoxOrient:'vertical' }}>
+                                  {session.titre}
+                                </div>
+                                <div style={{ fontSize:'.68rem', color:'var(--text-muted)', marginTop:'.2rem' }}>
+                                  {session.duree_min > 0 ? `${session.duree_min} min` : '🏁'}
+                                </div>
+                                {done && <div style={{ fontSize:'.6rem', color:'var(--success)', marginTop:'.15rem' }}>✅ Effectué</div>}
+                              </div>
+                              <button
+                                onClick={e => { e.stopPropagation(); setRescheduleIdx(v => v && v.weekNum === currentWeekData.numero && v.sessionIdx === idx ? null : { weekNum: currentWeekData.numero, sessionIdx: idx }) }}
+                                style={{ marginTop:'.3rem', background:'none', border:'1px solid rgba(255,255,255,.12)', borderRadius:6,
+                                  padding:'.15rem .35rem', fontSize:'.6rem', color:'rgba(255,255,255,.4)', cursor:'pointer',
+                                  fontFamily:'inherit', width:'100%' }}>
+                                📅 Déplacer
+                              </button>
+                              {rescheduleIdx && rescheduleIdx.weekNum === currentWeekData.numero && rescheduleIdx.sessionIdx === idx && (
+                                <div onClick={e => e.stopPropagation()} style={{
+                                  position:'absolute', top:'calc(100% + .25rem)', left:0, right:0, zIndex:50,
+                                  background:'var(--surface)', border:'1px solid var(--border)', borderRadius:8,
+                                  padding:'.4rem', boxShadow:'var(--shadow-lg)',
+                                }}>
+                                  <div style={{ fontSize:'.6rem', color:'var(--text-muted)', marginBottom:'.3rem', textAlign:'center' }}>Choisir le jour</div>
+                                  <div style={{ display:'flex', flexWrap:'wrap', gap:'.25rem', justifyContent:'center' }}>
+                                    {DAY_NAMES.map(d => (
+                                      <button key={d}
+                                        onClick={() => rescheduleSession(currentWeekData.numero, idx, d)}
+                                        style={{
+                                          padding:'.22rem .4rem', borderRadius:5, fontSize:'.62rem', cursor:'pointer',
+                                          fontFamily:'inherit', fontWeight: session.jour === d ? 800 : 500,
+                                          background: session.jour === d ? color+'30' : 'var(--surface-2)',
+                                          border: session.jour === d ? `1px solid ${color}` : '1px solid var(--border)',
+                                          color: session.jour === d ? color : 'var(--text)',
+                                        }}>
+                                        {d.slice(0,3)}
+                                      </button>
+                                    ))}
+                                  </div>
+                                </div>
+                              )}
                             </div>
                           </div>
-                        )}
-                      </div>
-                    )
-                  })}
-                </div>
-              )
-            })}
-          </div>
+                        )
+                      })}
+                    </div>
+                  )
+                })}
+              </div>
+            </div>
+
+            {/* ── MOBILE : liste verticale propre ── */}
+            <div className="plan-grid-mobile" style={{ display:'flex', flexDirection:'column', gap:'.625rem' }}>
+              {DAY_NAMES.map(day => {
+                const daySessions = byDay[day]
+                if (!daySessions.length) return null
+                return (
+                  <div key={day}>
+                    {/* En-tête jour */}
+                    <div style={{ display:'flex', alignItems:'center', gap:'.5rem', marginBottom:'.4rem' }}>
+                      <span style={{ fontSize:'.65rem', fontWeight:800, textTransform:'uppercase',
+                        letterSpacing:'.1em', color:'var(--text-muted)', flexShrink:0 }}>
+                        {day}
+                      </span>
+                      <div style={{ flex:1, height:1, background:'var(--border)' }} />
+                    </div>
+                    {/* Cartes séances */}
+                    <div style={{ display:'flex', flexDirection:'column', gap:'.4rem' }}>
+                      {daySessions.map(session => {
+                        const idx   = session._origIdx
+                        const done  = isCompleted(currentWeekData.numero, idx)
+                        const isRace = session.est_course || session.id_seance === 'RACE' || session.id_seance === 'RACE_INT'
+                        const color = SESSION_TYPE_COLORS[session.type] || '#10B981'
+                        const dateLabel = sessionDate(planMonday, currentWeekData.numero, session.jour)
+                        return (
+                          <div key={idx}
+                            onClick={() => setModal({ session:{...session, _isDone:done, _dateLabel:dateLabel}, weekNum:currentWeekData.numero, sessionIdx:idx })}
+                            style={{ borderRadius:12, overflow:'hidden', cursor:'pointer',
+                              background: done ? 'rgba(16,185,129,.1)' : isRace ? color+'12' : 'var(--surface-2)',
+                              border: `1px solid ${done ? 'rgba(16,185,129,.3)' : isRace ? color+'45' : 'rgba(255,255,255,.08)'}` }}>
+                            <div style={{ display:'flex', alignItems:'center', gap:'.65rem', padding:'.7rem .875rem',
+                              borderLeft:`3px solid ${done ? '#10B981' : color}` }}>
+                              <div style={{ flex:1, minWidth:0 }}>
+                                <div style={{ fontSize:'.62rem', fontWeight:700, textTransform:'uppercase',
+                                  letterSpacing:'.04em', marginBottom:'.15rem',
+                                  color: done ? '#10B981' : color }}>
+                                  {session.type}
+                                </div>
+                                <div style={{ fontSize:'.875rem', fontWeight:700, overflow:'hidden',
+                                  textOverflow:'ellipsis', whiteSpace:'nowrap' }}>
+                                  {session.titre}
+                                </div>
+                                <div style={{ fontSize:'.72rem', color:'var(--text-muted)', marginTop:'.12rem' }}>
+                                  ⏱ {session.duree_min > 0 ? `${session.duree_min} min` : '🏁'}
+                                  {session.rpe_cible ? ` · RPE ${session.rpe_cible}` : ''}
+                                </div>
+                              </div>
+                              <div style={{ flexShrink:0, display:'flex', alignItems:'center', gap:'.4rem' }}>
+                                {done && <span style={{ fontSize:'.8rem' }}>✅</span>}
+                                <span style={{ color:'rgba(255,255,255,.3)', fontSize:'1rem' }}>›</span>
+                              </div>
+                            </div>
+                          </div>
+                        )
+                      })}
+                    </div>
+                  </div>
+                )
+              })}
+            </div>
           </>
         )
       })()}
-
-      {/* Mobile agenda — vue agenda < 700px */}
-      {window.innerWidth < 700 && (() => {
-        if (!currentWeekData) return null
-        const DAY_NAMES = ['Lundi','Mardi','Mercredi','Jeudi','Vendredi','Samedi','Dimanche']
-        const DAY_SHORT  = ['Lun','Mar','Mer','Jeu','Ven','Sam','Dim']
-        const allSessions = (currentWeekData.seances || []).map((s, i) => ({...s, _origIdx: i}))
-        const byDay = {}
-        DAY_NAMES.forEach(d => { byDay[d] = [] })
-        allSessions
-          .filter(s => {
-            if (triTab === 'all') return true
-            const t = (s.type||'').toLowerCase()
-            const isRenfo = t.includes('renforcement') || (s.id_seance||'').startsWith('RENFO')
-            const isBrk = t.includes('brique') || (s.id_seance||'').startsWith('BRK')
-            if (triTab === 'natation') return t.includes('natation')
-            if (triTab === 'velo') return t.includes('vélo') || t.includes('velo')
-            if (triTab === 'brique') return isBrk
-            if (triTab === 'renfo') return isRenfo
-            if (triTab === 'course') return !t.includes('natation') && !t.includes('vélo') && !t.includes('velo') && !isBrk && !isRenfo
-            return true
-          })
-          .forEach(s => { if (byDay[s.jour]) byDay[s.jour].push(s) })
-
-        return (
-          <div className="plan-mobile-agenda" style={{ display:'flex', flexDirection:'column', gap:'.3rem' }}>
-            {DAY_NAMES.map((day, di) => {
-              const daySessions = byDay[day]
-              const hasSession = daySessions.length > 0
-              return (
-                <div key={day} style={{ display:'flex', gap:'.6rem', alignItems:'flex-start' }}>
-                  {/* Day pill */}
-                  <div style={{
-                    flexShrink:0, width:34, paddingTop: hasSession ? '.55rem' : '.6rem',
-                    display:'flex', flexDirection:'column', alignItems:'center',
-                  }}>
-                    <span style={{
-                      fontSize:'.62rem', fontWeight:800, textTransform:'uppercase', letterSpacing:'.05em',
-                      color: hasSession ? '#fff' : 'rgba(255,255,255,.2)',
-                    }}>{DAY_SHORT[di]}</span>
-                  </div>
-                  {/* Sessions or rest line */}
-                  <div style={{ flex:1, display:'flex', flexDirection:'column', gap:'.25rem' }}>
-                    {!hasSession ? (
-                      <div style={{ display:'flex', alignItems:'center', height:36 }}>
-                        <div style={{ flex:1, height:1, background:'rgba(255,255,255,.06)' }} />
-                        <span style={{ fontSize:'.6rem', color:'rgba(255,255,255,.2)', margin:'0 .5rem' }}>repos</span>
-                        <div style={{ flex:1, height:1, background:'rgba(255,255,255,.06)' }} />
-                      </div>
-                    ) : daySessions.map(session => {
-                      const idx   = session._origIdx
-                      const done  = isCompleted(currentWeekData.numero, idx)
-                      const isRace = session.est_course || session.id_seance === 'RACE' || session.id_seance === 'RACE_INT'
-                      const color = SESSION_TYPE_COLORS[session.type] || '#10B981'
-                      const dateLabel = sessionDate(planMonday, currentWeekData.numero, session.jour)
-                      return (
-                        <div key={idx}
-                          onClick={() => setModal({ session:{...session, _isDone:done, _dateLabel:dateLabel}, weekNum:currentWeekData.numero, sessionIdx:idx })}
-                          style={{
-                            display:'flex', alignItems:'center', gap:'.6rem',
-                            padding:'.5rem .7rem',
-                            background: done ? 'rgba(16,185,129,.1)' : isRace ? color+'15' : 'var(--surface-2)',
-                            border: `1px solid ${done ? 'rgba(16,185,129,.3)' : isRace ? color+'50' : 'rgba(255,255,255,.07)'}`,
-                            borderLeft: `3px solid ${done ? '#10B981' : color}`,
-                            borderRadius:10, cursor:'pointer', transition:'transform .1s',
-                          }}
-                          onMouseEnter={e => e.currentTarget.style.transform='translateX(2px)'}
-                          onMouseLeave={e => e.currentTarget.style.transform=''}>
-                          {/* Color dot */}
-                          <div style={{ width:8, height:8, borderRadius:'50%', background:done?'#10B981':color, flexShrink:0 }} />
-                          {/* Content */}
-                          <div style={{ flex:1, minWidth:0 }}>
-                            <div style={{ fontSize:'.62rem', fontWeight:700, color:done?'#10B981':color, marginBottom:'.08rem', textTransform:'uppercase', letterSpacing:'.04em' }}>
-                              {session.type}
-                            </div>
-                            <div style={{ fontSize:'.88rem', fontWeight:700, overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>
-                              {session.titre}
-                            </div>
-                          </div>
-                          {/* Right: duration + done badge */}
-                          <div style={{ flexShrink:0, display:'flex', flexDirection:'column', alignItems:'flex-end', gap:'.15rem' }}>
-                            <span style={{ fontSize:'.72rem', fontWeight:700, color:'rgba(255,255,255,.5)' }}>
-                              {session.duree_min > 0 ? `${session.duree_min}m` : '🏁'}
-                            </span>
-                            {done && <span style={{ fontSize:'.65rem' }}>✅</span>}
-                          </div>
-                          <span style={{ color:'rgba(255,255,255,.25)', fontSize:'.85rem', flexShrink:0 }}>›</span>
-                        </div>
-                      )
-                    })}
-                  </div>
-                </div>
-              )
-            })}
-          </div>
-        )
-      })()}
-
-      {/* Mobile: flat vertical list — HIDDEN, remplacée par l'agenda ci-dessus */}
-      <div className="plan-mobile-list" style={{ display:'none' }}>
-        {(currentWeekData?.seances || [])
-          .map((s, origIdx) => ({ ...s, _origIdx: origIdx }))
-          .sort((a, b) => sessionDayOrder(a) - sessionDayOrder(b))
-          .filter(session => {
-            if (triTab === 'all') return true;
-            const t = (session.type || '').toLowerCase();
-            const isRenfo = t.includes('renforcement') || (session.id_seance || '').startsWith('RENFO');
-            const isBrk = t.includes('brique') || (session.id_seance || '').startsWith('BRK');
-            if (triTab === 'natation') return t.includes('natation');
-            if (triTab === 'velo')     return t.includes('vélo') || t.includes('velo');
-            if (triTab === 'brique')   return isBrk;
-            if (triTab === 'renfo')    return isRenfo;
-            if (triTab === 'course')   return !t.includes('natation') && !t.includes('vélo') && !t.includes('velo') && !isBrk && !isRenfo;
-            return true;
-          })
-          .map((session) => {
-          const DAY_COL = { Lundi:1, Mardi:2, Mercredi:3, Jeudi:4, Vendredi:5, Samedi:6, Dimanche:7 }
-          const idx   = session._origIdx
-          const done  = isCompleted(currentWeekData.numero, idx)
-          const isRace = session.est_course || session.id_seance === 'RACE' || session.id_seance === 'RACE_INT'
-          const isBrique = (session.type || '').toLowerCase().includes('brique')
-          const color = SESSION_TYPE_COLORS[session.type] || '#10B981'
-
-          // ── Brick session card ──────────────────────────────────────────────
-          if (isBrique && !isRace) {
-            const bColor = '#8B5CF6'
-            const dateLabel = sessionDate(planMonday, currentWeekData.numero, session.jour)
-            const parts = (session.corps || '').split(/BLOC\s+/i).filter(Boolean)
-            return (
-              <div key={idx} style={{
-                borderRadius: 'var(--radius)',
-                border: `2px solid ${done ? 'var(--success)' : bColor}`,
-                background: `linear-gradient(135deg, ${bColor}10, ${bColor}06)`,
-                padding: '1rem 1.25rem', cursor: 'pointer',
-                opacity: done ? .75 : 1,
-              }} onClick={() => setModal({ session: { ...session, _isDone: done, _dateLabel: dateLabel }, weekNum: currentWeekData.numero, sessionIdx: idx })}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '.5rem', marginBottom: '.5rem' }}>
-                  <span style={{ fontSize: '.75rem', fontWeight: 700, color: bColor, background: bColor+'25', padding: '.15rem .6rem', borderRadius: 99 }}>
-                    🔗 Brique
-                  </span>
-                  {done && <span className="badge badge-success">✅ Effectuée</span>}
-                </div>
-                <div style={{ fontWeight: 800, fontSize: '1.05rem', marginBottom: '.2rem' }}>{session.titre}</div>
-                <div style={{ fontSize: '.8rem', color: 'var(--text-muted)', marginBottom: '.75rem' }}>
-                  {dateLabel} · {session.duree_min} min
-                </div>
-                <div style={{ display: 'flex', gap: '.5rem', flexWrap: 'wrap' }}>
-                  {parts.slice(0, 3).map((part, i) => {
-                    const firstLine = part.split('\n')[0].trim()
-                    const isBikeBloc = /vélo|velo|bike/i.test(firstLine)
-                    const isRunBloc  = /course|run|footing/i.test(firstLine)
-                    const isNatBloc  = /nage|natation|swim/i.test(firstLine)
-                    const bloColor   = isBikeBloc ? '#F97316' : isRunBloc ? '#10B981' : isNatBloc ? '#06B6D4' : bColor
-                    return (
-                      <div key={i} style={{ background: bloColor+'18', border: `1px solid ${bloColor}35`, borderRadius: 8, padding: '.3rem .7rem', fontSize: '.75rem', fontWeight: 600, color: bloColor }}>
-                        {firstLine.replace(/\n.*/, '')}
-                      </div>
-                    )
-                  })}
-                </div>
-              </div>
-            )
-          }
-
-          // ── Special race card ──────────────────────────────────────────────
-          if (isRace) {
-            const raceColor = session.type === 'Course intermédiaire' ? '#FB923C' : '#FFD700'
-            const dateLabel = sessionDate(planMonday, currentWeekData.numero, session.jour)
-            return (
-              <div key={idx} style={{
-                borderRadius: 'var(--radius)',
-                border: `2px solid ${raceColor}`,
-                background: `linear-gradient(135deg, ${raceColor}18, ${raceColor}08)`,
-                padding: '1rem 1.25rem',
-                position: 'relative', overflow: 'hidden',
-              }}>
-                <div style={{
-                  position: 'absolute', top: 0, right: 0, bottom: 0, width: 4,
-                  background: raceColor, opacity: .6,
-                }} />
-                <div style={{ display: 'flex', alignItems: 'center', gap: '.5rem', marginBottom: '.5rem' }}>
-                  <span style={{ fontSize: '1.25rem' }}>🏁</span>
-                  <span style={{ fontSize: '.75rem', fontWeight: 700, color: raceColor,
-                    background: raceColor + '25', padding: '.15rem .6rem', borderRadius: 99 }}>
-                    {session.type}
-                  </span>
-                </div>
-                <div style={{ fontWeight: 800, fontSize: '1.05rem', marginBottom: '.25rem', color: raceColor }}>
-                  {session.titre}
-                </div>
-                <div style={{ fontSize: '.8rem', color: 'var(--text-muted)', marginBottom: '.75rem' }}>{dateLabel}</div>
-                {session.corps && (
-                  <div style={{ fontSize: '.875rem', lineHeight: 1.6, color: 'var(--text)', fontStyle: 'italic',
-                    borderTop: `1px solid ${raceColor}30`, paddingTop: '.6rem' }}>
-                    {session.corps}
-                  </div>
-                )}
-                {session.notes_coach && (
-                  <div style={{ marginTop: '.5rem', fontSize: '.78rem', color: 'var(--text-muted)', lineHeight: 1.5 }}>
-                    💬 {session.notes_coach}
-                  </div>
-                )}
-              </div>
-            )
-          }
-
-          const isRenfo = (session.type || '').toLowerCase().includes('renforcement') || (session.id_seance || '').startsWith('RENFO')
-          const dateLabel = sessionDate(planMonday, currentWeekData.numero, session.jour)
-
-          const isRescheduling = rescheduleIdx && rescheduleIdx.weekNum === currentWeekData.numero && rescheduleIdx.sessionIdx === idx
-          return (
-            <div key={idx}
-              style={{
-                borderRadius: 14, overflow: 'visible',
-                // Fully green when done
-                background: done ? 'rgba(16,185,129,.12)' : 'var(--surface-2)',
-                border: done ? '1.5px solid rgba(16,185,129,.4)' : isRenfo ? `1.5px solid ${color}45` : '1px solid var(--border)',
-                transition: 'transform .12s, box-shadow .12s',
-                position: 'relative',
-              }}
-              onMouseEnter={e => { e.currentTarget.style.transform='translateY(-2px)'; e.currentTarget.style.boxShadow='var(--shadow-lg)' }}
-              onMouseLeave={e => { e.currentTarget.style.transform=''; e.currentTarget.style.boxShadow='' }}>
-              {/* Color accent strip top — green when done */}
-              <div style={{ height: 4, background: done ? '#10B981' : `linear-gradient(90deg, ${color}, ${color}88)`, borderRadius:'14px 14px 0 0' }} />
-              <div
-                onClick={() => setModal({ session: { ...session, _isDone: done, _dateLabel: dateLabel }, weekNum: currentWeekData.numero, sessionIdx: idx })}
-                style={{ padding: '.75rem 1rem', display:'flex', justifyContent:'space-between', alignItems:'flex-start', gap:'.75rem', cursor:'pointer' }}>
-                <div style={{ flex:1, minWidth:0 }}>
-                  <div style={{ display:'flex', alignItems:'center', gap:'.4rem', marginBottom:'.3rem', flexWrap:'wrap' }}>
-                    <span style={{ fontSize:'.68rem', fontWeight:700, color, background:color+'18', padding:'.12rem .5rem', borderRadius:99, whiteSpace:'nowrap' }}>
-                      {session.type}
-                    </span>
-                    <span style={{ fontSize:'.72rem', color:'var(--text-muted)' }}>{dateLabel}</span>
-                    {done && <span style={{ fontSize:'.68rem', color:'var(--success)', fontWeight:700 }}>✅ Effectué</span>}
-                  </div>
-                  <div style={{ fontWeight:700, fontSize:'.9rem', lineHeight:1.3, marginBottom:'.25rem',
-                    overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>
-                    {session.titre}
-                  </div>
-                  <div style={{ fontSize:'.75rem', color:'var(--text-muted)', display:'flex', gap:'.6rem' }}>
-                    <span>⏱ {session.duree_min} min</span>
-                    {session.rpe_cible && <span>💪 RPE {session.rpe_cible}</span>}
-                  </div>
-                </div>
-                <ExportBtn
-                  session={session}
-                  suuntoConnected={profile?.suunto_connected}
-                  garminConnected={profile?.garmin_connected}
-                  userId={profile?.id}
-                />
-              </div>
-              {/* Reschedule row */}
-              <div style={{ padding:'0 1rem .75rem', display:'flex', alignItems:'center', justifyContent:'flex-end', gap:'.5rem' }}>
-                <button
-                  onClick={e => { e.stopPropagation(); setRescheduleIdx(isRescheduling ? null : { weekNum: currentWeekData.numero, sessionIdx: idx }) }}
-                  style={{ background:'none', border:'1px solid rgba(255,255,255,.12)', borderRadius:8,
-                    padding:'.25rem .6rem', fontSize:'.72rem', color:'rgba(255,255,255,.45)', cursor:'pointer',
-                    fontFamily:'inherit' }}>
-                  📅 Déplacer
-                </button>
-              </div>
-              {/* Day picker overlay */}
-              {isRescheduling && (
-                <div onClick={e => e.stopPropagation()} style={{
-                  position:'absolute', bottom:'calc(100% + .3rem)', right:0, zIndex:50,
-                  background:'var(--surface)', border:'1px solid var(--border)', borderRadius:12,
-                  padding:'.75rem', boxShadow:'var(--shadow-lg)', minWidth:240,
-                }}>
-                  <div style={{ fontSize:'.72rem', color:'var(--text-muted)', marginBottom:'.5rem', fontWeight:600 }}>Déplacer au :</div>
-                  <div style={{ display:'flex', flexWrap:'wrap', gap:'.35rem' }}>
-                    {['Lundi','Mardi','Mercredi','Jeudi','Vendredi','Samedi','Dimanche'].map(day => (
-                      <button key={day}
-                        onClick={() => rescheduleSession(currentWeekData.numero, idx, day)}
-                        style={{
-                          padding:'.3rem .65rem', borderRadius:8, fontSize:'.75rem', cursor:'pointer',
-                          fontFamily:'inherit', fontWeight: session.jour === day ? 800 : 500,
-                          background: session.jour === day ? color+'30' : 'var(--surface-2)',
-                          border: session.jour === day ? `1.5px solid ${color}` : '1px solid var(--border)',
-                          color: session.jour === day ? color : 'var(--text)',
-                        }}>
-                        {day.slice(0,3)}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              )}
-            </div>
-          )
-        })}
-      </div>{/* end mobile list */}
 
       {/* Weekly feedback, appears when all sessions of active week are done */}
       {(() => {
