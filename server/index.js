@@ -154,10 +154,10 @@ const supabaseRT = createClient(
 );
 const anthropicAI = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
 
-// Debounce per user to avoid double-replies on rapid messages
-const pendingReplies = new Set();
+// Auto-reply disabled — seule l'analyse hebdomadaire envoie des messages automatiques
 
 async function autoReply(message) {
+  return; // désactivé
   const { user_id } = message;
   if (pendingReplies.has(user_id)) return;
   pendingReplies.add(user_id);

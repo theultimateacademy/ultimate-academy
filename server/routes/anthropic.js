@@ -1919,15 +1919,25 @@ router.post('/analyses/run-weekly', async (req, res) => {
           : 'RPE dans la zone cible'
         : 'RPE non renseigné';
 
-      const analysisPrompt = `Tu es le coach Alexis de The Ultimate Academy. Analyse la semaine ${weeksElapsed} de cet athlète.
+      const analysisPrompt = `Tu es le coach Alexis de The Ultimate Academy. Analyse la semaine ${weeksElapsed} de ${athlete.first_name}.
 Retourne UNIQUEMENT du JSON valide.
 
-Données semaine ${weeksElapsed} — ${weekData.phase} (${weekData.charge}) :
+Données semaine ${weeksElapsed} (${weekData.phase} - ${weekData.charge}) :
 - Séances planifiées : ${plannedCount}
 - Séances réalisées : ${doneCount}
 - RPE moyen : ${avgRpe}/10
 - Signal : ${loadSignal}
 - Commentaires : ${comments}
+
+RÈGLES IMPÉRATIVES pour message_coach :
+- Commence par "Hello ${athlete.first_name} !" ou "Salut ${athlete.first_name} !"
+- Toujours positif et bienveillant, même si peu de séances ont été faites
+- Tire quelque chose de bien de la semaine dans tous les cas
+- 4 à 6 phrases, style SMS naturel entre potes, chaleureux
+- 1 à 2 emojis maximum
+- Termine par un encouragement du style "bonne semaine !", "bon courage pour la suite !", "passe une bonne soirée !"
+- JAMAIS le caractère tiret long (—)
+- JAMAIS de signature, JAMAIS de formule formelle
 
 Format JSON :
 {
@@ -1939,7 +1949,7 @@ Format JSON :
   "seances_planifiees": ${plannedCount},
   "rpe_moyen": "${avgRpe}",
   "commentaires": "${comments.replace(/"/g, "'")}",
-  "message_coach": "Message naturel et amical, 3-4 phrases, à la 2ème personne, ton pote coach qui te parle franchement — sans signature"
+  "message_coach": "Message chaleureux et personnel pour ${athlete.first_name}, voir règles ci-dessus"
 }`;
 
       try {
@@ -2020,22 +2030,6 @@ router.post('/plans/fatigue-adapt', async (req, res) => {
     });
 
     const coachMessage = msg.content[0].text.trim();
-
-    // Send message to athlete
-    await supabase.from('messages').insert({
-      user_id: userId,
-      sender:  'coach',
-      content: coachMessage,
-      read:    false,
-    });
-
-    // Notify coach (internal flag via messages table)
-    await supabase.from('messages').insert({
-      user_id: userId,
-      sender:  'athlete',
-      content: `[AUTO] Adaptation déclenchée — RPE ${rpe}/10 pour ${athleteProfile.first_name}. Semaine ${weekNumber + 1} ajustée automatiquement.`,
-      read:    true,
-    });
 
     res.json({ success: true, coachMessage });
   } catch (err) {
@@ -2194,15 +2188,11 @@ router.post('/analyses/intermediate-post/run', async (req, res) => {
 Tu peux mettre 1-2 emojis, style SMS naturel, pas de signature, pas de "Cher/Chère".
 Réponds uniquement avec le texte du message.`;
 
-        const msg = await client.messages.create({
+        await client.messages.create({
           model: 'claude-sonnet-4-6', max_tokens: 350,
           messages: [{ role: 'user', content: prompt }]
         });
 
-        await supabase.from('messages').insert({
-          user_id: athlete.id, sender: 'coach',
-          content: msg.content[0].text.trim(), read: false,
-        });
         processed++;
       } catch (err) {
         console.error(`[intermediate-post] Error for ${athlete.id}:`, err.message);
@@ -2543,20 +2533,6 @@ router.post('/plans/schedule-regen', async (req, res) => {
     await supabase.from('profiles').update({ plan_regen_after: regenAt.toISOString() }).eq('id', userId);
     console.log(`[schedule-regen] Scheduled for ${userId} at ${regenAt.toISOString()} — reason: ${reason}`);
 
-    const { data: profile } = await supabase.from('profiles').select('first_name').eq('id', userId).single();
-    const firstName = profile?.first_name || '';
-    let confirmMsg = `Bien reçu ${firstName} ! J'ai pris note de ta modification — ton plan sera automatiquement adapté d'ici 1h. 👌`;
-    if (reason === 'Blessures / douleurs') {
-      confirmMsg = `Bien reçu ${firstName} 🩹 J'ai pris note de ta blessure — ton plan sera adapté d'ici 1h pour tenir compte de ça. Prends soin de toi, on y va progressivement.`;
-    } else if (reason === 'Cycle menstruel') {
-      confirmMsg = `Bien reçu ${firstName} 🌸 Tes paramètres de cycle sont enregistrés — ton plan sera adapté d'ici 1h. Prends soin de toi.`;
-    }
-    await supabase.from('messages').insert({
-      user_id: userId, sender: 'coach',
-      content: confirmMsg,
-      read: false,
-    });
-
     res.json({ success: true, regen_scheduled_for: regenAt.toISOString() });
   } catch (err) {
     console.error('[schedule-regen]', err.message);
@@ -2626,12 +2602,6 @@ router.post('/plans/check-regen', async (req, res) => {
               await supabase.from('training_plans').update({ plan_data: updatedPlan }).eq('id', heatPlan.id);
             }
           }
-
-          await supabase.from('messages').insert({
-            user_id: profile.id, sender: 'coach',
-            content: `${profile.first_name}, c'est fait — ta semaine est allégée 🌡️ Que des footings tranquilles jusqu'à ce que la canicule passe. Cours tôt le mat' ou en soirée et hydrate-toi bien.`,
-            read: false,
-          });
 
           processed++;
           console.log(`[check-regen] Heat adaptation applied for ${profile.first_name} (${profile.id})`);
@@ -2728,24 +2698,6 @@ CONTRAINTES ABSOLUES :
           status:       'active',
           activated_at: new Date().toISOString(),
         });
-
-        // Warm personal message — generated by Claude, buddy style
-        try {
-          const warmMsg = await client.messages.create({
-            model: 'claude-sonnet-4-6', max_tokens: 200,
-            messages: [{ role: 'user', content: `Tu es Alexis, coach running. Écris un message très court (2-3 phrases max) style SMS de pote à ${profile.first_name}. Tu viens de mettre à jour son plan suite à des changements dans son profil. Parle à la 1ère personne, dis "Hello ${profile.first_name} !" ou similaire, 1-2 emojis max en fin de phrase, très naturel, jamais "cher/chère", jamais de signature. Exemple : "Hello ${profile.first_name} ! J'ai vu tes modifs et j'ai mis ton plan à jour 💪 Vas voir l'onglet Plan !" Réponds uniquement avec le texte du message, sans guillemets.` }]
-          });
-          await supabase.from('messages').insert({
-            user_id: profile.id, sender: 'coach',
-            content: warmMsg.content[0].text.trim(), read: false,
-          });
-        } catch {
-          await supabase.from('messages').insert({
-            user_id: profile.id, sender: 'coach',
-            content: `Hello ${profile.first_name} ! J'ai mis ton plan à jour suite à tes modifs 💪 Vas jeter un œil dans l'onglet Plan.`,
-            read: false,
-          });
-        }
 
         processed++;
         console.log(`[check-regen] Plan regenerated for ${profile.first_name} (${profile.id})`);
