@@ -350,7 +350,7 @@ function SessionDetailPage({ session, weekNum, sessionIdx, planId, vma, onClose,
   return (
     /* ── Overlay sombre ── */
     <div style={{
-      position: 'fixed', inset: 0, zIndex: 200,
+      position: 'fixed', inset: 0, zIndex: 400,
       background: 'rgba(0,0,0,.55)', backdropFilter: 'blur(4px)',
       display: 'flex', alignItems: 'flex-end', justifyContent: 'center',
     }} onClick={e => e.target === e.currentTarget && onClose()}>
