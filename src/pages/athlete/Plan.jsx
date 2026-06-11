@@ -1395,7 +1395,7 @@ export default function AthletePlan() {
                   return (
                     <div key={day} style={{ display:'flex', flexDirection:'column', gap:'.4rem' }}>
                       {daySessions.length === 0 ? (
-                        <div style={{ height:96, display:'flex', alignItems:'center', justifyContent:'center',
+                        <div style={{ height:116, display:'flex', alignItems:'center', justifyContent:'center',
                           border:'1px dashed rgba(255,255,255,.07)', borderRadius:10,
                           fontSize:'.68rem', color:'rgba(255,255,255,.2)', fontStyle:'italic' }}>
                           Repos
@@ -1413,7 +1413,7 @@ export default function AthletePlan() {
                               borderLeft: `3px solid ${done ? 'var(--success)' : color}`,
                               background: done ? 'rgba(16,185,129,.12)' : isRace ? color+'15' : 'var(--surface-2)',
                               transition:'transform .12s',
-                              height:96, display:'flex', flexDirection:'column',
+                              height:116, display:'flex', flexDirection:'column',
                               overflow: isRescheduling ? 'visible' : 'hidden' }}
                             onMouseEnter={e => e.currentTarget.style.transform='translateY(-1px)'}
                             onMouseLeave={e => e.currentTarget.style.transform=''}>

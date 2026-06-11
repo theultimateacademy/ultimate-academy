@@ -136,7 +136,7 @@ function PlanView({ plan, completions, coachWeekIdx, setCoachWeekIdx, currentWee
             return (
               <div key={day} style={{ display:'flex', flexDirection:'column', gap:'.5rem' }}>
                 {daySessions.length === 0 ? (
-                  <div style={{ height:100, display:'flex', alignItems:'center', justifyContent:'center',
+                  <div style={{ height:120, display:'flex', alignItems:'center', justifyContent:'center',
                     border:'1px dashed rgba(255,255,255,.07)', borderRadius:10,
                     fontSize:'.7rem', color:'rgba(255,255,255,.18)', fontStyle:'italic' }}>
                     Repos
@@ -154,7 +154,7 @@ function PlanView({ plan, completions, coachWeekIdx, setCoachWeekIdx, currentWee
                       borderLeft: `3px solid ${done?'#10B981':clr}`,
                       background: done ? 'rgba(16,185,129,.12)' : isRace ? clr+'18' : 'var(--surface-2)',
                       display:'flex', flexDirection:'column',
-                      height:100, overflow: isRescheduling ? 'visible' : 'hidden' }}>
+                      height:120, overflow: isRescheduling ? 'visible' : 'hidden' }}>
                       {/* Content cliquable */}
                       <div onClick={() => onSessionClick(session, activeSem.numero, si, comp)}
                         style={{ padding:'.55rem .6rem', cursor:'pointer', flex:1, overflow:'hidden', minHeight:0 }}>
