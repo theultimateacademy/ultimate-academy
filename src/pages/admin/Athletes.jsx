@@ -968,6 +968,17 @@ function AthleteDetailPanel({ athlete, onClose, onUpdated, onAlertDismissed }) {
       onUpdated?.(updated)
       setEditField(null)
       showSaveToast('✓ Enregistré')
+
+      // Si la VMA change, recalculer les allures du plan actif (séances validées préservées)
+      if (editField === 'vma' || editField === 'vma_known') {
+        const LEVEL_VMA_DEFAULTS = { debutant: 10, intermediaire: 14, confirme: 17, expert: 20 }
+        const newVmaKnown = editField === 'vma_known' ? (value === 'true' || value === true) : (updated.vma_known === true || updated.vma_known === 'true')
+        const newVmaVal   = editField === 'vma' ? parseFloat(value) : parseFloat(updated.vma)
+        const resolvedVma = (newVmaKnown && newVmaVal) ? newVmaVal : (LEVEL_VMA_DEFAULTS[updated.level] || 14)
+        api.recalculateVma({ userId: athlete.id, newVma: resolvedVma })
+          .then(() => showSaveToast('✓ Allures du plan recalculées (VMA ' + resolvedVma + ')'))
+          .catch(() => {})
+      }
     } catch (err) {
       console.error('[saveField]', err)
       showSaveToast('✗ ' + (err.message || 'Erreur'), false)
@@ -1280,6 +1291,30 @@ function AthleteDetailPanel({ athlete, onClose, onUpdated, onAlertDismissed }) {
                       <FieldRow field="vma_known" label="VMA mesurée ?" type="select"
                         opts={[['true','Oui'],['false','Non']]}
                         show={v => v === true || v === 'true' ? 'Oui' : 'Non'} />
+
+                      {(() => {
+                        const LEVEL_VMA_DEFAULTS = { debutant: 10, intermediaire: 14, confirme: 17, expert: 20 }
+                        const vmaKnown = local.vma_known === true || local.vma_known === 'true'
+                        const resolvedVma = (vmaKnown && local.vma) ? parseFloat(local.vma) : (LEVEL_VMA_DEFAULTS[local.level] || 14)
+                        return (
+                          <div style={{ display:'flex', justifyContent:'flex-end', padding:'4px 0' }}>
+                            <button
+                              onClick={() => {
+                                api.recalculateVma({ userId: athlete.id, newVma: resolvedVma })
+                                  .then(r => showSaveToast(r?.skipped > 0
+                                    ? `✓ Allures recalculées (VMA ${resolvedVma}) — ${r.skipped} séance(s) validée(s) préservée(s)`
+                                    : `✓ Allures recalculées (VMA ${resolvedVma})`))
+                                  .catch(e => showSaveToast('✗ ' + e.message, false))
+                              }}
+                              style={{ fontSize:'.75rem', padding:'3px 10px', borderRadius:6,
+                                border:'1px solid #4A90D9', background:'#EBF4FF', color:'#1D4ED8',
+                                cursor:'pointer', fontWeight:600 }}
+                            >
+                              Recalculer allures plan (VMA {resolvedVma})
+                            </button>
+                          </div>
+                        )
+                      })()}
 
                       {!isTri && (
                         <FieldRow field="chrono_goal" label="Chrono cible" type="text"

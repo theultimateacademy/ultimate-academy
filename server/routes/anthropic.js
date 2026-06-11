@@ -1649,28 +1649,54 @@ router.post('/plans/recalculate-vma', async (req, res) => {
   if (!userId || !newVma) return res.status(400).json({ error: 'Missing data' });
 
   try {
-    const { data: plan } = await supabase
-      .from('training_plans').select('*')
-      .eq('user_id', userId).eq('status', 'active').single();
+    const [{ data: plan }, { data: profile }] = await Promise.all([
+      supabase.from('training_plans').select('*').eq('user_id', userId).eq('status', 'active').single(),
+      supabase.from('profiles').select('*').eq('id', userId).single(),
+    ]);
 
     if (!plan) return res.json({ success: true, updated: false });
+
+    // Load validated sessions to avoid touching them
+    const { data: completions } = await supabase
+      .from('session_completions')
+      .select('week_number, session_index')
+      .eq('plan_id', plan.id);
+
+    const validatedKeys = new Set(
+      (completions || []).map(c => `${c.week_number}-${c.session_index}`)
+    );
 
     const planData = JSON.parse(JSON.stringify(plan.plan_data));
     const vma      = parseFloat(newVma);
 
-    planData.semaines?.forEach(week => {
-      week.seances?.forEach(seance => {
+    // Load session library to rebuild corps/echauffement/retour with new VMA
+    const { map: libMap } = await loadSessionLibrary(profile?.objective || 'running');
+
+    planData.semaines?.forEach((week, _wi) => {
+      week.seances?.forEach((seance, sessionIdx) => {
+        const key = `${week.numero}-${sessionIdx}`;
+        if (validatedKeys.has(key)) return; // séance déjà validée — on ne touche pas
+
+        // Re-inject library content (corps/echauffement/retour) with new VMA
+        const lib = libMap?.[seance.id_seance];
+        if (lib) {
+          seance.echauffement    = lib.warmup   ? subsPaces(lib.warmup,   vma) : '';
+          seance.retour_au_calme = lib.cooldown ? subsPaces(lib.cooldown, vma) : '';
+          seance.corps           = buildCorps(lib, vma);
+        }
+
+        // Recalculate allures[] with new VMA
         if (!Array.isArray(seance.allures)) return;
         seance.allures = seance.allures.map(a => {
           if (!a.pourcentage_vma) return a;
-          const speed    = vma * (a.pourcentage_vma / 100);
-          const paceMin  = 60 / speed;
-          const m        = Math.floor(paceMin);
-          const s        = Math.round((paceMin - m) * 60);
+          const speed   = vma * (a.pourcentage_vma / 100);
+          const paceMin = 60 / speed;
+          const m       = Math.floor(paceMin);
+          const s       = Math.round((paceMin - m) * 60);
           return {
             ...a,
-            vitesse_kmh:    Math.round(speed * 10) / 10,
-            allure_min_km:  `${m}'${String(s).padStart(2, '0')}/km`,
+            vitesse_kmh:   Math.round(speed * 10) / 10,
+            allure_min_km: `${m}'${String(s).padStart(2, '0')}/km`,
           };
         });
       });
@@ -1678,7 +1704,7 @@ router.post('/plans/recalculate-vma', async (req, res) => {
 
     recalculateDistances(planData, vma);
     await supabase.from('training_plans').update({ plan_data: planData }).eq('id', plan.id);
-    res.json({ success: true, updated: true });
+    res.json({ success: true, updated: true, skipped: validatedKeys.size });
   } catch (err) {
     console.error('[recalculate-vma]', err.message);
     res.status(500).json({ error: err.message });
