@@ -123,22 +123,22 @@ function PlanView({ plan, completions, coachWeekIdx, setCoachWeekIdx, currentWee
         `}</style>
 
         {/* ── DESKTOP : grille unique headers+cells, cartes hauteur uniforme ── */}
-        <div className="coach-plan-desktop" style={{ display:'grid', gridTemplateColumns:'repeat(7,1fr)', gap:'.35rem' }}>
+        <div className="coach-plan-desktop" style={{ display:'grid', gridTemplateColumns:'repeat(7,1fr)', gap:'.5rem' }}>
           {/* Row 1 : en-têtes jours */}
           {DAY_SHORT.map(d => (
-            <div key={d} style={{ textAlign:'center', fontSize:'.61rem', fontWeight:800, textTransform:'uppercase',
-              letterSpacing:'.07em', color:'var(--text-muted)', paddingBottom:'.3rem',
-              borderBottom:'1px solid var(--border)', marginBottom:'.15rem' }}>{d}</div>
+            <div key={d} style={{ textAlign:'center', fontSize:'.72rem', fontWeight:800, textTransform:'uppercase',
+              letterSpacing:'.07em', color:'var(--text-muted)', paddingBottom:'.4rem',
+              borderBottom:'1px solid var(--border)', marginBottom:'.2rem' }}>{d}</div>
           ))}
           {/* Row 2 : colonnes de séances */}
           {DAY_NAMES.map(day => {
             const daySessions = byDay[day]
             return (
-              <div key={day} style={{ display:'flex', flexDirection:'column', gap:'.3rem' }}>
+              <div key={day} style={{ display:'flex', flexDirection:'column', gap:'.5rem' }}>
                 {daySessions.length === 0 ? (
-                  <div style={{ height:88, display:'flex', alignItems:'center', justifyContent:'center',
-                    border:'1px dashed rgba(255,255,255,.07)', borderRadius:7,
-                    fontSize:'.6rem', color:'rgba(255,255,255,.18)', fontStyle:'italic' }}>
+                  <div style={{ height:100, display:'flex', alignItems:'center', justifyContent:'center',
+                    border:'1px dashed rgba(255,255,255,.07)', borderRadius:10,
+                    fontSize:'.7rem', color:'rgba(255,255,255,.18)', fontStyle:'italic' }}>
                     Repos
                   </div>
                 ) : daySessions.map(session => {
@@ -149,21 +149,21 @@ function PlanView({ plan, completions, coachWeekIdx, setCoachWeekIdx, currentWee
                   const isRace = session.est_course || (session.id_seance||'').startsWith('RACE')
                   const isRescheduling = rescheduleCell === si
                   return (
-                    <div key={si} style={{ borderRadius:7, minWidth:0, position:'relative',
+                    <div key={si} style={{ borderRadius:10, minWidth:0, position:'relative',
                       border: done ? '1px solid rgba(16,185,129,.35)' : '1px solid var(--border)',
                       borderLeft: `3px solid ${done?'#10B981':clr}`,
                       background: done ? 'rgba(16,185,129,.12)' : isRace ? clr+'18' : 'var(--surface-2)',
                       display:'flex', flexDirection:'column',
-                      height:88, overflow: isRescheduling ? 'visible' : 'hidden' }}>
+                      height:100, overflow: isRescheduling ? 'visible' : 'hidden' }}>
                       {/* Content cliquable */}
                       <div onClick={() => onSessionClick(session, activeSem.numero, si, comp)}
-                        style={{ padding:'.42rem .45rem', cursor:'pointer', flex:1, overflow:'hidden', minHeight:0 }}>
-                        <div style={{ fontSize:'.59rem', fontWeight:700, color:done?'#10B981':clr, marginBottom:'.1rem',
+                        style={{ padding:'.55rem .6rem', cursor:'pointer', flex:1, overflow:'hidden', minHeight:0 }}>
+                        <div style={{ fontSize:'.67rem', fontWeight:700, color:done?'#10B981':clr, marginBottom:'.15rem',
                           overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>{session.type || '—'}</div>
-                        <div style={{ fontSize:'.71rem', fontWeight:700, lineHeight:1.2,
+                        <div style={{ fontSize:'.8rem', fontWeight:700, lineHeight:1.2,
                           overflow:'hidden', textOverflow:'ellipsis',
                           display:'-webkit-box', WebkitLineClamp:2, WebkitBoxOrient:'vertical' }}>{session.titre || '—'}</div>
-                        <div style={{ fontSize:'.6rem', color: done ? '#10B981' : 'var(--text-muted)', marginTop:'.1rem',
+                        <div style={{ fontSize:'.68rem', color: done ? '#10B981' : 'var(--text-muted)', marginTop:'.12rem',
                           overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>
                           {session.duree_min > 0 ? `${session.duree_min} min` : '—'}{done ? ' · ✅' : ''}
                         </div>
@@ -173,17 +173,17 @@ function PlanView({ plan, completions, coachWeekIdx, setCoachWeekIdx, currentWee
                         {onRescheduleSession && (
                           <button
                             onClick={e => { e.stopPropagation(); setRescheduleCell(isRescheduling ? null : si) }}
-                            style={{ flex:1, padding:'.18rem 0', background: isRescheduling ? 'rgba(139,47,201,.2)' : 'rgba(255,255,255,.04)',
-                              border:'none', cursor:'pointer', fontSize:'.6rem',
+                            style={{ flex:1, padding:'.28rem 0', background: isRescheduling ? 'rgba(139,47,201,.2)' : 'rgba(255,255,255,.04)',
+                              border:'none', cursor:'pointer', fontSize:'.72rem',
                               color: isRescheduling ? '#C084FC' : 'rgba(255,255,255,.38)', fontFamily:'inherit' }}>
                             📅
                           </button>
                         )}
                         {onDeleteSession && (
                           <button onClick={e => { e.stopPropagation(); onDeleteSession(coachWeekIdx, si, session.titre) }}
-                            style={{ flex:1, padding:'.18rem 0', background:'rgba(239,68,68,.08)',
+                            style={{ flex:1, padding:'.28rem 0', background:'rgba(239,68,68,.08)',
                               border:'none', borderLeft: onRescheduleSession ? '1px solid rgba(255,255,255,.06)' : 'none',
-                              cursor:'pointer', fontSize:'.6rem', color:'#FCA5A5', fontFamily:'inherit' }}>
+                              cursor:'pointer', fontSize:'.72rem', color:'#FCA5A5', fontFamily:'inherit' }}>
                             🗑️
                           </button>
                         )}
@@ -1481,7 +1481,7 @@ function AthleteDetailPanel({ athlete, onClose, onUpdated, onAlertDismissed }) {
 
             {/* ══════════ PLAN ══════════ */}
             {tab === 'plan' && (
-              <div className="coach-tab-pane" style={{ maxWidth:900, margin:'0 auto', padding:'1.5rem' }}>
+              <div className="coach-tab-pane" style={{ padding:'1.5rem' }}>
                 {!plan || !plan.plan_data ? (
                   <div style={{ textAlign:'center', padding:'4rem 2rem', color:'var(--text-muted)' }}>
                     <div style={{ fontSize:'2rem', marginBottom:'.75rem' }}>📋</div>

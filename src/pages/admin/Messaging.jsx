@@ -77,7 +77,11 @@ function Conversation({ athlete, onBack }) {
       <div style={{ padding: '1rem', background: 'var(--surface)', borderBottom: '1px solid var(--border)',
         display: 'flex', alignItems: 'center', gap: '.75rem', flexShrink: 0, overflow: 'hidden' }}>
         <button className="btn-icon" onClick={onBack} style={{ flexShrink: 0 }}>←</button>
-        <div className="chat-avatar" style={{ flexShrink: 0 }}>{athlete.first_name?.[0]?.toUpperCase()}</div>
+        <div className="chat-avatar" style={{ flexShrink: 0, overflow:'hidden', padding:0 }}>
+          {athlete.avatar_url
+            ? <img src={athlete.avatar_url} alt={athlete.first_name} style={{ width:'100%', height:'100%', objectFit:'cover', borderRadius:'50%' }} />
+            : athlete.first_name?.[0]?.toUpperCase()}
+        </div>
         <div style={{ flex: 1, minWidth: 0 }}>
           <div style={{ fontWeight: 700, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{athlete.first_name} {athlete.last_name}</div>
           <div style={{ fontSize: '.75rem', color: 'var(--text-muted)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{athlete.email}</div>
@@ -97,8 +101,10 @@ function Conversation({ athlete, onBack }) {
               alignItems: msg.sender === 'coach' ? 'flex-end' : 'flex-start' }}>
               {msg.sender === 'athlete' && (
                 <div style={{ display: 'flex', alignItems: 'flex-end', gap: '.5rem' }}>
-                  <div className="chat-avatar" style={{ width: 28, height: 28, fontSize: '.75rem' }}>
-                    {athlete.first_name?.[0]?.toUpperCase()}
+                  <div className="chat-avatar" style={{ width: 28, height: 28, fontSize: '.75rem', overflow:'hidden', padding:0 }}>
+                    {athlete.avatar_url
+                      ? <img src={athlete.avatar_url} alt={athlete.first_name} style={{ width:'100%', height:'100%', objectFit:'cover', borderRadius:'50%' }} />
+                      : athlete.first_name?.[0]?.toUpperCase()}
                   </div>
                   <div>
                     <div className="chat-bubble coach">{msg.content}</div>
@@ -163,7 +169,7 @@ export default function AdminMessaging() {
     setLoading(true)
     try {
       const { data: profiles } = await supabase
-        .from('profiles').select('id, first_name, last_name, email')
+        .from('profiles').select('id, first_name, last_name, email, avatar_url')
         .eq('role', 'athlete').order('first_name')
 
       const ids = (profiles || []).map(p => p.id)
@@ -221,8 +227,10 @@ export default function AdminMessaging() {
               onClick={() => { setSelected(a); loadConversations() }}>
               <div style={{ display: 'flex', gap: '.75rem', alignItems: 'center' }}>
                 <div style={{ position: 'relative' }}>
-                  <div className="chat-avatar" style={{ width: 36, height: 36, fontSize: '.9rem' }}>
-                    {a.first_name?.[0]?.toUpperCase()}
+                  <div className="chat-avatar" style={{ width: 36, height: 36, fontSize: '.9rem', overflow:'hidden', padding:0 }}>
+                    {a.avatar_url
+                      ? <img src={a.avatar_url} alt={a.first_name} style={{ width:'100%', height:'100%', objectFit:'cover', borderRadius:'50%' }} />
+                      : a.first_name?.[0]?.toUpperCase()}
                   </div>
                   {u > 0 && (
                     <div style={{ position: 'absolute', top: -2, right: -2,
