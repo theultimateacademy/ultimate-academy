@@ -19,8 +19,7 @@ export function AuthProvider({ children }) {
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       setUser(session?.user ?? null)
       if (session?.user) {
-        setLoading(true)
-        loadProfile(session.user.id)
+        loadProfile(session.user.id) // silent refresh — don't show loading spinner (avoids page remount on token refresh)
       } else { setProfile(null); setLoading(false) }
     })
     return () => subscription.unsubscribe()

@@ -122,37 +122,44 @@ function getStepIds(data) {
 
 const gd = { background: 'linear-gradient(135deg,#8B2FC9,#E8237A)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text' }
 
+function readWizardDraft(userId) {
+  if (!userId) return {}
+  try { return JSON.parse(localStorage.getItem(`wizard_draft_${userId}`)) || {} } catch { return {} }
+}
+
 export default function ProfileWizard() {
   const { user, refreshProfile, updateProfile } = useAuth()
   const navigate = useNavigate()
 
-  const [data, setData] = useState({
-    first_name: '', gender: '', objective: '', objective_other: '',
-    race_date: '',
-    intermediate_race_date: '', intermediate_race_name: '',
-    training_terrain: '',
-    level: '',
-    vma_known: false, vma: '',
-    chrono_goal_known: false, chrono_goal: '',
-    days_per_week: 4, preferred_days: [],
-    gps_watch: '', best_recent_time: '',
-    injuries: '', injury_detail: '',
-    current_form: '',
-    period_pain: false, period_pain_days: '',
-    race_denivele: '',
-    coach_message: '',
-    // Trail
-    trail_experience: '', trail_poles: '',
-    // Triathlon
-    tri_swim_sessions: 2, tri_bike_sessions: 2, tri_run_sessions: 2,
-    tri_swim_level: '',
-    css_known: false, css_value: '',
-    ftp_known: false, ftp_value: '',
-    open_water: '', bike_type: '',
-    tri_experience: '',
+  const [data, setData] = useState(() => {
+    const defaults = {
+      first_name: '', gender: '', objective: '', objective_other: '',
+      race_date: '',
+      intermediate_race_date: '', intermediate_race_name: '',
+      training_terrain: '',
+      level: '',
+      vma_known: false, vma: '',
+      chrono_goal_known: false, chrono_goal: '',
+      days_per_week: 4, preferred_days: [],
+      gps_watch: '', best_recent_time: '',
+      injuries: '', injury_detail: '',
+      current_form: '',
+      period_pain: false, period_pain_days: '',
+      race_denivele: '',
+      coach_message: '',
+      trail_experience: '', trail_poles: '',
+      tri_swim_sessions: 2, tri_bike_sessions: 2, tri_run_sessions: 2,
+      tri_swim_level: '',
+      css_known: false, css_value: '',
+      ftp_known: false, ftp_value: '',
+      open_water: '', bike_type: '',
+      tri_experience: '',
+    }
+    const saved = readWizardDraft(user?.id)
+    return saved.data ? { ...defaults, ...saved.data } : defaults
   })
 
-  const [currentIdx, setCurrentIdx] = useState(0)
+  const [currentIdx, setCurrentIdx] = useState(() => readWizardDraft(user?.id).currentIdx || 0)
   const [direction, setDirection]   = useState('forward')
   const [animKey, setAnimKey]        = useState(0)
   const [submitting, setSubmitting]  = useState(false)
@@ -169,6 +176,11 @@ export default function ProfileWizard() {
   useEffect(() => {
     api.health().catch(() => {})
   }, [])
+
+  useEffect(() => {
+    if (!user?.id) return
+    localStorage.setItem(`wizard_draft_${user.id}`, JSON.stringify({ data, currentIdx }))
+  }, [user?.id, data, currentIdx])
 
   function set(key, val) { setData(d => ({ ...d, [key]: val })) }
 
@@ -323,6 +335,7 @@ export default function ProfileWizard() {
       }
       console.error('[Plan] All attempts failed — server will self-heal on next wake-up')
     })().catch(() => {})
+    localStorage.removeItem(`wizard_draft_${user.id}`)
     // Force a full page reload to /app/home — this re-reads the profile from Supabase
     // which has profile_completed=true, so RequireActive will pass without race condition
     window.location.replace('/app/home')

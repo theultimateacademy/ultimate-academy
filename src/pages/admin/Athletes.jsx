@@ -153,7 +153,7 @@ function PlanView({ plan, completions, coachWeekIdx, setCoachWeekIdx, currentWee
                       border: done ? '1px solid rgba(16,185,129,.35)' : '1px solid var(--border)',
                       borderLeft: `3px solid ${done?'#10B981':clr}`,
                       background: done ? 'rgba(16,185,129,.12)' : isRace ? clr+'18' : 'var(--surface-2)',
-                      display:'flex', flexDirection:'column', overflow:'hidden' }}>
+                      display:'flex', flexDirection:'column', overflow: isRescheduling ? 'visible' : 'hidden' }}>
                       {/* Content cliquable */}
                       <div onClick={() => onSessionClick(session, activeSem.numero, si, comp)}
                         style={{ padding:'.42rem .45rem', cursor:'pointer', flex:1 }}>
@@ -848,7 +848,7 @@ function AthleteDetailPanel({ athlete, onClose, onUpdated, onAlertDismissed }) {
   const [plan,          setPlan]          = useState(null)
   const [alerts,        setAlerts]        = useState([])
   const [loading,       setLoading]       = useState(true)
-  const [tab,           setTab]           = useState('profile')
+  const [tab,           setTab]           = useState(() => sessionStorage.getItem(`admin_tab_${athlete.id}`) || 'profile')
   const [generating,    setGenerating]    = useState(false)
   const [generateMsg,   setGenerateMsg]   = useState('')
   const [local,         setLocal]         = useState(athlete)
@@ -879,6 +879,10 @@ function AthleteDetailPanel({ athlete, onClose, onUpdated, onAlertDismissed }) {
   }, [plan?.id])
 
   useEffect(() => { loadDetail() }, [])
+
+  useEffect(() => {
+    sessionStorage.setItem(`admin_tab_${athlete.id}`, tab)
+  }, [athlete.id, tab])
 
   // Realtime : met à jour le plan coach quand l'athlète déplace une séance
   useEffect(() => {
@@ -1082,8 +1086,10 @@ function AthleteDetailPanel({ athlete, onClose, onUpdated, onAlertDismissed }) {
             borderRadius:8, cursor:'pointer', fontFamily:'inherit', color:'var(--text-muted)', fontSize:'.82rem', flexShrink:0 }}>
           ← Retour
         </button>
-        <div className="chat-avatar" style={{ width:42, height:42, fontSize:'1.05rem', flexShrink:0 }}>
-          {local.first_name?.[0]?.toUpperCase()}
+        <div className="chat-avatar" style={{ width:42, height:42, fontSize:'1.05rem', flexShrink:0, overflow:'hidden', padding:0 }}>
+          {local.avatar_url
+            ? <img src={local.avatar_url} alt={local.first_name} style={{ width:'100%', height:'100%', objectFit:'cover', borderRadius:'50%' }} />
+            : local.first_name?.[0]?.toUpperCase()}
         </div>
         <div style={{ flex:1, minWidth:0 }}>
           <div style={{ fontWeight:700, fontSize:'1.05rem', display:'flex', alignItems:'center', gap:'.5rem' }}>
@@ -1755,12 +1761,19 @@ function AthleteDetailPanel({ athlete, onClose, onUpdated, onAlertDismissed }) {
 export default function AdminAthletes() {
   const [athletes,   setAthletes]   = useState([])
   const [alertsMap,  setAlertsMap]  = useState({})
-  const [filter,     setFilter]     = useState('all')
-  const [search,     setSearch]     = useState('')
+  const [filter,     setFilter]     = useState(() => sessionStorage.getItem('admin_athletes_filter') || 'all')
+  const [search,     setSearch]     = useState(() => sessionStorage.getItem('admin_athletes_search') || '')
   const [selected,   setSelected]   = useState(null)
   const [loading,    setLoading]    = useState(true)
   const [confirmDel, setConfirmDel] = useState(null)
   const [deleting,   setDeleting]   = useState(false)
+
+  useEffect(() => { sessionStorage.setItem('admin_athletes_filter', filter) }, [filter])
+  useEffect(() => { sessionStorage.setItem('admin_athletes_search', search) }, [search])
+  useEffect(() => {
+    if (selected?.id) sessionStorage.setItem('admin_athletes_selected', selected.id)
+    else sessionStorage.removeItem('admin_athletes_selected')
+  }, [selected?.id])
 
   useEffect(() => { loadAthletes() }, [])
 
@@ -1784,6 +1797,11 @@ export default function AdminAthletes() {
       const { data } = await supabase.from('profiles').select('*')
         .eq('role','athlete').order('created_at', { ascending:false })
       setAthletes(data || [])
+      const savedId = sessionStorage.getItem('admin_athletes_selected')
+      if (savedId && data?.length) {
+        const match = data.find(a => a.id === savedId)
+        if (match) setSelected(match)
+      }
       if (data?.length) {
         const cutoff = new Date(Date.now() - 7 * 24 * 3600 * 1000).toISOString()
         const { data: al } = await supabase.from('messages').select('user_id')
@@ -1837,8 +1855,10 @@ export default function AdminAthletes() {
                 <tr key={a.id}>
                   <td>
                     <div style={{ display:'flex', alignItems:'center', gap:'.75rem' }}>
-                      <div className="chat-avatar" style={{ width:32, height:32, fontSize:'.8rem' }}>
-                        {a.first_name?.[0]?.toUpperCase()}
+                      <div className="chat-avatar" style={{ width:32, height:32, fontSize:'.8rem', overflow:'hidden', padding:0 }}>
+                        {a.avatar_url
+                          ? <img src={a.avatar_url} alt={a.first_name} style={{ width:'100%', height:'100%', objectFit:'cover', borderRadius:'50%' }} />
+                          : a.first_name?.[0]?.toUpperCase()}
                       </div>
                       <div>
                         <div style={{ fontWeight:600, display:'flex', alignItems:'center', gap:'.4rem' }}>
@@ -1877,7 +1897,11 @@ export default function AdminAthletes() {
             style={{ display:'flex', alignItems:'center', gap:'.875rem', padding:'.875rem 1rem', cursor:'pointer' }}
             onClick={() => setSelected(a)}>
             <div style={{ position:'relative', flexShrink:0 }}>
-              <div className="chat-avatar" style={{ width:42, height:42, fontSize:'1rem' }}>{a.first_name?.[0]?.toUpperCase()}</div>
+              <div className="chat-avatar" style={{ width:42, height:42, fontSize:'1rem', overflow:'hidden', padding:0 }}>
+                {a.avatar_url
+                  ? <img src={a.avatar_url} alt={a.first_name} style={{ width:'100%', height:'100%', objectFit:'cover', borderRadius:'50%' }} />
+                  : a.first_name?.[0]?.toUpperCase()}
+              </div>
               {alertsMap[a.id] && <div style={{ position:'absolute', top:-2, right:-2, width:10, height:10, borderRadius:'50%', background:'#EF4444', border:'2px solid var(--bg)' }} />}
             </div>
             <div style={{ flex:1, minWidth:0 }}>

@@ -7,6 +7,11 @@ import LoadingSpinner from '../../components/UI/LoadingSpinner'
 const C = { purple: '#8B2FC9', pink: '#E8237A', green: '#34D399', yellow: '#FBBF24', red: '#F87171' }
 const gradient = `linear-gradient(135deg, ${C.purple} 0%, ${C.pink} 100%)`
 
+function readPostRaceDraft(userId) {
+  if (!userId) return {}
+  try { return JSON.parse(localStorage.getItem(`postrace_draft_${userId}`)) || {} } catch { return {} }
+}
+
 const FEELING_OPTIONS = [
   { value: 1, label: 'Très difficile', emoji: '😰', color: C.red },
   { value: 2, label: 'Difficile',      emoji: '😓', color: '#FB923C' },
@@ -97,14 +102,14 @@ export default function PostRaceFlow() {
   const { profile } = useAuth()
   const navigate    = useNavigate()
 
-  const [step,       setStep]       = useState(1)
-  const [timeSecs,   setTimeSecs]   = useState(0)
-  const [feeling,    setFeeling]    = useState(null)
-  const [issues,     setIssues]     = useState([])
-  const [avgHr,      setAvgHr]      = useState('')
-  const [maxHr,      setMaxHr]      = useState('')
-  const [paceSecs,   setPaceSecs]   = useState(0)
-  const [notes,      setNotes]      = useState('')
+  const [step,       setStep]       = useState(() => readPostRaceDraft(profile?.id).step || 1)
+  const [timeSecs,   setTimeSecs]   = useState(() => readPostRaceDraft(profile?.id).timeSecs || 0)
+  const [feeling,    setFeeling]    = useState(() => readPostRaceDraft(profile?.id).feeling ?? null)
+  const [issues,     setIssues]     = useState(() => readPostRaceDraft(profile?.id).issues || [])
+  const [avgHr,      setAvgHr]      = useState(() => readPostRaceDraft(profile?.id).avgHr || '')
+  const [maxHr,      setMaxHr]      = useState(() => readPostRaceDraft(profile?.id).maxHr || '')
+  const [paceSecs,   setPaceSecs]   = useState(() => readPostRaceDraft(profile?.id).paceSecs || 0)
+  const [notes,      setNotes]      = useState(() => readPostRaceDraft(profile?.id).notes || '')
   const [submitting, setSubmitting] = useState(false)
   const [analysis,   setAnalysis]   = useState(null)
   const [error,      setError]      = useState(null)
@@ -121,6 +126,13 @@ export default function PostRaceFlow() {
       .catch(() => {})
       .finally(() => setLoadingExisting(false))
   }, [profile?.id])
+
+  useEffect(() => {
+    if (!profile?.id || analysis) return
+    localStorage.setItem(`postrace_draft_${profile.id}`, JSON.stringify({
+      step, timeSecs, feeling, issues, avgHr, maxHr, paceSecs, notes,
+    }))
+  }, [profile?.id, analysis, step, timeSecs, feeling, issues, avgHr, maxHr, paceSecs, notes])
 
   function toggleIssue(id) {
     setIssues(prev => prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id])
@@ -141,6 +153,7 @@ export default function PostRaceFlow() {
         notes:        notes || null,
       })
       const { analysis: ana } = await api.generatePostRaceAnalysis({ userId: profile.id, raceResultId: result.id })
+      localStorage.removeItem(`postrace_draft_${profile.id}`)
       setAnalysis({ ...ana, raceResult: result })
       setStep(4)
     } catch (err) {
