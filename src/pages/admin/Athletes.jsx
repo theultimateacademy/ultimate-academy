@@ -1285,36 +1285,54 @@ function AthleteDetailPanel({ athlete, onClose, onUpdated, onAlertDismissed }) {
                       <div style={sectionBlock('performance')}>
                       <div style={sectionHdr}>📊 Performance</div>
 
-                      <FieldRow field="vma" label="VMA (km/h)" type="number"
-                        show={v => v ? `${v} km/h` : '—'} />
+                      {/* VMA row avec bouton recalcul intégré */}
+                      {(() => {
+                        const isEditing = editField === 'vma'
+                        const LEVEL_VMA_DEFAULTS = { debutant: 10, intermediaire: 14, confirme: 17, expert: 20 }
+                        const vmaKnown    = local.vma_known === true || local.vma_known === 'true'
+                        const resolvedVma = (vmaKnown && local.vma) ? parseFloat(local.vma) : (LEVEL_VMA_DEFAULTS[local.level] || 14)
+                        return (
+                          <div style={{ ...rowStyle, cursor: isEditing ? 'default' : 'pointer' }}
+                            onClick={() => !isEditing && startEdit('vma')}>
+                            <span style={{ fontSize:'.82rem', color:'var(--text-muted)', flexShrink:0, minWidth:140 }}>VMA (km/h)</span>
+                            {isEditing ? (
+                              <div style={{ display:'flex', alignItems:'center', gap:'.4rem', flex:1, justifyContent:'flex-end' }}
+                                onClick={e => e.stopPropagation()}>
+                                <input type="number" value={editVal} onChange={e => setEditVal(e.target.value)}
+                                  style={{ ...inp, width:'auto', flex:1, maxWidth:200 }} autoFocus
+                                  onKeyDown={e => { if (e.key === 'Enter') saveField(); if (e.key === 'Escape') setEditField(null) }} />
+                                <button onClick={saveField} disabled={editSaving} style={saveBtn}>{editSaving ? '…' : '✓'}</button>
+                                <button onClick={() => setEditField(null)} style={cancelBtn}>✕</button>
+                              </div>
+                            ) : (
+                              <div style={{ display:'flex', alignItems:'center', gap:'.5rem' }} onClick={e => e.stopPropagation()}>
+                                <button
+                                  onClick={() => {
+                                    api.recalculateVma({ userId: athlete.id, newVma: resolvedVma })
+                                      .then(r => showSaveToast(r?.skipped > 0
+                                        ? `✓ Allures recalculées — ${r.skipped} séance(s) validée(s) préservée(s)`
+                                        : '✓ Allures du plan recalculées'))
+                                      .catch(e => showSaveToast('✗ ' + e.message, false))
+                                  }}
+                                  style={{ fontSize:'.7rem', padding:'2px 8px', borderRadius:5,
+                                    border:'1px solid #4A90D9', background:'#EBF4FF', color:'#1D4ED8',
+                                    cursor:'pointer', fontWeight:600, whiteSpace:'nowrap' }}
+                                >
+                                  Recalculer les allures
+                                </button>
+                                <span style={{ fontWeight:600, fontSize:'.875rem', cursor:'pointer' }}
+                                  onClick={() => startEdit('vma')}>
+                                  {local.vma ? `${local.vma} km/h` : '—'}
+                                </span>
+                              </div>
+                            )}
+                          </div>
+                        )
+                      })()}
 
                       <FieldRow field="vma_known" label="VMA mesurée ?" type="select"
                         opts={[['true','Oui'],['false','Non']]}
                         show={v => v === true || v === 'true' ? 'Oui' : 'Non'} />
-
-                      {(() => {
-                        const LEVEL_VMA_DEFAULTS = { debutant: 10, intermediaire: 14, confirme: 17, expert: 20 }
-                        const vmaKnown = local.vma_known === true || local.vma_known === 'true'
-                        const resolvedVma = (vmaKnown && local.vma) ? parseFloat(local.vma) : (LEVEL_VMA_DEFAULTS[local.level] || 14)
-                        return (
-                          <div style={{ display:'flex', justifyContent:'flex-end', padding:'4px 0' }}>
-                            <button
-                              onClick={() => {
-                                api.recalculateVma({ userId: athlete.id, newVma: resolvedVma })
-                                  .then(r => showSaveToast(r?.skipped > 0
-                                    ? `✓ Allures recalculées (VMA ${resolvedVma}) — ${r.skipped} séance(s) validée(s) préservée(s)`
-                                    : `✓ Allures recalculées (VMA ${resolvedVma})`))
-                                  .catch(e => showSaveToast('✗ ' + e.message, false))
-                              }}
-                              style={{ fontSize:'.75rem', padding:'3px 10px', borderRadius:6,
-                                border:'1px solid #4A90D9', background:'#EBF4FF', color:'#1D4ED8',
-                                cursor:'pointer', fontWeight:600 }}
-                            >
-                              Recalculer allures plan (VMA {resolvedVma})
-                            </button>
-                          </div>
-                        )
-                      })()}
 
                       {!isTri && (
                         <FieldRow field="chrono_goal" label="Chrono cible" type="text"
