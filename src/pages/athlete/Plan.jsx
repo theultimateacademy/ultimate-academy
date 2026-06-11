@@ -1395,7 +1395,7 @@ export default function AthletePlan() {
                   return (
                     <div key={day} style={{ display:'flex', flexDirection:'column', gap:'.4rem' }}>
                       {daySessions.length === 0 ? (
-                        <div style={{ minHeight:56, display:'flex', alignItems:'center', justifyContent:'center',
+                        <div style={{ height:96, display:'flex', alignItems:'center', justifyContent:'center',
                           border:'1px dashed rgba(255,255,255,.07)', borderRadius:10,
                           fontSize:'.68rem', color:'rgba(255,255,255,.2)', fontStyle:'italic' }}>
                           Repos
@@ -1405,63 +1405,67 @@ export default function AthletePlan() {
                         const done  = isCompleted(currentWeekData.numero, idx)
                         const color = SESSION_TYPE_COLORS[session.type] || '#10B981'
                         const isRace = session.est_course || session.id_seance === 'RACE' || session.id_seance === 'RACE_INT'
+                        const isRescheduling = rescheduleIdx?.weekNum === currentWeekData.numero && rescheduleIdx?.sessionIdx === idx
                         return (
                           <div key={idx}
-                            style={{ borderRadius:8, minWidth:0, position:'relative', overflow:'hidden',
+                            style={{ borderRadius:8, minWidth:0, position:'relative',
                               border: done ? '1px solid rgba(16,185,129,.35)' : '1px solid var(--border)',
                               borderLeft: `3px solid ${done ? 'var(--success)' : color}`,
                               background: done ? 'rgba(16,185,129,.12)' : isRace ? color+'15' : 'var(--surface-2)',
-                              cursor:'pointer', transition:'transform .12s', minHeight:72 }}
+                              transition:'transform .12s',
+                              height:96, display:'flex', flexDirection:'column',
+                              overflow: isRescheduling ? 'visible' : 'hidden' }}
                             onMouseEnter={e => e.currentTarget.style.transform='translateY(-1px)'}
                             onMouseLeave={e => e.currentTarget.style.transform=''}>
-                            <div style={{ padding:'.55rem .65rem' }}>
-                              <div onClick={() => setModal({ session: {...session, _isDone: done, _dateLabel: sessionDate(planMonday, currentWeekData.numero, session.jour)}, weekNum: currentWeekData.numero, sessionIdx: idx })}>
-                                <div style={{ fontSize:'.65rem', fontWeight:700, color, marginBottom:'.2rem',
-                                  overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>
-                                  {session.type}
-                                </div>
-                                <div style={{ fontSize:'.78rem', fontWeight:700, lineHeight:1.2,
-                                  overflow:'hidden', textOverflow:'ellipsis',
-                                  display:'-webkit-box', WebkitLineClamp:2, WebkitBoxOrient:'vertical' }}>
-                                  {session.titre}
-                                </div>
-                                <div style={{ fontSize:'.68rem', color:'var(--text-muted)', marginTop:'.2rem' }}>
-                                  {session.duree_min > 0 ? `${session.duree_min} min` : '🏁'}
-                                </div>
-                                {done && <div style={{ fontSize:'.6rem', color:'var(--success)', marginTop:'.15rem' }}>✅ Effectué</div>}
+                            <div
+                              style={{ flex:1, padding:'.5rem .6rem', overflow:'hidden', minHeight:0, cursor:'pointer' }}
+                              onClick={() => setModal({ session: {...session, _isDone: done, _dateLabel: sessionDate(planMonday, currentWeekData.numero, session.jour)}, weekNum: currentWeekData.numero, sessionIdx: idx })}>
+                              <div style={{ fontSize:'.65rem', fontWeight:700, color, marginBottom:'.15rem',
+                                overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>
+                                {session.type}
                               </div>
-                              <button
-                                onClick={e => { e.stopPropagation(); setRescheduleIdx(v => v && v.weekNum === currentWeekData.numero && v.sessionIdx === idx ? null : { weekNum: currentWeekData.numero, sessionIdx: idx }) }}
-                                style={{ marginTop:'.3rem', background:'none', border:'1px solid rgba(255,255,255,.12)', borderRadius:6,
-                                  padding:'.15rem .35rem', fontSize:'.6rem', color:'rgba(255,255,255,.4)', cursor:'pointer',
-                                  fontFamily:'inherit', width:'100%' }}>
-                                📅 Déplacer
-                              </button>
-                              {rescheduleIdx && rescheduleIdx.weekNum === currentWeekData.numero && rescheduleIdx.sessionIdx === idx && (
-                                <div onClick={e => e.stopPropagation()} style={{
-                                  position:'absolute', top:'calc(100% + .25rem)', left:0, right:0, zIndex:50,
-                                  background:'var(--surface)', border:'1px solid var(--border)', borderRadius:8,
-                                  padding:'.4rem', boxShadow:'var(--shadow-lg)',
-                                }}>
-                                  <div style={{ fontSize:'.6rem', color:'var(--text-muted)', marginBottom:'.3rem', textAlign:'center' }}>Choisir le jour</div>
-                                  <div style={{ display:'flex', flexWrap:'wrap', gap:'.25rem', justifyContent:'center' }}>
-                                    {DAY_NAMES.map(d => (
-                                      <button key={d}
-                                        onClick={() => rescheduleSession(currentWeekData.numero, idx, d)}
-                                        style={{
-                                          padding:'.22rem .4rem', borderRadius:5, fontSize:'.62rem', cursor:'pointer',
-                                          fontFamily:'inherit', fontWeight: session.jour === d ? 800 : 500,
-                                          background: session.jour === d ? color+'30' : 'var(--surface-2)',
-                                          border: session.jour === d ? `1px solid ${color}` : '1px solid var(--border)',
-                                          color: session.jour === d ? color : 'var(--text)',
-                                        }}>
-                                        {d.slice(0,3)}
-                                      </button>
-                                    ))}
-                                  </div>
-                                </div>
-                              )}
+                              <div style={{ fontSize:'.75rem', fontWeight:700, lineHeight:1.2,
+                                overflow:'hidden', textOverflow:'ellipsis',
+                                display:'-webkit-box', WebkitLineClamp:2, WebkitBoxOrient:'vertical' }}>
+                                {session.titre}
+                              </div>
+                              <div style={{ fontSize:'.65rem', color: done ? 'var(--success)' : 'var(--text-muted)', marginTop:'.15rem',
+                                overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>
+                                {session.duree_min > 0 ? `${session.duree_min} min` : '🏁'}{done ? ' · ✅' : ''}
+                              </div>
                             </div>
+                            <button
+                              onClick={e => { e.stopPropagation(); setRescheduleIdx(v => v && v.weekNum === currentWeekData.numero && v.sessionIdx === idx ? null : { weekNum: currentWeekData.numero, sessionIdx: idx }) }}
+                              style={{ flexShrink:0, background:'none', border:'none',
+                                borderTop:'1px solid rgba(255,255,255,.08)',
+                                padding:'.2rem', fontSize:'.58rem', color:'rgba(255,255,255,.35)', cursor:'pointer',
+                                fontFamily:'inherit', width:'100%' }}>
+                              📅 Déplacer
+                            </button>
+                            {isRescheduling && (
+                              <div onClick={e => e.stopPropagation()} style={{
+                                position:'absolute', top:'calc(100% + .25rem)', left:0, right:0, zIndex:50,
+                                background:'var(--surface)', border:'1px solid var(--border)', borderRadius:8,
+                                padding:'.4rem', boxShadow:'var(--shadow-lg)',
+                              }}>
+                                <div style={{ fontSize:'.6rem', color:'var(--text-muted)', marginBottom:'.3rem', textAlign:'center' }}>Choisir le jour</div>
+                                <div style={{ display:'flex', flexWrap:'wrap', gap:'.25rem', justifyContent:'center' }}>
+                                  {DAY_NAMES.map(d => (
+                                    <button key={d}
+                                      onClick={() => rescheduleSession(currentWeekData.numero, idx, d)}
+                                      style={{
+                                        padding:'.22rem .4rem', borderRadius:5, fontSize:'.62rem', cursor:'pointer',
+                                        fontFamily:'inherit', fontWeight: session.jour === d ? 800 : 500,
+                                        background: session.jour === d ? color+'30' : 'var(--surface-2)',
+                                        border: session.jour === d ? `1px solid ${color}` : '1px solid var(--border)',
+                                        color: session.jour === d ? color : 'var(--text)',
+                                      }}>
+                                      {d.slice(0,3)}
+                                    </button>
+                                  ))}
+                                </div>
+                              </div>
+                            )}
                           </div>
                         )
                       })}

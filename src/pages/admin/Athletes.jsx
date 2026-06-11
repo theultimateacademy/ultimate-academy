@@ -153,18 +153,19 @@ function PlanView({ plan, completions, coachWeekIdx, setCoachWeekIdx, currentWee
                       border: done ? '1px solid rgba(16,185,129,.35)' : '1px solid var(--border)',
                       borderLeft: `3px solid ${done?'#10B981':clr}`,
                       background: done ? 'rgba(16,185,129,.12)' : isRace ? clr+'18' : 'var(--surface-2)',
-                      display:'flex', flexDirection:'column', overflow: isRescheduling ? 'visible' : 'hidden' }}>
+                      display:'flex', flexDirection:'column',
+                      height:88, overflow: isRescheduling ? 'visible' : 'hidden' }}>
                       {/* Content cliquable */}
                       <div onClick={() => onSessionClick(session, activeSem.numero, si, comp)}
-                        style={{ padding:'.42rem .45rem', cursor:'pointer', flex:1 }}>
+                        style={{ padding:'.42rem .45rem', cursor:'pointer', flex:1, overflow:'hidden', minHeight:0 }}>
                         <div style={{ fontSize:'.59rem', fontWeight:700, color:done?'#10B981':clr, marginBottom:'.1rem',
                           overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>{session.type || '—'}</div>
                         <div style={{ fontSize:'.71rem', fontWeight:700, lineHeight:1.2,
                           overflow:'hidden', textOverflow:'ellipsis',
                           display:'-webkit-box', WebkitLineClamp:2, WebkitBoxOrient:'vertical' }}>{session.titre || '—'}</div>
-                        <div style={{ fontSize:'.6rem', color:'var(--text-muted)', marginTop:'.1rem' }}>
-                          {session.duree_min > 0 ? `${session.duree_min} min` : '—'}
-                          {done && <span style={{ color:'#10B981', marginLeft:'.25rem' }}>✅</span>}
+                        <div style={{ fontSize:'.6rem', color: done ? '#10B981' : 'var(--text-muted)', marginTop:'.1rem',
+                          overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>
+                          {session.duree_min > 0 ? `${session.duree_min} min` : '—'}{done ? ' · ✅' : ''}
                         </div>
                       </div>
                       {/* Actions — TOUJOURS visibles en bas */}
