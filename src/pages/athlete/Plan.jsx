@@ -373,16 +373,15 @@ function SessionDetailPage({ session, weekNum, sessionIdx, planId, vma, onClose,
         height: '94dvh', maxHeight: '94dvh',
         background: 'var(--bg)',
         borderRadius: '20px 20px 0 0',
-        position: 'relative', overflow: 'hidden',
+        display: 'flex', flexDirection: 'column',
         animation: 'slideUpModal .35s cubic-bezier(0.32,0.72,0,1)',
       }}>
 
-      {/* Zone scrollable */}
+      {/* Zone scrollable — flex:1 prend tout l'espace sauf le CTA */}
       <div style={{
-        position: 'absolute', inset: 0,
-        overflowY: 'auto', overflowX: 'hidden',
+        flex: 1, overflowY: 'auto', overflowX: 'hidden',
         WebkitOverflowScrolling: 'touch',
-        paddingBottom: 120,
+        minHeight: 0,
       }}>
 
       {/* ── HEADER avec fond coloré ── */}
@@ -480,7 +479,7 @@ function SessionDetailPage({ session, weekNum, sessionIdx, planId, vma, onClose,
       </div>
 
       {/* ── CONTENT ── */}
-      <div style={{ padding: '1rem 1rem 9rem', display: 'flex', flexDirection: 'column', gap: '.875rem' }}>
+      <div style={{ padding: '1rem 1rem 2rem', display: 'flex', flexDirection: 'column', gap: '.875rem' }}>
 
         {/* Programme de séance — carte principale */}
         <div className="detail-card" style={{ background: 'var(--surface)', borderRadius: 20, overflow: 'hidden', border: '1px solid var(--border)' }}>
@@ -733,12 +732,13 @@ function SessionDetailPage({ session, weekNum, sessionIdx, planId, vma, onClose,
 
       </div>{/* end scrollable zone */}
 
-      {/* ── CTA — position absolute bottom:0 dans le conteneur fixed, toujours visible ── */}
+      {/* ── CTA — flex item en bas, toujours visible sans position absolute ── */}
       <div style={{
-        position: 'absolute', bottom: 0, left: 0, right: 0, zIndex: 20,
-        padding: '1.25rem 1.25rem max(env(safe-area-inset-bottom, 0px) + 1.25rem, 1.5rem)',
-        background: 'linear-gradient(to top, #0D0D0D 65%, rgba(13,13,13,.92) 80%, transparent)',
-        pointerEvents: isDone ? 'none' : 'auto',
+        flexShrink: 0,
+        padding: '1rem 1.25rem',
+        paddingBottom: 'max(env(safe-area-inset-bottom, 16px), 20px)',
+        background: 'var(--bg)',
+        borderTop: '1px solid rgba(255,255,255,.06)',
       }}>
         {isDone ? (
           <div className="alert alert-success" style={{ textAlign: 'center', borderRadius: 18 }}>✅ Séance enregistrée !</div>
@@ -891,11 +891,13 @@ export default function AthletePlan() {
 
   async function rescheduleSession(weekNum, sessionIdx, newDay) {
     try {
-      const updated = JSON.parse(JSON.stringify(plan.plan_data))
-      updated.semaines[weekNum - 1].seances[sessionIdx].jour = newDay
-      const { error } = await supabase.from('training_plans').update({ plan_data: updated }).eq('id', plan.id)
-      if (error) throw error
-      setPlan(prev => prev ? { ...prev, plan_data: updated } : prev)
+      const result = await api.rescheduleSession({
+        userId: profile.id, planId: plan.id,
+        weekNum, sessionIdx, newDay,
+      })
+      if (result?.plan_data) {
+        setPlan(prev => prev ? { ...prev, plan_data: result.plan_data } : prev)
+      }
       setRescheduleIdx(null)
       const DAY_FR = { Lundi:'lundi', Mardi:'mardi', Mercredi:'mercredi', Jeudi:'jeudi', Vendredi:'vendredi', Samedi:'samedi', Dimanche:'dimanche' }
       showToast(`Séance déplacée au ${DAY_FR[newDay] || newDay} ✓`)
@@ -1407,11 +1409,12 @@ export default function AthletePlan() {
                           <div key={idx}
                             style={{ borderRadius:8, minWidth:0, position:'relative', overflow:'hidden',
                               border: done ? '1px solid rgba(16,185,129,.35)' : '1px solid var(--border)',
+                              borderLeft: `3px solid ${done ? 'var(--success)' : color}`,
                               background: done ? 'rgba(16,185,129,.12)' : isRace ? color+'15' : 'var(--surface-2)',
-                              cursor:'pointer', transition:'transform .12s' }}
+                              cursor:'pointer', transition:'transform .12s', minHeight:72 }}
                             onMouseEnter={e => e.currentTarget.style.transform='translateY(-1px)'}
                             onMouseLeave={e => e.currentTarget.style.transform=''}>
-                            <div style={{ borderLeft:`3px solid ${done ? 'var(--success)' : color}`, padding:'.55rem .65rem' }}>
+                            <div style={{ padding:'.55rem .65rem' }}>
                               <div onClick={() => setModal({ session: {...session, _isDone: done, _dateLabel: sessionDate(planMonday, currentWeekData.numero, session.jour)}, weekNum: currentWeekData.numero, sessionIdx: idx })}>
                                 <div style={{ fontSize:'.65rem', fontWeight:700, color, marginBottom:'.2rem',
                                   overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>

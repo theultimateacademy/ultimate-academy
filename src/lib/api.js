@@ -45,6 +45,7 @@ export const api = {
   adjustHeat:              (body)   => request('/api/plans/adjust-heat',               { method: 'POST', body }),
   adaptInjury:             (body)   => request('/api/plans/adapt-injury',              { method: 'POST', body }),
   restoreWeek:             (body)   => request('/api/plans/restore-week',              { method: 'POST', body }),
+  rescheduleSession:       (body)   => request('/api/plans/reschedule-session',        { method: 'POST', body }),
   scheduleRegen:           (body)   => request('/api/plans/schedule-regen',            { method: 'POST', body }),
   getProfile:              (userId) => request(`/api/profile/${userId}`),
   updateProfile:           (body)   => request('/api/profile/update',                  { method: 'POST', body }),

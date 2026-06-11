@@ -52,15 +52,22 @@ function PlanView({ plan, completions, coachWeekIdx, setCoachWeekIdx, currentWee
 
     return (
       <>
-        {/* Week tabs avec dates */}
-        <div style={{ display:'flex', gap:'.35rem', overflowX:'auto', paddingBottom:'.5rem', marginBottom:'.75rem' }}>
+        {/* Week tabs — desktop: date range, mobile: S1 S2... */}
+        <style>{`
+          .coach-week-date { display: inline; }
+          @media (max-width: 699px) {
+            .coach-week-date { display: none; }
+            .coach-week-tabs { flex-wrap: wrap !important; overflow: visible !important; }
+          }
+        `}</style>
+        <div className="coach-week-tabs" style={{ display:'flex', gap:'.35rem', overflowX:'auto', paddingBottom:'.5rem', marginBottom:'.75rem' }}>
           {semaines.map((w,i) => {
             const wStart = new Date(planMonday); wStart.setDate(planMonday.getDate() + i*7)
             const wEnd   = new Date(wStart);     wEnd.setDate(wStart.getDate() + 6)
             const fmtShort = d => d.toLocaleDateString('fr-FR', { day:'numeric', month:'short' })
             return (
               <button key={i} onClick={() => setCoachWeekIdx(i)}
-                style={{ flexShrink:0, padding:'.38rem .9rem', borderRadius:12, border:'none',
+                style={{ flexShrink:0, padding:'.38rem .75rem', borderRadius:12, border:'none',
                   whiteSpace:'nowrap', textAlign:'left',
                   background: coachWeekIdx === i ? 'var(--gradient)' : 'var(--surface-2)',
                   color: coachWeekIdx === i ? '#fff' : 'var(--text-muted)',
@@ -68,7 +75,7 @@ function PlanView({ plan, completions, coachWeekIdx, setCoachWeekIdx, currentWee
                 <div style={{ fontSize:'.78rem' }}>
                   S{w.numero}{w.numero === currentWeekNum ? ' ●' : ''}
                 </div>
-                <div style={{ fontSize:'.65rem', opacity:.75, marginTop:'.1rem' }}>
+                <div className="coach-week-date" style={{ fontSize:'.65rem', opacity:.75, marginTop:'.1rem' }}>
                   {fmtShort(wStart)} – {fmtShort(wEnd)}
                 </div>
               </button>
@@ -142,44 +149,43 @@ function PlanView({ plan, completions, coachWeekIdx, setCoachWeekIdx, currentWee
                   const isRace = session.est_course || (session.id_seance||'').startsWith('RACE')
                   const isRescheduling = rescheduleCell === si
                   return (
-                    <div key={si} style={{ borderRadius:7, overflow:'visible', minWidth:0, position:'relative',
+                    <div key={si} style={{ borderRadius:7, minWidth:0, position:'relative',
                       border: done ? '1px solid rgba(16,185,129,.35)' : '1px solid var(--border)',
+                      borderLeft: `3px solid ${done?'#10B981':clr}`,
                       background: done ? 'rgba(16,185,129,.12)' : isRace ? clr+'18' : 'var(--surface-2)',
-                      height:88, display:'flex', flexDirection:'column' }}>
-                      <div style={{ borderLeft:`3px solid ${done?'#10B981':clr}`, flex:1, display:'flex', flexDirection:'column', overflow:'hidden', borderRadius:'6px 0 0 6px' }}>
-                        <div onClick={() => onSessionClick(session, activeSem.numero, si, comp)}
-                          style={{ padding:'.42rem .45rem', cursor:'pointer', flex:1 }}>
-                          <div style={{ fontSize:'.59rem', fontWeight:700, color:done?'#10B981':clr, marginBottom:'.1rem',
-                            overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>{session.type || '—'}</div>
-                          <div style={{ fontSize:'.71rem', fontWeight:700, lineHeight:1.2,
-                            overflow:'hidden', textOverflow:'ellipsis',
-                            display:'-webkit-box', WebkitLineClamp:2, WebkitBoxOrient:'vertical',
-                            height:'2.4em' }}>{session.titre || '—'}</div>
-                          <div style={{ fontSize:'.6rem', color:'var(--text-muted)', marginTop:'.1rem' }}>
-                            {session.duree_min > 0 ? `${session.duree_min} min` : '—'}
-                            {done && <span style={{ color:'#10B981', marginLeft:'.25rem' }}>✅</span>}
-                          </div>
+                      display:'flex', flexDirection:'column', overflow:'hidden' }}>
+                      {/* Content cliquable */}
+                      <div onClick={() => onSessionClick(session, activeSem.numero, si, comp)}
+                        style={{ padding:'.42rem .45rem', cursor:'pointer', flex:1 }}>
+                        <div style={{ fontSize:'.59rem', fontWeight:700, color:done?'#10B981':clr, marginBottom:'.1rem',
+                          overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>{session.type || '—'}</div>
+                        <div style={{ fontSize:'.71rem', fontWeight:700, lineHeight:1.2,
+                          overflow:'hidden', textOverflow:'ellipsis',
+                          display:'-webkit-box', WebkitLineClamp:2, WebkitBoxOrient:'vertical' }}>{session.titre || '—'}</div>
+                        <div style={{ fontSize:'.6rem', color:'var(--text-muted)', marginTop:'.1rem' }}>
+                          {session.duree_min > 0 ? `${session.duree_min} min` : '—'}
+                          {done && <span style={{ color:'#10B981', marginLeft:'.25rem' }}>✅</span>}
                         </div>
-                        {/* Actions */}
-                        <div style={{ display:'flex', borderTop:'1px solid rgba(255,255,255,.06)', flexShrink:0 }}>
-                          {onRescheduleSession && (
-                            <button
-                              onClick={e => { e.stopPropagation(); setRescheduleCell(isRescheduling ? null : si) }}
-                              style={{ flex:1, padding:'.16rem 0', background: isRescheduling ? 'rgba(139,47,201,.2)' : 'rgba(255,255,255,.04)',
-                                border:'none', cursor:'pointer', fontSize:'.6rem',
-                                color: isRescheduling ? '#C084FC' : 'rgba(255,255,255,.38)', fontFamily:'inherit' }}>
-                              📅
-                            </button>
-                          )}
-                          {onDeleteSession && (
-                            <button onClick={e => { e.stopPropagation(); onDeleteSession(coachWeekIdx, si, session.titre) }}
-                              style={{ flex:1, padding:'.16rem 0', background:'rgba(239,68,68,.08)',
-                                border:'none', borderLeft: onRescheduleSession ? '1px solid rgba(255,255,255,.06)' : 'none',
-                                cursor:'pointer', fontSize:'.6rem', color:'#FCA5A5', fontFamily:'inherit' }}>
-                              🗑️
-                            </button>
-                          )}
-                        </div>
+                      </div>
+                      {/* Actions — TOUJOURS visibles en bas */}
+                      <div style={{ display:'flex', borderTop:'1px solid rgba(255,255,255,.06)', flexShrink:0 }}>
+                        {onRescheduleSession && (
+                          <button
+                            onClick={e => { e.stopPropagation(); setRescheduleCell(isRescheduling ? null : si) }}
+                            style={{ flex:1, padding:'.18rem 0', background: isRescheduling ? 'rgba(139,47,201,.2)' : 'rgba(255,255,255,.04)',
+                              border:'none', cursor:'pointer', fontSize:'.6rem',
+                              color: isRescheduling ? '#C084FC' : 'rgba(255,255,255,.38)', fontFamily:'inherit' }}>
+                            📅
+                          </button>
+                        )}
+                        {onDeleteSession && (
+                          <button onClick={e => { e.stopPropagation(); onDeleteSession(coachWeekIdx, si, session.titre) }}
+                            style={{ flex:1, padding:'.18rem 0', background:'rgba(239,68,68,.08)',
+                              border:'none', borderLeft: onRescheduleSession ? '1px solid rgba(255,255,255,.06)' : 'none',
+                              cursor:'pointer', fontSize:'.6rem', color:'#FCA5A5', fontFamily:'inherit' }}>
+                            🗑️
+                          </button>
+                        )}
                       </div>
                       {/* Day picker */}
                       {isRescheduling && onRescheduleSession && (
@@ -873,6 +879,22 @@ function AthleteDetailPanel({ athlete, onClose, onUpdated, onAlertDismissed }) {
   }, [plan?.id])
 
   useEffect(() => { loadDetail() }, [])
+
+  // Realtime : met à jour le plan coach quand l'athlète déplace une séance
+  useEffect(() => {
+    if (!athlete?.id) return
+    const channel = supabase.channel(`plan-${athlete.id}`)
+      .on('postgres_changes', {
+        event: 'UPDATE', schema: 'public', table: 'training_plans',
+        filter: `user_id=eq.${athlete.id}`,
+      }, payload => {
+        if (payload.new?.plan_data) {
+          setPlan(p => p ? { ...p, plan_data: payload.new.plan_data } : p)
+        }
+      })
+      .subscribe()
+    return () => { supabase.removeChannel(channel) }
+  }, [athlete?.id])
 
   async function loadDetail() {
     setLoading(true)

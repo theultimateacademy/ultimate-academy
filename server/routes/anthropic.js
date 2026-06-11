@@ -2738,4 +2738,33 @@ CONTRAINTES ABSOLUES :
   }
 });
 
+// ─── POST /api/plans/reschedule-session ─── (athlete, bypasses RLS) ─────────
+router.post('/plans/reschedule-session', async (req, res) => {
+  const { userId, planId, weekNum, sessionIdx, newDay } = req.body;
+  if (!userId || !planId || weekNum == null || sessionIdx == null || !newDay)
+    return res.status(400).json({ error: 'Missing params' });
+
+  try {
+    const { data: plan, error: fetchErr } = await supabase
+      .from('training_plans').select('plan_data').eq('id', planId).eq('user_id', userId).single();
+    if (fetchErr || !plan) return res.status(404).json({ error: 'Plan not found' });
+
+    const pd = JSON.parse(JSON.stringify(plan.plan_data));
+    const week = pd.semaines.find(s => s.numero === weekNum);
+    if (!week || !week.seances[sessionIdx])
+      return res.status(404).json({ error: 'Session not found' });
+
+    week.seances[sessionIdx].jour = newDay;
+
+    const { error: updateErr } = await supabase
+      .from('training_plans').update({ plan_data: pd }).eq('id', planId);
+    if (updateErr) throw new Error(updateErr.message);
+
+    res.json({ success: true, plan_data: pd });
+  } catch (err) {
+    console.error('[reschedule-session]', err.message);
+    res.status(500).json({ error: err.message });
+  }
+});
+
 module.exports = router;
