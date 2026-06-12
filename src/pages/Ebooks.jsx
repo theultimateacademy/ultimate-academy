@@ -42,7 +42,7 @@ export default function EbooksPage() {
           Plans d'entraînement PDF
         </h1>
         <div style={{ fontSize: 'clamp(1.1rem,3vw,1.5rem)', fontWeight: 700, color: '#fff', marginBottom: '.75rem' }}>
-          14,90€ — Paiement unique
+          14,99€ — Paiement unique
         </div>
         <p style={{ fontSize: '1rem', color: 'rgba(255,255,255,.6)', maxWidth: 520, margin: '0 auto', lineHeight: 1.7 }}>
           Des plans complets, structurés et personnalisables selon ta VMA.<br />
