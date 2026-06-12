@@ -13,12 +13,14 @@ export default function AdminEbooks() {
 
   useEffect(() => { load() }, [])
 
+  const API = import.meta.env.VITE_API_URL || 'http://localhost:3001'
+
   async function load() {
     setLoading(true)
     try {
       const [s, p] = await Promise.all([
-        fetch('/api/ebooks/admin/stats').then(r => r.json()),
-        fetch('/api/ebooks/admin/purchases').then(r => r.json()),
+        fetch(`${API}/api/ebooks/admin/stats`).then(r => r.json()),
+        fetch(`${API}/api/ebooks/admin/purchases`).then(r => r.json()),
       ])
       setStats(s)
       setPurchases(p.purchases || [])
@@ -30,7 +32,7 @@ export default function AdminEbooks() {
   async function toggleActive(id) {
     setToggling(id)
     try {
-      await fetch(`/api/ebooks/admin/${id}/toggle`, { method: 'PATCH' })
+      await fetch(`${API}/api/ebooks/admin/${id}/toggle`, { method: 'PATCH' })
       await load()
     } finally {
       setToggling(null)

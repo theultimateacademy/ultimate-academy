@@ -102,8 +102,10 @@ export default function EbookDetail() {
 
   const meta = EBOOK_DETAILS[slug] || {}
 
+  const API = import.meta.env.VITE_API_URL || 'http://localhost:3001'
+
   useEffect(() => {
-    fetch(`/api/ebooks/${slug}`)
+    fetch(`${API}/api/ebooks/${slug}`)
       .then(r => r.ok ? r.json() : Promise.reject('not found'))
       .then(d => setEbook(d.ebook))
       .catch(() => navigate('/ebooks'))
@@ -116,7 +118,7 @@ export default function EbookDetail() {
     setPaying(true)
     setError(null)
     try {
-      const res = await fetch('/api/ebooks/checkout', {
+      const res = await fetch(`${API}/api/ebooks/checkout`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ ebook_id: ebook.id, email: email.trim(), slug }),

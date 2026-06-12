@@ -18,8 +18,10 @@ export default function EbooksPage() {
   const [ebooks, setEbooks] = useState([])
   const [loading, setLoading] = useState(true)
 
+  const API = import.meta.env.VITE_API_URL || 'http://localhost:3001'
+
   useEffect(() => {
-    fetch('/api/ebooks')
+    fetch(`${API}/api/ebooks`)
       .then(r => r.json())
       .then(d => setEbooks(d.ebooks || []))
       .catch(() => {})
