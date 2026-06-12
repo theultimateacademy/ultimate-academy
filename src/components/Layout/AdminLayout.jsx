@@ -57,6 +57,7 @@ const NAV = [
   { to: '/admin/plans',     icon: '📋', label: 'Plans' },
   { to: '/admin/analyses',  icon: '📈', label: 'Analyses' },
   { to: '/admin/messages',  icon: '💬', label: 'Messagerie' },
+  { to: '/admin/ebooks',    icon: '📚', label: 'Ebooks' },
 ]
 
 function AdminShell() {

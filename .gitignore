@@ -40,3 +40,4 @@ yarn-error.log*
 # OS temp files
 *.tmp
 *.temp
+.vercel

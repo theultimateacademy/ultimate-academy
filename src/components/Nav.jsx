@@ -133,6 +133,9 @@ export default function Nav() {
           <Link to="/blog" className="landing-nav-link" style={{ textDecoration: 'none', color: location.pathname.startsWith('/blog') ? '#C084FC' : undefined, fontWeight: location.pathname.startsWith('/blog') ? 600 : undefined }}>
             Blog
           </Link>
+          <Link to="/ebooks" className="landing-nav-link" style={{ textDecoration: 'none', color: location.pathname.startsWith('/ebooks') ? '#C084FC' : undefined, fontWeight: location.pathname.startsWith('/ebooks') ? 600 : undefined }}>
+            Ebooks
+          </Link>
           <div ref={toolsRef} style={{ position: 'relative' }}>
             <button className="landing-nav-link"
               onClick={() => setOpenTools(o => !o)}
@@ -199,6 +202,7 @@ export default function Nav() {
             <button key={id} className="nav-mobile-link" onClick={() => goToSection(id)}>{label}</button>
           ))}
           <Link to="/blog" className="nav-mobile-link accent" onClick={() => setMobileMenu(false)}>Blog</Link>
+          <Link to="/ebooks" className="nav-mobile-link accent" onClick={() => setMobileMenu(false)}>Ebooks 📚</Link>
           <button className="nav-mobile-link accent"
             onClick={e => { e.stopPropagation(); setMobileTools(v => !v) }}>
             Outils gratuits {mobileTools ? '▴' : '▾'}

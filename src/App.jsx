@@ -19,6 +19,9 @@ import Privacy        from './pages/legal/Privacy'
 import Terms          from './pages/legal/Terms'
 import Cookies        from './pages/legal/Cookies'
 import Calculator     from './pages/Calculator'
+import Ebooks         from './pages/Ebooks'
+import EbookDetail    from './pages/EbookDetail'
+import EbookMerci     from './pages/EbookMerci'
 import VMACalculator  from './pages/calculators/VMA'
 import AlluresCalculator from './pages/calculators/Allures'
 import PredictorCalculator from './pages/calculators/Predictor'
@@ -35,6 +38,7 @@ import PreRaceAnalysis     from './pages/athlete/PreRaceAnalysis'
 import PostRaceFlow        from './pages/athlete/PostRaceFlow'
 
 import DevLogin        from './pages/DevLogin'
+import AdminEbooks     from './pages/admin/Ebooks'
 import AdminDashboard  from './pages/admin/Dashboard'
 import AdminAthletes   from './pages/admin/Athletes'
 import AdminPlans      from './pages/admin/Plans'
@@ -85,6 +89,9 @@ function AppRoutes() {
       <Route path="/privacy"      element={<Privacy />} />
       <Route path="/terms"        element={<Terms />} />
       <Route path="/cookies"      element={<Cookies />} />
+      <Route path="/ebooks"           element={<Ebooks />} />
+      <Route path="/ebooks/merci"     element={<EbookMerci />} />
+      <Route path="/ebooks/:slug"     element={<EbookDetail />} />
       <Route path="/calculateur"             element={<Calculator />} />
       <Route path="/calculateur/vma"         element={<VMACalculator />} />
       <Route path="/calculateur/allures"     element={<AlluresCalculator />} />
@@ -110,6 +117,7 @@ function AppRoutes() {
         <Route path="plans"     element={<AdminPlans />} />
         <Route path="analyses"  element={<AdminAnalyses />} />
         <Route path="messages"  element={<AdminMessaging />} />
+        <Route path="ebooks"    element={<AdminEbooks />} />
       </Route>
 
       <Route path="*" element={<Navigate to="/" replace />} />

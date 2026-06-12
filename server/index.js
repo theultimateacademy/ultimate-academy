@@ -38,12 +38,14 @@ const garminRoutes    = require('./routes/garmin');
 const devRoutes       = require('./routes/dev');
 const adminRoutes     = require('./routes/admin');
 const { router: blogRoutes, generateAndPublish } = require('./routes/blog');
+const ebookRoutes     = require('./routes/ebooks');
 
 const app  = express();
 const PORT = process.env.PORT || 3001;
 
-// Stripe webhook needs raw body
-app.use('/api/stripe/webhook', express.raw({ type: 'application/json' }));
+// Stripe webhooks need raw body — register before JSON parser
+app.use('/api/stripe/webhook',  express.raw({ type: 'application/json' }));
+app.use('/api/ebooks/webhook',  express.raw({ type: 'application/json' }));
 
 const ALLOWED_ORIGINS = [
   'http://localhost:3000',
@@ -69,6 +71,8 @@ app.use('/api/garmin',  garminRoutes);
 app.use('/api/dev',     devRoutes);
 app.use('/api/admin',  adminRoutes);
 app.use('/api/blog',   blogRoutes);
+app.use('/api/ebooks', ebookRoutes);
+app.use('/public/ebooks', express.static(require('path').join(__dirname, '../public/ebooks')));
 
 app.get('/health', (req, res) => res.json({ status: 'ok' }));
 
