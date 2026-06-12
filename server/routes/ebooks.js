@@ -6,7 +6,7 @@ const { createClient } = require('@supabase/supabase-js');
 
 const router  = express.Router();
 const stripe  = new Stripe(process.env.STRIPE_SECRET_KEY);
-const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_ROLE_KEY);
+const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_KEY);
 
 const CLIENT_URL = process.env.CLIENT_URL || 'https://theultimateacademy.fr';
 
