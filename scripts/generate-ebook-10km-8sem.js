@@ -34,7 +34,7 @@ const SEMAINES = [
         echauff:'25 min de footing EF à 65% VMA.', corps:'10 × 400m à 95-100% VMA. Effort presque maximal. Récupération 90 sec au trot entre chaque. Maintiens la même allure du premier au dernier.', retour:'10 min de jogging léger.',
         note:'RPE 8-9/10 · Si les dernières sont plus lentes, récupère un peu plus la prochaine fois.' },
       { jour:'Samedi',   type:'EF',           titre:'Footing de récupération',   duree:'45 min',
-        echauff:'', corps:'45 min à 65% VMA. Active la circulation et prépare la sortie longue du lendemain. Si tu as des courbatures, ce footing les élimine progressivement.', retour:'',
+        echauff:'', corps:'45 min à 60% VMA. Active la circulation et prépare la sortie longue du lendemain. Si tu as des courbatures, ce footing les élimine progressivement.', retour:'',
         note:'RPE 3/10 · Vraiment facile, aucun effort.' },
       { jour:'Dimanche', type:'Sortie longue', titre:'Sortie longue',            duree:'75 min',
         echauff:'', corps:'Course continue à 70-75% VMA pendant 75 minutes. Allure régulière. Hydrate-toi. Concentre-toi sur ta respiration et ta foulée.', retour:'',
@@ -51,7 +51,7 @@ const SEMAINES = [
         echauff:'25 min de footing EF à 65% VMA.', corps:'12 × 400m à 95-100% VMA. Deux répétitions de plus. Récupération 90 sec au trot. Maintiens la même allure sur les 12.', retour:'10 min de footing léger.',
         note:'RPE 8-9/10 · La récupération courte est volontaire pour développer ta résistance.' },
       { jour:'Samedi',   type:'EF',           titre:'Footing de récupération',   duree:'45 min',
-        echauff:'', corps:'45 min à 65% VMA. Active la circulation et prépare la sortie longue du lendemain. Cours très détendu.', retour:'',
+        echauff:'', corps:'45 min à 60% VMA. Active la circulation et prépare la sortie longue du lendemain. Cours très détendu.', retour:'',
         note:'RPE 3/10 · Vraiment facile.' },
       { jour:'Dimanche', type:'Sortie longue', titre:'Sortie longue',            duree:'80 min',
         echauff:'', corps:'80 min à 70-75% VMA. 5 minutes de plus que la semaine dernière. Régularité du début à la fin.', retour:'',
@@ -102,7 +102,7 @@ const SEMAINES = [
         echauff:'25 min de footing EF.', corps:'16 × 300m à 100-105% VMA. Intensité très élevée. Récupération 60 sec entre chaque. Maintiens la même vitesse sur les 16.', retour:'10 min de footing léger.',
         note:'RPE 9/10 · 60 sec de récupération — calculé pour forcer l\'adaptation aux efforts répétés.' },
       { jour:'Samedi',   type:'EF',           titre:'Footing de récupération',   duree:'45 min',
-        echauff:'', corps:'45 min à 65% VMA. Fondamentale après une grosse semaine — active la circulation pour accélérer la récupération musculaire avant la sortie longue du lendemain.', retour:'',
+        echauff:'', corps:'45 min à 60% VMA. Fondamentale après une grosse semaine — active la circulation pour accélérer la récupération musculaire avant la sortie longue du lendemain.', retour:'',
         note:'RPE 3/10 · Cette séance te fait récupérer plus vite.' },
       { jour:'Dimanche', type:'Sortie longue', titre:'Sortie longue avec encart allure', duree:'90 min',
         echauff:'', corps:'60 min à 70-75% VMA, puis 5 km à ton allure cible 10km, puis retour à l\'allure EF. Cet encart t\'apprend à tenir l\'allure quand les jambes sont déjà sollicitées.', retour:'',
@@ -119,7 +119,7 @@ const SEMAINES = [
         echauff:'25 min de footing EF.', corps:'4 × 2 km exactement à ton allure cible 10km. Récupération 90 sec au trot. La séance la plus course-spécifique du plan.', retour:'10 min de footing léger.',
         note:'RPE 8/10 · Si l\'allure cible est trop facile, ton objectif est peut-être trop prudent.' },
       { jour:'Samedi',   type:'EF',           titre:'Footing de récupération',   duree:'45 min',
-        echauff:'', corps:'45 min à 65% VMA. Indispensable pour absorber la charge des deux séances clés. Ton corps s\'adapte à un niveau supérieur.', retour:'',
+        echauff:'', corps:'45 min à 60% VMA. Indispensable pour absorber la charge des deux séances clés. Ton corps s\'adapte à un niveau supérieur.', retour:'',
         note:'RPE 3/10 · Le footing de récupération est aussi important que les séances intenses.' },
       { jour:'Dimanche', type:'Sortie longue', titre:'Dernière sortie longue',   duree:'85 min',
         echauff:'', corps:'85 min à 70-75% VMA. Ta dernière vraie sortie longue avant la course. Mémorise cette sensation — l\'affûtage va encore l\'améliorer.', retour:'',
@@ -230,6 +230,7 @@ const SVG_NUT_SUN = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 36 36"
   <line x1="8" y1="8" x2="11" y2="11" stroke="url(#ns-g)" stroke-width="2" stroke-linecap="round"/>
   <line x1="25" y1="25" x2="28" y2="28" stroke="url(#ns-g)" stroke-width="2" stroke-linecap="round"/>
   <line x1="28" y1="8" x2="25" y2="11" stroke="url(#ns-g)" stroke-width="2" stroke-linecap="round"/>
+  <line x1="8" y1="28" x2="11" y2="25" stroke="url(#ns-g)" stroke-width="2" stroke-linecap="round"/>
 </svg>`
 
 const SVG_NUT_BOLT = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 36 36" width="36" height="36">
@@ -237,16 +238,40 @@ const SVG_NUT_BOLT = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 36 36
   <path d="M20 4 L11 20 L17 20 L16 32 L25 16 L19 16 Z" fill="url(#nb-g)" opacity="0.9"/>
 </svg>`
 
-// Finale: growth chart
-const SVG_FIN_CHART = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 140 64" width="140" height="64">
-  <defs><linearGradient id="fc-g" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="#8B2FC9" stop-opacity="0.5"/><stop offset="100%" stop-color="#E8237A" stop-opacity="0.9"/></linearGradient></defs>
-  <rect x="8"  y="50" width="16" height="12" rx="3" fill="url(#fc-g)" opacity="0.35"/>
-  <rect x="32" y="40" width="16" height="22" rx="3" fill="url(#fc-g)" opacity="0.5"/>
-  <rect x="56" y="28" width="16" height="34" rx="3" fill="url(#fc-g)" opacity="0.65"/>
-  <rect x="80" y="16" width="16" height="46" rx="3" fill="url(#fc-g)" opacity="0.8"/>
-  <rect x="104" y="4"  width="16" height="58" rx="3" fill="url(#fc-g)" opacity="1"/>
-  <polyline points="16,50 40,40 64,28 88,16 112,4" fill="none" stroke="url(#fc-g)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
-  <path d="M109,1 L116,4 L109,7" fill="none" stroke="#E8237A" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+// Finale: trophée
+const SVG_FIN_TROPHY = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 220 88" width="220" height="88">
+  <defs>
+    <linearGradient id="ft-g1" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#8B2FC9"/><stop offset="100%" stop-color="#E8237A"/></linearGradient>
+    <linearGradient id="ft-g2" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="#8B2FC9" stop-opacity="0"/><stop offset="50%" stop-color="#8B2FC9" stop-opacity="0.25"/><stop offset="100%" stop-color="#E8237A" stop-opacity="0"/></linearGradient>
+  </defs>
+  <!-- Corps coupe -->
+  <path d="M88 14 Q83 14 80 22 L76 64 L144 64 L140 22 Q137 14 132 14 Z" fill="url(#ft-g1)" opacity="0.14"/>
+  <path d="M88 14 Q83 14 80 22 L76 64 L144 64 L140 22 Q137 14 132 14 Z" fill="none" stroke="url(#ft-g1)" stroke-width="2" stroke-linejoin="round"/>
+  <!-- Anse gauche -->
+  <path d="M80 27 Q60 27 60 42 Q60 56 77 56" fill="none" stroke="url(#ft-g1)" stroke-width="2" stroke-linecap="round"/>
+  <!-- Anse droite -->
+  <path d="M140 27 Q160 27 160 42 Q160 56 143 56" fill="none" stroke="url(#ft-g1)" stroke-width="2" stroke-linecap="round"/>
+  <!-- Étoile intérieure -->
+  <path d="M110 30 L113 39 L123 39 L115 45 L118 54 L110 49 L102 54 L105 45 L97 39 L107 39 Z" fill="url(#ft-g1)" opacity="0.75"/>
+  <!-- Tige -->
+  <rect x="103" y="64" width="14" height="6" fill="url(#ft-g1)" opacity="0.5"/>
+  <!-- Socle -->
+  <rect x="88" y="70" width="44" height="7" rx="3.5" fill="url(#ft-g1)" opacity="0.75"/>
+  <!-- Ligne de sol -->
+  <line x1="15" y1="79" x2="205" y2="79" stroke="url(#ft-g2)" stroke-width="1"/>
+  <!-- Étoiles déco -->
+  <circle cx="44" cy="24" r="2.5" fill="rgba(234,179,8,.75)"/>
+  <circle cx="176" cy="20" r="2" fill="rgba(234,179,8,.65)"/>
+  <circle cx="30" cy="50" r="1.5" fill="rgba(139,47,201,.6)"/>
+  <circle cx="192" cy="48" r="1.5" fill="rgba(232,35,122,.6)"/>
+  <circle cx="55" cy="68" r="1" fill="rgba(255,255,255,.35)"/>
+  <circle cx="168" cy="66" r="1" fill="rgba(255,255,255,.35)"/>
+  <!-- Lignes vitesse gauche -->
+  <line x1="12" y1="37" x2="56" y2="37" stroke="rgba(139,47,201,.3)" stroke-width="1.5" stroke-linecap="round"/>
+  <line x1="18" y1="46" x2="58" y2="46" stroke="rgba(139,47,201,.2)" stroke-width="1" stroke-linecap="round"/>
+  <!-- Lignes vitesse droite -->
+  <line x1="162" y1="37" x2="206" y2="37" stroke="rgba(232,35,122,.3)" stroke-width="1.5" stroke-linecap="round"/>
+  <line x1="162" y1="46" x2="202" y2="46" stroke="rgba(232,35,122,.2)" stroke-width="1" stroke-linecap="round"/>
 </svg>`
 
 // ─── CSS ──────────────────────────────────────────────────────────────────────
@@ -274,10 +299,10 @@ body {
 .blob-tr, .blob-bl, .blob-tl, .blob-br {
   position: absolute; border-radius: 50%; pointer-events: none; z-index: 0;
 }
-.blob-tr { top:-80px; right:-70px; width:300px; height:300px; background:radial-gradient(ellipse,rgba(139,47,201,.26) 0%,transparent 65%); }
-.blob-bl { bottom:-70px; left:-60px; width:260px; height:260px; background:radial-gradient(ellipse,rgba(232,35,122,.2) 0%,transparent 65%); }
-.blob-tl { top:-60px; left:-60px; width:250px; height:250px; background:radial-gradient(ellipse,rgba(168,85,247,.2) 0%,transparent 65%); }
-.blob-br { bottom:-60px; right:-50px; width:230px; height:230px; background:radial-gradient(ellipse,rgba(236,72,153,.18) 0%,transparent 65%); }
+.blob-tr { top:-80px; right:-70px; width:300px; height:300px; background:radial-gradient(ellipse,rgba(139,47,201,.24) 0%,transparent 65%); }
+.blob-bl { bottom:-70px; left:-60px; width:260px; height:260px; background:radial-gradient(ellipse,rgba(232,35,122,.18) 0%,transparent 65%); }
+.blob-tl { top:-60px; left:-60px; width:250px; height:250px; background:radial-gradient(ellipse,rgba(139,47,201,.24) 0%,transparent 65%); }
+.blob-br { bottom:-60px; right:-50px; width:230px; height:230px; background:radial-gradient(ellipse,rgba(232,35,122,.18) 0%,transparent 65%); }
 
 /* Tout contenu au-dessus des blobs SAUF .pnum qui est absolu */
 .page > *:not([class^="blob"]):not(.pnum) { position: relative; z-index: 1; }
@@ -345,8 +370,8 @@ body {
 .som-sections { flex: 1; display: flex; flex-direction: column; gap: 8px; min-height: 0; }
 .som-section { flex: 1; display: flex; flex-direction: column; }
 .som-section-lbl {
-  font-size: 7.5pt; font-weight: 800; letter-spacing: .1em; text-transform: uppercase;
-  padding-bottom: 5px; border-bottom: 1px solid rgba(255,255,255,.08); margin-bottom: 4px;
+  font-size: 11pt; font-weight: 800; letter-spacing: .04em; text-transform: uppercase;
+  padding-bottom: 6px; border-bottom: 1px solid rgba(255,255,255,.08); margin-bottom: 5px;
   background: linear-gradient(135deg,#8B2FC9,#E8237A);
   -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
 }
@@ -489,16 +514,19 @@ body {
 .fin-grid { flex: 1; min-height: 0; display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
 .fin-feat {
   background: rgba(255,255,255,.04); border: 1px solid rgba(255,255,255,.07); border-radius: 12px;
-  padding: 14px; display: flex; flex-direction: column; gap: 6px;
+  padding: 14px; display: flex; flex-direction: column;
 }
+.fin-feat-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
 .fin-icon {
-  width: 36px; height: 36px; border-radius: 10px;
+  width: 38px; height: 38px; border-radius: 10px;
   background: linear-gradient(135deg,#8B2FC9,#E8237A);
   display: flex; align-items: center; justify-content: center; flex-shrink: 0;
 }
-.fin-icon-svg { width: 20px; height: 20px; opacity: .9; }
-.fin-feat-title { font-size: 10pt; font-weight: 700; margin-top: 2px; }
-.fin-feat-desc { font-size: 9pt; color: rgba(255,255,255,.68); line-height: 1.45; }
+.fin-feat-num { font-size: 13pt; font-weight: 800; color: rgba(255,255,255,.07); }
+.fin-feat-title { font-size: 10.5pt; font-weight: 700; margin-bottom: 4px; }
+.fin-feat-bar { height: 2px; border-radius: 1px; margin-bottom: 8px; }
+.fin-feat-desc { font-size: 9pt; color: rgba(255,255,255,.7); line-height: 1.5; flex: 1; }
+.fin-feat-tag { margin-top: auto; display: inline-block; background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.1); border-radius: 12px; padding: 3px 10px; font-size: 7.5pt; font-weight: 700; color: rgba(255,255,255,.5); margin-top: 10px; }
 .fin-cta { flex-shrink: 0; background: linear-gradient(135deg,#8B2FC9,#E8237A); border-radius: 10px; padding: 13px; text-align: center; }
 .fin-cta-title { font-size: 12pt; font-weight: 800; color: white; }
 .fin-cta-sub { font-size: 9pt; color: rgba(255,255,255,.85); margin-top: 3px; }
@@ -551,7 +579,6 @@ function weekPage(sem) {
     <div class="week-hero">
       <div class="week-num">Semaine ${sem.num} sur 8</div>
       <div class="week-phase grad">${sem.phase.toUpperCase()}</div>
-      <div class="week-charge">${sem.charge}</div>
     </div>
     <div class="objectif">
       <div class="obj-lbl">Objectif</div>
@@ -644,6 +671,9 @@ const HTML = `<!DOCTYPE html>
     pour obtenir tes allures exactes. Sans VMA connue : cours 12 min — VMA (km/h) = distance (m) ÷ 200.
   </p>
   ${SVG_HEARTBEAT}
+  <div style="flex-shrink:0;text-align:center;font-size:7.5pt;font-weight:700;color:rgba(255,255,255,.38);text-transform:uppercase;letter-spacing:.09em">
+    Exemple calculé pour une VMA de 14 km/h — calcule les tiennes sur theultimateacademy.fr
+  </div>
   <div class="zones-wrap">
     ${ZONES.map(z=>`
     <div class="zone-card" style="border-left:3px solid ${z.c};background:rgba(${z.rgb},.08);">
@@ -771,26 +801,35 @@ ${SEMAINES.map(s => weekPage(s)).join('')}
 <div class="page">
   ${blobs('A')}
   <div class="fin-hero">
-    ${SVG_FIN_CHART}
+    ${SVG_FIN_TROPHY}
     <div class="fin-eyebrow" style="margin-top:8px">The Ultimate Academy</div>
     <div class="fin-title">Passe à la vitesse supérieure</div>
     <div class="fin-sub">Ton prochain plan, conçu sur mesure pour toi chaque semaine.</div>
   </div>
   <div class="fin-grid">
     ${[
-      ['Plan personnalisé','Basé sur ta VMA réelle, ton objectif précis et ta disponibilité — pas un plan générique.',
-        `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" width="20" height="20"><circle cx="10" cy="10" r="8" fill="none" stroke="white" stroke-width="2"/><path d="M7 10 L9 12 L13 8" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>`],
-      ['Suivi hebdomadaire','Bilan personnalisé chaque semaine. Tu signales de la fatigue — le plan s\'allège.',
-        `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" width="20" height="20"><rect x="3" y="3" width="14" height="14" rx="2" fill="none" stroke="white" stroke-width="2"/><polyline points="7,10 9,13 13,7" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>`],
-      ['Analyses de course','Analyse pré-course J-7 et post-course pour comprendre et progresser.',
-        `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" width="20" height="20"><polyline points="3,15 7,9 11,12 17,5" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="17" cy="5" r="2" fill="white"/></svg>`],
-      ['Coach disponible','Alexis répond à tes questions directement dans l\'application.',
-        `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" width="20" height="20"><path d="M4 14 Q4 4 10 4 Q16 4 16 9 Q16 14 10 14 L7 17 Z" fill="none" stroke="white" stroke-width="2" stroke-linejoin="round"/></svg>`],
-    ].map(([t,d,icon])=>`
+      { n:'01', t:'Plan personnalisé', bar:'#8B2FC9', tag:'100% sur mesure',
+        d:'Généré selon ta VMA réelle, ton objectif précis et ta disponibilité. Chaque semaine est unique — pas un plan générique copié-collé.',
+        icon:`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" width="20" height="20"><circle cx="10" cy="10" r="8" fill="none" stroke="white" stroke-width="2"/><path d="M7 10 L9 12 L13 8" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>` },
+      { n:'02', t:'Suivi chaque semaine', bar:'#E8237A', tag:'Bilan hebdo',
+        d:'Un bilan personnalisé chaque semaine. Tu signales de la fatigue — le plan s\'allège. Tu progresses vite — il accélère. Jamais de stagnation.',
+        icon:`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" width="20" height="20"><rect x="3" y="3" width="14" height="14" rx="2" fill="none" stroke="white" stroke-width="2"/><line x1="7" y1="10" x2="13" y2="10" stroke="white" stroke-width="2" stroke-linecap="round"/><line x1="10" y1="7" x2="10" y2="13" stroke="white" stroke-width="2" stroke-linecap="round"/></svg>` },
+      { n:'03', t:'Analyses de course', bar:'#A855F7', tag:'Avant & après',
+        d:'Analyse pré-course J-7 pour finaliser ta stratégie. Analyse post-course pour comprendre tes résultats et identifier les axes de progression.',
+        icon:`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" width="20" height="20"><polyline points="3,15 7,9 11,12 17,5" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="17" cy="5" r="2" fill="white"/></svg>` },
+      { n:'04', t:'Coach disponible', bar:'#06B6D4', tag:'Alexis répond',
+        d:'Alexis répond à tes questions directement dans l\'application. Conseil rapide, personnalisé, disponible quand tu en as besoin.',
+        icon:`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" width="20" height="20"><path d="M4 13 Q4 4 10 4 Q16 4 16 9 Q16 14 10 14 L7 17 Z" fill="none" stroke="white" stroke-width="2" stroke-linejoin="round"/></svg>` },
+    ].map(({n,t,bar,tag,d,icon})=>`
     <div class="fin-feat">
-      <div class="fin-icon">${icon}</div>
+      <div class="fin-feat-header">
+        <div class="fin-icon">${icon}</div>
+        <div class="fin-feat-num">${n}</div>
+      </div>
       <div class="fin-feat-title">${t}</div>
+      <div class="fin-feat-bar" style="background:${bar}"></div>
       <div class="fin-feat-desc">${d}</div>
+      <div class="fin-feat-tag">${tag}</div>
     </div>`).join('')}
   </div>
   <div class="fin-cta">
