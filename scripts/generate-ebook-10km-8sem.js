@@ -411,10 +411,10 @@ body {
   font-size: 13pt; font-weight: 800; color: #C084FC;
   padding-bottom: 4px; border-bottom: 1px solid rgba(192,132,252,.25);
 }
-.som-item { display: flex; align-items: baseline; }
+.som-item { display: flex; align-items: baseline; width: 100%; }
 .som-label { font-size: 10.5pt; font-weight: 500; color: rgba(255,255,255,.88); flex-shrink: 0; }
 .som-dots { flex: 1; border-bottom: 1px dotted rgba(255,255,255,.15); margin: 0 10px; align-self: flex-end; margin-bottom: 3px; }
-.som-page { font-size: 10pt; font-weight: 800; flex-shrink: 0; color: #C084FC; width: 38px; text-align: right; font-variant-numeric: tabular-nums; }
+.som-page { font-size: 10pt; font-weight: 800; flex-shrink: 0; color: #C084FC; display: inline-block; width: 42px; text-align: right; }
 
 /* ══ ALLURES ══ */
 .zones-wrap { flex: 1; display: flex; flex-direction: column; gap: 5px; min-height: 0; }
@@ -432,11 +432,11 @@ body {
 /* ══ PRINCIPES ══ */
 .principes-wrap { flex: 1; display: flex; flex-direction: column; min-height: 0; }
 .principe {
-  flex: 1; display: flex; gap: 14px; align-items: flex-start;
+  flex: 1; display: flex; gap: 14px; align-items: center;
   padding: 6px 12px;
   overflow: hidden;
 }
-.p-num { font-size: 15pt; font-weight: 800; flex-shrink: 0; width: 28px; line-height: 1; text-align: left; }
+.p-num { font-size: 15pt; font-weight: 800; flex-shrink: 0; width: 28px; line-height: 1; text-align: left; align-self: center; }
 .p-t { font-size: 10.5pt; font-weight: 700; margin-bottom: 3px; }
 .p-d { font-size: 9.5pt; color: rgba(255,255,255,.75); line-height: 1.5; }
 
