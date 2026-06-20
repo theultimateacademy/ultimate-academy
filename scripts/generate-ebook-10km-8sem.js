@@ -477,14 +477,15 @@ body {
   border-radius: 12px; overflow: hidden;
 }
 .s-head {
-  flex-shrink: 0; display: flex; flex-direction: column; justify-content: center;
-  gap: 3px; padding: 5px 13px 4px;
+  flex-shrink: 0; position: relative; height: 40px;
+  display: flex; align-items: center; padding: 0 13px;
 }
-.s-head-row { display: flex; align-items: center; gap: 10px; }
-.s-jour { font-size: 8.5pt; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; color: rgba(255,255,255,.45); flex-shrink: 0; width: 66px; }
+.s-head-row { display: none; }
+.s-jour { font-size: 8.5pt; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; color: rgba(255,255,255,.45); flex-shrink: 0; position: relative; z-index: 1; }
 .s-badge { font-size: 6.5pt; font-weight: 800; letter-spacing: .05em; text-transform: uppercase; border-radius: 10px; padding: 2px 8px; flex-shrink: 0; white-space: nowrap; }
-.s-duree { font-size: 9.5pt; font-weight: 800; flex-shrink: 0; white-space: nowrap; margin-left: auto; }
-.s-titre { font-size: 10pt; font-weight: 700; text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.s-duree { font-size: 9.5pt; font-weight: 800; flex-shrink: 0; white-space: nowrap; margin-left: auto; position: relative; z-index: 1; }
+.s-center { position: absolute; left: 0; right: 0; display: flex; justify-content: center; align-items: center; gap: 8px; pointer-events: none; }
+.s-titre { font-size: 10pt; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
 .s-body {
   flex: 1; min-height: 0; overflow: hidden;
@@ -582,12 +583,12 @@ function sessionCard(s) {
   return `
   <div class="session" style="${cardSt}">
     <div class="s-head" style="${headSt}">
-      <div class="s-head-row">
-        <span class="s-jour">${s.jour}</span>
+      <span class="s-jour">${s.jour}</span>
+      <div class="s-center">
         <span class="s-badge" style="${badgeSt}">${s.type}</span>
-        <span class="s-duree" style="${durSt}">${s.duree}</span>
+        <span class="s-titre">${s.titre}</span>
       </div>
-      <div class="s-titre">${s.titre}</div>
+      <span class="s-duree" style="${durSt}">${s.duree}</span>
     </div>
     <div class="s-body">${meta}<div class="s-corps">${s.corps}</div></div>
     <div class="s-note">${s.note}</div>
