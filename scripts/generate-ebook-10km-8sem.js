@@ -828,7 +828,7 @@ ${SEMAINES.map(s => weekPage(s)).join('')}
       { n:'03', t:'Analyses de course', bar:'#A855F7', tag:'Avant & après',
         d:'Analyse pré-course J-7 pour finaliser ta stratégie. Analyse post-course pour comprendre tes résultats et identifier les axes de progression.',
         icon:`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" width="20" height="20"><polyline points="3,15 7,9 11,12 17,5" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="17" cy="5" r="2" fill="white"/></svg>` },
-      { n:'04', t:'Coach disponible', bar:'#06B6D4', tag:'Alexis répond',
+      { n:'04', t:'Coach disponible', bar:'#E8237A', tag:'Alexis répond',
         d:'Alexis répond à tes questions directement dans l\'application. Conseil rapide, personnalisé, disponible quand tu en as besoin.',
         icon:`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" width="20" height="20"><path d="M4 13 Q4 4 10 4 Q16 4 16 9 Q16 14 10 14 L7 17 Z" fill="none" stroke="white" stroke-width="2" stroke-linejoin="round"/></svg>` },
     ].map(({n,t,bar,tag,d,icon})=>`
@@ -840,7 +840,6 @@ ${SEMAINES.map(s => weekPage(s)).join('')}
       <div class="fin-feat-title">${t}</div>
       <div class="fin-feat-bar" style="background:${bar}"></div>
       <div class="fin-feat-desc">${d}</div>
-      <div class="fin-feat-tag">${tag}</div>
     </div>`).join('')}
   </div>
   <div class="fin-cta">
