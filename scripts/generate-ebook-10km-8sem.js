@@ -135,9 +135,9 @@ const SEMAINES = [
       { jour:'Jeudi',    type:'Fractionné',    titre:'6 × 400 mètres — volume réduit', duree:'55 min',
         echauff:'25 min de footing progressif EF.', corps:'6 × 400m à 95-100% VMA. Volume réduit de 40% mais intensité maintenue. Récupération 2 min entre chaque.', retour:'10 min de footing léger.',
         note:'RPE 8/10 · Ces 6 répétitions maintiennent tes sensations sans te fatiguer.' },
-      { jour:'Samedi',   type:'Activation',   titre:'Trot léger d\'activation',  duree:'25 min',
-        echauff:'', corps:'25 min de trot à 60-65% VMA. Juste assez pour que les jambes se souviennent de courir avant la course dans une semaine. Pas d\'effort, juste du mouvement.', retour:'',
-        note:'RPE 2-3/10 · Tout pour la course. Ne dépasse jamais cette sensation.' },
+      { jour:'Samedi',   type:'EF',           titre:'Footing de 45 minutes',     duree:'45 min',
+        echauff:'', corps:'45 min à 65% VMA. Garde les jambes en mouvement sans les fatiguer. Cours au ressenti, détendu et régulier. Profite de l\'affûtage — ton corps est en train de se recharger pour le jour J.', retour:'',
+        note:'RPE 3/10 · Tu dois finir frais et légèrement dynamisé, jamais fatigué.' },
     ]},
   { num:8, phase:'Semaine de course', charge:'Conserve — tu es prêt',
     objectif:'Rien ne se gagne à l\'entraînement cette semaine. L\'objectif unique : arriver au départ reposé, confiant, les jambes fraîches.',
@@ -210,6 +210,86 @@ const SVG_COVER_LINES = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 10
 const SVG_COVER_DOTS = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 48" width="64" height="48">
   <defs><radialGradient id="cv-dg"><stop offset="0%" stop-color="#E8237A" stop-opacity="0.7"/><stop offset="100%" stop-color="#8B2FC9" stop-opacity="0.3"/></radialGradient></defs>
   ${[0,1,2,3].map(i=>[0,1,2].map(j=>`<circle cx="${8+i*16}" cy="${8+j*16}" r="${2-j*0.3}" fill="url(#cv-dg)"/>`).join('')).join('')}
+</svg>`
+
+// Cover: runner silhouette
+const SVG_COVER_RUNNER = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 230" width="160" height="230">
+  <defs>
+    <linearGradient id="rn-g" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#8B2FC9"/>
+      <stop offset="100%" stop-color="#E8237A"/>
+    </linearGradient>
+  </defs>
+  <!-- Head -->
+  <circle cx="92" cy="26" r="18" fill="url(#rn-g)"/>
+  <!-- Torso incliné en avant -->
+  <path d="M82 42 Q76 72 70 100 Q90 108 120 102 Q128 72 118 42 Z" fill="url(#rn-g)"/>
+  <!-- Bras droit en avant (plié vers le haut) -->
+  <path d="M118 58 L136 46 L148 58" fill="none" stroke="url(#rn-g)" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"/>
+  <!-- Bras gauche en arrière -->
+  <path d="M80 58 L62 68 L50 58" fill="none" stroke="url(#rn-g)" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"/>
+  <!-- Jambe gauche (genou levé en avant) -->
+  <path d="M114 100 L124 128 L144 148" fill="none" stroke="url(#rn-g)" stroke-width="13" stroke-linecap="round" stroke-linejoin="round"/>
+  <!-- Jambe droite (poussée en arrière) -->
+  <path d="M80 100 L66 132 L50 158 L58 178" fill="none" stroke="url(#rn-g)" stroke-width="13" stroke-linecap="round" stroke-linejoin="round"/>
+  <!-- Traînée de vitesse -->
+  <line x1="6" y1="110" x2="44" y2="110" stroke="rgba(232,35,122,.45)" stroke-width="2" stroke-linecap="round"/>
+  <line x1="12" y1="124" x2="44" y2="124" stroke="rgba(139,47,201,.35)" stroke-width="1.5" stroke-linecap="round"/>
+  <line x1="18" y1="138" x2="44" y2="138" stroke="rgba(232,35,122,.22)" stroke-width="1" stroke-linecap="round"/>
+  <!-- Étoiles -->
+  <circle cx="148" cy="170" r="2" fill="rgba(234,179,8,.65)"/>
+  <circle cx="138" cy="192" r="1.5" fill="rgba(255,255,255,.35)"/>
+  <circle cx="22" cy="196" r="1.5" fill="rgba(234,179,8,.5)"/>
+</svg>`
+
+// Cover: piste perspective bas de page
+const SVG_COVER_TRACK_BOTTOM = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 595 70" width="595" height="70" preserveAspectRatio="none">
+  <defs>
+    <linearGradient id="ctb-g" x1="0" y1="1" x2="0" y2="0">
+      <stop offset="0%" stop-color="rgba(139,47,201,0.35)"/>
+      <stop offset="60%" stop-color="rgba(232,35,122,0.12)"/>
+      <stop offset="100%" stop-color="rgba(139,47,201,0)"/>
+    </linearGradient>
+  </defs>
+  <rect x="0" y="0" width="595" height="70" fill="url(#ctb-g)"/>
+  <line x1="0" y1="18" x2="595" y2="18" stroke="rgba(139,47,201,.32)" stroke-width="1"/>
+  <line x1="0" y1="35" x2="595" y2="35" stroke="rgba(139,47,201,.22)" stroke-width="1"/>
+  <line x1="0" y1="52" x2="595" y2="52" stroke="rgba(232,35,122,.18)" stroke-width="1"/>
+  <!-- Ligne d'arrivée centrale (damier stylisé) -->
+  <rect x="240" y="0" width="115" height="70" fill="rgba(255,255,255,.015)"/>
+  <line x1="297" y1="0" x2="297" y2="70" stroke="rgba(255,255,255,.06)" stroke-width="1.5" stroke-dasharray="5,5"/>
+</svg>`
+
+// Cover: oval piste en arrière-plan
+const SVG_COVER_OVAL_BG = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 260" width="480" height="260">
+  <defs>
+    <linearGradient id="cob-g1" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#8B2FC9" stop-opacity="0.55"/>
+      <stop offset="50%" stop-color="#E8237A" stop-opacity="0.85"/>
+      <stop offset="100%" stop-color="#8B2FC9" stop-opacity="0.55"/>
+    </linearGradient>
+    <linearGradient id="cob-g2" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#8B2FC9" stop-opacity="0.2"/>
+      <stop offset="50%" stop-color="#E8237A" stop-opacity="0.35"/>
+      <stop offset="100%" stop-color="#8B2FC9" stop-opacity="0.2"/>
+    </linearGradient>
+  </defs>
+  <!-- Oval extérieur -->
+  <ellipse cx="240" cy="130" rx="228" ry="116" fill="none" stroke="url(#cob-g1)" stroke-width="2.5"/>
+  <!-- Oval intérieur en pointillés -->
+  <ellipse cx="240" cy="130" rx="170" ry="80" fill="none" stroke="url(#cob-g2)" stroke-width="1.5" stroke-dasharray="7,11"/>
+  <!-- Droites (couloirs) -->
+  <line x1="12" y1="130" x2="468" y2="130" stroke="rgba(255,255,255,.04)" stroke-width="1"/>
+  <!-- Marques départ/arrivée -->
+  <line x1="240" y1="14" x2="240" y2="28" stroke="rgba(232,35,122,.7)" stroke-width="2"/>
+  <line x1="240" y1="232" x2="240" y2="246" stroke="rgba(232,35,122,.5)" stroke-width="2"/>
+  <!-- Coureur sur l'oval -->
+  <circle cx="438" cy="130" r="7" fill="#E8237A" opacity="0.8"/>
+  <circle cx="438" cy="130" r="14" fill="none" stroke="rgba(232,35,122,.35)" stroke-width="1.5"/>
+  <!-- Points kilométriques -->
+  <circle cx="240" cy="14" r="3" fill="rgba(139,47,201,.7)"/>
+  <circle cx="12" cy="130" r="3" fill="rgba(139,47,201,.5)"/>
+  <circle cx="468" cy="130" r="3" fill="rgba(232,35,122,.7)"/>
 </svg>`
 
 // Nutrition icons
@@ -322,7 +402,8 @@ body {
 
 /* TITRES DE PAGES — centrés, gradient */
 .page-title {
-  font-size: 27pt; font-weight: 800; line-height: 1; text-align: center; flex-shrink: 0;
+  font-size: 27pt; font-weight: 800; line-height: 1.15; text-align: center; flex-shrink: 0;
+  padding: 5px 0 3px;
   background: linear-gradient(135deg,#8B2FC9,#E8237A);
   -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
 }
@@ -375,17 +456,17 @@ body {
   background: linear-gradient(135deg,#8B2FC9,#E8237A);
   -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
 }
-.som-items { display: flex; flex-direction: column; flex: 1; justify-content: space-around; }
-.som-item { display: flex; align-items: baseline; padding: 4px 0; }
+.som-items { display: flex; flex-direction: column; flex: 1; justify-content: space-evenly; }
+.som-item { display: flex; align-items: baseline; padding: 3px 0; }
 .som-num {
-  font-size: 9pt; font-weight: 800; flex-shrink: 0; width: 26px;
+  font-size: 9pt; font-weight: 800; flex-shrink: 0; width: 26px; display: inline-block;
   background: linear-gradient(135deg,#8B2FC9,#E8237A);
   -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
 }
 .som-label { font-size: 10.5pt; font-weight: 500; color: rgba(255,255,255,.88); flex-shrink: 0; }
 .som-dots { flex: 1; border-bottom: 1px dotted rgba(255,255,255,.18); margin: 0 8px; align-self: flex-end; margin-bottom: 4px; }
 .som-page {
-  font-size: 10pt; font-weight: 800; flex-shrink: 0;
+  font-size: 10pt; font-weight: 800; flex-shrink: 0; display: inline-block;
   background: linear-gradient(135deg,#8B2FC9,#E8237A);
   -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
 }
@@ -525,8 +606,8 @@ body {
 .fin-feat-num { font-size: 13pt; font-weight: 800; color: rgba(255,255,255,.07); }
 .fin-feat-title { font-size: 10.5pt; font-weight: 700; margin-bottom: 4px; }
 .fin-feat-bar { height: 2px; border-radius: 1px; margin-bottom: 8px; }
-.fin-feat-desc { font-size: 9pt; color: rgba(255,255,255,.7); line-height: 1.5; flex: 1; }
-.fin-feat-tag { margin-top: auto; display: inline-block; background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.1); border-radius: 12px; padding: 3px 10px; font-size: 7.5pt; font-weight: 700; color: rgba(255,255,255,.5); margin-top: 10px; }
+.fin-feat-desc { font-size: 9pt; color: rgba(255,255,255,.7); line-height: 1.5; }
+.fin-feat-tag { display: inline-block; background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.1); border-radius: 12px; padding: 3px 10px; font-size: 7.5pt; font-weight: 700; color: rgba(255,255,255,.5); margin-top: 8px; }
 .fin-cta { flex-shrink: 0; background: linear-gradient(135deg,#8B2FC9,#E8237A); border-radius: 10px; padding: 13px; text-align: center; }
 .fin-cta-title { font-size: 12pt; font-weight: 800; color: white; }
 .fin-cta-sub { font-size: 9pt; color: rgba(255,255,255,.85); margin-top: 3px; }
@@ -615,9 +696,33 @@ const HTML = `<!DOCTYPE html>
 <!-- P.1 COUVERTURE -->
 <div class="cover-page">
   <div class="cover-wm">10</div>
+  <!-- Oval piste arrière-plan, centré verticalement -->
+  <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);opacity:0.18;pointer-events:none;z-index:0">${SVG_COVER_OVAL_BG}</div>
+  <!-- Runner silhouette, droite -->
+  <div style="position:absolute;bottom:68mm;right:8mm;opacity:0.22;pointer-events:none;z-index:0">${SVG_COVER_RUNNER}</div>
+  <!-- Piste bas de page -->
+  <div style="position:absolute;bottom:0;left:0;right:0;pointer-events:none;z-index:0">${SVG_COVER_TRACK_BOTTOM}</div>
+  <!-- Décos existantes -->
   <div class="cover-deco-tr">${SVG_COVER_CIRCLES}</div>
   <div class="cover-deco-bl">${SVG_COVER_LINES}</div>
   <div class="cover-deco-br">${SVG_COVER_DOTS}</div>
+  <!-- Étoiles supplémentaires -->
+  <div style="position:absolute;top:22mm;left:16mm;pointer-events:none;z-index:0;opacity:0.7">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 80 80" width="80" height="80">
+      <circle cx="12" cy="12" r="2.5" fill="rgba(234,179,8,.7)"/>
+      <circle cx="58" cy="28" r="1.8" fill="rgba(255,255,255,.4)"/>
+      <circle cx="30" cy="62" r="2" fill="rgba(232,35,122,.6)"/>
+      <circle cx="72" cy="60" r="1.5" fill="rgba(234,179,8,.5)"/>
+      <circle cx="6" cy="46" r="1.2" fill="rgba(139,47,201,.6)"/>
+    </svg>
+  </div>
+  <div style="position:absolute;bottom:30mm;left:14mm;pointer-events:none;z-index:0;opacity:0.6">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 60 60" width="60" height="60">
+      <circle cx="8" cy="10" r="2" fill="rgba(232,35,122,.6)"/>
+      <circle cx="44" cy="22" r="1.5" fill="rgba(234,179,8,.5)"/>
+      <circle cx="22" cy="46" r="2.5" fill="rgba(139,47,201,.55)"/>
+    </svg>
+  </div>
   <div class="cover-inner">
     ${logoB64 ? `<img src="${logoB64}" class="cover-logo"/>` : ''}
     <div class="cover-sep"></div>
