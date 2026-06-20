@@ -414,8 +414,7 @@ body {
 .som-item { display: flex; align-items: baseline; width: 100%; }
 .som-label { font-size: 10.5pt; font-weight: 500; color: rgba(255,255,255,.88); flex-shrink: 0; }
 .som-dots { flex: 1; border-bottom: 1px dotted rgba(255,255,255,.15); margin: 0 10px; align-self: flex-end; margin-bottom: 3px; }
-.som-page { font-size: 10pt; font-weight: 800; flex-shrink: 0; color: #C084FC; display: inline-flex; align-items: baseline; }
-.som-pnum { display: inline-block; width: 20px; text-align: right; }
+.som-page { font-size: 10pt; font-weight: 800; flex-shrink: 0; color: #C084FC; width: 42px; }
 
 /* ══ ALLURES ══ */
 .zones-wrap { flex: 1; display: flex; flex-direction: column; gap: 5px; min-height: 0; }
@@ -656,15 +655,15 @@ const HTML = `<!DOCTYPE html>
   <div class="som-flat">
     <div class="som-glbl">Introduction</div>
     ${[['01','Tes allures personnalisées','3'],['02','Les principes du plan','4']].map(([n,l,p])=>
-      `<div class="som-item"><span class="som-label">${l}</span><span class="som-dots"></span><span class="som-page">p.<span class="som-pnum">${p}</span></span></div>`
+      `<div class="som-item"><span class="som-label">${l}</span><span class="som-dots"></span><span class="som-page">p.${p}</span></div>`
     ).join('')}
     <div class="som-glbl">Programme semaine par semaine</div>
     ${[['03','Semaine 1 · Adaptation','5'],['04','Semaine 2 · Adaptation','6'],['05','Semaine 3 · Développement','7'],['06','Semaine 4 · Développement','8'],['07','Semaine 5 · Intensification','9'],['08','Semaine 6 · Intensification','10'],['09','Semaine 7 · Affûtage','11'],['10','Semaine 8 · Semaine de course','12']].map(([n,l,p])=>
-      `<div class="som-item"><span class="som-label">${l}</span><span class="som-dots"></span><span class="som-page">p.<span class="som-pnum">${p}</span></span></div>`
+      `<div class="som-item"><span class="som-label">${l}</span><span class="som-dots"></span><span class="som-page">p.${p}</span></div>`
     ).join('')}
     <div class="som-glbl">Course &amp; après</div>
     ${[['11','Stratégie de course','13'],['12','Nutrition avant et après','14'],['13','Coaching personnalisé','15']].map(([n,l,p])=>
-      `<div class="som-item"><span class="som-label">${l}</span><span class="som-dots"></span><span class="som-page">p.<span class="som-pnum">${p}</span></span></div>`
+      `<div class="som-item"><span class="som-label">${l}</span><span class="som-dots"></span><span class="som-page">p.${p}</span></div>`
     ).join('')}
   </div>
   <div class="pnum">2</div>
