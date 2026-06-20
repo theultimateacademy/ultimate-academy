@@ -482,7 +482,7 @@ body {
 }
 .s-jour { font-size: 8.5pt; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; color: rgba(255,255,255,.45); flex-shrink: 0; width: 66px; }
 .s-badge { font-size: 6.5pt; font-weight: 800; letter-spacing: .05em; text-transform: uppercase; border-radius: 10px; padding: 2px 8px; flex-shrink: 0; white-space: nowrap; }
-.s-titre { font-size: 10pt; font-weight: 700; flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.s-titre { font-size: 10pt; font-weight: 700; flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; text-align: center; }
 .s-duree { font-size: 9.5pt; font-weight: 800; flex-shrink: 0; white-space: nowrap; }
 
 .s-body {
