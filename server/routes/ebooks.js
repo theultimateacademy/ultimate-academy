@@ -10,15 +10,37 @@ const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SER
 
 const CLIENT_URL = process.env.CLIENT_URL || 'https://theultimateacademy.fr';
 
+// ─── Ebooks à variantes (VMA × séances/semaine) ───────────────────────────────
+// Tarif par nombre de séances/semaine, identique pour toutes les VMA.
+const PRICE_TIERS = {
+  '10km-8sem': { 3: 1499, 4: 1799, 5: 1999, 6: 2299 },
+};
+
+const VMA_MIN = 10;
+const VMA_MAX = 24;
+
+function isValidVma(vma) {
+  const n = Number(vma);
+  return Number.isFinite(n) && n >= VMA_MIN && n <= VMA_MAX && Math.round(n * 2) === n * 2;
+}
+
+function isValidSeances(seances, tiers) {
+  return Object.prototype.hasOwnProperty.call(tiers, String(seances));
+}
+
+function variantPdfPath(slug, vma, seances) {
+  return path.join(__dirname, '../../public/ebooks', slug, `vma-${vma}-${seances}seances.pdf`);
+}
+
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
-async function sendEbookEmail(email, ebook) {
+async function sendEbookEmail(email, ebook, pdfPathOverride) {
   if (!process.env.RESEND_API_KEY) {
     console.warn('[Ebooks] RESEND_API_KEY not set — skipping email');
     return;
   }
 
-  const pdfPath = path.join(__dirname, '../../public/ebooks', ebook.pdf_path || `${ebook.slug}.pdf`);
+  const pdfPath = pdfPathOverride || path.join(__dirname, '../../public/ebooks', ebook.pdf_path || `${ebook.slug}.pdf`);
   if (!fs.existsSync(pdfPath)) {
     console.error(`[Ebooks] PDF not found: ${pdfPath}`);
     return;
@@ -104,13 +126,26 @@ router.get('/:slug', async (req, res) => {
 // ─── POST /api/ebooks/checkout ────────────────────────────────────────────────
 
 router.post('/checkout', async (req, res) => {
-  const { ebook_id, email, slug } = req.body;
+  const { ebook_id, email, slug, vma, seances } = req.body;
   if (!ebook_id || !email) return res.status(400).json({ error: 'ebook_id et email requis' });
 
   try {
     const { data: ebook, error } = await supabase
       .from('ebooks').select('*').eq('id', ebook_id).eq('active', true).single();
     if (error || !ebook) return res.status(404).json({ error: 'Ebook introuvable' });
+
+    const tiers = PRICE_TIERS[ebook.slug];
+    let unitAmount = ebook.price_cents;
+    const metadata = { ebook_id: ebook.id, email };
+
+    if (tiers) {
+      if (!isValidVma(vma) || !isValidSeances(seances, tiers)) {
+        return res.status(400).json({ error: 'VMA (10-24, pas 0,5) et séances/semaine (3-6) requis pour cet ebook' });
+      }
+      unitAmount = tiers[String(seances)];
+      metadata.vma = String(vma);
+      metadata.seances = String(seances);
+    }
 
     // Créer la session Stripe
     const session = await stripe.checkout.sessions.create({
@@ -121,11 +156,11 @@ router.post('/checkout', async (req, res) => {
         price_data: {
           currency:     'eur',
           product_data: { name: ebook.title, description: ebook.description || undefined },
-          unit_amount:  ebook.price_cents,
+          unit_amount:  unitAmount,
         },
         quantity: 1,
       }],
-      metadata: { ebook_id: ebook.id, email },
+      metadata,
       success_url: `${CLIENT_URL}/ebooks/merci`,
       cancel_url:  `${CLIENT_URL}/ebooks/${ebook.slug}`,
     });
@@ -136,6 +171,7 @@ router.post('/checkout', async (req, res) => {
       email,
       stripe_payment_intent_id: session.payment_intent || session.id,
       status:                   'pending',
+      ...(tiers ? { vma: Number(vma), seances_semaine: Number(seances) } : {}),
     });
 
     res.json({ url: session.url });
@@ -162,7 +198,7 @@ router.post('/webhook', async (req, res) => {
     const session = event.data.object;
     if (session.mode !== 'payment') return res.json({ received: true });
 
-    const { ebook_id, email } = session.metadata || {};
+    const { ebook_id, email, vma, seances } = session.metadata || {};
     if (!ebook_id || !email) return res.json({ received: true });
 
     try {
@@ -175,8 +211,9 @@ router.post('/webhook', async (req, res) => {
       const { data: ebook } = await supabase.from('ebooks').select('*').eq('id', ebook_id).single();
       if (!ebook) throw new Error('Ebook not found for id: ' + ebook_id);
 
-      // Envoyer le PDF par email
-      await sendEbookEmail(email, ebook);
+      // Envoyer le PDF par email (variante VMA/séances si applicable)
+      const pdfPathOverride = (vma && seances) ? variantPdfPath(ebook.slug, vma, seances) : null;
+      await sendEbookEmail(email, ebook, pdfPathOverride);
 
       // Marquer comme envoyé
       await supabase.from('ebook_purchases')

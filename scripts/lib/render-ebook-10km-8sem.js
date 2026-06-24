@@ -1,11 +1,8 @@
-const puppeteer = require('puppeteer')
-const fs        = require('fs')
-const path      = require('path')
+const fs   = require('fs')
+const path = require('path')
+const { OBJ_PCT, formatPace, formatPaceRange, formatSpeed, formatObjPace } = require('./paces')
 
-const OUT  = path.join(__dirname, '../public/ebooks/10km-8sem.pdf')
-const LOGO = path.join(__dirname, '../public/Logo.png')
-fs.mkdirSync(path.dirname(OUT), { recursive: true })
-
+const LOGO = path.join(__dirname, '../../public/Logo.png')
 const logoB64 = fs.existsSync(LOGO)
   ? `data:image/png;base64,${fs.readFileSync(LOGO).toString('base64')}`
   : ''
@@ -19,144 +16,8 @@ const TC = {
   'Activation':    { b:'#EAB308', bg:'rgba(234,179,8,.1)',   hd:'rgba(234,179,8,.18)',   tx:'#FDE047' },
   'Course':        { b:'#EC4899', bg:'rgba(236,72,153,.12)', hd:'rgba(236,72,153,.22)',  tx:'#F9A8D4' },
   'Spécifique':    { b:'#3B82F6', bg:'rgba(59,130,246,.1)',  hd:'rgba(59,130,246,.18)',  tx:'#93C5FD' },
+  'Renforcement':  { b:'#F472B6', bg:'rgba(244,114,182,.1)', hd:'rgba(244,114,182,.18)', tx:'#FBCFE8' },
 }
-
-// ─── Données (échauffements tous à 25 min) ────────────────────────────────────
-const SEMAINES = [
-  { num:1, phase:'Adaptation', charge:'Modérée',
-    objectif:'Installer les habitudes d\'entraînement et prendre ses marques sur les allures. Finir chaque séance en se sentant bien.',
-    conseil:'Sur les 10 × 400m, l\'objectif n\'est pas d\'aller le plus vite, mais de tenir la même allure sur les 10. Garde tes 90 secondes de récupération complètes.',
-    seances:[
-      { jour:'Mardi',    type:'EF',           titre:'Endurance Fondamentale',    duree:'45 min',
-        echauff:'', corps:'Course continue à 65-70% VMA. Allure conversation, tu dois pouvoir parler en phrases complètes. Si tu as du mal à parler, tu vas trop vite. Régulier et relâché.', retour:'',
-        note:'RPE 4-5/10 · Finis en te sentant bien, comme si tu pouvais encore courir.' },
-      { jour:'Jeudi',    type:'Fractionné',    titre:'10 × 400 mètres',          duree:'65 min',
-        echauff:'25 min de footing EF à 65% VMA.', corps:'10 × 400m à 95-100% VMA. Effort presque maximal. Récupération 90 sec au trot entre chaque. Maintiens la même allure du premier au dernier.', retour:'10 min de jogging léger.',
-        note:'RPE 8-9/10 · Si les dernières sont plus lentes, récupère un peu plus la prochaine fois.' },
-      { jour:'Samedi',   type:'EF',           titre:'Footing de récupération',   duree:'45 min',
-        echauff:'', corps:'45 min à 60% VMA. Active la circulation et prépare la sortie longue du lendemain. Si tu as des courbatures, ce footing les élimine progressivement.', retour:'',
-        note:'RPE 3/10 · Vraiment facile, aucun effort.' },
-      { jour:'Dimanche', type:'Sortie longue', titre:'Sortie longue',            duree:'75 min',
-        echauff:'', corps:'Course continue à 70-75% VMA pendant 75 minutes. Allure régulière. Hydrate-toi. Concentre-toi sur ta respiration et ta foulée.', retour:'',
-        note:'RPE 5-6/10 · Tu dois pouvoir parler par courtes phrases. Si tu fatigues, ralentis.' },
-    ]},
-  { num:2, phase:'Adaptation', charge:'Modérée, légère progression',
-    objectif:'Confirmer les bases. Le plan doit commencer à sembler naturel. Le corps assimile les nouvelles charges d\'entraînement.',
-    conseil:'Sur les 12 × 400m, l\'objectif c\'est de tenir la même allure sur les 12. Si les dernières sont nettement plus lentes, tu es parti trop vite.',
-    seances:[
-      { jour:'Mardi',    type:'EF',           titre:'Endurance Fondamentale',    duree:'45 min',
-        echauff:'', corps:'45 min à 65-70% VMA. Même principe que la semaine passée. Allure conversation, régulière du début à la fin.', retour:'',
-        note:'RPE 4-5/10 · Léger et régulier.' },
-      { jour:'Jeudi',    type:'Fractionné',    titre:'12 × 400 mètres',          duree:'70 min',
-        echauff:'25 min de footing EF à 65% VMA.', corps:'12 × 400m à 95-100% VMA. Deux répétitions de plus. Récupération 90 sec au trot. Maintiens la même allure sur les 12.', retour:'10 min de footing léger.',
-        note:'RPE 8-9/10 · La récupération courte est volontaire pour développer ta résistance.' },
-      { jour:'Samedi',   type:'EF',           titre:'Footing de récupération',   duree:'45 min',
-        echauff:'', corps:'45 min à 60% VMA. Active la circulation et prépare la sortie longue du lendemain. Cours très détendu.', retour:'',
-        note:'RPE 3/10 · Vraiment facile.' },
-      { jour:'Dimanche', type:'Sortie longue', titre:'Sortie longue',            duree:'80 min',
-        echauff:'', corps:'80 min à 70-75% VMA. 5 minutes de plus que la semaine dernière. Régularité du début à la fin.', retour:'',
-        note:'RPE 5-6/10 · La sortie longue est la pierre angulaire de ta préparation.' },
-    ]},
-  { num:3, phase:'Développement', charge:'Élevée, première séance tempo',
-    objectif:'L\'inconfort arrive, c\'est le signe que tu travailles dans la bonne zone. Montée en intensité avec la première séance au seuil anaérobie.',
-    conseil:'Sur le tempo, l\'allure doit être inconfortable mais tenable. Tu peux prononcer des mots isolés mais pas des phrases complètes.',
-    seances:[
-      { jour:'Mardi',    type:'EF',           titre:'Footing long EF',           duree:'50 min',
-        echauff:'', corps:'50 min à 70% VMA. Long et facile avant la semaine chargée. Travaille ta technique : légère bascule vers l\'avant, attaque milieu du pied.', retour:'',
-        note:'RPE 5/10 · Si tu te sens fatigué, passe à 65% VMA.' },
-      { jour:'Mercredi', type:'Tempo',         titre:'Tempo continu, 20 minutes', duree:'60 min',
-        echauff:'25 min de footing progressif à 65-70% VMA.', corps:'20 minutes continues à 85% VMA. Première séance au seuil. Difficile mais tenable. Tu peux prononcer des mots mais pas tenir une conversation.', retour:'15 min de jogging très lent.',
-        note:'RPE 7-8/10 · C\'est normal si tu souffres sur les dernières minutes, cette zone te fait progresser.' },
-      { jour:'Vendredi', type:'Fractionné',    titre:'5 × 1000 mètres',          duree:'70 min',
-        echauff:'25 min de footing EF à 65% VMA.', corps:'5 × 1000m à 85-88% VMA. Intervalles plus longs, développent ta résistance à l\'allure seuil. Récupération 2 min au trot.', retour:'10 min de footing léger.',
-        note:'RPE 7-8/10 · La progression 400m → 1000m est intentionnelle. Ton corps est prêt.' },
-      { jour:'Dimanche', type:'Sortie longue', titre:'Sortie longue + accélération', duree:'85 min',
-        echauff:'', corps:'70 min à 70-75% VMA, puis accélération progressive sur les 15 dernières minutes à 80-82% VMA. Tu apprends à finir fort, compétence clé sur les 2 derniers km.', retour:'',
-        note:'RPE 6/10 puis 7-8/10 · Mémorise cette sensation, tu la réutiliseras en course.' },
-    ]},
-  { num:4, phase:'Développement', charge:'Élevée, consolidation du seuil',
-    objectif:'Consolider le travail de seuil et augmenter le volume. La fatigue s\'installe, mange correctement et dors 8 heures par nuit.',
-    conseil:'Si tu ressens une fatigue importante, remplace la séance du vendredi par un footing EF de 45 min. Un athlète reposé progresse davantage.',
-    seances:[
-      { jour:'Mardi',    type:'EF',           titre:'Footing long EF',           duree:'55 min',
-        echauff:'', corps:'55 min à 70% VMA. Long, régulier, facile. Volume avant la semaine la plus chargée jusqu\'ici.', retour:'',
-        note:'RPE 5/10 · Si tu te sens fatigué, passe à 65% VMA.' },
-      { jour:'Mercredi', type:'Tempo',         titre:'2 × 15 minutes au seuil',  duree:'65 min',
-        echauff:'25 min de footing progressif EF.', corps:'2 × 15 min à 85% VMA avec 3 min de récupération. Plus difficile car la deuxième répétition arrive quand tu es déjà fatigué.', retour:'10 min de footing léger.',
-        note:'RPE 7-8/10 · Si la deuxième est plus difficile que la première, c\'est qu\'elle est supposée l\'être.' },
-      { jour:'Vendredi', type:'Fractionné',    titre:'6 × 1000 mètres',          duree:'75 min',
-        echauff:'25 min de footing EF.', corps:'6 × 1000m à 87-90% VMA. Une répétition de plus, allure légèrement plus haute. Récupération 2 min au trot.', retour:'10 min de footing léger.',
-        note:'RPE 8/10 · C\'est normal si les dernières sont dures, tu construis ta résistance aérobie.' },
-      { jour:'Dimanche', type:'Sortie longue', titre:'Sortie longue',            duree:'90 min',
-        echauff:'', corps:'90 min à 72-75% VMA. Ta sortie longue la plus importante jusqu\'ici. Régularité et respiration. Hydrate-toi toutes les 20-25 min.', retour:'',
-        note:'RPE 6/10 · Tu dois finir fatigué mais pas à plat.' },
-    ]},
-  { num:5, phase:'Intensification', charge:'Élevée, bloc VMA',
-    objectif:'Les séances les plus intenses du plan. Ce sont elles qui font progresser le plus sur 10km. Donne tout sur les répétitions.',
-    conseil:'Les côtes sont la séance la plus efficace du plan. Concentre-toi sur l\'impulsion au sol et la montée des genoux. La descente au trot est ta récupération active.',
-    seances:[
-      { jour:'Mardi',    type:'Côtes',         titre:'10 × côtes, 150 mètres', duree:'60 min',
-        echauff:'25 min de footing progressif à 65-70% VMA.', corps:'10 montées de 150m à effort maximal. Genoux hauts, bras actifs, pousse à fond jusqu\'en haut. Descente au trot complète entre chaque montée.', retour:'15 min de footing très léger.',
-        note:'RPE 9/10 sur les montées · Les côtes renforcent tes muscles propulseurs.' },
-      { jour:'Vendredi', type:'Fractionné',    titre:'16 × 300 mètres',          duree:'70 min',
-        echauff:'25 min de footing EF.', corps:'16 × 300m à 100-105% VMA. Intensité très élevée. Récupération 60 sec entre chaque. Maintiens la même vitesse sur les 16.', retour:'10 min de footing léger.',
-        note:'RPE 9/10 · 60 sec de récupération, calculé pour forcer l\'adaptation aux efforts répétés.' },
-      { jour:'Samedi',   type:'EF',           titre:'Footing de récupération',   duree:'45 min',
-        echauff:'', corps:'45 min à 60% VMA. Fondamentale après une grosse semaine, active la circulation pour accélérer la récupération musculaire avant la sortie longue du lendemain.', retour:'',
-        note:'RPE 3/10 · Cette séance te fait récupérer plus vite.' },
-      { jour:'Dimanche', type:'Sortie longue', titre:'Sortie longue avec encart allure', duree:'90 min',
-        echauff:'', corps:'60 min à 70-75% VMA, puis 5 km à ton allure cible 10km, puis retour à l\'allure EF. Cet encart t\'apprend à tenir l\'allure quand les jambes sont déjà sollicitées.', retour:'',
-        note:'RPE 6/10 en EF · 7-8/10 sur les 5 km · Note ton allure, indicateur fiable de ta forme.' },
-    ]},
-  { num:6, phase:'Intensification', charge:'Maximale, dernier bloc chargé',
-    objectif:'Dernière semaine de charge maximale avant l\'affûtage. Tu atteins le pic de ta préparation. Ce que tu construis ici sera transformé en performance lors de l\'affûtage.',
-    conseil:'C\'est ta semaine de charge maximale. N\'ajoute rien. Mange des glucides les soirs avant les séances clés. Dors 8 heures. Hydrate-toi toute la journée.',
-    seances:[
-      { jour:'Mardi',    type:'Tempo',         titre:'3 × 10 minutes au seuil',  duree:'70 min',
-        echauff:'25 min de footing progressif EF.', corps:'3 × 10 min à 87-90% VMA avec 3 min de récupération entre chaque. La troisième répétition est la plus difficile. Maintiens l\'allure.', retour:'10 min de footing léger.',
-        note:'RPE 8-9/10 · 30 min totales au seuil, ton record sur ce plan.' },
-      { jour:'Jeudi',    type:'Spécifique',    titre:'4 × 2 km à allure objectif', duree:'70 min',
-        echauff:'25 min de footing EF.', corps:'4 × 2 km exactement à ton allure cible 10km. Récupération 90 sec au trot. La séance la plus course-spécifique du plan.', retour:'10 min de footing léger.',
-        note:'RPE 8/10 · Si l\'allure cible est trop facile, ton objectif est peut-être trop prudent.' },
-      { jour:'Samedi',   type:'EF',           titre:'Footing de récupération',   duree:'45 min',
-        echauff:'', corps:'45 min à 60% VMA. Indispensable pour absorber la charge des deux séances clés. Ton corps s\'adapte à un niveau supérieur.', retour:'',
-        note:'RPE 3/10 · Le footing de récupération est aussi important que les séances intenses.' },
-      { jour:'Dimanche', type:'Sortie longue', titre:'Dernière sortie longue',   duree:'85 min',
-        echauff:'', corps:'85 min à 70-75% VMA. Ta dernière vraie sortie longue avant la course. Mémorise cette sensation, l\'affûtage va encore l\'améliorer.', retour:'',
-        note:'RPE 6/10 · Après cette séance, l\'entraînement dur est terminé.' },
-    ]},
-  { num:7, phase:'Affûtage', charge:'Volume réduit, intensité maintenue',
-    objectif:'L\'affûtage ne fait pas perdre de forme, il la concentre. Tu gardes une séance d\'intensité pour maintenir les sensations. Tes muscles récupèrent.',
-    conseil:'Des études montrent qu\'un athlète est au maximum de ses capacités 8 à 14 jours après la dernière grosse charge. Ce plan est calculé pour ça, fais confiance au processus.',
-    seances:[
-      { jour:'Mardi',    type:'EF',           titre:'Footing léger',             duree:'45 min',
-        echauff:'', corps:'45 min très faciles à 65% VMA. Garder les jambes en mouvement sans les fatiguer. Cours au ressenti, sans montre. Profite de la légèreté de l\'affûtage.', retour:'',
-        note:'RPE 3/10 · Tu dois finir comme si tu venais de te promener.' },
-      { jour:'Jeudi',    type:'Fractionné',    titre:'6 × 400 mètres, volume réduit', duree:'55 min',
-        echauff:'25 min de footing progressif EF.', corps:'6 × 400m à 95-100% VMA. Volume réduit de 40% mais intensité maintenue. Récupération 2 min entre chaque.', retour:'10 min de footing léger.',
-        note:'RPE 8/10 · Ces 6 répétitions maintiennent tes sensations sans te fatiguer.' },
-      { jour:'Samedi',   type:'EF',           titre:'Footing de 45 minutes',     duree:'45 min',
-        echauff:'', corps:'45 min à 65% VMA. Garde les jambes en mouvement sans les fatiguer. Cours au ressenti, détendu et régulier. Profite de l\'affûtage, ton corps est en train de se recharger pour le jour J.', retour:'',
-        note:'RPE 3/10 · Tu dois finir frais et légèrement dynamisé, jamais fatigué.' },
-    ]},
-  { num:8, phase:'Semaine de course', charge:'Conserve, tu es prêt',
-    objectif:'Rien ne se gagne à l\'entraînement cette semaine. L\'objectif unique : arriver au départ reposé, confiant, les jambes fraîches.',
-    conseil:'Fais confiance à tes 7 semaines de travail. Pars légèrement en dessous de ton allure cible les 2 premiers km. Tu rattraperas les impatients au km 7.',
-    seances:[
-      { jour:'Lundi',    type:'EF',           titre:'Footing très léger',        duree:'35 min',
-        echauff:'', corps:'35 min à 60-65% VMA. Maintenir la circulation sanguine. Vraiment facile, si tu te sens fatigué, réduis à 25 minutes.', retour:'',
-        note:'RPE 3/10 · Aucun effort. Juste des jambes qui bougent.' },
-      { jour:'Mardi',    type:'EF',           titre:'Footing très léger',        duree:'35 min',
-        echauff:'', corps:'35 min à 60-65% VMA. Même principe que la veille. Profite pour visualiser ta course et te concentrer mentalement.', retour:'',
-        note:'RPE 3/10 · Profite de cette légèreté, tes jambes sont prêtes.' },
-      { jour:'Samedi',   type:'Activation',   titre:'Activation J-1 + accélérations', duree:'30 min',
-        echauff:'', corps:'20 min de trot à 60-65% VMA. Puis 6 à 8 accélérations progressives de 80m, démarre doucement et accélère jusqu\'à 90% sur les 20 derniers mètres. Récupère 60 sec en marchant entre chaque.', retour:'',
-        note:'Ces accélérations réveillent tes fibres rapides. Efficace la veille d\'une course.' },
-      { jour:'Dimanche', type:'Course',       titre:'COURSE 10 KILOMÈTRES',   duree:'Jour J',
-        echauff:'10 min de jogging léger avant le départ.', corps:'KM 1-2 : pars 5 à 8 sec/km en dessous de ton allure cible. KM 3-8 : allure cible exacte, régularité absolue. KM 9 : accélère si tu as des réserves. KM 10 : donne absolument tout.', retour:'10-15 min de marche. Banane et eau dans les 30 min.',
-        note:'Les sensations difficiles aux km 6-7 sont normales. C\'est là que se gagne un 10km.' },
-    ]},
-]
 
 // ─── SVG décoratifs ──────────────────────────────────────────────────────────
 const SVG_HEARTBEAT = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 28" width="100%" height="28" style="display:block;flex-shrink:0">
@@ -183,7 +44,6 @@ const SVG_TRACK = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 180 90" 
   <circle cx="8" cy="45" r="3.5" fill="rgba(139,47,201,.6)"/>
 </svg>`
 
-// Cover: concentric circles + speed lines + dots
 const SVG_COVER_CIRCLES = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" width="120" height="120">
   <defs><radialGradient id="cv-cg" cx="50%" cy="50%" r="50%">
     <stop offset="0%" stop-color="#E8237A" stop-opacity="0.7"/>
@@ -212,45 +72,6 @@ const SVG_COVER_DOTS = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 
   ${[0,1,2,3].map(i=>[0,1,2].map(j=>`<circle cx="${8+i*16}" cy="${8+j*16}" r="${2-j*0.3}" fill="url(#cv-dg)"/>`).join('')).join('')}
 </svg>`
 
-// Cover: visuel A4 pleine page violet-rose
-const SVG_COVER_BG = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 595 842" width="595" height="842">
-  <defs>
-    <radialGradient id="cv-center" cx="297" cy="380" r="480" gradientUnits="userSpaceOnUse">
-      <stop offset="0%" stop-color="#6D28D9" stop-opacity="0.32"/>
-      <stop offset="55%" stop-color="#8B2FC9" stop-opacity="0.14"/>
-      <stop offset="100%" stop-color="#8B2FC9" stop-opacity="0"/>
-    </radialGradient>
-    <radialGradient id="cv-tr" cx="595" cy="0" r="420" gradientUnits="userSpaceOnUse">
-      <stop offset="0%" stop-color="#8B2FC9" stop-opacity="0.7"/>
-      <stop offset="100%" stop-color="#8B2FC9" stop-opacity="0"/>
-    </radialGradient>
-    <radialGradient id="cv-bl" cx="0" cy="842" r="420" gradientUnits="userSpaceOnUse">
-      <stop offset="0%" stop-color="#E8237A" stop-opacity="0.65"/>
-      <stop offset="100%" stop-color="#E8237A" stop-opacity="0"/>
-    </radialGradient>
-    <linearGradient id="cv-diag" x1="0" y1="1" x2="1" y2="0">
-      <stop offset="0%" stop-color="#E8237A"/>
-      <stop offset="100%" stop-color="#8B2FC9"/>
-    </linearGradient>
-  </defs>
-  <!-- Glow centralremplit la page -->
-  <circle cx="297" cy="380" r="480" fill="url(#cv-center)"/>
-  <!-- Coins forts -->
-  <circle cx="595" cy="0" r="420" fill="url(#cv-tr)"/>
-  <circle cx="0" cy="842" r="420" fill="url(#cv-bl)"/>
-  <!-- Grande zone remplie en bas (bloc diagonal vivid) -->
-  <path d="M0 580 L595 420 L595 842 L0 842 Z" fill="url(#cv-diag)" opacity="0.22"/>
-  <path d="M0 700 L595 610 L595 842 L0 842 Z" fill="url(#cv-diag)" opacity="0.15"/>
-  <!-- Cercles graphiques centrés hautremplissent le tiers supérieur -->
-  <circle cx="297" cy="200" r="310" fill="none" stroke="url(#cv-diag)" stroke-width="1.5" opacity="0.25"/>
-  <circle cx="297" cy="200" r="230" fill="none" stroke="url(#cv-diag)" stroke-width="1.2" opacity="0.18" stroke-dasharray="10,18"/>
-  <circle cx="297" cy="200" r="150" fill="none" stroke="url(#cv-diag)" stroke-width="1" opacity="0.14"/>
-  <circle cx="297" cy="200" r="72" fill="url(#cv-diag)" opacity="0.08"/>
-  <!-- Ligne de séparation diagonale -->
-  <line x1="0" y1="578" x2="595" y2="418" stroke="url(#cv-diag)" stroke-width="1.5" opacity="0.3"/>
-</svg>`
-
-// Nutrition icons
 const SVG_NUT_MOON = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 36 36" width="36" height="36">
   <defs><linearGradient id="nm-g" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#8B2FC9"/><stop offset="100%" stop-color="#A855F7"/></linearGradient></defs>
   <path d="M24 18 A10 10 0 1 1 14 8 A7 7 0 1 0 24 18" fill="url(#nm-g)" opacity="0.9"/>
@@ -276,38 +97,27 @@ const SVG_NUT_BOLT = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 36 36
   <path d="M20 4 L11 20 L17 20 L16 32 L25 16 L19 16 Z" fill="url(#nb-g)" opacity="0.9"/>
 </svg>`
 
-// Finale: trophée
 const SVG_FIN_TROPHY = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 220 88" width="220" height="88">
   <defs>
     <linearGradient id="ft-g1" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#8B2FC9"/><stop offset="100%" stop-color="#E8237A"/></linearGradient>
     <linearGradient id="ft-g2" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="#8B2FC9" stop-opacity="0"/><stop offset="50%" stop-color="#8B2FC9" stop-opacity="0.25"/><stop offset="100%" stop-color="#E8237A" stop-opacity="0"/></linearGradient>
   </defs>
-  <!-- Corps coupe -->
   <path d="M88 14 Q83 14 80 22 L76 64 L144 64 L140 22 Q137 14 132 14 Z" fill="url(#ft-g1)" opacity="0.14"/>
   <path d="M88 14 Q83 14 80 22 L76 64 L144 64 L140 22 Q137 14 132 14 Z" fill="none" stroke="url(#ft-g1)" stroke-width="2" stroke-linejoin="round"/>
-  <!-- Anse gauche -->
   <path d="M80 27 Q60 27 60 42 Q60 56 77 56" fill="none" stroke="url(#ft-g1)" stroke-width="2" stroke-linecap="round"/>
-  <!-- Anse droite -->
   <path d="M140 27 Q160 27 160 42 Q160 56 143 56" fill="none" stroke="url(#ft-g1)" stroke-width="2" stroke-linecap="round"/>
-  <!-- Étoile intérieure -->
   <path d="M110 30 L113 39 L123 39 L115 45 L118 54 L110 49 L102 54 L105 45 L97 39 L107 39 Z" fill="url(#ft-g1)" opacity="0.75"/>
-  <!-- Tige -->
   <rect x="103" y="64" width="14" height="6" fill="url(#ft-g1)" opacity="0.5"/>
-  <!-- Socle -->
   <rect x="88" y="70" width="44" height="7" rx="3.5" fill="url(#ft-g1)" opacity="0.75"/>
-  <!-- Ligne de sol -->
   <line x1="15" y1="79" x2="205" y2="79" stroke="url(#ft-g2)" stroke-width="1"/>
-  <!-- Étoiles déco -->
   <circle cx="44" cy="24" r="2.5" fill="rgba(234,179,8,.75)"/>
   <circle cx="176" cy="20" r="2" fill="rgba(234,179,8,.65)"/>
   <circle cx="30" cy="50" r="1.5" fill="rgba(139,47,201,.6)"/>
   <circle cx="192" cy="48" r="1.5" fill="rgba(232,35,122,.6)"/>
   <circle cx="55" cy="68" r="1" fill="rgba(255,255,255,.35)"/>
   <circle cx="168" cy="66" r="1" fill="rgba(255,255,255,.35)"/>
-  <!-- Lignes vitesse gauche -->
   <line x1="12" y1="37" x2="56" y2="37" stroke="rgba(139,47,201,.3)" stroke-width="1.5" stroke-linecap="round"/>
   <line x1="18" y1="46" x2="58" y2="46" stroke="rgba(139,47,201,.2)" stroke-width="1" stroke-linecap="round"/>
-  <!-- Lignes vitesse droite -->
   <line x1="162" y1="37" x2="206" y2="37" stroke="rgba(232,35,122,.3)" stroke-width="1.5" stroke-linecap="round"/>
   <line x1="162" y1="46" x2="202" y2="46" stroke="rgba(232,35,122,.2)" stroke-width="1" stroke-linecap="round"/>
 </svg>`
@@ -333,7 +143,6 @@ body {
   display: flex; flex-direction: column; gap: 10px;
 }
 
-/* Blobs - z-index 0 */
 .blob-tr, .blob-bl, .blob-tl, .blob-br {
   position: absolute; border-radius: 50%; pointer-events: none; z-index: 0;
 }
@@ -342,10 +151,8 @@ body {
 .blob-tl { top:-60px; left:-60px; width:250px; height:250px; background:radial-gradient(ellipse,rgba(139,47,201,.24) 0%,transparent 65%); }
 .blob-br { bottom:-60px; right:-50px; width:230px; height:230px; background:radial-gradient(ellipse,rgba(232,35,122,.18) 0%,transparent 65%); }
 
-/* Tout contenu au-dessus des blobs SAUF .pnum qui est absolu */
 .page > *:not([class^="blob"]):not(.pnum) { position: relative; z-index: 1; }
 
-/* NUMÉRO PAGEbas droite absolu, z-index élevé */
 .pnum {
   position: absolute; bottom: 11mm; right: 13mm; z-index: 10;
   font-size: 14pt; font-weight: 800;
@@ -358,7 +165,6 @@ body {
   -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
 }
 
-/* TITRES DE PAGEScentrés, gradient */
 .page-title {
   font-size: 27pt; font-weight: 800; line-height: 1.1; text-align: center; flex-shrink: 0;
   padding: 2px 0;
@@ -374,7 +180,6 @@ body {
   letter-spacing: .1em; color: rgba(255,255,255,.38); margin-bottom: 6px;
 }
 
-/* ══ COUVERTURE ══ */
 .cover-page {
   width: 210mm; height: 297mm; overflow: hidden; background: #0C0A18;
   page-break-after: always; break-after: page; position: relative;
@@ -404,7 +209,6 @@ body {
 .cover-subtitle { font-size: 15pt; font-weight: 600; color: rgba(255,255,255,.75); letter-spacing: .05em; margin-top: 10px; }
 .cover-academy { font-size: 8pt; font-weight: 700; letter-spacing: .16em; text-transform: uppercase; color: rgba(255,255,255,.28); margin-top: 34px; }
 
-/* ══ SOMMAIRE ══ */
 .som-track { flex-shrink: 0; }
 .som-flat { flex: 1; display: flex; flex-direction: column; justify-content: space-evenly; min-height: 0; }
 .som-glbl {
@@ -416,7 +220,6 @@ body {
 .som-dots { flex: 1; border-bottom: 1px dotted rgba(255,255,255,.15); margin: 0 10px; align-self: flex-end; margin-bottom: 3px; }
 .som-page { font-size: 10pt; font-weight: 800; flex-shrink: 0; color: #C084FC; width: 42px; }
 
-/* ══ ALLURES ══ */
 .zones-wrap { flex: 1; display: flex; flex-direction: column; gap: 5px; min-height: 0; }
 .zone-card {
   flex: 1; display: flex; align-items: center; padding: 0 14px;
@@ -429,7 +232,6 @@ body {
 .zone-pace { font-size: 17pt; font-weight: 800; flex-shrink: 0; text-align: right; }
 .zone-speed { font-size: 7.5pt; color: rgba(255,255,255,.45); text-align: right; margin-top: 1px; }
 
-/* ══ PRINCIPES ══ */
 .principes-wrap { flex: 1; display: flex; flex-direction: column; min-height: 0; }
 .principe {
   flex: 1; display: flex; gap: 14px; align-items: center;
@@ -440,7 +242,6 @@ body {
 .p-t { font-size: 10.5pt; font-weight: 700; margin-bottom: 3px; }
 .p-d { font-size: 9.5pt; color: rgba(255,255,255,.75); line-height: 1.5; }
 
-/* ══ STRATÉGIE ══ */
 .strats-wrap { flex: 1; display: flex; flex-direction: column; min-height: 0; }
 .strat { flex: 1; display: flex; gap: 14px; align-items: center; padding: 0; }
 .strat-km { width: 54px; flex-shrink: 0; text-align: center; }
@@ -450,7 +251,6 @@ body {
 .strat-t { font-size: 10.5pt; font-weight: 700; margin-bottom: 3px; }
 .strat-d { font-size: 9.5pt; color: rgba(255,255,255,.75); line-height: 1.5; }
 
-/* ══ SEMAINES ══ */
 .week-hero {
   flex-shrink: 0; padding-bottom: 8px;
   text-align: center;
@@ -501,11 +301,16 @@ body {
   white-space: nowrap; overflow: hidden; text-overflow: ellipsis; text-align: center;
 }
 
+.sessions-wrap.dense-5 .s-corps, .sessions-wrap.dense-6 .s-corps { font-size: 9pt; line-height: 1.4; }
+.sessions-wrap.dense-5 .s-note, .sessions-wrap.dense-6 .s-note { font-size: 7pt; }
+.sessions-wrap.dense-5 .s-head, .sessions-wrap.dense-6 .s-head { height: 32px; }
+.sessions-wrap.dense-5 .s-titre, .sessions-wrap.dense-6 .s-titre { font-size: 9pt; }
+.sessions-wrap.dense-6 .s-body { padding: 5px 14px; gap: 3px; }
+
 .conseil { flex-shrink: 0; padding: 7px 0 7px 11px; border-left: 2px solid rgba(232,35,122,.5); }
 .conseil-lbl { font-size: 6.5pt; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: rgba(232,35,122,.9); margin-bottom: 3px; }
 .conseil-txt { font-size: 9.5pt; color: rgba(255,255,255,.8); line-height: 1.5; }
 
-/* ══ NUTRITION ══ */
 .nut-cards-wrap { flex: 1; display: flex; flex-direction: column; gap: 8px; min-height: 0; }
 .nut-card {
   flex: 1; display: flex; flex-direction: column; min-height: 0;
@@ -522,7 +327,6 @@ body {
 .nut-text { font-size: 9.5pt; color: rgba(255,255,255,.82); line-height: 1.45; }
 .nut-key { font-weight: 700; color: #fff; }
 
-/* ══ FINALE ══ */
 .fin-hero { flex-shrink: 0; text-align: center; padding: 4px 0 8px; }
 .fin-eyebrow { font-size: 8pt; font-weight: 700; letter-spacing: .15em; text-transform: uppercase; color: rgba(255,255,255,.38); margin-bottom: 6px; }
 .fin-title {
@@ -566,6 +370,30 @@ function blobs(v = 'A') {
     : '<div class="blob-tl"></div><div class="blob-br"></div>'
 }
 
+// Remplace {{P}} (séquentiel sur la queue de pct) et {{OBJ}} (allure objectif) dans un texte.
+function fillText(text, pctQueue, vma) {
+  if (!text) return text
+  let out = text.replace(/{{P}}/g, () => {
+    const range = pctQueue.shift()
+    if (!range) return ''
+    const [min, max] = range
+    return min === max ? `${formatPace(vma, min)}/km` : formatPaceRange(vma, min, max)
+  })
+  out = out.replace(/{{OBJ}}/g, () => formatObjPace(vma))
+  return out
+}
+
+function fillSession(s, vma) {
+  const queue = (s.pcts || []).map(p => p.slice())
+  return {
+    ...s,
+    echauff: fillText(s.echauff || '', queue, vma),
+    corps:   fillText(s.corps   || '', queue, vma),
+    retour:  fillText(s.retour  || '', queue, vma),
+    note:    fillText(s.note    || '', queue, vma),
+  }
+}
+
 function sessionCard(s) {
   const c = TC[s.type] || TC['EF']
   const headSt = `background:linear-gradient(90deg,${c.hd},rgba(255,255,255,.04));`
@@ -595,7 +423,9 @@ function sessionCard(s) {
   </div>`
 }
 
-function weekPage(sem) {
+function weekPage(sem, vma) {
+  const seances = sem.seances.map(s => fillSession(s, vma))
+  const denseClass = seances.length >= 6 ? 'dense-6' : seances.length === 5 ? 'dense-5' : ''
   return `
   <div class="page">
     ${blobs(sem.num % 2 === 0 ? 'B' : 'A')}
@@ -607,26 +437,40 @@ function weekPage(sem) {
       <div class="obj-lbl">Objectif</div>
       <div class="obj-txt">${sem.objectif}</div>
     </div>
-    <div class="sessions-wrap">${sem.seances.map(s => sessionCard(s)).join('')}</div>
+    <div class="sessions-wrap ${denseClass}">${seances.map(s => sessionCard(s)).join('')}</div>
     <div class="conseil">
       <div class="conseil-lbl">Conseil de la semaine</div>
-      <div class="conseil-txt">${sem.conseil}</div>
+      <div class="conseil-txt">${fillText(sem.conseil, [], vma)}</div>
     </div>
     <div class="pnum">${sem.num + 4}</div>
   </div>`
 }
 
-// ─── Zones allures ────────────────────────────────────────────────────────────
-const ZONES = [
-  { pct:'65%', name:'Endurance Fondamentale', pace:"6'36\"", speed:'9,1 km/h', desc:'Allure conversation · footing EF · 80% du volume total', c:'#06B6D4', rgb:'6,182,212' },
-  { pct:'75%', name:'Endurance Active',        pace:"5'43\"", speed:'10,5 km/h', desc:'Confortable mais soutenu · phrases courtes', c:'#10B981', rgb:'16,185,129' },
-  { pct:'85%', name:'Seuil Anaérobie',         pace:"5'02\"", speed:'11,9 km/h', desc:'Difficile mais tenable 20-40 min · Tempo', c:'#F59E0B', rgb:'245,158,11' },
-  { pct:'95%', name:'VMA 95%',               pace:"4'30\"", speed:'13,3 km/h', desc:'Très difficile · répétitions courtes · fractionnés', c:'#F97316', rgb:'249,115,22' },
-  { pct:'100%',name:'VMA Max',                 pace:"4'17\"", speed:'14,0 km/h', desc:'Effort maximal · côtes et 300 mètres', c:'#EF4444', rgb:'239,68,68' },
+// Zones d'allure : %, nom, description, couleur — calculées depuis la VMA au rendu.
+const ZONE_DEFS = [
+  { pct:65,        name:'Endurance Fondamentale', desc:'Allure conversation · footing EF · 80% du volume total', c:'#06B6D4', rgb:'6,182,212' },
+  { pct:75,        name:'Endurance Active',        desc:'Confortable mais soutenu · phrases courtes', c:'#10B981', rgb:'16,185,129' },
+  { pct:85,        name:'Seuil Anaérobie',         desc:'Difficile mais tenable 20-40 min · Tempo', c:'#F59E0B', rgb:'245,158,11' },
+  { pct:OBJ_PCT,   name:'Allure objectif 10km',    desc:'Ta cible le jour de la course · à mémoriser', c:'#FBBF24', rgb:'251,191,36', obj:true },
+  { pct:95,        name:'VMA 95%',                 desc:'Très difficile · répétitions courtes · fractionnés', c:'#F97316', rgb:'249,115,22' },
+  { pct:100,       name:'VMA Max',                 desc:'Effort maximal · côtes et 300 mètres', c:'#EF4444', rgb:'239,68,68' },
 ]
 
-// ─── HTML ─────────────────────────────────────────────────────────────────────
-const HTML = `<!DOCTYPE html>
+function buildZones(vma) {
+  return ZONE_DEFS.map(z => ({
+    ...z,
+    pctLabel: `${z.pct}%`,
+    pace: formatPace(vma, z.pct),
+    speed: formatSpeed(vma, z.pct),
+  }))
+}
+
+function renderHtml({ vma, seances }) {
+  const SEMAINES = require(`../ebook-data/10km-8sem/semaines-${seances}.js`)
+  const ZONES = buildZones(vma)
+  const objPace = formatObjPace(vma, { suffix: false })
+
+  const HTML = `<!DOCTYPE html>
 <html>
 <head>
 <meta charset="UTF-8">
@@ -644,9 +488,9 @@ const HTML = `<!DOCTYPE html>
   <div class="cover-inner">
     ${logoB64 ? `<img src="${logoB64}" class="cover-logo"/>` : ''}
     <div class="cover-sep"></div>
-    <div class="cover-eyebrow">Plan d'entraînement</div>
+    <div class="cover-eyebrow">Plan d'entraînement personnalisé</div>
     <div class="cover-title">10 KM</div>
-    <div class="cover-subtitle">8 semaines de préparation</div>
+    <div class="cover-subtitle">8 semaines · ${seances} séances/semaine · VMA ${vma} km/h</div>
     <div class="cover-academy">The Ultimate Academy</div>
   </div>
 </div>
@@ -678,17 +522,17 @@ const HTML = `<!DOCTYPE html>
   ${blobs('B')}
   <div class="page-title">Tes allures personnalisées</div>
   <p class="page-intro">
-    Toutes les séances utilisent des % de VMA. Va sur <strong style="color:#C084FC">theultimateacademy.fr/calculateur/vma</strong>
-    pour obtenir tes allures exactes. Sans VMA connue : cours 12 min, VMA (km/h) = distance (m) ÷ 200.
+    Calculées pour ta VMA de <strong style="color:#C084FC">${vma} km/h</strong> et utilisées tout au long de ce plan.
+    Si ta VMA évolue, refais le test sur <strong style="color:#C084FC">theultimateacademy.fr/calculateur/vma</strong> pour rester à jour.
   </p>
   ${SVG_HEARTBEAT}
-  <div style="flex-shrink:0;text-align:center;font-size:7.5pt;font-weight:700;color:rgba(255,255,255,.38);text-transform:uppercase;letter-spacing:.09em">
-    Exemple calculé pour une VMA de 14 km/h, calcule les tiennes sur theultimateacademy.fr
+  <div style="flex-shrink:0;text-align:center;font-size:7.5pt;font-weight:700;color:#FBBF24;text-transform:uppercase;letter-spacing:.09em">
+    Ton allure objectif course (10km) : ${objPace}/km
   </div>
   <div class="zones-wrap">
     ${ZONES.map(z=>`
-    <div class="zone-card" style="border-left:3px solid ${z.c};background:rgba(${z.rgb},.08);">
-      <div class="zone-pct" style="color:${z.c}">${z.pct}</div>
+    <div class="zone-card" style="border-left:3px solid ${z.c};background:rgba(${z.rgb},${z.obj ? '.16' : '.08'});">
+      <div class="zone-pct" style="color:${z.c}">${z.pctLabel}</div>
       <div class="zone-info">
         <div class="zone-name">${z.name}</div>
         <div class="zone-desc">${z.desc}</div>
@@ -713,7 +557,7 @@ const HTML = `<!DOCTYPE html>
       ['02','L\'échauffement, 25 min, toujours','25 minutes de footing EF avant chaque séance intense, sans exception. L\'échauffement prépare les muscles, les tendons et le cœur. Si tu manques de temps, raccourcis la séance, jamais l\'échauffement.'],
       ['03','Le retour au calme, 10 min, toujours','10 minutes de jogging léger après chaque séance intense. Accélère l\'élimination des déchets métaboliques et prépare le corps pour la séance suivante. Sur 8 semaines, l\'effet cumulé est significatif.'],
       ['04','La progressivité, la règle des 10%','Le volume augmente de 10% maximum par semaine. Augmenter trop vite est la première cause de blessure : périostite, tendinite, syndrome rotulien. Respecte le plan même si tu te sens bien.'],
-      ['05','Le renforcement musculaire','1 séance de 20 min par semaine : gainage, fentes, squats, montées de mollets. Protège les genoux, les hanches et les chevilles, les zones les plus exposées du coureur.'],
+      ['05','Le renforcement musculaire',seances>=5 ? '1 séance par semaine, directement planifiée dans ton programme puisque tu as choisi '+seances+' séances/semaine. Protège les genoux, les hanches et les chevilles, les zones les plus exposées du coureur.' : '1 séance de 20 min par semaine, à ajouter de ton côté en plus des '+seances+' séances de ce plan : gainage, fentes, squats, montées de mollets. Protège les genoux, les hanches et les chevilles.'],
     ].map(([n,t,d])=>`
     <div class="principe">
       <div class="p-num grad">${n}</div>
@@ -724,7 +568,7 @@ const HTML = `<!DOCTYPE html>
 </div>
 
 <!-- SEMAINES 1-8 -->
-${SEMAINES.map(s => weekPage(s)).join('')}
+${SEMAINES.map(s => weekPage(s, vma)).join('')}
 
 <!-- P.13 STRATÉGIE -->
 <div class="page">
@@ -734,9 +578,9 @@ ${SEMAINES.map(s => weekPage(s)).join('')}
   ${SVG_HEARTBEAT}
   <div class="strats-wrap">
     ${[
-      ['KM 1-2','-5 à 8 sec/km','Patience et retenue','Pars légèrement sous ton allure cible. L\'adrénaline du départ va te pousser à partir vite, résiste. Ces 2 km trop rapides peuvent te coûter 30 à 60 secondes sur les 3 derniers.'],
-      ['KM 3-8','Allure cible','Régularité absolue','Utilise ta montre GPS. Chaque kilomètre identique. Un 10km régulier est toujours plus rapide qu\'un 10km en yoyo. Foulée, respiration, posture.'],
-      ['KM 9','Si réserves','Évaluation et décision','Fais un bilan honnête. Si tu as des réserves, accélère progressivement. Si tu souffres, maintiens l\'allure, ne t\'engage pas dans une accélération que tu ne pourras pas tenir.'],
+      ['KM 1-2',`${objPace}/km`,'Patience et retenue',`Pars exactement à ton allure objectif ${objPace}/km, ne pars surtout pas plus vite. L\'adrénaline du départ va te pousser à accélérer, résiste. Partir trop vite peut te coûter 30 à 60 secondes sur les 3 derniers kilomètres.`],
+      ['KM 3-8',`${objPace}/km`,'Régularité absolue',`Utilise ta montre GPS pour rester sur ${objPace}/km. Un 10km régulier est toujours plus rapide qu\'un 10km en yoyo. Foulée, respiration, posture.`],
+      ['KM 9','Si réserves','Évaluation et décision','Fais un bilan honnête. Si tu as des réserves, accélère progressivement sous ton allure objectif. Si tu souffres, maintiens l\'allure, ne t\'engage pas dans une accélération que tu ne pourras pas tenir.'],
       ['KM 10','Tout ce qui reste','Donner absolument tout','Donne tout. La douleur est temporaire, le chrono est permanent. Raccourcis ta foulée, augmente ta cadence. Tout ce que tu as conservé, c\'est maintenant.'],
     ].map(([km,allure,titre,desc])=>`
     <div class="strat">
@@ -797,7 +641,7 @@ ${SEMAINES.map(s => weekPage(s)).join('')}
         </div>
       </div>
       <div class="nut-items">
-        ${[['30 min','Banane ou barre de céréales + eau ou boisson isotonique.'],['2 heures','Repas complet protéines + glucidespoulet-riz, omelette-pain.'],['Alcool','Évite les 24h suivantesralentit significativement la récupération.'],['Hydratation','Continue à boire toute la journée. La déshydratation persiste.']].map(([k,v])=>`
+        ${[['30 min','Banane ou barre de céréales + eau ou boisson isotonique.'],['2 heures','Repas complet protéines + glucides — poulet-riz, omelette-pain.'],['Alcool','Évite les 24h suivantes — ralentit significativement la récupération.'],['Hydratation','Continue à boire toute la journée. La déshydratation persiste.']].map(([k,v])=>`
         <div class="nut-item">
           <div class="nut-dot" style="background:#22C55E"></div>
           <div class="nut-text"><span class="nut-key">${k}</span> ${v}</div>
@@ -820,10 +664,10 @@ ${SEMAINES.map(s => weekPage(s)).join('')}
   <div class="fin-grid">
     ${[
       { n:'01', t:'Plan personnalisé', bar:'#8B2FC9', tag:'100% sur mesure',
-        d:'Généré selon ta VMA réelle, ton objectif précis et ta disponibilité. Chaque semaine est uniquepas un plan générique copié-collé.',
+        d:'Généré selon ta VMA réelle, ton objectif précis et ta disponibilité. Chaque semaine est unique — pas un plan générique copié-collé.',
         icon:`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" width="20" height="20"><circle cx="10" cy="10" r="8" fill="none" stroke="white" stroke-width="2"/><path d="M7 10 L9 12 L13 8" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>` },
       { n:'02', t:'Suivi chaque semaine', bar:'#E8237A', tag:'Bilan hebdo',
-        d:'Un bilan personnalisé chaque semaine. Tu signales de la fatiguele plan s\'allège. Tu progresses viteil accélère. Jamais de stagnation.',
+        d:'Un bilan personnalisé chaque semaine. Tu signales de la fatigue — le plan s\'allège. Tu progresses vite — il accélère. Jamais de stagnation.',
         icon:`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" width="20" height="20"><rect x="3" y="3" width="14" height="14" rx="2" fill="none" stroke="white" stroke-width="2"/><line x1="7" y1="10" x2="13" y2="10" stroke="white" stroke-width="2" stroke-linecap="round"/><line x1="10" y1="7" x2="10" y2="13" stroke="white" stroke-width="2" stroke-linecap="round"/></svg>` },
       { n:'03', t:'Analyses de course', bar:'#A855F7', tag:'Avant & après',
         d:'Analyse pré-course J-7 pour finaliser ta stratégie. Analyse post-course pour comprendre tes résultats et identifier les axes de progression.',
@@ -843,7 +687,7 @@ ${SEMAINES.map(s => weekPage(s)).join('')}
     </div>`).join('')}
   </div>
   <div class="fin-cta">
-    <div class="fin-cta-title">14 jours d'essai gratuitsans engagement</div>
+    <div class="fin-cta-title">14 jours d'essai gratuit — sans engagement</div>
     <div class="fin-cta-sub">Rejoins les athlètes qui progressent chaque semaine avec un plan personnalisé.</div>
   </div>
   <div class="fin-url">
@@ -854,13 +698,7 @@ ${SEMAINES.map(s => weekPage(s)).join('')}
 
 </body></html>`
 
-;(async () => {
-  const browser = await puppeteer.launch({ headless:'new', args:['--no-sandbox','--disable-setuid-sandbox'] })
-  const page    = await browser.newPage()
-  await page.setContent(HTML, { waitUntil:'networkidle0', timeout:30000 })
-  await page.evaluateHandle('document.fonts.ready')
-  await page.pdf({ path:OUT, format:'A4', printBackground:true, margin:{top:0,right:0,bottom:0,left:0} })
-  await browser.close()
-  const ko = Math.round(fs.statSync(OUT).size/1024)
-  console.log(`✅ PDF généré : ${OUT} (${ko} Ko)`)
-})()
+  return HTML
+}
+
+module.exports = { renderHtml }

@@ -5,17 +5,31 @@ import Nav from '../components/Nav'
 const C = { purple: '#8B2FC9', pink: '#E8237A', bg: '#0C0A18' }
 const grad = 'linear-gradient(135deg,#8B2FC9,#E8237A)'
 
+// Ebooks à variantes : l'athlète indique sa VMA + son nombre de séances/semaine
+// avant l'achat, et reçoit le PDF qui correspond exactement à son profil.
+const VARIANT_PRICE_TIERS = {
+  '10km-8sem': { 3: 1499, 4: 1799, 5: 1999, 6: 2299 },
+}
+const VMA_MIN = 10
+const VMA_MAX = 24
+
+function isValidVma(v) {
+  const n = Number(v)
+  return Number.isFinite(n) && n >= VMA_MIN && n <= VMA_MAX && Math.round(n * 2) === n * 2
+}
+
 const EBOOK_DETAILS = {
   '10km-8sem': {
     icon: '🏃', weeks: 8, distance: '10 km', level: 'Intermédiaire',
     full_description: 'Un plan complet de 8 semaines pour préparer ta prochaine course de 10km. Idéal si tu cours déjà régulièrement et souhaites progresser sur cette distance emblématique.',
     toc: [
+      'Allures littérales (min/km) calculées depuis ta VMA — plus aucun pourcentage à convertir',
+      'Ton allure objectif 10km, travaillée chaque semaine en fractionné, en seuil ou en sortie longue',
       'Semaines 1-2 : Adaptation — footing EF, fractionné court, sortie longue',
       'Semaines 3-4 : Développement — tempo, intervalles 1000m, volume',
       'Semaines 5-6 : Intensification — VMA, seuil, allure spécifique 10km',
       'Semaine 7 : Affûtage — volume réduit, allures maintenues',
       'Semaine 8 : Course — stratégie km par km, gestion de l\'effort',
-      'Bonus : Calcul des allures personnalisées selon ta VMA',
       'Bonus : Nutrition avant et après course',
     ],
     for_who: 'Coureur capable de courir 30 min sans s\'arrêter, souhaitant améliorer son 10km.',
@@ -96,11 +110,15 @@ export default function EbookDetail() {
   const navigate = useNavigate()
   const [ebook,    setEbook]    = useState(null)
   const [email,    setEmail]    = useState('')
+  const [vma,      setVma]      = useState('')
+  const [seances,  setSeances]  = useState(null)
   const [loading,  setLoading]  = useState(true)
   const [paying,   setPaying]   = useState(false)
   const [error,    setError]    = useState(null)
 
   const meta = EBOOK_DETAILS[slug] || {}
+  const priceTiers = VARIANT_PRICE_TIERS[slug]
+  const isVariant  = !!priceTiers
 
   const API = import.meta.env.VITE_API_URL || 'http://localhost:3001'
 
@@ -112,16 +130,25 @@ export default function EbookDetail() {
       .finally(() => setLoading(false))
   }, [slug])
 
+  const displayPriceCents = isVariant
+    ? priceTiers[seances || Math.min(...Object.keys(priceTiers).map(Number))]
+    : ebook?.price_cents
+
+  const canCheckout = email.trim() && ebook && (!isVariant || (isValidVma(vma) && seances))
+
   async function handleCheckout(e) {
     e.preventDefault()
-    if (!email.trim() || !ebook) return
+    if (!canCheckout) return
     setPaying(true)
     setError(null)
     try {
       const res = await fetch(`${API}/api/ebooks/checkout`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ebook_id: ebook.id, email: email.trim(), slug }),
+        body: JSON.stringify({
+          ebook_id: ebook.id, email: email.trim(), slug,
+          ...(isVariant ? { vma: Number(vma), seances } : {}),
+        }),
       })
       const data = await res.json()
       if (!res.ok) throw new Error(data.error || 'Erreur paiement')
@@ -204,12 +231,48 @@ export default function EbookDetail() {
               <div style={{ background: 'rgba(255,255,255,.05)', border: '1px solid rgba(255,255,255,.1)', borderRadius: 24, padding: '1.75rem' }}>
                 <div style={{ textAlign: 'center', marginBottom: '1.5rem' }}>
                   <div style={{ fontSize: '2.5rem', fontWeight: 900, background: grad, WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text' }}>
-                    {(ebook.price_cents / 100).toFixed(2).replace('.', ',')}€
+                    {isVariant && !seances && 'dès '}{(displayPriceCents / 100).toFixed(2).replace('.', ',')}€
                   </div>
                   <div style={{ fontSize: '.8rem', color: 'rgba(255,255,255,.4)', marginTop: '.2rem' }}>Paiement unique — accès à vie</div>
                 </div>
 
                 <form onSubmit={handleCheckout}>
+                  {isVariant && (
+                    <>
+                      <label style={{ display: 'block', fontSize: '.8rem', fontWeight: 600, color: 'rgba(255,255,255,.6)', marginBottom: '.4rem' }}>
+                        Ta VMA (km/h) *
+                      </label>
+                      <input
+                        type="number" required placeholder="14" step="0.5" min={VMA_MIN} max={VMA_MAX}
+                        value={vma} onChange={e => setVma(e.target.value)}
+                        style={{ width: '100%', padding: '.75rem 1rem', borderRadius: 12, border: '1.5px solid rgba(255,255,255,.12)',
+                          background: 'rgba(255,255,255,.07)', color: '#fff', fontSize: '.95rem',
+                          fontFamily: 'inherit', marginBottom: '.4rem', boxSizing: 'border-box' }}
+                      />
+                      <div style={{ marginBottom: '.9rem' }}>
+                        <Link to="/calculateur/vma" style={{ color: '#C084FC', fontSize: '.78rem', fontWeight: 600, textDecoration: 'none' }}>
+                          Tu ne connais pas ta VMA ? Calcule-la ici →
+                        </Link>
+                      </div>
+
+                      <label style={{ display: 'block', fontSize: '.8rem', fontWeight: 600, color: 'rgba(255,255,255,.6)', marginBottom: '.4rem' }}>
+                        Séances par semaine *
+                      </label>
+                      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: '.5rem', marginBottom: '.9rem' }}>
+                        {Object.keys(priceTiers).map(Number).sort((a,b)=>a-b).map(n => (
+                          <button key={n} type="button" onClick={() => setSeances(n)}
+                            style={{ padding: '.6rem .3rem', borderRadius: 12, cursor: 'pointer', fontFamily: 'inherit',
+                              border: seances === n ? `1.5px solid ${C.purple}` : '1.5px solid rgba(255,255,255,.12)',
+                              background: seances === n ? 'rgba(139,47,201,.18)' : 'rgba(255,255,255,.07)',
+                              color: seances === n ? '#fff' : 'rgba(255,255,255,.7)' }}>
+                            <div style={{ fontWeight: 800, fontSize: '.95rem' }}>{n}</div>
+                            <div style={{ fontSize: '.68rem', marginTop: '.15rem' }}>{(priceTiers[n]/100).toFixed(2).replace('.', ',')}€</div>
+                          </button>
+                        ))}
+                      </div>
+                    </>
+                  )}
+
                   <label style={{ display: 'block', fontSize: '.8rem', fontWeight: 600, color: 'rgba(255,255,255,.6)', marginBottom: '.4rem' }}>
                     Ton adresse email *
                   </label>
@@ -221,12 +284,12 @@ export default function EbookDetail() {
                       fontFamily: 'inherit', marginBottom: '.75rem', boxSizing: 'border-box' }}
                   />
                   {error && <p style={{ color: '#F87171', fontSize: '.8rem', margin: '-.25rem 0 .75rem' }}>{error}</p>}
-                  <button type="submit" disabled={!email.trim() || paying}
+                  <button type="submit" disabled={!canCheckout || paying}
                     style={{ width: '100%', padding: '.875rem', borderRadius: 99, border: 'none',
-                      background: (!email.trim() || paying) ? 'rgba(255,255,255,.1)' : grad,
-                      color: (!email.trim() || paying) ? 'rgba(255,255,255,.3)' : '#fff',
-                      fontWeight: 700, fontSize: '1rem', cursor: (!email.trim() || paying) ? 'default' : 'pointer',
-                      fontFamily: 'inherit', boxShadow: (!email.trim() || paying) ? 'none' : '0 8px 24px rgba(232,35,122,.35)' }}>
+                      background: (!canCheckout || paying) ? 'rgba(255,255,255,.1)' : grad,
+                      color: (!canCheckout || paying) ? 'rgba(255,255,255,.3)' : '#fff',
+                      fontWeight: 700, fontSize: '1rem', cursor: (!canCheckout || paying) ? 'default' : 'pointer',
+                      fontFamily: 'inherit', boxShadow: (!canCheckout || paying) ? 'none' : '0 8px 24px rgba(232,35,122,.35)' }}>
                     {paying ? '⏳ Redirection…' : 'Acheter et recevoir par email →'}
                   </button>
                 </form>

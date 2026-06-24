@@ -5,6 +5,11 @@ import Nav from '../components/Nav'
 const C = { purple: '#8B2FC9', pink: '#E8237A', bg: '#0C0A18' }
 const grad = 'linear-gradient(135deg,#8B2FC9,#E8237A)'
 
+// Ebooks à variantes : prix qui dépend du nombre de séances/semaine choisi à l'achat.
+const VARIANT_PRICE_TIERS = {
+  '10km-8sem': { 3: 1499, 4: 1799, 5: 1999, 6: 2299 },
+}
+
 const EBOOK_META = {
   '10km-8sem':      { icon: '🏃', weeks: 8,  distance: '10 km',         toc: ['8 semaines structurées', 'Séances EF, Fractionné, Tempo', 'Sortie longue progressive', 'Semaine d\'affûtage', 'Stratégie de course'] },
   '10km-12sem':     { icon: '🏃', weeks: 12, distance: '10 km',         toc: ['12 semaines progressives', 'Volume et intensité montants', 'Blocs de développement VMA', 'Affûtage 2 semaines', 'Stratégie et nutrition'] },
@@ -103,6 +108,9 @@ export default function EbooksPage() {
 
 function EbookCard({ ebook }) {
   const meta = EBOOK_META[ebook.slug] || {}
+  const tiers = VARIANT_PRICE_TIERS[ebook.slug]
+  const fromCents = tiers ? Math.min(...Object.values(tiers)) : ebook.price_cents
+  const priceLabel = `${tiers ? 'dès ' : ''}${(fromCents / 100).toFixed(2).replace('.', ',')}€`
   return (
     <Link to={`/ebooks/${ebook.slug}`} style={{ textDecoration: 'none', color: '#fff', display: 'flex', flexDirection: 'column' }}>
       <div style={{ background: 'rgba(255,255,255,.04)', border: '1px solid rgba(255,255,255,.08)', borderRadius: 20, overflow: 'hidden', transition: 'transform .15s, border-color .15s', cursor: 'pointer', flex: 1, display: 'flex', flexDirection: 'column' }}
@@ -121,7 +129,7 @@ function EbookCard({ ebook }) {
               </>
           }
           <div style={{ position: 'absolute', top: 12, right: 12, background: 'rgba(0,0,0,.5)', backdropFilter: 'blur(8px)', borderRadius: 99, padding: '.25rem .7rem', fontSize: '.72rem', fontWeight: 700 }}>
-            {(ebook.price_cents / 100).toFixed(2).replace('.', ',')}€
+            {priceLabel}
           </div>
         </div>
         {/* Contenu */}
@@ -142,7 +150,7 @@ function EbookCard({ ebook }) {
           )}
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
             <span style={{ fontWeight: 800, fontSize: '1.1rem', background: grad, WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text' }}>
-              {(ebook.price_cents / 100).toFixed(2).replace('.', ',')}€
+              {priceLabel}
             </span>
             <span style={{ background: grad, color: '#fff', borderRadius: 99, padding: '.45rem 1.1rem', fontSize: '.85rem', fontWeight: 700 }}>
               Acheter →
