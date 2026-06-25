@@ -13,7 +13,8 @@ const CLIENT_URL = process.env.CLIENT_URL || 'https://theultimateacademy.fr';
 // ─── Ebooks à variantes (VMA × séances/semaine) ───────────────────────────────
 // Tarif par nombre de séances/semaine, identique pour toutes les VMA.
 const PRICE_TIERS = {
-  '10km-8sem': { 3: 1499, 4: 1799, 5: 1999, 6: 2299 },
+  '10km-8sem':  { 3: 1499, 4: 1799, 5: 1999, 6: 2299 },
+  '10km-12sem': { 3: 1499, 4: 1799, 5: 1999, 6: 2299 },
 };
 
 const VMA_MIN = 10;

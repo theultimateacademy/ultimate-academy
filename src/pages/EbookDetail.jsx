@@ -6,7 +6,8 @@ const C = { purple: '#8B2FC9', pink: '#E8237A', bg: '#0C0A18' }
 const grad = 'linear-gradient(135deg,#8B2FC9,#E8237A)'
 
 const VARIANT_PRICE_TIERS = {
-  '10km-8sem': { 3: 1499, 4: 1799, 5: 1999, 6: 2299 },
+  '10km-8sem':  { 3: 1499, 4: 1799, 5: 1999, 6: 2299 },
+  '10km-12sem': { 3: 1499, 4: 1799, 5: 1999, 6: 2299 },
 }
 
 // Toutes les VMA disponibles : 10 à 24 par pas de 0.5
@@ -42,14 +43,17 @@ const EBOOK_DETAILS = {
   },
   '10km-12sem': {
     icon: '🏃', weeks: 12, distance: '10 km', level: 'Tous niveaux',
-    full_description: 'La version longue et progressive pour préparer un 10km en 12 semaines. Plus de temps pour construire ta base, développer ta VMA et arriver en pleine forme.',
+    full_description: 'La version longue et progressive pour préparer un 10km en 12 semaines. Plus de temps pour construire ta base aérobie, développer ta VMA et arriver en pleine forme le jour J.',
     toc: [
-      'Semaines 1-3 : Construction de base — endurance fondamentale',
-      'Semaines 4-6 : Développement aérobie — sorties longues, côtes',
-      'Semaines 7-9 : Bloc VMA — fractionnés courts et longs',
-      'Semaines 10-11 : Allure spécifique — tempo et blocs 10km',
-      'Semaine 12 : Consolidation et course',
-      'Conseils nutrition et récupération',
+      'Allures personnalisées en min/km',
+      'Semaines 1-2 · Adaptation',
+      'Semaines 3-4 · Développement aérobie',
+      'Semaines 5-6 · Développement VMA',
+      'Semaines 7-8 · Intensification',
+      'Semaines 9-10 · Spécificité',
+      'Semaine 11 · Consolidation',
+      'Semaine 12 · Semaine de course',
+      'Stratégie de course et nutrition',
     ],
     for_who: [
       { check: true, text: 'Tu peux courir 30 minutes sans t\'arrêter' },
