@@ -22,14 +22,14 @@ const EBOOK_DETAILS = {
     icon: '🏃', weeks: 8, distance: '10 km', level: 'Tous niveaux',
     full_description: 'Un plan complet de 8 semaines pour préparer ta prochaine course de 10 km. Chaque séance est calculée depuis ta VMA réelle — tu cours aux bonnes allures, au bon moment, sans jamais avoir à convertir des pourcentages.',
     toc: [
-      'Allures personnalisées en min/km calculées depuis ta VMA — zéro calcul à faire',
-      'Semaines 1-2 · Adaptation — footings EF, fractionné 400m, sortie longue progressive',
-      'Semaines 3-4 · Développement — tempo au seuil anaérobie, intervalles 1 000m, montée en volume',
-      'Semaines 5-6 · Intensification — côtes, 300m VMA, blocs à allure spécifique 10km',
-      'Semaine 7 · Consolidation — volume allégé, intensité maintenue, jambes fraîches',
-      'Semaine 8 · Semaine de course — 8×30/30, activation J-1, stratégie km par km',
-      'Stratégie de course en 4 phases avec tes allures exactes',
-      'Nutrition avant et après course — veille, matin J, récupération',
+      'Allures personnalisées en min/km',
+      'Semaines 1-2 · Adaptation',
+      'Semaines 3-4 · Développement',
+      'Semaines 5-6 · Intensification',
+      'Semaine 7 · Consolidation',
+      'Semaine 8 · Semaine de course',
+      'Stratégie de course',
+      'Nutrition',
     ],
     for_who: [
       { check: true,  text: 'Tu peux courir 30 minutes sans t\'arrêter — c\'est le seul prérequis' },
@@ -164,25 +164,6 @@ function Illustration10km() {
         <polyline points="160,116 178,100 186,86" stroke="url(#il-g)" strokeWidth="4.5" opacity="0.85" />
       </g>
 
-      {/* Lignes de vitesse */}
-      <line x1="62" y1="110" x2="108" y2="108" stroke="url(#il-g)" strokeWidth="2.5" opacity="0.32" strokeLinecap="round" />
-      <line x1="54" y1="122" x2="105" y2="121" stroke="url(#il-g)" strokeWidth="1.8" opacity="0.22" strokeLinecap="round" />
-      <line x1="58" y1="134" x2="107" y2="133" stroke="url(#il-g)" strokeWidth="1.2" opacity="0.15" strokeLinecap="round" />
-
-      {/* Point coureur sur la piste extérieure */}
-      <circle cx="292" cy="57" r="7" fill="#E8237A" opacity="0.8" />
-      <circle cx="292" cy="57" r="14" fill="none" stroke="#E8237A" strokeWidth="1.5" opacity="0.3" />
-      <circle cx="292" cy="57" r="22" fill="none" stroke="#E8237A" strokeWidth="0.8" opacity="0.15" />
-
-      {/* Ligne heartbeat */}
-      <polyline fill="none" stroke="url(#il-g)" strokeWidth="1.8" strokeLinecap="round"
-        strokeLinejoin="round" opacity="0.35"
-        points="310,205 350,205 365,205 375,190 385,220 393,200 401,210 410,205 470,205 483,205 494,190 505,220 513,205 560,205 640,205" />
-
-      {/* Filigrane 10 géant */}
-      <text x="325" y="160" fontFamily="Poppins,sans-serif" fontSize="110" fontWeight="900"
-        fill="url(#il-g)" opacity="0.07" letterSpacing="-5">10</text>
-
       {/* Titre "10 KM" */}
       <text x="352" y="152" fontFamily="Poppins,sans-serif" fontSize="54" fontWeight="900"
         fill="url(#il-g)" opacity="0.92" letterSpacing="-2">10 KM</text>
@@ -208,15 +189,10 @@ function Illustration10km() {
       <text x="429" y="40.5" fontFamily="Poppins,sans-serif" fontSize="10.5" fontWeight="700"
         fill="#C084FC" textAnchor="middle" letterSpacing="2.5">VMA PERSONNALISÉE</text>
 
-      {/* Étoiles / particules */}
-      <circle cx="320" cy="32" r="2.2" fill="white" opacity="0.38" />
-      <circle cx="395" cy="20" r="1.5" fill="white" opacity="0.30" />
-      <circle cx="570" cy="42" r="2.8" fill="#C084FC" opacity="0.45" />
-      <circle cx="28" cy="42" r="2" fill="white" opacity="0.38" />
-      <circle cx="600" cy="155" r="1.8" fill="#F472B6" opacity="0.40" />
-      <circle cx="558" cy="178" r="1.2" fill="white" opacity="0.28" />
-      <circle cx="70" cy="210" r="1.5" fill="#8B2FC9" opacity="0.35" />
-      <circle cx="270" cy="230" r="1" fill="white" opacity="0.22" />
+      {/* Particules */}
+      <circle cx="570" cy="42" r="2.2" fill="#C084FC" opacity="0.4" />
+      <circle cx="28" cy="42" r="1.8" fill="white" opacity="0.3" />
+      <circle cx="600" cy="155" r="1.5" fill="#F472B6" opacity="0.35" />
     </svg>
   )
 }
@@ -274,7 +250,7 @@ function BlurredPreview({ slug }) {
           </div>
 
           {/* Page 2 — Semaine type (floutée) */}
-          <div style={{ padding: '10px 8px', minHeight: 180, filter: 'blur(4px)',
+          <div style={{ padding: '10px 8px', minHeight: 180, filter: 'blur(2px)',
             userSelect: 'none', borderRight: '1px solid rgba(255,255,255,.06)', overflow: 'hidden' }}>
             <div style={{ fontSize: '.5rem', fontWeight: 700, color: 'rgba(255,255,255,.35)',
               textTransform: 'uppercase', letterSpacing: '2px', marginBottom: 4 }}>Semaine 1 / 8</div>
@@ -297,7 +273,7 @@ function BlurredPreview({ slug }) {
           </div>
 
           {/* Page 3 — Stratégie de course (floutée) */}
-          <div style={{ padding: '10px 8px', minHeight: 180, filter: 'blur(4px)',
+          <div style={{ padding: '10px 8px', minHeight: 180, filter: 'blur(2px)',
             userSelect: 'none', overflow: 'hidden' }}>
             <div style={{ fontSize: '.6rem', fontWeight: 900,
               background: grad, WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text',
