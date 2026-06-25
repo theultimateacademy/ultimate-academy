@@ -11,12 +11,12 @@ const VARIANT_PRICE_TIERS = {
 }
 
 const EBOOK_META = {
-  '10km-8sem':      { icon: '🏃', weeks: 8,  distance: '10 km',         toc: ['8 semaines structurées', 'Séances EF, Fractionné, Tempo', 'Sortie longue progressive', 'Semaine d\'affûtage', 'Stratégie de course'] },
-  '10km-12sem':     { icon: '🏃', weeks: 12, distance: '10 km',         toc: ['12 semaines progressives', 'Volume et intensité montants', 'Blocs de développement VMA', 'Affûtage 2 semaines', 'Stratégie et nutrition'] },
-  'semi-12sem':     { icon: '🏅', weeks: 12, distance: 'Semi-marathon', toc: ['12 semaines complètes', 'Long runs jusqu\'à 18km', 'Séances au seuil et allure spé', 'Gestion des 21km', 'Nutrition avant course'] },
-  'marathon-12sem': { icon: '🏆', weeks: 12, distance: 'Marathon',      toc: ['12 semaines intensives', 'Sorties longues jusqu\'à 30km', 'Allures marathon et tempo', 'Stratégie ravitaillement', 'Préparation mentale'] },
-  'marathon-16sem': { icon: '🏆', weeks: 16, distance: 'Marathon',      toc: ['16 semaines progressives', 'Construction du volume km', 'Long runs hebdomadaires', 'Affûtage sur 3 semaines', 'Plan A/B/C par objectif'] },
-  'anti-blessure':  { icon: '🩺', weeks: null, distance: null,          toc: ['Prévention des blessures courantes', 'Renforcement musculaire ciblé', 'Étirements et mobilité', 'Signes d\'alerte à connaître', 'Protocoles de reprise'] },
+  '10km-8sem':      { icon: '🏃', weeks: 8,  distance: '10 km',         tags: ['VMA personnalisée', 'Allures en min/km', 'Stratégie course'] },
+  '10km-12sem':     { icon: '🏃', weeks: 12, distance: '10 km',         tags: ['12 semaines', 'Développement VMA', 'Stratégie et nutrition'] },
+  'semi-12sem':     { icon: '🏅', weeks: 12, distance: 'Semi-marathon', tags: ['Long runs 18km', 'Seuil lactique', 'Nutrition course'] },
+  'marathon-12sem': { icon: '🏆', weeks: 12, distance: 'Marathon',      tags: ['Long runs 30km', 'Allure marathon', 'Stratégie ravitaillement'] },
+  'marathon-16sem': { icon: '🏆', weeks: 16, distance: 'Marathon',      tags: ['Progression sur 4 mois', 'Plans A/B/C', 'Hydratation complète'] },
+  'anti-blessure':  { icon: '🩺', weeks: null, distance: null,          tags: ['Prévention blessures', 'Renforcement musculaire', 'Protocoles reprise'] },
 }
 
 export default function EbooksPage() {
@@ -106,54 +106,133 @@ export default function EbooksPage() {
   )
 }
 
+function CardIllustration10km() {
+  return (
+    <svg viewBox="0 0 320 160" xmlns="http://www.w3.org/2000/svg"
+      style={{ width: '100%', height: '100%', position: 'absolute', inset: 0 }}>
+      <defs>
+        <linearGradient id="cd-bg" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0%" stopColor="#1A0A2E"/><stop offset="100%" stopColor="#2D0B4E"/>
+        </linearGradient>
+        <linearGradient id="cd-g" x1="0" y1="0" x2="1" y2="0">
+          <stop offset="0%" stopColor="#8B2FC9"/><stop offset="100%" stopColor="#E8237A"/>
+        </linearGradient>
+        <linearGradient id="cd-gv" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stopColor="#8B2FC9"/><stop offset="100%" stopColor="#E8237A"/>
+        </linearGradient>
+        <radialGradient id="cd-gl" cx="25%" cy="55%" r="55%">
+          <stop offset="0%" stopColor="#8B2FC9" stopOpacity="0.35"/>
+          <stop offset="100%" stopColor="#8B2FC9" stopOpacity="0"/>
+        </radialGradient>
+      </defs>
+      <rect width="320" height="160" fill="url(#cd-bg)"/>
+      <rect width="320" height="160" fill="url(#cd-gl)"/>
+
+      {/* Piste */}
+      <ellipse cx="85" cy="82" rx="72" ry="46" fill="none" stroke="url(#cd-g)" strokeWidth="1.5" opacity="0.42"/>
+      <ellipse cx="85" cy="82" rx="50" ry="30" fill="none" stroke="url(#cd-g)" strokeWidth="1" strokeDasharray="4,6" opacity="0.25"/>
+
+      {/* Coureur */}
+      <circle cx="86" cy="44" r="7" fill="url(#cd-g)" opacity="0.85"/>
+      <line x1="86" y1="51" x2="85" y2="68" stroke="url(#cd-g)" strokeWidth="2.5" strokeLinecap="round" opacity="0.85"/>
+      <polyline points="85,58 96,51 99,47" stroke="url(#cd-g)" strokeWidth="1.8" strokeLinecap="round" fill="none" opacity="0.75"/>
+      <polyline points="85,58 75,65 72,70" stroke="url(#cd-g)" strokeWidth="1.8" strokeLinecap="round" fill="none" opacity="0.75"/>
+      <polyline points="85,68 76,86 68,88" stroke="url(#cd-g)" strokeWidth="2.5" strokeLinecap="round" fill="none" opacity="0.85"/>
+      <polyline points="85,68 95,60 100,51" stroke="url(#cd-g)" strokeWidth="2.5" strokeLinecap="round" fill="none" opacity="0.85"/>
+
+      {/* Lignes vitesse */}
+      <line x1="34" y1="66" x2="58" y2="64" stroke="url(#cd-g)" strokeWidth="1.5" opacity="0.3" strokeLinecap="round"/>
+      <line x1="29" y1="73" x2="56" y2="72" stroke="url(#cd-g)" strokeWidth="1" opacity="0.2" strokeLinecap="round"/>
+
+      {/* 10 KM */}
+      <text x="175" y="88" fontFamily="Poppins,sans-serif" fontSize="60" fontWeight="900"
+        fill="url(#cd-g)" opacity="0.08" letterSpacing="-3">10</text>
+      <text x="182" y="94" fontFamily="Poppins,sans-serif" fontSize="32" fontWeight="900"
+        fill="url(#cd-g)" opacity="0.92" letterSpacing="-1">10 KM</text>
+      <text x="186" y="112" fontFamily="Poppins,sans-serif" fontSize="8" fontWeight="700"
+        fill="rgba(255,255,255,0.45)" letterSpacing="3.5">8 SEMAINES</text>
+
+      {/* Barres charge */}
+      <rect x="176" y="128" width="8" height="12" rx="2" fill="url(#cd-gv)" opacity="0.42"/>
+      <rect x="188" y="123" width="8" height="17" rx="2" fill="url(#cd-gv)" opacity="0.52"/>
+      <rect x="200" y="118" width="8" height="22" rx="2" fill="url(#cd-gv)" opacity="0.62"/>
+      <rect x="212" y="112" width="8" height="28" rx="2" fill="url(#cd-gv)" opacity="0.75"/>
+      <rect x="224" y="105" width="8" height="35" rx="2" fill="url(#cd-gv)" opacity="0.88"/>
+      <rect x="236" y="102" width="8" height="38" rx="2" fill="url(#cd-gv)" opacity="0.92"/>
+      <rect x="248" y="120" width="8" height="20" rx="2" fill="url(#cd-gv)" opacity="0.55"/>
+      <rect x="260" y="133" width="8" height="7" rx="2" fill="url(#cd-gv)" opacity="0.30"/>
+
+      {/* Étoiles */}
+      <circle cx="165" cy="22" r="1.5" fill="white" opacity="0.35"/>
+      <circle cx="295" cy="30" r="2" fill="#C084FC" opacity="0.4"/>
+      <circle cx="15" cy="25" r="1.5" fill="white" opacity="0.3"/>
+    </svg>
+  )
+}
+
 function EbookCard({ ebook }) {
   const meta = EBOOK_META[ebook.slug] || {}
   const tiers = VARIANT_PRICE_TIERS[ebook.slug]
   const fromCents = tiers ? Math.min(...Object.values(tiers)) : ebook.price_cents
-  const priceLabel = `${tiers ? 'dès ' : ''}${(fromCents / 100).toFixed(2).replace('.', ',')}€`
+  const priceLabel = tiers
+    ? `À partir de ${(fromCents / 100).toFixed(2).replace('.', ',')}€`
+    : `${(fromCents / 100).toFixed(2).replace('.', ',')}€`
+
   return (
     <Link to={`/ebooks/${ebook.slug}`} style={{ textDecoration: 'none', color: '#fff', display: 'flex', flexDirection: 'column' }}>
       <div style={{ background: 'rgba(255,255,255,.04)', border: '1px solid rgba(255,255,255,.08)', borderRadius: 20, overflow: 'hidden', transition: 'transform .15s, border-color .15s', cursor: 'pointer', flex: 1, display: 'flex', flexDirection: 'column' }}
         onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-4px)'; e.currentTarget.style.borderColor = 'rgba(139,47,201,.4)' }}
         onMouseLeave={e => { e.currentTarget.style.transform = ''; e.currentTarget.style.borderColor = 'rgba(255,255,255,.08)' }}>
+
         {/* Couverture */}
-        <div style={{ height: 160, background: `linear-gradient(135deg,#1A0A2E,#2D0B4E)`, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', position: 'relative', overflow: 'hidden' }}>
-          <div style={{ position: 'absolute', inset: 0, background: grad, opacity: .15 }} />
-          {ebook.cover_image
-            ? <img src={ebook.cover_image} alt={ebook.title} style={{ width: '100%', height: '100%', objectFit: 'cover', position: 'absolute', inset: 0 }} />
-            : <>
-                <div style={{ fontSize: '2.5rem', marginBottom: '.5rem', position: 'relative' }}>{meta.icon || '📋'}</div>
-                <div style={{ fontSize: '.7rem', fontWeight: 700, letterSpacing: '.1em', textTransform: 'uppercase', color: 'rgba(255,255,255,.5)', position: 'relative' }}>
-                  {meta.distance || 'Guide'}
-                </div>
-              </>
+        <div style={{ height: 170, background: 'linear-gradient(135deg,#1A0A2E,#2D0B4E)', position: 'relative', overflow: 'hidden' }}>
+          {ebook.slug === '10km-8sem'
+            ? <CardIllustration10km />
+            : ebook.cover_image
+              ? <img src={ebook.cover_image} alt={ebook.title} style={{ width: '100%', height: '100%', objectFit: 'cover', position: 'absolute', inset: 0 }} />
+              : <>
+                  <div style={{ position: 'absolute', inset: 0, background: grad, opacity: .18 }} />
+                  <div style={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
+                    <div style={{ fontSize: '2.8rem', marginBottom: '.5rem' }}>{meta.icon || '📋'}</div>
+                    <div style={{ fontSize: '.72rem', fontWeight: 700, letterSpacing: '.1em', textTransform: 'uppercase', color: 'rgba(255,255,255,.5)' }}>
+                      {meta.distance || 'Guide'}
+                    </div>
+                  </div>
+                </>
           }
-          <div style={{ position: 'absolute', top: 12, right: 12, background: 'rgba(0,0,0,.5)', backdropFilter: 'blur(8px)', borderRadius: 99, padding: '.25rem .7rem', fontSize: '.72rem', fontWeight: 700 }}>
+          {/* Badge prix */}
+          <div style={{ position: 'absolute', top: 12, right: 12,
+            background: grad, borderRadius: 99, padding: '.25rem .75rem',
+            fontSize: '.72rem', fontWeight: 800, color: '#fff',
+            boxShadow: '0 4px 12px rgba(232,35,122,.3)' }}>
             {priceLabel}
           </div>
         </div>
+
         {/* Contenu */}
         <div style={{ padding: '1.25rem', flex: 1, display: 'flex', flexDirection: 'column' }}>
           <h3 style={{ margin: '0 0 .5rem', fontSize: '1rem', fontWeight: 800, lineHeight: 1.3 }}>{ebook.title}</h3>
           <p style={{ margin: '0 0 1rem', fontSize: '.83rem', color: 'rgba(255,255,255,.55)', lineHeight: 1.6, flex: 1 }}>
             {ebook.description}
           </p>
-          {meta.weeks && (
-            <div style={{ display: 'flex', gap: '.5rem', marginBottom: '1rem' }}>
-              <span style={{ background: 'rgba(139,47,201,.15)', border: '1px solid rgba(139,47,201,.25)', borderRadius: 99, padding: '.2rem .65rem', fontSize: '.72rem', fontWeight: 600, color: '#C084FC' }}>
-                {meta.weeks} semaines
-              </span>
-              <span style={{ background: 'rgba(232,35,122,.1)', border: '1px solid rgba(232,35,122,.2)', borderRadius: 99, padding: '.2rem .65rem', fontSize: '.72rem', fontWeight: 600, color: '#F472B6' }}>
-                {meta.distance}
-              </span>
+          {/* Tags */}
+          {meta.tags && (
+            <div style={{ display: 'flex', gap: '.4rem', flexWrap: 'wrap', marginBottom: '1rem' }}>
+              {meta.tags.slice(0, 2).map(t => (
+                <span key={t} style={{ background: 'rgba(139,47,201,.12)', border: '1px solid rgba(139,47,201,.22)',
+                  borderRadius: 99, padding: '.18rem .6rem', fontSize: '.68rem', fontWeight: 600, color: '#C084FC' }}>
+                  {t}
+                </span>
+              ))}
             </div>
           )}
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-            <span style={{ fontWeight: 800, fontSize: '1.1rem', background: grad, WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text' }}>
+            <span style={{ fontWeight: 800, fontSize: '1rem', background: grad,
+              WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text' }}>
               {priceLabel}
             </span>
             <span style={{ background: grad, color: '#fff', borderRadius: 99, padding: '.45rem 1.1rem', fontSize: '.85rem', fontWeight: 700 }}>
-              Acheter →
+              Découvrir →
             </span>
           </div>
         </div>
