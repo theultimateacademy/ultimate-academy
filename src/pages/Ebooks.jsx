@@ -161,12 +161,12 @@ function CardIllustrationAntiBlessure() {
         fill="none" stroke="url(#cab-g)" strokeWidth="1.5" opacity="0.22"/>
       <path d="M 160,18 L 225,36 L 225,92 C 225,121 160,140 160,140 C 160,140 95,121 95,92 L 95,36 Z"
         fill="rgba(139,47,201,.06)"/>
-      <text x="160" y="68" fontFamily="Poppins,sans-serif" fontSize="18" fontWeight="700"
-        fill="rgba(255,255,255,.45)" letterSpacing="8" textAnchor="middle">ANTI</text>
-      <text x="160" y="100" fontFamily="Poppins,sans-serif" fontSize="28" fontWeight="900"
+      <text x="160" y="64" fontFamily="Poppins,sans-serif" fontSize="17" fontWeight="700"
+        fill="rgba(255,255,255,.45)" letterSpacing="6" textAnchor="middle">ANTI</text>
+      <text x="160" y="90" fontFamily="Poppins,sans-serif" fontSize="27" fontWeight="900"
         fill="url(#cab-g)" opacity="0.88" textAnchor="middle">BLESSURE</text>
-      <text x="160" y="118" fontFamily="Poppins,sans-serif" fontSize="6.5" fontWeight="700"
-        fill="rgba(255,255,255,.32)" letterSpacing="3.5" textAnchor="middle">COURIR DURABLEMENT</text>
+      <text x="160" y="106" fontFamily="Poppins,sans-serif" fontSize="6.5" fontWeight="700"
+        fill="rgba(255,255,255,.32)" letterSpacing="2" textAnchor="middle">COURIR DURABLEMENT</text>
       <circle cx="42" cy="28" r="1.2" fill="white" opacity="0.14"/>
       <circle cx="278" cy="22" r="1.5" fill="#C084FC" opacity="0.20"/>
       <circle cx="292" cy="134" r="1" fill="white" opacity="0.12"/>

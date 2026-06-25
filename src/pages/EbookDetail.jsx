@@ -213,12 +213,12 @@ function IllustrationAntiBlessure({ price }) {
         fill="none" stroke="url(#il-g)" strokeWidth="1.5" opacity="0.22" />
       <path d="M 320,30 L 432,62 L 432,142 C 432,186 320,218 320,218 C 320,218 208,186 208,142 L 208,62 Z"
         fill="rgba(139,47,201,.06)" />
-      <text x="320" y="110" fontFamily="Poppins,sans-serif" fontSize="28" fontWeight="700"
+      <text x="320" y="104" fontFamily="Poppins,sans-serif" fontSize="28" fontWeight="700"
         fill="rgba(255,255,255,.45)" letterSpacing="12" textAnchor="middle">ANTI</text>
-      <text x="320" y="165" fontFamily="Poppins,sans-serif" fontSize="50" fontWeight="900"
+      <text x="320" y="155" fontFamily="Poppins,sans-serif" fontSize="50" fontWeight="900"
         fill="url(#il-g)" opacity="0.88" letterSpacing="-1" textAnchor="middle">BLESSURE</text>
-      <text x="320" y="200" fontFamily="Poppins,sans-serif" fontSize="11" fontWeight="700"
-        fill="rgba(255,255,255,.32)" letterSpacing="5" textAnchor="middle">COURIR DURABLEMENT</text>
+      <text x="320" y="178" fontFamily="Poppins,sans-serif" fontSize="10" fontWeight="700"
+        fill="rgba(255,255,255,.32)" letterSpacing="3" textAnchor="middle">COURIR DURABLEMENT</text>
       {price && (
         <>
           <rect x="496" y="12" width="132" height="24" rx="12" fill="url(#il-g)" opacity="0.88" />
