@@ -126,54 +126,54 @@ function Illustration10km() {
         <linearGradient id="il-gv" x1="0" y1="0" x2="0" y2="1">
           <stop offset="0%" stopColor="#8B2FC9" /><stop offset="100%" stopColor="#E8237A" />
         </linearGradient>
-        <radialGradient id="il-gl1" cx="20%" cy="55%" r="55%">
-          <stop offset="0%" stopColor="#8B2FC9" stopOpacity="0.38" />
+        <radialGradient id="il-gl1" cx="22%" cy="52%" r="65%">
+          <stop offset="0%" stopColor="#8B2FC9" stopOpacity="0.26" />
           <stop offset="100%" stopColor="#8B2FC9" stopOpacity="0" />
-        </radialGradient>
-        <radialGradient id="il-gl2" cx="82%" cy="30%" r="45%">
-          <stop offset="0%" stopColor="#E8237A" stopOpacity="0.22" />
-          <stop offset="100%" stopColor="#E8237A" stopOpacity="0" />
         </radialGradient>
       </defs>
 
       {/* Fond */}
       <rect width="640" height="260" fill="url(#il-bg)" />
       <rect width="640" height="260" fill="url(#il-gl1)" />
-      <rect width="640" height="260" fill="url(#il-gl2)" />
 
-      {/* Piste — 2 ellipses concentriques */}
-      <ellipse cx="160" cy="138" rx="132" ry="82" fill="none" stroke="url(#il-g)" strokeWidth="2.5" opacity="0.42" />
-      <ellipse cx="160" cy="138" rx="88" ry="52" fill="none" stroke="url(#il-g)" strokeWidth="1.5" strokeDasharray="5,8" opacity="0.25" />
+      {/* Séparateur */}
+      <line x1="316" y1="18" x2="316" y2="244" stroke="rgba(255,255,255,.06)" strokeWidth="1" />
 
-      {/* Titre "10 KM" */}
-      <text x="352" y="115" fontFamily="Poppins,sans-serif" fontSize="54" fontWeight="900"
-        fill="url(#il-g)" opacity="0.92" letterSpacing="-2">10 KM</text>
-      <text x="360" y="138" fontFamily="Poppins,sans-serif" fontSize="12.5" fontWeight="700"
-        fill="rgba(255,255,255,0.5)" letterSpacing="5">8 SEMAINES</text>
+      {/* GAUCHE — Titre grand format */}
+      <text x="22" y="162" fontFamily="Poppins,sans-serif" fontSize="118" fontWeight="900"
+        fill="url(#il-g)" opacity="0.92" letterSpacing="-5">10</text>
+      <text x="24" y="207" fontFamily="Poppins,sans-serif" fontSize="44" fontWeight="900"
+        fill="url(#il-g)" opacity="0.80" letterSpacing="8">KM</text>
+      <text x="24" y="232" fontFamily="Poppins,sans-serif" fontSize="11" fontWeight="700"
+        fill="rgba(255,255,255,.35)" letterSpacing="7">8 SEMAINES</text>
+      <rect x="24" y="240" width="72" height="1.5" rx="1" fill="url(#il-g)" opacity="0.35" />
 
-      {/* Barres de charge hebdomadaire */}
-      {/* S1:40% S2:55% S3:65% S4:75% S5:90% S6:95% S7:60% S8:20% → max 55px */}
-      <rect x="347" y="220" width="15" height="22" rx="3" fill="url(#il-gv)" opacity="0.42" />
-      <rect x="367" y="212" width="15" height="30" rx="3" fill="url(#il-gv)" opacity="0.50" />
-      <rect x="387" y="205" width="15" height="37" rx="3" fill="url(#il-gv)" opacity="0.58" />
-      <rect x="407" y="197" width="15" height="45" rx="3" fill="url(#il-gv)" opacity="0.66" />
-      <rect x="427" y="185" width="15" height="57" rx="3" fill="url(#il-gv)" opacity="0.80" />
-      <rect x="447" y="180" width="15" height="62" rx="3" fill="url(#il-gv)" opacity="0.88" />
-      <rect x="467" y="208" width="15" height="34" rx="3" fill="url(#il-gv)" opacity="0.55" />
-      <rect x="487" y="228" width="15" height="14" rx="3" fill="url(#il-gv)" opacity="0.32" />
-      <text x="348" y="252" fontFamily="Poppins,sans-serif" fontSize="7.5"
-        fill="rgba(255,255,255,0.28)" letterSpacing="4.5">S1 S2 S3 S4 S5 S6 S7 S8</text>
+      {/* DROITE — Graphique de progression S1→S8 */}
+      <line x1="336" y1="218" x2="614" y2="218" stroke="rgba(255,255,255,.1)" strokeWidth="1" />
 
-      {/* Badge VMA */}
-      <rect x="330" y="22" width="198" height="27" rx="13.5"
-        fill="rgba(139,47,201,0.18)" stroke="rgba(139,47,201,0.5)" strokeWidth="1" />
-      <text x="429" y="40.5" fontFamily="Poppins,sans-serif" fontSize="10.5" fontWeight="700"
-        fill="#C084FC" textAnchor="middle" letterSpacing="2.5">VMA PERSONNALISÉE</text>
+      <rect x="337" y="190" width="22" height="28" rx="3" fill="url(#il-gv)" opacity="0.36" />
+      <text x="348" y="234" fontFamily="Poppins,sans-serif" fontSize="8" fontWeight="600" fill="rgba(255,255,255,.28)" textAnchor="middle">S1</text>
 
-      {/* Particules */}
-      <circle cx="570" cy="42" r="2.2" fill="#C084FC" opacity="0.4" />
-      <circle cx="28" cy="42" r="1.8" fill="white" opacity="0.3" />
-      <circle cx="600" cy="155" r="1.5" fill="#F472B6" opacity="0.35" />
+      <rect x="368" y="178" width="22" height="40" rx="3" fill="url(#il-gv)" opacity="0.46" />
+      <text x="379" y="234" fontFamily="Poppins,sans-serif" fontSize="8" fontWeight="600" fill="rgba(255,255,255,.28)" textAnchor="middle">S2</text>
+
+      <rect x="399" y="162" width="22" height="56" rx="3" fill="url(#il-gv)" opacity="0.56" />
+      <text x="410" y="234" fontFamily="Poppins,sans-serif" fontSize="8" fontWeight="600" fill="rgba(255,255,255,.28)" textAnchor="middle">S3</text>
+
+      <rect x="430" y="150" width="22" height="68" rx="3" fill="url(#il-gv)" opacity="0.65" />
+      <text x="441" y="234" fontFamily="Poppins,sans-serif" fontSize="8" fontWeight="600" fill="rgba(255,255,255,.28)" textAnchor="middle">S4</text>
+
+      <rect x="461" y="136" width="22" height="82" rx="3" fill="url(#il-gv)" opacity="0.76" />
+      <text x="472" y="234" fontFamily="Poppins,sans-serif" fontSize="8" fontWeight="600" fill="rgba(255,255,255,.28)" textAnchor="middle">S5</text>
+
+      <rect x="492" y="128" width="22" height="90" rx="3" fill="url(#il-gv)" opacity="0.90" />
+      <text x="503" y="234" fontFamily="Poppins,sans-serif" fontSize="8" fontWeight="600" fill="rgba(255,255,255,.28)" textAnchor="middle">S6</text>
+
+      <rect x="523" y="166" width="22" height="52" rx="3" fill="url(#il-gv)" opacity="0.58" />
+      <text x="534" y="234" fontFamily="Poppins,sans-serif" fontSize="8" fontWeight="600" fill="rgba(255,255,255,.28)" textAnchor="middle">S7</text>
+
+      <rect x="554" y="186" width="22" height="32" rx="3" fill="url(#il-gv)" opacity="0.40" />
+      <text x="565" y="234" fontFamily="Poppins,sans-serif" fontSize="8" fontWeight="600" fill="rgba(255,255,255,.28)" textAnchor="middle">S8</text>
     </svg>
   )
 }
@@ -195,15 +195,20 @@ function IllustrationGeneric({ icon, title }) {
 function BlurredPreview({ slug }) {
   if (slug !== '10km-8sem') return null
 
+  // Semaine 6 — plan 6 séances/semaine (Intensification maximale)
   const sessions = [
-    { day: 'MAR', type: 'Endurance Fondamentale', color: '#22C55E', dur: '40 min',
-      lines: ['Course continue à allure EF. Allure conversation, tu dois pouvoir parler en phrases complètes.', 'RPE 4-5/10 · Finis en te sentant bien.'] },
-    { day: 'JEU', type: '8 × 400 mètres', color: '#8B2FC9', dur: '55 min',
-      lines: ['Échauffement : 25 min de footing EF.', '8 × 400m à allure VMA. Récupération 90 sec au trot entre chaque.', 'RPE 8-9/10 · Maintiens la même allure du premier au dernier.'] },
-    { day: 'VEN', type: 'Footing EF', color: '#22C55E', dur: '40 min',
-      lines: ['40 min à allure EF. Régulier et détendu.', 'RPE 4/10 · Léger et régulier.'] },
-    { day: 'DIM', type: 'Sortie longue', color: '#06B6D4', dur: '65 min',
-      lines: ['60 min à allure EF, puis les 5 dernières minutes à ton allure objectif 10km.', 'RPE 5-6/10 · Mémorise la sensation de ces 5 dernières minutes.'] },
+    { day: 'LUN', type: 'Footing EF', color: '#22C55E', dur: '40 min',
+      lines: ['40 min très faciles. Sortie légère avant les deux séances clés de la semaine.', 'RPE 3/10 · Si tu sens la fatigue, raccourcis à 25 min.'] },
+    { day: 'MAR', type: '3 × 10 min au seuil', color: '#F97316', dur: '70 min',
+      lines: ['Échauffement 25 min EF progressif.', '3 × 10 min à allure seuil, 3 min de récupération entre chaque. La 3e répétition est la plus difficile.', 'RPE 8-9/10 · 30 min totales au seuil, ton record sur ce plan.'] },
+    { day: 'MER', type: 'Footing EF', color: '#22C55E', dur: '30 min',
+      lines: ['30 min très faciles. 2e sortie de récupération, volontairement courte.', 'RPE 3/10 · Ces footings servent à absorber la charge, rien de plus.'] },
+    { day: 'JEU', type: '4 × 2 km à allure objectif', color: '#8B2FC9', dur: '70 min',
+      lines: ['Échauffement 25 min EF.', '4 × 2 km à ton allure objectif 10km. Récupération 90 sec au trot.', 'RPE 8/10 · La séance la plus course-spécifique du plan.'] },
+    { day: 'SAM', type: 'Footing de récupération', color: '#22C55E', dur: '45 min',
+      lines: ['45 min très faciles. Indispensable pour absorber la charge des deux séances clés.', 'RPE 3/10 · Aussi important que les séances intenses.'] },
+    { day: 'DIM', type: 'Sortie longue', color: '#06B6D4', dur: '85 min',
+      lines: ['85 min à allure EF. Ta dernière vraie sortie longue avant la course.', 'RPE 6/10 · Après cette séance, l\'entraînement dur est terminé.'] },
   ]
 
   return (
@@ -211,13 +216,11 @@ function BlurredPreview({ slug }) {
       <h3 style={{ margin: '0 0 .75rem', fontSize: '.95rem', fontWeight: 800 }}>
         Aperçu du plan
       </h3>
-      <div
-        onClick={() => document.getElementById('buy-form')?.scrollIntoView({ behavior: 'smooth', block: 'nearest' })}
-        style={{ position: 'relative', borderRadius: 16, overflow: 'hidden',
-          border: '1px solid rgba(255,255,255,.1)', cursor: 'pointer',
-          boxShadow: '0 4px 30px rgba(0,0,0,.5)' }}>
+      <div style={{ position: 'relative', borderRadius: 16, overflow: 'hidden',
+        border: '1px solid rgba(255,255,255,.1)',
+        boxShadow: '0 4px 30px rgba(0,0,0,.5)' }}>
 
-        {/* Contenu flouté — simulation page ebook semaine 1 */}
+        {/* Contenu flouté — semaine 6, plan 6 séances */}
         <div style={{ filter: 'blur(3px)', userSelect: 'none', background: '#0E0B1E', padding: '1.25rem 1.5rem' }}>
 
           {/* En-tête */}
@@ -241,13 +244,13 @@ function BlurredPreview({ slug }) {
           {/* Semaine */}
           <div style={{ marginBottom: '.75rem' }}>
             <div style={{ fontSize: '.42rem', color: 'rgba(255,255,255,.38)', textTransform: 'uppercase',
-              letterSpacing: '2.5px', marginBottom: '.2rem' }}>Semaine 1 / 8</div>
+              letterSpacing: '2.5px', marginBottom: '.2rem' }}>Semaine 6 / 8 · 6 séances</div>
             <div style={{ fontSize: '1.05rem', fontWeight: 900, marginBottom: '.3rem',
               background: grad, WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text' }}>
-              ADAPTATION
+              INTENSIFICATION
             </div>
             <div style={{ fontSize: '.6rem', color: 'rgba(255,255,255,.45)', lineHeight: 1.55 }}>
-              Objectif : Installer les habitudes d'entraînement et prendre ses marques sur les allures. Finir chaque séance en se sentant bien.
+              Dernière semaine de charge maximale. Tu atteins le pic de ta préparation.
             </div>
           </div>
 
@@ -275,18 +278,11 @@ function BlurredPreview({ slug }) {
 
         {/* Gradient overlay */}
         <div style={{ position: 'absolute', inset: 0, pointerEvents: 'none',
-          background: 'linear-gradient(to bottom, transparent 28%, rgba(12,10,24,.7) 58%, rgba(12,10,24,.97) 100%)' }} />
+          background: 'linear-gradient(to bottom, transparent 40%, rgba(12,10,24,.65) 65%, rgba(12,10,24,.97) 100%)' }} />
 
-        {/* CTA */}
-        <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, padding: '1.25rem 1.5rem', textAlign: 'center' }}>
-          <div style={{ fontSize: '.72rem', color: 'rgba(255,255,255,.42)', marginBottom: '.6rem' }}>
+        <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, padding: '1rem 1.5rem', textAlign: 'center' }}>
+          <div style={{ fontSize: '.72rem', color: 'rgba(255,255,255,.42)' }}>
             🔒 Allures personnalisées déverrouillées après achat
-          </div>
-          <div style={{ display: 'inline-flex', alignItems: 'center', gap: '.5rem',
-            background: grad, borderRadius: 99, padding: '.5rem 1.4rem',
-            fontSize: '.82rem', fontWeight: 800, color: '#fff',
-            boxShadow: '0 6px 22px rgba(232,35,122,.4)' }}>
-            Obtenir mon plan →
           </div>
         </div>
       </div>
