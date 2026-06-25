@@ -139,41 +139,51 @@ function Illustration10km() {
       {/* Séparateur */}
       <line x1="316" y1="18" x2="316" y2="244" stroke="rgba(255,255,255,.06)" strokeWidth="1" />
 
-      {/* GAUCHE — Titre grand format */}
-      <text x="22" y="162" fontFamily="Poppins,sans-serif" fontSize="118" fontWeight="900"
-        fill="url(#il-g)" opacity="0.92" letterSpacing="-5">10</text>
-      <text x="24" y="207" fontFamily="Poppins,sans-serif" fontSize="44" fontWeight="900"
-        fill="url(#il-g)" opacity="0.80" letterSpacing="8">KM</text>
-      <text x="24" y="232" fontFamily="Poppins,sans-serif" fontSize="11" fontWeight="700"
-        fill="rgba(255,255,255,.35)" letterSpacing="7">8 SEMAINES</text>
-      <rect x="24" y="240" width="72" height="1.5" rx="1" fill="url(#il-g)" opacity="0.35" />
+      {/* GAUCHE — Titre centré dans la moitié gauche */}
+      <text x="158" y="162" fontFamily="Poppins,sans-serif" fontSize="118" fontWeight="900"
+        fill="url(#il-g)" opacity="0.92" letterSpacing="-5" textAnchor="middle">10</text>
+      <text x="158" y="207" fontFamily="Poppins,sans-serif" fontSize="44" fontWeight="900"
+        fill="url(#il-g)" opacity="0.80" letterSpacing="8" textAnchor="middle">KM</text>
+      <text x="158" y="232" fontFamily="Poppins,sans-serif" fontSize="11" fontWeight="700"
+        fill="rgba(255,255,255,.35)" letterSpacing="7" textAnchor="middle">8 SEMAINES</text>
+      <rect x="122" y="241" width="72" height="1.5" rx="1" fill="url(#il-g)" opacity="0.35" />
 
-      {/* DROITE — Graphique de progression S1→S8 */}
-      <line x1="336" y1="218" x2="614" y2="218" stroke="rgba(255,255,255,.1)" strokeWidth="1" />
+      {/* DROITE — Graphique de progression S1→S8 (centré dans la moitié droite) */}
+      <rect x="362" y="190" width="22" height="28" rx="3" fill="url(#il-gv)" opacity="0.36" />
+      <text x="373" y="236" fontFamily="Poppins,sans-serif" fontSize="8" fontWeight="600" fill="rgba(255,255,255,.28)" textAnchor="middle">S1</text>
 
-      <rect x="337" y="190" width="22" height="28" rx="3" fill="url(#il-gv)" opacity="0.36" />
-      <text x="348" y="234" fontFamily="Poppins,sans-serif" fontSize="8" fontWeight="600" fill="rgba(255,255,255,.28)" textAnchor="middle">S1</text>
+      <rect x="392" y="178" width="22" height="40" rx="3" fill="url(#il-gv)" opacity="0.46" />
+      <text x="403" y="236" fontFamily="Poppins,sans-serif" fontSize="8" fontWeight="600" fill="rgba(255,255,255,.28)" textAnchor="middle">S2</text>
 
-      <rect x="368" y="178" width="22" height="40" rx="3" fill="url(#il-gv)" opacity="0.46" />
-      <text x="379" y="234" fontFamily="Poppins,sans-serif" fontSize="8" fontWeight="600" fill="rgba(255,255,255,.28)" textAnchor="middle">S2</text>
+      <rect x="422" y="162" width="22" height="56" rx="3" fill="url(#il-gv)" opacity="0.56" />
+      <text x="433" y="236" fontFamily="Poppins,sans-serif" fontSize="8" fontWeight="600" fill="rgba(255,255,255,.28)" textAnchor="middle">S3</text>
 
-      <rect x="399" y="162" width="22" height="56" rx="3" fill="url(#il-gv)" opacity="0.56" />
-      <text x="410" y="234" fontFamily="Poppins,sans-serif" fontSize="8" fontWeight="600" fill="rgba(255,255,255,.28)" textAnchor="middle">S3</text>
+      <rect x="452" y="150" width="22" height="68" rx="3" fill="url(#il-gv)" opacity="0.65" />
+      <text x="463" y="236" fontFamily="Poppins,sans-serif" fontSize="8" fontWeight="600" fill="rgba(255,255,255,.28)" textAnchor="middle">S4</text>
 
-      <rect x="430" y="150" width="22" height="68" rx="3" fill="url(#il-gv)" opacity="0.65" />
-      <text x="441" y="234" fontFamily="Poppins,sans-serif" fontSize="8" fontWeight="600" fill="rgba(255,255,255,.28)" textAnchor="middle">S4</text>
+      <rect x="482" y="136" width="22" height="82" rx="3" fill="url(#il-gv)" opacity="0.76" />
+      <text x="493" y="236" fontFamily="Poppins,sans-serif" fontSize="8" fontWeight="600" fill="rgba(255,255,255,.28)" textAnchor="middle">S5</text>
 
-      <rect x="461" y="136" width="22" height="82" rx="3" fill="url(#il-gv)" opacity="0.76" />
-      <text x="472" y="234" fontFamily="Poppins,sans-serif" fontSize="8" fontWeight="600" fill="rgba(255,255,255,.28)" textAnchor="middle">S5</text>
+      <rect x="512" y="128" width="22" height="90" rx="3" fill="url(#il-gv)" opacity="0.90" />
+      <text x="523" y="236" fontFamily="Poppins,sans-serif" fontSize="8" fontWeight="600" fill="rgba(255,255,255,.28)" textAnchor="middle">S6</text>
 
-      <rect x="492" y="128" width="22" height="90" rx="3" fill="url(#il-gv)" opacity="0.90" />
-      <text x="503" y="234" fontFamily="Poppins,sans-serif" fontSize="8" fontWeight="600" fill="rgba(255,255,255,.28)" textAnchor="middle">S6</text>
+      <rect x="542" y="166" width="22" height="52" rx="3" fill="url(#il-gv)" opacity="0.58" />
+      <text x="553" y="236" fontFamily="Poppins,sans-serif" fontSize="8" fontWeight="600" fill="rgba(255,255,255,.28)" textAnchor="middle">S7</text>
 
-      <rect x="523" y="166" width="22" height="52" rx="3" fill="url(#il-gv)" opacity="0.58" />
-      <text x="534" y="234" fontFamily="Poppins,sans-serif" fontSize="8" fontWeight="600" fill="rgba(255,255,255,.28)" textAnchor="middle">S7</text>
+      <rect x="572" y="186" width="22" height="32" rx="3" fill="url(#il-gv)" opacity="0.40" />
+      <text x="583" y="236" fontFamily="Poppins,sans-serif" fontSize="8" fontWeight="600" fill="rgba(255,255,255,.28)" textAnchor="middle">S8</text>
 
-      <rect x="554" y="186" width="22" height="32" rx="3" fill="url(#il-gv)" opacity="0.40" />
-      <text x="565" y="234" fontFamily="Poppins,sans-serif" fontSize="8" fontWeight="600" fill="rgba(255,255,255,.28)" textAnchor="middle">S8</text>
+      {/* Points décoratifs */}
+      <circle cx="58" cy="38" r="1.2" fill="white" opacity="0.14" />
+      <circle cx="142" cy="24" r="1.8" fill="white" opacity="0.12" />
+      <circle cx="268" cy="48" r="1.4" fill="white" opacity="0.16" />
+      <circle cx="82" cy="210" r="1" fill="white" opacity="0.13" />
+      <circle cx="228" cy="228" r="1.5" fill="white" opacity="0.12" />
+      <circle cx="340" cy="62" r="1.2" fill="white" opacity="0.16" />
+      <circle cx="600" cy="85" r="1.6" fill="white" opacity="0.13" />
+      <circle cx="628" cy="185" r="1" fill="white" opacity="0.12" />
+      <circle cx="460" cy="108" r="1.4" fill="#C084FC" opacity="0.22" />
+      <circle cx="594" cy="148" r="1.2" fill="#F472B6" opacity="0.20" />
     </svg>
   )
 }
@@ -398,8 +408,14 @@ export default function EbookDetail() {
             <h1 style={{ fontSize: 'clamp(1.4rem,4vw,2rem)', fontWeight: 900, margin: '0 0 1rem', lineHeight: 1.2 }}>
               {ebook.title}
             </h1>
-            <p style={{ color: 'rgba(255,255,255,.7)', lineHeight: 1.8, marginBottom: '1.75rem' }}>
-              {meta.full_description || ebook.description}
+            <p style={{ color: 'rgba(255,255,255,.7)', lineHeight: 1.8, marginBottom: '1.75rem', textAlign: 'justify' }}>
+              {slug === '10km-8sem' ? (
+                <>
+                  Un plan complet de 8 semaines pour préparer ta prochaine course de 10 km. Chaque séance est{' '}
+                  <strong style={{ fontWeight: 800, background: grad, WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text' }}>calculée depuis ta VMA réelle</strong>
+                  {' '}: tu cours aux bonnes allures, au bon moment, sans jamais avoir à convertir des pourcentages.
+                </>
+              ) : (meta.full_description || ebook.description)}
             </p>
 
             {/* Pour qui */}
