@@ -6,8 +6,8 @@ const base = require('./semaines-4-i.js')
 
 // Jours libres choisis pour ne jamais coller deux séances exigeantes.
 const EXTRA_DAYS = {
-  1: ['Lundi', 'Mercredi'],
-  2: ['Lundi', 'Mercredi'],
+  1: ['Lundi', 'Vendredi'],
+  2: ['Lundi', 'Vendredi'],
   3: ['Lundi', 'Samedi'],
   4: ['Lundi', 'Samedi'],
   5: ['Lundi', 'Jeudi'],

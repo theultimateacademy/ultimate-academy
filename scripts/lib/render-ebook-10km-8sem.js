@@ -430,8 +430,11 @@ function sessionCard(s) {
   </div>`
 }
 
+const JOUR_ORDER = ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi', 'Dimanche']
+
 function weekPage(sem, vma) {
-  const seances = sem.seances.map(s => fillSession(s, vma))
+  const ordered = [...sem.seances].sort((a, b) => JOUR_ORDER.indexOf(a.jour) - JOUR_ORDER.indexOf(b.jour))
+  const seances = ordered.map(s => fillSession(s, vma))
   const denseClass = seances.length >= 6 ? 'dense-6' : seances.length === 5 ? 'dense-5' : ''
   return `
   <div class="page">
