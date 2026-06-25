@@ -7,7 +7,7 @@ const grad = 'linear-gradient(135deg,#8B2FC9,#E8237A)'
 
 const VARIANT_PRICE_TIERS = {
   '10km-8sem':  { 3: 1499, 4: 1799, 5: 1999, 6: 2299 },
-  '10km-12sem': { 3: 1499, 4: 1799, 5: 1999, 6: 2299 },
+  '10km-12sem': { 3: 1799, 4: 1999, 5: 2299, 6: 2499 },
 }
 
 // Toutes les VMA disponibles : 10 à 24 par pas de 0.5
@@ -543,6 +543,12 @@ export default function EbookDetail() {
                   Un plan complet de 8 semaines pour préparer ta prochaine course de 10 km. Chaque séance est{' '}
                   <strong style={{ fontWeight: 800, background: grad, WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text' }}>calculée depuis ta VMA réelle</strong>
                   {' '}: tu cours aux bonnes allures, au bon moment, sans jamais avoir à convertir des pourcentages.
+                </>
+              ) : slug === '10km-12sem' ? (
+                <>
+                  La version longue et progressive pour préparer un 10km en 12 semaines. Plus de temps pour{' '}
+                  <strong style={{ fontWeight: 800, background: grad, WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text' }}>construire ta base aérobie, développer ta VMA et arriver en pleine forme</strong>
+                  {' '}le jour J.
                 </>
               ) : (meta.full_description || ebook.description)}
             </p>

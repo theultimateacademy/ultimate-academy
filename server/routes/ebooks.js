@@ -14,7 +14,7 @@ const CLIENT_URL = process.env.CLIENT_URL || 'https://theultimateacademy.fr';
 // Tarif par nombre de séances/semaine, identique pour toutes les VMA.
 const PRICE_TIERS = {
   '10km-8sem':  { 3: 1499, 4: 1799, 5: 1999, 6: 2299 },
-  '10km-12sem': { 3: 1499, 4: 1799, 5: 1999, 6: 2299 },
+  '10km-12sem': { 3: 1799, 4: 1999, 5: 2299, 6: 2499 },
 };
 
 const VMA_MIN = 10;
