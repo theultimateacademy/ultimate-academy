@@ -106,10 +106,8 @@ export default function EbooksPage() {
   )
 }
 
-function CardIllustrationRunning({ gid, dist, weeksLabel, bars, bw, gap, distFs = 55 }) {
-  const totalW = bars.length * bw + (bars.length - 1) * gap
-  const startX = Math.round(240 - totalW / 2)
-  const maxH = Math.max(...bars)
+function CardIllustrationRunning({ gid, dist, weeksLabel, price }) {
+  const distFs = dist.length <= 2 ? 68 : dist.length <= 4 ? 52 : 36
   return (
     <svg viewBox="0 0 320 160" xmlns="http://www.w3.org/2000/svg"
       style={{ width: '100%', height: '100%', position: 'absolute', inset: 0 }}>
@@ -120,43 +118,36 @@ function CardIllustrationRunning({ gid, dist, weeksLabel, bars, bw, gap, distFs 
         <linearGradient id={`${gid}-g`} x1="0" y1="0" x2="1" y2="0">
           <stop offset="0%" stopColor="#8B2FC9"/><stop offset="100%" stopColor="#E8237A"/>
         </linearGradient>
-        <linearGradient id={`${gid}-gv`} x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stopColor="#8B2FC9"/><stop offset="100%" stopColor="#E8237A"/>
-        </linearGradient>
-        <radialGradient id={`${gid}-gl`} cx="22%" cy="52%" r="65%">
-          <stop offset="0%" stopColor="#8B2FC9" stopOpacity="0.26"/>
+        <radialGradient id={`${gid}-gl`} cx="50%" cy="50%" r="65%">
+          <stop offset="0%" stopColor="#8B2FC9" stopOpacity="0.24"/>
           <stop offset="100%" stopColor="#8B2FC9" stopOpacity="0"/>
         </radialGradient>
       </defs>
       <rect width="320" height="160" fill={`url(#${gid}-bg)`}/>
       <rect width="320" height="160" fill={`url(#${gid}-gl)`}/>
-      <line x1="158" y1="10" x2="158" y2="150" stroke="rgba(255,255,255,.06)" strokeWidth="1"/>
-      <text x="79" y="90" fontFamily="Poppins,sans-serif" fontSize={distFs} fontWeight="900"
-        fill={`url(#${gid}-g)`} opacity="0.92" letterSpacing="-3" textAnchor="middle">{dist}</text>
-      <text x="79" y="117" fontFamily="Poppins,sans-serif" fontSize="22" fontWeight="900"
+      <text x="160" y="88" fontFamily="Poppins,sans-serif" fontSize={distFs} fontWeight="900"
+        fill={`url(#${gid}-g)`} opacity="0.92" letterSpacing="-2" textAnchor="middle">{dist}</text>
+      <text x="160" y="112" fontFamily="Poppins,sans-serif" fontSize="21" fontWeight="900"
         fill={`url(#${gid}-g)`} opacity="0.80" letterSpacing="5" textAnchor="middle">KM</text>
-      <text x="79" y="134" fontFamily="Poppins,sans-serif" fontSize="7" fontWeight="700"
+      <text x="160" y="130" fontFamily="Poppins,sans-serif" fontSize="7" fontWeight="700"
         fill="rgba(255,255,255,.35)" letterSpacing="4" textAnchor="middle">{weeksLabel} SEMAINES</text>
-      <rect x="43" y="140" width="72" height="1" rx="1" fill={`url(#${gid}-g)`} opacity="0.35"/>
-      <g>
-        {bars.map((h, i) => {
-          const x = startX + i * (bw + gap)
-          const op = +(0.35 + (h / maxH) * 0.55).toFixed(2)
-          return (
-            <rect key={i} x={x} y={130 - h} width={bw} height={h} rx={Math.min(2, Math.floor(bw / 2))}
-              fill={`url(#${gid}-gv)`} opacity={op}/>
-          )
-        })}
-      </g>
+      <rect x="124" y="136" width="72" height="1" rx="1" fill={`url(#${gid}-g)`} opacity="0.35"/>
+      {price && (
+        <>
+          <rect x="84" y="144" width="152" height="10" rx="5" fill={`url(#${gid}-g)`} opacity="0.82"/>
+          <text x="160" y="152" fontFamily="Poppins,sans-serif" fontSize="6" fontWeight="800"
+            fill="white" textAnchor="middle">{price}</text>
+        </>
+      )}
       <circle cx="28" cy="22" r="1" fill="white" opacity="0.14"/>
-      <circle cx="134" cy="16" r="1.4" fill="white" opacity="0.12"/>
-      <circle cx="296" cy="26" r="1.5" fill="#C084FC" opacity="0.22"/>
-      <circle cx="306" cy="138" r="1" fill="#F472B6" opacity="0.18"/>
+      <circle cx="292" cy="18" r="1.4" fill="#C084FC" opacity="0.22"/>
+      <circle cx="44" cy="138" r="1" fill="white" opacity="0.13"/>
+      <circle cx="276" cy="142" r="1.2" fill="#F472B6" opacity="0.18"/>
     </svg>
   )
 }
 
-function CardIllustrationAntiBlessure() {
+function CardIllustrationAntiBlessure({ price }) {
   return (
     <svg viewBox="0 0 320 160" xmlns="http://www.w3.org/2000/svg"
       style={{ width: '100%', height: '100%', position: 'absolute', inset: 0 }}>
@@ -178,12 +169,19 @@ function CardIllustrationAntiBlessure() {
         fill="none" stroke="url(#cab-g)" strokeWidth="1.5" opacity="0.22"/>
       <path d="M 160,18 L 225,36 L 225,92 C 225,121 160,140 160,140 C 160,140 95,121 95,92 L 95,36 Z"
         fill="rgba(139,47,201,.06)"/>
-      <text x="160" y="68" fontFamily="Poppins,sans-serif" fontSize="18" fontWeight="700"
+      <text x="160" y="64" fontFamily="Poppins,sans-serif" fontSize="18" fontWeight="700"
         fill="rgba(255,255,255,.45)" letterSpacing="8" textAnchor="middle">ANTI</text>
-      <text x="160" y="102" fontFamily="Poppins,sans-serif" fontSize="28" fontWeight="900"
+      <text x="160" y="96" fontFamily="Poppins,sans-serif" fontSize="28" fontWeight="900"
         fill="url(#cab-g)" opacity="0.88" textAnchor="middle">BLESSURE</text>
-      <text x="160" y="148" fontFamily="Poppins,sans-serif" fontSize="6.5" fontWeight="700"
+      <text x="160" y="112" fontFamily="Poppins,sans-serif" fontSize="6.5" fontWeight="700"
         fill="rgba(255,255,255,.32)" letterSpacing="3.5" textAnchor="middle">COURIR DURABLEMENT</text>
+      {price && (
+        <>
+          <rect x="84" y="126" width="152" height="10" rx="5" fill="url(#cab-g)" opacity="0.82"/>
+          <text x="160" y="134" fontFamily="Poppins,sans-serif" fontSize="6" fontWeight="800"
+            fill="white" textAnchor="middle">{price}</text>
+        </>
+      )}
       <circle cx="42" cy="28" r="1.2" fill="white" opacity="0.14"/>
       <circle cx="278" cy="22" r="1.5" fill="#C084FC" opacity="0.20"/>
       <circle cx="292" cy="134" r="1" fill="white" opacity="0.12"/>
@@ -208,12 +206,12 @@ function EbookCard({ ebook }) {
         {/* Couverture */}
         <div style={{ height: 170, background: 'linear-gradient(135deg,#1A0A2E,#2D0B4E)', position: 'relative', overflow: 'hidden' }}>
           {(() => {
-            if (ebook.slug === '10km-8sem')      return <CardIllustrationRunning gid="c8"   dist="10"   weeksLabel="8"  bars={[17,24,34,41,50,55,32,20]} bw={13} gap={5} />
-            if (ebook.slug === '10km-12sem')     return <CardIllustrationRunning gid="c10"  dist="10"   weeksLabel="12" bars={[13,17,21,27,33,38,43,48,52,55,34,18]} bw={8}  gap={4} />
-            if (ebook.slug === 'semi-12sem')     return <CardIllustrationRunning gid="cs"   dist="21,1" weeksLabel="12" bars={[15,19,23,28,34,38,43,47,51,55,34,17]} bw={8}  gap={4} distFs={42} />
-            if (ebook.slug === 'marathon-12sem') return <CardIllustrationRunning gid="cm12" dist="42"   weeksLabel="12" bars={[13,17,22,27,32,37,41,46,51,55,32,16]} bw={8}  gap={4} />
-            if (ebook.slug === 'marathon-16sem') return <CardIllustrationRunning gid="cm16" dist="42"   weeksLabel="16" bars={[11,13,16,18,22,26,30,35,40,44,48,52,55,37,21,13]} bw={6}  gap={3} />
-            if (ebook.slug === 'anti-blessure')  return <CardIllustrationAntiBlessure />
+            if (ebook.slug === '10km-8sem')      return <CardIllustrationRunning gid="c8"   dist="10"     weeksLabel="8"  price={priceLabel} />
+            if (ebook.slug === '10km-12sem')     return <CardIllustrationRunning gid="c10"  dist="10"     weeksLabel="12" price={priceLabel} />
+            if (ebook.slug === 'semi-12sem')     return <CardIllustrationRunning gid="cs"   dist="21,1"   weeksLabel="12" price={priceLabel} />
+            if (ebook.slug === 'marathon-12sem') return <CardIllustrationRunning gid="cm12" dist="42,195" weeksLabel="12" price={priceLabel} />
+            if (ebook.slug === 'marathon-16sem') return <CardIllustrationRunning gid="cm16" dist="42,195" weeksLabel="16" price={priceLabel} />
+            if (ebook.slug === 'anti-blessure')  return <CardIllustrationAntiBlessure price={priceLabel} />
             if (ebook.cover_image) return <img src={ebook.cover_image} alt={ebook.title} style={{ width: '100%', height: '100%', objectFit: 'cover', position: 'absolute', inset: 0 }} />
             return (
               <>
@@ -227,13 +225,6 @@ function EbookCard({ ebook }) {
               </>
             )
           })()}
-          {/* Badge prix */}
-          <div style={{ position: 'absolute', top: 12, right: 12,
-            background: grad, borderRadius: 99, padding: '.25rem .75rem',
-            fontSize: '.72rem', fontWeight: 800, color: '#fff',
-            boxShadow: '0 4px 12px rgba(232,35,122,.3)' }}>
-            {priceLabel}
-          </div>
         </div>
 
         {/* Contenu */}

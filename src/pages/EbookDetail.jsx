@@ -137,9 +137,8 @@ const EBOOK_DETAILS = {
 }
 
 // ─── Illustrations SVG ───────────────────────────────────────────────────────
-function IllustrationRunning({ dist, weeksLabel, bars, bw = 22, gap = 8 }) {
-  const totalW = bars.length * bw + (bars.length - 1) * gap
-  const startX = Math.round(478 - totalW / 2)
+function IllustrationRunning({ dist, weeksLabel, price }) {
+  const distFs = dist.length <= 2 ? 140 : dist.length <= 4 ? 108 : 78
   return (
     <svg viewBox="0 0 640 260" xmlns="http://www.w3.org/2000/svg"
       style={{ width: '100%', height: '100%', position: 'absolute', inset: 0 }}>
@@ -150,58 +149,49 @@ function IllustrationRunning({ dist, weeksLabel, bars, bw = 22, gap = 8 }) {
         <linearGradient id="il-g" x1="0" y1="0" x2="1" y2="0">
           <stop offset="0%" stopColor="#8B2FC9" /><stop offset="100%" stopColor="#E8237A" />
         </linearGradient>
-        <linearGradient id="il-gv" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stopColor="#8B2FC9" /><stop offset="100%" stopColor="#E8237A" />
-        </linearGradient>
-        <radialGradient id="il-gl1" cx="22%" cy="52%" r="65%">
-          <stop offset="0%" stopColor="#8B2FC9" stopOpacity="0.26" />
+        <radialGradient id="il-gl1" cx="50%" cy="50%" r="65%">
+          <stop offset="0%" stopColor="#8B2FC9" stopOpacity="0.24" />
           <stop offset="100%" stopColor="#8B2FC9" stopOpacity="0" />
         </radialGradient>
       </defs>
       <rect width="640" height="260" fill="url(#il-bg)" />
       <rect width="640" height="260" fill="url(#il-gl1)" />
-      <line x1="316" y1="18" x2="316" y2="244" stroke="rgba(255,255,255,.06)" strokeWidth="1" />
-      <text x="158" y="162" fontFamily="Poppins,sans-serif" fontSize="118" fontWeight="900"
-        fill="url(#il-g)" opacity="0.92" letterSpacing="-5" textAnchor="middle">{dist}</text>
-      <text x="158" y="207" fontFamily="Poppins,sans-serif" fontSize="44" fontWeight="900"
+
+      <text x="320" y="162" fontFamily="Poppins,sans-serif" fontSize={distFs} fontWeight="900"
+        fill="url(#il-g)" opacity="0.92" letterSpacing="-4" textAnchor="middle">{dist}</text>
+      <text x="320" y="207" fontFamily="Poppins,sans-serif" fontSize="44" fontWeight="900"
         fill="url(#il-g)" opacity="0.80" letterSpacing="8" textAnchor="middle">KM</text>
-      <text x="158" y="232" fontFamily="Poppins,sans-serif" fontSize="11" fontWeight="700"
+      <text x="320" y="232" fontFamily="Poppins,sans-serif" fontSize="11" fontWeight="700"
         fill="rgba(255,255,255,.35)" letterSpacing="6" textAnchor="middle">{weeksLabel} SEMAINES</text>
-      <rect x="122" y="241" width="72" height="1.5" rx="1" fill="url(#il-g)" opacity="0.35" />
-      <g>
-        {bars.map((h, i) => {
-          const x = startX + i * (bw + gap)
-          const op = +(0.35 + (h / 90) * 0.55).toFixed(2)
-          return (
-            <g key={i}>
-              <rect x={x} y={218 - h} width={bw} height={h} rx={Math.min(3, Math.floor(bw / 2))}
-                fill="url(#il-gv)" opacity={op} />
-              <text x={x + bw / 2} y={236} fontFamily="Poppins,sans-serif"
-                fontSize={bw >= 18 ? 8 : bw >= 12 ? 7 : 6}
-                fontWeight="600" fill="rgba(255,255,255,.28)" textAnchor="middle">S{i + 1}</text>
-            </g>
-          )
-        })}
-      </g>
+      <rect x="284" y="241" width="72" height="1.5" rx="1" fill="url(#il-g)" opacity="0.35" />
+
+      {price && (
+        <>
+          <rect x="496" y="12" width="132" height="24" rx="12" fill="url(#il-g)" opacity="0.88" />
+          <text x="562" y="28" fontFamily="Poppins,sans-serif" fontSize="10.5" fontWeight="800"
+            fill="white" textAnchor="middle">{price}</text>
+        </>
+      )}
+
       <circle cx="58" cy="38" r="1.2" fill="white" opacity="0.14" />
       <circle cx="142" cy="24" r="1.8" fill="white" opacity="0.12" />
-      <circle cx="268" cy="48" r="1.4" fill="white" opacity="0.16" />
+      <circle cx="498" cy="48" r="1.4" fill="white" opacity="0.16" />
       <circle cx="82" cy="210" r="1" fill="white" opacity="0.13" />
       <circle cx="228" cy="228" r="1.5" fill="white" opacity="0.12" />
-      <circle cx="340" cy="62" r="1.2" fill="white" opacity="0.16" />
+      <circle cx="558" cy="220" r="1.2" fill="white" opacity="0.16" />
       <circle cx="600" cy="85" r="1.6" fill="white" opacity="0.13" />
-      <circle cx="628" cy="185" r="1" fill="white" opacity="0.12" />
-      <circle cx="460" cy="108" r="1.4" fill="#C084FC" opacity="0.22" />
-      <circle cx="594" cy="148" r="1.2" fill="#F472B6" opacity="0.20" />
+      <circle cx="44" cy="185" r="1" fill="white" opacity="0.12" />
+      <circle cx="186" cy="52" r="1.4" fill="#C084FC" opacity="0.22" />
+      <circle cx="454" cy="198" r="1.2" fill="#F472B6" opacity="0.20" />
     </svg>
   )
 }
 
-function Illustration10km() {
-  return <IllustrationRunning dist="10" weeksLabel="8" bars={[28, 40, 56, 68, 82, 90, 52, 32]} />
+function Illustration10km({ price }) {
+  return <IllustrationRunning dist="10" weeksLabel="8" price={price} />
 }
 
-function IllustrationAntiBlessure() {
+function IllustrationAntiBlessure({ price }) {
   return (
     <svg viewBox="0 0 640 260" xmlns="http://www.w3.org/2000/svg"
       style={{ width: '100%', height: '100%', position: 'absolute', inset: 0 }}>
@@ -229,6 +219,13 @@ function IllustrationAntiBlessure() {
         fill="url(#il-g)" opacity="0.88" letterSpacing="-1" textAnchor="middle">BLESSURE</text>
       <text x="320" y="200" fontFamily="Poppins,sans-serif" fontSize="11" fontWeight="700"
         fill="rgba(255,255,255,.32)" letterSpacing="5" textAnchor="middle">COURIR DURABLEMENT</text>
+      {price && (
+        <>
+          <rect x="496" y="12" width="132" height="24" rx="12" fill="url(#il-g)" opacity="0.88" />
+          <text x="562" y="28" fontFamily="Poppins,sans-serif" fontSize="10.5" fontWeight="800"
+            fill="white" textAnchor="middle">{price}</text>
+        </>
+      )}
       <circle cx="95" cy="45" r="1.5" fill="white" opacity="0.14" />
       <circle cx="545" cy="38" r="1.8" fill="#C084FC" opacity="0.20" />
       <circle cx="560" cy="210" r="1.2" fill="white" opacity="0.12" />
@@ -252,24 +249,100 @@ function IllustrationGeneric({ icon, title }) {
 }
 
 // ─── Aperçu flouté ────────────────────────────────────────────────────────────
-function BlurredPreview({ slug }) {
-  if (slug !== '10km-8sem') return null
+const PREVIEW_DATA = {
+  '10km-8sem': {
+    header: '10 KM · 8 SEMAINES', allureeLabel: 'Allure objectif 10km : XX:XX min/km',
+    weekLabel: 'Semaine 6 / 8 · 6 séances', phase: 'INTENSIFICATION',
+    phaseDesc: 'Dernière semaine de charge maximale. Tu atteins le pic de ta préparation.',
+    sessions: [
+      { day: 'LUN', type: 'Footing EF', color: '#22C55E', dur: '40 min',
+        lines: ['40 min très faciles. Sortie légère avant les deux séances clés.', 'RPE 3/10'] },
+      { day: 'MAR', type: '3 × 10 min au seuil', color: '#F97316', dur: '70 min',
+        lines: ['Échauffement 25 min EF progressif.', '3 × 10 min à allure seuil, 3 min récup entre chaque.', 'RPE 8-9/10 · 30 min totales au seuil.'] },
+      { day: 'MER', type: 'Footing EF', color: '#22C55E', dur: '30 min',
+        lines: ['30 min très faciles. Sortie de récupération volontairement courte.', 'RPE 3/10'] },
+      { day: 'JEU', type: '4 × 2 km à allure objectif', color: '#8B2FC9', dur: '70 min',
+        lines: ['Échauffement 25 min EF.', '4 × 2 km à ton allure objectif 10km. Récupération 90 sec.', 'RPE 8/10 · La séance la plus course-spécifique du plan.'] },
+      { day: 'SAM', type: 'Footing de récupération', color: '#22C55E', dur: '45 min',
+        lines: ['45 min très faciles. Aussi important que les séances intenses.', 'RPE 3/10'] },
+      { day: 'DIM', type: 'Sortie longue', color: '#06B6D4', dur: '85 min',
+        lines: ['85 min à allure EF. Ta dernière vraie sortie longue avant la course.', 'RPE 6/10'] },
+    ],
+  },
+  '10km-12sem': {
+    header: '10 KM · 12 SEMAINES', allureeLabel: 'Allure objectif 10km : XX:XX min/km',
+    weekLabel: 'Semaine 8 / 12 · 5 séances', phase: 'DÉVELOPPEMENT VMA',
+    phaseDesc: 'Montée en puissance. Le volume atteint son pic et la VMA est sollicitée.',
+    sessions: [
+      { day: 'MAR', type: 'Footing EF', color: '#22C55E', dur: '45 min',
+        lines: ['45 min à allure fondamentale. Volume de base avant les séances de qualité.', 'RPE 4-5/10'] },
+      { day: 'MER', type: '5 × 1000 m au seuil', color: '#F97316', dur: '65 min',
+        lines: ['Échauffement 25 min EF.', '5 × 1000m à ton allure seuil. Récupération 2 min au trot.', 'RPE 7-8/10'] },
+      { day: 'VEN', type: '12 × 400 m VMA', color: '#EF4444', dur: '65 min',
+        lines: ['Échauffement 25 min progressif.', '12 × 400m à allure VMA. Récupération 90 sec au trot.', 'RPE 9/10 · La séance qui fait le plus progresser.'] },
+      { day: 'SAM', type: 'Footing de récupération', color: '#22C55E', dur: '40 min',
+        lines: ['40 min très faciles. Active la circulation avant la sortie longue.', 'RPE 3/10'] },
+      { day: 'DIM', type: 'Sortie longue', color: '#06B6D4', dur: '90 min',
+        lines: ['85 min à allure EF, puis 5 min à ton allure objectif 10km.', 'RPE 6/10'] },
+    ],
+  },
+  'semi-12sem': {
+    header: '21,1 KM · 12 SEMAINES', allureeLabel: 'Allure objectif semi : XX:XX min/km',
+    weekLabel: 'Semaine 9 / 12 · 5 séances', phase: 'SPÉCIFICITÉ SEMI',
+    phaseDesc: 'Les séances s\'alignent sur ton allure de course. Le jour J se rapproche.',
+    sessions: [
+      { day: 'LUN', type: 'Footing EF', color: '#22C55E', dur: '45 min',
+        lines: ['45 min à allure fondamentale. Récupération active après la semaine chargée.', 'RPE 4/10'] },
+      { day: 'MAR', type: '2 × 15 min au seuil lactique', color: '#F97316', dur: '70 min',
+        lines: ['Échauffement 25 min progressif.', '2 × 15 min à ton allure seuil, 3 min de récupération.', 'RPE 8/10'] },
+      { day: 'JEU', type: '4 × 2 km à allure semi', color: '#8B2FC9', dur: '75 min',
+        lines: ['Échauffement 25 min EF.', '4 × 2 km à ton allure objectif semi-marathon. Récup 90 sec.', 'RPE 7-8/10 · La séance la plus spécifique du plan.'] },
+      { day: 'SAM', type: 'Footing EF', color: '#22C55E', dur: '35 min',
+        lines: ['35 min très faciles. Prépare la sortie longue du lendemain.', 'RPE 3/10'] },
+      { day: 'DIM', type: 'Sortie longue 22 km', color: '#06B6D4', dur: '120 min',
+        lines: ['22 km à allure endurance fondamentale. Le long run le plus important du plan.', 'RPE 6/10 · Ravitaille-toi à mi-course.'] },
+    ],
+  },
+  'marathon-12sem': {
+    header: '42,195 KM · 12 SEMAINES', allureeLabel: 'Allure objectif marathon : XX:XX min/km',
+    weekLabel: 'Semaine 9 / 12 · 5 séances', phase: 'ALLURE MARATHON',
+    phaseDesc: 'L\'allure objectif est au cœur de chaque séance. Les long runs atteignent leur pic.',
+    sessions: [
+      { day: 'LUN', type: 'Footing EF', color: '#22C55E', dur: '50 min',
+        lines: ['50 min à allure fondamentale. Récupération après le week-end chargé.', 'RPE 4/10'] },
+      { day: 'MER', type: '3 × 12 min au seuil', color: '#F97316', dur: '75 min',
+        lines: ['Échauffement 25 min progressif.', '3 × 12 min à ton allure seuil, 3 min de récupération.', 'RPE 8-9/10'] },
+      { day: 'VEN', type: '5 × 2 km à allure marathon', color: '#8B2FC9', dur: '85 min',
+        lines: ['Échauffement 25 min EF.', '5 × 2 km exactement à ton allure objectif marathon. Récup 90 sec.', 'RPE 8/10 · Mémorise cette sensation, c\'est celle du jour J.'] },
+      { day: 'SAM', type: 'Footing de récupération', color: '#22C55E', dur: '40 min',
+        lines: ['40 min faciles. Récupération active avant le long run du dimanche.', 'RPE 3/10'] },
+      { day: 'DIM', type: 'Sortie longue 30 km', color: '#06B6D4', dur: '160 min',
+        lines: ['28 km à allure EF, puis 2 km à ton allure objectif marathon.', 'RPE 6/10 · Le long run le plus long du plan.'] },
+    ],
+  },
+  'marathon-16sem': {
+    header: '42,195 KM · 16 SEMAINES', allureeLabel: 'Allure objectif marathon : XX:XX min/km',
+    weekLabel: 'Semaine 11 / 16 · 5 séances', phase: 'DÉVELOPPEMENT MARATHON',
+    phaseDesc: 'Le volume atteint son pic. Les sorties longues dépassent les 30 km.',
+    sessions: [
+      { day: 'LUN', type: 'Footing EF', color: '#22C55E', dur: '50 min',
+        lines: ['50 min à allure fondamentale. Base aérobie de la semaine.', 'RPE 4/10'] },
+      { day: 'MAR', type: '2 × 20 min au seuil', color: '#F97316', dur: '80 min',
+        lines: ['Échauffement 25 min.', '2 × 20 min à ton allure seuil, 4 min de récupération.', 'RPE 8/10 · 40 min totales au seuil, ta charge la plus élevée.'] },
+      { day: 'JEU', type: '5 × 1500 m à allure marathon', color: '#8B2FC9', dur: '80 min',
+        lines: ['Échauffement 25 min EF.', '5 × 1500m à ton allure objectif marathon. Récupération 2 min.', 'RPE 7-8/10'] },
+      { day: 'SAM', type: 'Footing EF', color: '#22C55E', dur: '45 min',
+        lines: ['45 min faciles. Prépare le long run du lendemain.', 'RPE 3/10'] },
+      { day: 'DIM', type: 'Sortie longue 32 km', color: '#06B6D4', dur: '175 min',
+        lines: ['30 km à allure EF, puis 2 km à ton allure objectif marathon.', 'RPE 6/10 · Ravitaille-toi toutes les 45 min.'] },
+    ],
+  },
+}
 
-  // Semaine 6 — plan 6 séances/semaine (Intensification maximale)
-  const sessions = [
-    { day: 'LUN', type: 'Footing EF', color: '#22C55E', dur: '40 min',
-      lines: ['40 min très faciles. Sortie légère avant les deux séances clés de la semaine.', 'RPE 3/10 · Si tu sens la fatigue, raccourcis à 25 min.'] },
-    { day: 'MAR', type: '3 × 10 min au seuil', color: '#F97316', dur: '70 min',
-      lines: ['Échauffement 25 min EF progressif.', '3 × 10 min à allure seuil, 3 min de récupération entre chaque. La 3e répétition est la plus difficile.', 'RPE 8-9/10 · 30 min totales au seuil, ton record sur ce plan.'] },
-    { day: 'MER', type: 'Footing EF', color: '#22C55E', dur: '30 min',
-      lines: ['30 min très faciles. 2e sortie de récupération, volontairement courte.', 'RPE 3/10 · Ces footings servent à absorber la charge, rien de plus.'] },
-    { day: 'JEU', type: '4 × 2 km à allure objectif', color: '#8B2FC9', dur: '70 min',
-      lines: ['Échauffement 25 min EF.', '4 × 2 km à ton allure objectif 10km. Récupération 90 sec au trot.', 'RPE 8/10 · La séance la plus course-spécifique du plan.'] },
-    { day: 'SAM', type: 'Footing de récupération', color: '#22C55E', dur: '45 min',
-      lines: ['45 min très faciles. Indispensable pour absorber la charge des deux séances clés.', 'RPE 3/10 · Aussi important que les séances intenses.'] },
-    { day: 'DIM', type: 'Sortie longue', color: '#06B6D4', dur: '85 min',
-      lines: ['85 min à allure EF. Ta dernière vraie sortie longue avant la course.', 'RPE 6/10 · Après cette séance, l\'entraînement dur est terminé.'] },
-  ]
+function BlurredPreview({ slug }) {
+  const data = PREVIEW_DATA[slug]
+  if (!data) return null
+  const { header, allureeLabel, weekLabel, phase, phaseDesc, sessions } = data
 
   return (
     <div>
@@ -280,7 +353,7 @@ function BlurredPreview({ slug }) {
         border: '1px solid rgba(255,255,255,.1)',
         boxShadow: '0 4px 30px rgba(0,0,0,.5)' }}>
 
-        {/* Contenu flouté — semaine 6, plan 6 séances */}
+        {/* Contenu flouté */}
         <div style={{ filter: 'blur(3px)', userSelect: 'none', background: '#0E0B1E', padding: '1.25rem 1.5rem' }}>
 
           {/* En-tête */}
@@ -291,26 +364,26 @@ function BlurredPreview({ slug }) {
                 textTransform: 'uppercase', marginBottom: '.1rem' }}>The Ultimate Academy</div>
               <div style={{ fontSize: '.85rem', fontWeight: 900,
                 background: grad, WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text' }}>
-                10 KM · 8 SEMAINES
+                {header}
               </div>
             </div>
             <div style={{ textAlign: 'right', fontSize: '.48rem', color: 'rgba(255,255,255,.28)', lineHeight: 1.7 }}>
               <div>VMA : XX,X km/h</div>
               <div>Allure EF : XX:XX min/km</div>
-              <div>Allure objectif 10km : XX:XX min/km</div>
+              <div>{allureeLabel}</div>
             </div>
           </div>
 
           {/* Semaine */}
           <div style={{ marginBottom: '.75rem' }}>
             <div style={{ fontSize: '.42rem', color: 'rgba(255,255,255,.38)', textTransform: 'uppercase',
-              letterSpacing: '2.5px', marginBottom: '.2rem' }}>Semaine 6 / 8 · 6 séances</div>
+              letterSpacing: '2.5px', marginBottom: '.2rem' }}>{weekLabel}</div>
             <div style={{ fontSize: '1.05rem', fontWeight: 900, marginBottom: '.3rem',
               background: grad, WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text' }}>
-              INTENSIFICATION
+              {phase}
             </div>
             <div style={{ fontSize: '.6rem', color: 'rgba(255,255,255,.45)', lineHeight: 1.55 }}>
-              Dernière semaine de charge maximale. Tu atteins le pic de ta préparation.
+              {phaseDesc}
             </div>
           </div>
 
@@ -415,15 +488,16 @@ export default function EbookDetail() {
 
   const forWhoIsArray = Array.isArray(meta.for_who)
 
+  const priceStr = `À partir de ${((minCents || ebook.price_cents) / 100).toFixed(2).replace('.', ',')} €`
   const RUNNING_ILL_CFG = {
-    '10km-12sem':     { dist: '10',   weeksLabel: '12', bars: [22,28,35,44,54,62,70,78,85,90,55,30], bw: 14, gap: 7 },
-    'semi-12sem':     { dist: '21,1', weeksLabel: '12', bars: [24,30,38,46,55,63,70,78,84,90,55,28], bw: 14, gap: 7 },
-    'marathon-12sem': { dist: '42',   weeksLabel: '12', bars: [22,28,36,44,52,60,68,76,84,90,52,26], bw: 14, gap: 7 },
-    'marathon-16sem': { dist: '42',   weeksLabel: '16', bars: [18,22,26,30,36,42,50,58,65,72,78,85,90,60,34,22], bw: 10, gap: 5 },
+    '10km-12sem':     { dist: '10',     weeksLabel: '12' },
+    'semi-12sem':     { dist: '21,1',   weeksLabel: '12' },
+    'marathon-12sem': { dist: '42,195', weeksLabel: '12' },
+    'marathon-16sem': { dist: '42,195', weeksLabel: '16' },
   }
-  const slugIllustration = slug === '10km-8sem' ? <Illustration10km />
-    : RUNNING_ILL_CFG[slug] ? <IllustrationRunning {...RUNNING_ILL_CFG[slug]} />
-    : slug === 'anti-blessure' ? <IllustrationAntiBlessure />
+  const slugIllustration = slug === '10km-8sem' ? <Illustration10km price={priceStr} />
+    : RUNNING_ILL_CFG[slug] ? <IllustrationRunning {...RUNNING_ILL_CFG[slug]} price={priceStr} />
+    : slug === 'anti-blessure' ? <IllustrationAntiBlessure price={priceStr} />
     : null
 
   return (
@@ -446,14 +520,6 @@ export default function EbookDetail() {
                 ? <img src={ebook.cover_image} alt={ebook.title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                 : <IllustrationGeneric icon={meta.icon || '📋'} title={ebook.title} />
               )}
-              {/* Badge prix */}
-              <div style={{ position: 'absolute', top: 14, right: 14,
-                borderRadius: 99, padding: '.3rem .85rem',
-                fontSize: '.75rem', fontWeight: 800,
-                background: grad, color: '#fff',
-                boxShadow: '0 4px 14px rgba(232,35,122,.35)' }}>
-                À partir de {(minCents || ebook.price_cents) / 100}€
-              </div>
             </div>
 
             {/* Chips */}
@@ -490,7 +556,7 @@ export default function EbookDetail() {
                     {meta.for_who.map((item, i) => (
                       <div key={i} style={{ display: 'flex', gap: '.65rem', alignItems: 'flex-start' }}>
                         <span style={{ color: '#10B981', fontWeight: 800, fontSize: '1rem', lineHeight: 1.4, flexShrink: 0 }}>✓</span>
-                        <span style={{ fontSize: '.88rem', color: 'rgba(255,255,255,.8)', lineHeight: 1.55 }}>{item.text}</span>
+                        <span style={{ fontSize: '.88rem', color: 'rgba(255,255,255,.8)', lineHeight: 1.55, display: 'block', textAlign: 'justify' }}>{item.text}</span>
                       </div>
                     ))}
                   </div>

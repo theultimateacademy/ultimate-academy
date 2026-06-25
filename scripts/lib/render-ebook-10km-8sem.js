@@ -576,7 +576,7 @@ function renderHtml({ vma, seances }) {
       ['02','L\'échauffement, 25 min, toujours','25 minutes de footing EF avant chaque séance intense, sans exception. L\'échauffement prépare les muscles, les tendons et le cœur. Si tu manques de temps, raccourcis la séance, jamais l\'échauffement.'],
       ['03','Le retour au calme, 10 min, toujours','10 minutes de jogging léger après chaque séance intense. Accélère l\'élimination des déchets métaboliques et prépare le corps pour la séance suivante. Sur 8 semaines, l\'effet cumulé est significatif.'],
       ['04','La progressivité, la règle des 10%','Le volume augmente de 10% maximum par semaine. Augmenter trop vite est la première cause de blessure : périostite, tendinite, syndrome rotulien. Respecte le plan même si tu te sens bien.'],
-      ['05','Le renforcement musculaire',seances===5 ? '1 séance par semaine, directement planifiée dans ton programme puisque tu as choisi 5 séances/semaine. Protège les genoux, les hanches et les chevilles, les zones les plus exposées du coureur.' : '1 séance de 20 min par semaine, à ajouter de ton côté en plus des '+seances+' séances de course à pied de ce plan : gainage, fentes, squats, montées de mollets. Protège les genoux, les hanches et les chevilles.'],
+      ['05','Le renforcement musculaire','1 séance de 20 min par semaine, à ajouter de ton côté en plus des '+seances+' séances de course à pied de ce plan : gainage, fentes, squats, montées de mollets. Protège les genoux, les hanches et les chevilles.'],
     ].map(([n,t,d])=>`
     <div class="principe">
       <div class="p-num">${gradText(n, { sizePt: 15, weight: 800, width: 30, align: 'start' })}</div>
