@@ -2,7 +2,7 @@
 // Base = la trame 4 séances (déjà validée), + 1 séance de renforcement musculaire
 // hebdomadaire (sauf semaine de course, où le taper prime). Contenu du renforcement
 // qui monte en intensité avec les phases, comme le reste du plan.
-const base = require('./semaines-4.js')
+const base = require('./semaines-4-i.js')
 
 const RENFO_JOUR = { 1:'Vendredi', 2:'Vendredi', 3:'Samedi', 4:'Samedi', 5:'Jeudi', 6:'Mercredi', 7:'Vendredi' }
 

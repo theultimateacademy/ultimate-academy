@@ -155,22 +155,9 @@ body {
 
 .pnum {
   position: absolute; bottom: 11mm; right: 13mm; z-index: 10;
-  font-size: 14pt; font-weight: 800;
-  background: linear-gradient(135deg,#8B2FC9,#E8237A);
-  -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
 }
 
-.grad {
-  background: linear-gradient(135deg,#8B2FC9,#E8237A);
-  -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
-}
-
-.page-title {
-  font-size: 27pt; font-weight: 800; line-height: 1.1; text-align: center; flex-shrink: 0;
-  padding: 2px 0;
-  background: linear-gradient(135deg,#8B2FC9,#E8237A);
-  -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
-}
+.page-title { flex-shrink: 0; }
 .page-intro {
   font-size: 9.5pt; color: rgba(255,255,255,.72); line-height: 1.6;
   text-align: center; flex-shrink: 0;
@@ -238,7 +225,7 @@ body {
   padding: 6px 12px;
   overflow: hidden;
 }
-.p-num { font-size: 15pt; font-weight: 800; flex-shrink: 0; width: 28px; line-height: 1; text-align: left; align-self: center; }
+.p-num { flex-shrink: 0; width: 28px; align-self: center; }
 .p-t { font-size: 10.5pt; font-weight: 700; margin-bottom: 3px; }
 .p-d { font-size: 9.5pt; color: rgba(255,255,255,.75); line-height: 1.5; }
 
@@ -255,12 +242,8 @@ body {
   flex-shrink: 0; padding-bottom: 8px;
   text-align: center;
 }
-.week-num {
-  font-size: 11pt; font-weight: 700; letter-spacing: .07em; text-transform: uppercase; margin-bottom: 2px;
-  background: linear-gradient(135deg,#8B2FC9,#E8237A);
-  -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
-}
-.week-phase { font-size: 26pt; font-weight: 800; line-height: 1; margin-bottom: 2px; }
+.week-num { margin-bottom: 2px; }
+.week-phase { margin-bottom: 2px; }
 .week-charge { font-size: 9pt; color: rgba(255,255,255,.45); }
 
 .objectif {
@@ -329,11 +312,6 @@ body {
 
 .fin-hero { flex-shrink: 0; text-align: center; padding: 4px 0 8px; }
 .fin-eyebrow { font-size: 8pt; font-weight: 700; letter-spacing: .15em; text-transform: uppercase; color: rgba(255,255,255,.38); margin-bottom: 6px; }
-.fin-title {
-  font-size: 22pt; font-weight: 800; line-height: 1.1;
-  background: linear-gradient(135deg,#8B2FC9,#E8237A);
-  -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
-}
 .fin-sub { font-size: 10pt; color: rgba(255,255,255,.6); margin-top: 6px; line-height: 1.5; }
 .fin-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
 .fin-feat {
@@ -368,6 +346,35 @@ function blobs(v = 'A') {
   return v === 'A'
     ? '<div class="blob-tr"></div><div class="blob-bl"></div>'
     : '<div class="blob-tl"></div><div class="blob-br"></div>'
+}
+
+// Largeur de la zone de contenu d'une page A4 avec le padding du .page (12mm/13mm/20mm).
+const CONTENT_W = 695
+let gradTextIdSeq = 0
+
+function escXml(s) {
+  return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+}
+
+// Texte en dégradé violet→rose rendu en SVG (plutôt que -webkit-background-clip:text,
+// qui casse avec un artefact visible dès la 2e page d'un PDF multi-pages dans Chrome).
+function ptToPx(pt) { return Math.round(pt * 1.3333 * 10) / 10 }
+
+function gradText(text, { sizePt, weight = 800, width = CONTENT_W, height, letterSpacing = 0, align = 'center', uppercase = false, style = '' } = {}) {
+  const fontSize = ptToPx(sizePt)
+  const h = height || Math.ceil(fontSize * 1.3)
+  const gid = `gt${gradTextIdSeq++}`
+  const x = align === 'center' ? width / 2 : align === 'end' ? width : 0
+  const anchor = align === 'center' ? 'middle' : align === 'end' ? 'end' : 'start'
+  const y = Math.round(h * 0.76)
+  const marginCss = align === 'center' ? '0 auto' : '0'
+  const t = uppercase ? text.toUpperCase() : text
+  return `<svg viewBox="0 0 ${width} ${h}" width="${width}" height="${h}" style="display:block;margin:${marginCss};overflow:visible;max-width:100%;${style}">
+    <defs><linearGradient id="${gid}" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#8B2FC9"/><stop offset="100%" stop-color="#E8237A"/>
+    </linearGradient></defs>
+    <text x="${x}" y="${y}" text-anchor="${anchor}" font-family="Poppins" font-weight="${weight}" font-size="${fontSize}" letter-spacing="${letterSpacing}" fill="url(#${gid})">${escXml(t)}</text>
+  </svg>`
 }
 
 // Remplace {{P}} (séquentiel sur la queue de pct) et {{OBJ}} (allure objectif) dans un texte.
@@ -430,8 +437,8 @@ function weekPage(sem, vma) {
   <div class="page">
     ${blobs(sem.num % 2 === 0 ? 'B' : 'A')}
     <div class="week-hero">
-      <div class="week-num">Semaine ${sem.num} sur 8</div>
-      <div class="week-phase grad">${sem.phase.toUpperCase()}</div>
+      <div class="week-num">${gradText(`Semaine ${sem.num} sur 8`, { sizePt: 11, weight: 700, letterSpacing: '0.07em', uppercase: true })}</div>
+      <div class="week-phase">${gradText(sem.phase, { sizePt: 26, weight: 800, uppercase: true })}</div>
     </div>
     <div class="objectif">
       <div class="obj-lbl">Objectif</div>
@@ -442,7 +449,7 @@ function weekPage(sem, vma) {
       <div class="conseil-lbl">Conseil de la semaine</div>
       <div class="conseil-txt">${fillText(sem.conseil, [], vma)}</div>
     </div>
-    <div class="pnum">${sem.num + 4}</div>
+    <div class="pnum">${gradText(String(sem.num + 4), { sizePt: 14, weight: 800, width: 40, align: 'end' })}</div>
   </div>`
 }
 
@@ -465,8 +472,17 @@ function buildZones(vma) {
   }))
 }
 
+// Paliers de niveau, déterminés par la VMA : la structure des séances de qualité
+// (volume, % VMA) diffère par palier, pas seulement l'allure littérale.
+function vmaTier(vma) {
+  if (vma <= 13.5) return 'd'  // Débutant : 10 à 13.5
+  if (vma <= 18.5) return 'i'  // Intermédiaire : 14 à 18.5
+  return 'a'                  // Avancé : 19 à 24
+}
+
 function renderHtml({ vma, seances }) {
-  const SEMAINES = require(`../ebook-data/10km-8sem/semaines-${seances}.js`)
+  const tier = vmaTier(vma)
+  const SEMAINES = require(`../ebook-data/10km-8sem/semaines-${seances}-${tier}.js`)
   const ZONES = buildZones(vma)
   const objPace = formatObjPace(vma, { suffix: false })
 
@@ -498,7 +514,7 @@ function renderHtml({ vma, seances }) {
 <!-- P.2 SOMMAIRE -->
 <div class="page">
   ${blobs('A')}
-  <div class="page-title">Sommaire</div>
+  <div class="page-title">${gradText('Sommaire', { sizePt: 27 })}</div>
   <div class="som-track">${SVG_TRACK}</div>
   <div class="som-flat">
     <div class="som-glbl">Introduction</div>
@@ -514,13 +530,13 @@ function renderHtml({ vma, seances }) {
       `<div class="som-item"><span class="som-label">${l}</span><span class="som-dots"></span><span class="som-page">p.${p}</span></div>`
     ).join('')}
   </div>
-  <div class="pnum">2</div>
+  <div class="pnum">${gradText('2', { sizePt: 14, weight: 800, width: 40, align: 'end' })}</div>
 </div>
 
 <!-- P.3 ALLURES -->
 <div class="page">
   ${blobs('B')}
-  <div class="page-title">Tes allures personnalisées</div>
+  <div class="page-title">${gradText('Tes allures personnalisées', { sizePt: 27 })}</div>
   <p class="page-intro">
     Calculées pour ta VMA de <strong style="color:#C084FC">${vma} km/h</strong> et utilisées tout au long de ce plan.
     Si ta VMA évolue, refais le test sur <strong style="color:#C084FC">theultimateacademy.fr/calculateur/vma</strong> pour rester à jour.
@@ -543,13 +559,13 @@ function renderHtml({ vma, seances }) {
       </div>
     </div>`).join('')}
   </div>
-  <div class="pnum">3</div>
+  <div class="pnum">${gradText('3', { sizePt: 14, weight: 800, width: 40, align: 'end' })}</div>
 </div>
 
 <!-- P.4 PRINCIPES -->
 <div class="page">
   ${blobs('A')}
-  <div class="page-title">Les principes du plan</div>
+  <div class="page-title">${gradText('Les principes du plan', { sizePt: 27 })}</div>
   <p class="page-intro">Les règles qui font la différence entre progresser et stagner sur 8 semaines.</p>
   <div class="principes-wrap">
     ${[
@@ -557,14 +573,14 @@ function renderHtml({ vma, seances }) {
       ['02','L\'échauffement, 25 min, toujours','25 minutes de footing EF avant chaque séance intense, sans exception. L\'échauffement prépare les muscles, les tendons et le cœur. Si tu manques de temps, raccourcis la séance, jamais l\'échauffement.'],
       ['03','Le retour au calme, 10 min, toujours','10 minutes de jogging léger après chaque séance intense. Accélère l\'élimination des déchets métaboliques et prépare le corps pour la séance suivante. Sur 8 semaines, l\'effet cumulé est significatif.'],
       ['04','La progressivité, la règle des 10%','Le volume augmente de 10% maximum par semaine. Augmenter trop vite est la première cause de blessure : périostite, tendinite, syndrome rotulien. Respecte le plan même si tu te sens bien.'],
-      ['05','Le renforcement musculaire',seances>=5 ? '1 séance par semaine, directement planifiée dans ton programme puisque tu as choisi '+seances+' séances/semaine. Protège les genoux, les hanches et les chevilles, les zones les plus exposées du coureur.' : '1 séance de 20 min par semaine, à ajouter de ton côté en plus des '+seances+' séances de ce plan : gainage, fentes, squats, montées de mollets. Protège les genoux, les hanches et les chevilles.'],
+      ['05','Le renforcement musculaire',seances===5 ? '1 séance par semaine, directement planifiée dans ton programme puisque tu as choisi 5 séances/semaine. Protège les genoux, les hanches et les chevilles, les zones les plus exposées du coureur.' : '1 séance de 20 min par semaine, à ajouter de ton côté en plus des '+seances+' séances de course à pied de ce plan : gainage, fentes, squats, montées de mollets. Protège les genoux, les hanches et les chevilles.'],
     ].map(([n,t,d])=>`
     <div class="principe">
-      <div class="p-num grad">${n}</div>
+      <div class="p-num">${gradText(n, { sizePt: 15, weight: 800, width: 30, align: 'start' })}</div>
       <div><div class="p-t">${t}</div><div class="p-d">${d}</div></div>
     </div>`).join('')}
   </div>
-  <div class="pnum">4</div>
+  <div class="pnum">${gradText('4', { sizePt: 14, weight: 800, width: 40, align: 'end' })}</div>
 </div>
 
 <!-- SEMAINES 1-8 -->
@@ -573,7 +589,7 @@ ${SEMAINES.map(s => weekPage(s, vma)).join('')}
 <!-- P.13 STRATÉGIE -->
 <div class="page">
   ${blobs('A')}
-  <div class="page-title">Stratégie de course</div>
+  <div class="page-title">${gradText('Stratégie de course', { sizePt: 27 })}</div>
   <p class="page-intro">La majorité des coureurs ratent leur 10km sur les 2 premiers kilomètres. Cette stratégie en 4 phases fonctionne à tous les niveaux.</p>
   ${SVG_HEARTBEAT}
   <div class="strats-wrap">
@@ -591,13 +607,13 @@ ${SEMAINES.map(s => weekPage(s, vma)).join('')}
   <div style="flex-shrink:0;padding:8px 0 8px 11px;border-left:2px solid rgba(139,47,201,.4);font-size:9.5pt;color:rgba(255,255,255,.75);line-height:1.5">
     <strong style="color:#C084FC">Hydratation :</strong> Eau au km 5. Pas de gel sauf si ta course dure plus d'une heure et que tu en as l'habitude. Ne jamais tester quelque chose de nouveau le jour J.
   </div>
-  <div class="pnum">13</div>
+  <div class="pnum">${gradText('13', { sizePt: 14, weight: 800, width: 40, align: 'end' })}</div>
 </div>
 
 <!-- P.14 NUTRITION -->
 <div class="page">
   ${blobs('B')}
-  <div class="page-title">Nutrition de course</div>
+  <div class="page-title">${gradText('Nutrition de course', { sizePt: 27 })}</div>
   <p class="page-intro">Ce que tu mets dans l'assiette peut faire gagner ou perdre plusieurs minutes. Les 48h avant le départ sont cruciales.</p>
   <div class="nut-cards-wrap">
     <div class="nut-card" style="border-left:3px solid rgba(168,85,247,.7);background:rgba(168,85,247,.07)">
@@ -649,7 +665,7 @@ ${SEMAINES.map(s => weekPage(s, vma)).join('')}
       </div>
     </div>
   </div>
-  <div class="pnum">14</div>
+  <div class="pnum">${gradText('14', { sizePt: 14, weight: 800, width: 40, align: 'end' })}</div>
 </div>
 
 <!-- P.15 COACHING -->
@@ -658,7 +674,7 @@ ${SEMAINES.map(s => weekPage(s, vma)).join('')}
   <div class="fin-hero">
     ${SVG_FIN_TROPHY}
     <div class="fin-eyebrow" style="margin-top:8px">The Ultimate Academy</div>
-    <div class="fin-title">Passe à la vitesse supérieure</div>
+    <div class="fin-title">${gradText('Passe à la vitesse supérieure', { sizePt: 22 })}</div>
     <div class="fin-sub">Ton prochain plan, conçu sur mesure pour toi chaque semaine.</div>
   </div>
   <div class="fin-grid">
@@ -691,9 +707,9 @@ ${SEMAINES.map(s => weekPage(s, vma)).join('')}
     <div class="fin-cta-sub">Rejoins les athlètes qui progressent chaque semaine avec un plan personnalisé.</div>
   </div>
   <div class="fin-url">
-    <div class="grad" style="font-size:12pt;font-weight:800">theultimateacademy.fr</div>
+    ${gradText('theultimateacademy.fr', { sizePt: 12, weight: 800 })}
   </div>
-  <div class="pnum">15</div>
+  <div class="pnum">${gradText('15', { sizePt: 14, weight: 800, width: 40, align: 'end' })}</div>
 </div>
 
 </body></html>`
