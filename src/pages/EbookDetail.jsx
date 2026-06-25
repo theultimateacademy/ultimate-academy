@@ -20,7 +20,7 @@ function isValidVma(v) {
 const EBOOK_DETAILS = {
   '10km-8sem': {
     icon: '🏃', weeks: 8, distance: '10 km', level: 'Tous niveaux',
-    full_description: 'Un plan complet de 8 semaines pour préparer ta prochaine course de 10 km. Chaque séance est calculée depuis ta VMA réelle — tu cours aux bonnes allures, au bon moment, sans jamais avoir à convertir des pourcentages.',
+    full_description: 'Un plan complet de 8 semaines pour préparer ta prochaine course de 10 km. Chaque séance est calculée depuis ta VMA réelle : tu cours aux bonnes allures, au bon moment, sans jamais avoir à convertir des pourcentages.',
     toc: [
       'Allures personnalisées en min/km',
       'Semaines 1-2 · Adaptation',
@@ -32,12 +32,12 @@ const EBOOK_DETAILS = {
       'Nutrition',
     ],
     for_who: [
-      { check: true,  text: 'Tu peux courir 30 minutes sans t\'arrêter — c\'est le seul prérequis' },
+      { check: true,  text: 'Tu peux courir 30 minutes sans t\'arrêter' },
       { check: true,  text: 'Tu veux descendre sous les 60 min, 55 min, 50 min, 45 min ou même 40 min' },
       { check: true,  text: 'Tu prépares ta première course de 10km et tu veux un plan progressif et structuré' },
       { check: true,  text: 'Tu cours déjà mais sans méthode, et tu veux enfin progresser avec logique' },
       { check: true,  text: 'Tu as déjà couru un 10km et tu veux battre ton record personnel' },
-      { check: true,  text: 'Tu t\'entraînes de 3 à 6 fois par semaine — le plan s\'adapte exactement à ta disponibilité' },
+      { check: true,  text: 'Tu t\'entraînes de 3 à 6 fois par semaine, le plan s\'adapte exactement à ta disponibilité' },
     ],
   },
   '10km-12sem': {
@@ -141,33 +141,14 @@ function Illustration10km() {
       <rect width="640" height="260" fill="url(#il-gl1)" />
       <rect width="640" height="260" fill="url(#il-gl2)" />
 
-      {/* Piste — 3 ellipses concentriques */}
+      {/* Piste — 2 ellipses concentriques */}
       <ellipse cx="160" cy="138" rx="132" ry="82" fill="none" stroke="url(#il-g)" strokeWidth="2.5" opacity="0.42" />
-      <ellipse cx="160" cy="138" rx="93" ry="54" fill="none" stroke="url(#il-g)" strokeWidth="1.5" strokeDasharray="5,8" opacity="0.28" />
-      <ellipse cx="160" cy="138" rx="55" ry="29" fill="none" stroke="rgba(139,47,201,0.7)" strokeWidth="1" opacity="0.38" />
-
-      {/* Coureur — silhouette stylisée en foulée */}
-      <g strokeLinecap="round" strokeLinejoin="round" fill="none">
-        {/* Tête */}
-        <circle cx="162" cy="66" r="13" fill="url(#il-g)" opacity="0.88" />
-        {/* Corps */}
-        <line x1="162" y1="79" x2="160" y2="116" stroke="url(#il-g)" strokeWidth="4.5" opacity="0.85" />
-        {/* Bras avant (droit) */}
-        <polyline points="160,96 183,82 189,75" stroke="url(#il-g)" strokeWidth="3" opacity="0.75" />
-        {/* Bras arrière (gauche) */}
-        <polyline points="160,96 139,112 133,120" stroke="url(#il-g)" strokeWidth="3" opacity="0.75" />
-        {/* Jambe avant (gauche) */}
-        <polyline points="160,116 141,150 126,154" stroke="url(#il-g)" strokeWidth="4.5" opacity="0.85" />
-        {/* Pied avant */}
-        <line x1="126" y1="154" x2="113" y2="150" stroke="url(#il-g)" strokeWidth="3" opacity="0.7" />
-        {/* Jambe arrière shootée (droite) */}
-        <polyline points="160,116 178,100 186,86" stroke="url(#il-g)" strokeWidth="4.5" opacity="0.85" />
-      </g>
+      <ellipse cx="160" cy="138" rx="88" ry="52" fill="none" stroke="url(#il-g)" strokeWidth="1.5" strokeDasharray="5,8" opacity="0.25" />
 
       {/* Titre "10 KM" */}
-      <text x="352" y="152" fontFamily="Poppins,sans-serif" fontSize="54" fontWeight="900"
+      <text x="352" y="115" fontFamily="Poppins,sans-serif" fontSize="54" fontWeight="900"
         fill="url(#il-g)" opacity="0.92" letterSpacing="-2">10 KM</text>
-      <text x="360" y="177" fontFamily="Poppins,sans-serif" fontSize="12.5" fontWeight="700"
+      <text x="360" y="138" fontFamily="Poppins,sans-serif" fontSize="12.5" fontWeight="700"
         fill="rgba(255,255,255,0.5)" letterSpacing="5">8 SEMAINES</text>
 
       {/* Barres de charge hebdomadaire */}
@@ -214,99 +195,98 @@ function IllustrationGeneric({ icon, title }) {
 function BlurredPreview({ slug }) {
   if (slug !== '10km-8sem') return null
 
-  const sessionColors = ['#06B6D4', '#F97316', '#22C55E', '#A855F7']
-  const weekData = [
-    { day: 'MAR', color: '#06B6D4', label: 'Endurance' },
-    { day: 'JEU', color: '#F97316', label: '10 × 400m' },
-    { day: 'SAM', color: '#06B6D4', label: 'Récupération' },
-    { day: 'DIM', color: '#22C55E', label: 'Sortie longue' },
+  const sessions = [
+    { day: 'MAR', type: 'Endurance Fondamentale', color: '#22C55E', dur: '40 min',
+      lines: ['Course continue à allure EF. Allure conversation, tu dois pouvoir parler en phrases complètes.', 'RPE 4-5/10 · Finis en te sentant bien.'] },
+    { day: 'JEU', type: '8 × 400 mètres', color: '#8B2FC9', dur: '55 min',
+      lines: ['Échauffement : 25 min de footing EF.', '8 × 400m à allure VMA. Récupération 90 sec au trot entre chaque.', 'RPE 8-9/10 · Maintiens la même allure du premier au dernier.'] },
+    { day: 'VEN', type: 'Footing EF', color: '#22C55E', dur: '40 min',
+      lines: ['40 min à allure EF. Régulier et détendu.', 'RPE 4/10 · Léger et régulier.'] },
+    { day: 'DIM', type: 'Sortie longue', color: '#06B6D4', dur: '65 min',
+      lines: ['60 min à allure EF, puis les 5 dernières minutes à ton allure objectif 10km.', 'RPE 5-6/10 · Mémorise la sensation de ces 5 dernières minutes.'] },
   ]
 
   return (
-    <div style={{ marginBottom: '2rem' }}>
+    <div>
       <h3 style={{ margin: '0 0 .75rem', fontSize: '.95rem', fontWeight: 800 }}>
-        👁 Aperçu du plan
+        Aperçu du plan
       </h3>
-      <div style={{ position: 'relative', borderRadius: 16, overflow: 'hidden',
-        border: '1px solid rgba(255,255,255,.08)' }}>
+      <div
+        onClick={() => document.getElementById('buy-form')?.scrollIntoView({ behavior: 'smooth', block: 'nearest' })}
+        style={{ position: 'relative', borderRadius: 16, overflow: 'hidden',
+          border: '1px solid rgba(255,255,255,.1)', cursor: 'pointer',
+          boxShadow: '0 4px 30px rgba(0,0,0,.5)' }}>
 
-        {/* 3 mini-pages côte à côte */}
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', background: '#0C0A18' }}>
+        {/* Contenu flouté — simulation page ebook semaine 1 */}
+        <div style={{ filter: 'blur(3px)', userSelect: 'none', background: '#0E0B1E', padding: '1.25rem 1.5rem' }}>
 
-          {/* Page 1 — Couverture (légèrement visible) */}
-          <div style={{ padding: '12px 10px', background: 'linear-gradient(135deg,#1A0A2E,#2D0B4E)',
-            minHeight: 180, display: 'flex', flexDirection: 'column', alignItems: 'center',
-            justifyContent: 'center', gap: 6, borderRight: '1px solid rgba(255,255,255,.06)' }}>
-            <div style={{ fontSize: '1.8rem', fontWeight: 900, lineHeight: 1,
-              background: grad, WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text' }}>10</div>
-            <div style={{ fontSize: '.9rem', fontWeight: 900,
-              background: grad, WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text' }}>KM</div>
-            <div style={{ fontSize: '.48rem', fontWeight: 700, color: 'rgba(255,255,255,.45)',
-              letterSpacing: '2px', marginTop: 4 }}>8 SEMAINES</div>
-            <div style={{ width: 30, height: 1.5, background: grad, borderRadius: 1, margin: '2px 0' }} />
-            <div style={{ fontSize: '.4rem', color: 'rgba(255,255,255,.3)', letterSpacing: '1px', textTransform: 'uppercase' }}>
-              The Ultimate Academy
-            </div>
-          </div>
-
-          {/* Page 2 — Semaine type (floutée) */}
-          <div style={{ padding: '10px 8px', minHeight: 180, filter: 'blur(2px)',
-            userSelect: 'none', borderRight: '1px solid rgba(255,255,255,.06)', overflow: 'hidden' }}>
-            <div style={{ fontSize: '.5rem', fontWeight: 700, color: 'rgba(255,255,255,.35)',
-              textTransform: 'uppercase', letterSpacing: '2px', marginBottom: 4 }}>Semaine 1 / 8</div>
-            <div style={{ fontSize: '.7rem', fontWeight: 900,
-              background: grad, WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text',
-              marginBottom: 8 }}>ADAPTATION</div>
-            <div style={{ fontSize: '.4rem', color: 'rgba(255,255,255,.5)', marginBottom: 8, lineHeight: 1.5 }}>
-              Objectif : installer les habitudes et prendre ses marques sur les allures.
-            </div>
-            {weekData.map((s, i) => (
-              <div key={i} style={{ marginBottom: 5, background: `${s.color}18`,
-                borderLeft: `2px solid ${s.color}`, borderRadius: '0 4px 4px 0', padding: '3px 5px' }}>
-                <div style={{ fontSize: '.38rem', fontWeight: 700, color: 'rgba(255,255,255,.4)',
-                  textTransform: 'uppercase', letterSpacing: '1px' }}>{s.day}</div>
-                <div style={{ fontSize: '.44rem', fontWeight: 700, color: s.color }}>{s.label}</div>
-                <div style={{ height: 2, background: `${s.color}40`, borderRadius: 1, marginTop: 2 }} />
-                <div style={{ height: 1.5, background: `${s.color}25`, borderRadius: 1, marginTop: 1, width: '70%' }} />
+          {/* En-tête */}
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+            borderBottom: '1px solid rgba(255,255,255,.1)', paddingBottom: '.65rem', marginBottom: '.85rem' }}>
+            <div>
+              <div style={{ fontSize: '.45rem', color: 'rgba(255,255,255,.3)', letterSpacing: '3px',
+                textTransform: 'uppercase', marginBottom: '.1rem' }}>The Ultimate Academy</div>
+              <div style={{ fontSize: '.85rem', fontWeight: 900,
+                background: grad, WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text' }}>
+                10 KM · 8 SEMAINES
               </div>
-            ))}
+            </div>
+            <div style={{ textAlign: 'right', fontSize: '.48rem', color: 'rgba(255,255,255,.28)', lineHeight: 1.7 }}>
+              <div>VMA : XX,X km/h</div>
+              <div>Allure EF : XX:XX min/km</div>
+              <div>Allure objectif 10km : XX:XX min/km</div>
+            </div>
           </div>
 
-          {/* Page 3 — Stratégie de course (floutée) */}
-          <div style={{ padding: '10px 8px', minHeight: 180, filter: 'blur(2px)',
-            userSelect: 'none', overflow: 'hidden' }}>
-            <div style={{ fontSize: '.6rem', fontWeight: 900,
-              background: grad, WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text',
-              marginBottom: 8, lineHeight: 1.3 }}>STRATÉGIE<br/>DE COURSE</div>
-            {[
-              { km: 'KM 1-2', c: '#06B6D4', label: 'Patience' },
-              { km: 'KM 3-8', c: '#22C55E', label: 'Régularité' },
-              { km: 'KM 9',   c: '#F97316', label: 'Accélération' },
-              { km: 'KM 10',  c: '#EF4444', label: 'Tout donner' },
-            ].map((p, i) => (
-              <div key={i} style={{ display: 'flex', gap: 4, alignItems: 'flex-start', marginBottom: 6 }}>
-                <div style={{ fontSize: '.42rem', fontWeight: 800, color: p.c, flexShrink: 0, width: 24 }}>{p.km}</div>
-                <div style={{ flex: 1 }}>
-                  <div style={{ fontSize: '.44rem', fontWeight: 700, color: 'rgba(255,255,255,.7)' }}>{p.label}</div>
-                  <div style={{ height: 1.5, background: `${p.c}50`, borderRadius: 1, marginTop: 2 }} />
-                  <div style={{ height: 1, background: 'rgba(255,255,255,.1)', borderRadius: 1, marginTop: 1.5, width: '65%' }} />
+          {/* Semaine */}
+          <div style={{ marginBottom: '.75rem' }}>
+            <div style={{ fontSize: '.42rem', color: 'rgba(255,255,255,.38)', textTransform: 'uppercase',
+              letterSpacing: '2.5px', marginBottom: '.2rem' }}>Semaine 1 / 8</div>
+            <div style={{ fontSize: '1.05rem', fontWeight: 900, marginBottom: '.3rem',
+              background: grad, WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text' }}>
+              ADAPTATION
+            </div>
+            <div style={{ fontSize: '.6rem', color: 'rgba(255,255,255,.45)', lineHeight: 1.55 }}>
+              Objectif : Installer les habitudes d'entraînement et prendre ses marques sur les allures. Finir chaque séance en se sentant bien.
+            </div>
+          </div>
+
+          {/* Séances */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '.45rem' }}>
+            {sessions.map((s, i) => (
+              <div key={i} style={{ display: 'grid', gridTemplateColumns: '2.8rem 1fr auto',
+                gap: '.6rem', alignItems: 'start',
+                background: `${s.color}0D`, border: `1px solid ${s.color}22`,
+                borderRadius: 8, padding: '.5rem .7rem' }}>
+                <div>
+                  <div style={{ fontSize: '.62rem', fontWeight: 800, color: 'rgba(255,255,255,.5)' }}>{s.day}</div>
                 </div>
+                <div>
+                  <div style={{ fontSize: '.68rem', fontWeight: 800, color: s.color, marginBottom: '.2rem' }}>{s.type}</div>
+                  {s.lines.map((l, j) => (
+                    <div key={j} style={{ fontSize: '.55rem', color: 'rgba(255,255,255,.45)', lineHeight: 1.55 }}>{l}</div>
+                  ))}
+                </div>
+                <div style={{ fontSize: '.55rem', color: 'rgba(255,255,255,.3)', whiteSpace: 'nowrap' }}>{s.dur}</div>
               </div>
             ))}
           </div>
         </div>
 
-        {/* Dégradé + overlay CTA */}
+        {/* Gradient overlay */}
         <div style={{ position: 'absolute', inset: 0, pointerEvents: 'none',
-          background: 'linear-gradient(to bottom, transparent 25%, rgba(12,10,24,.75) 65%, rgba(12,10,24,.97) 100%)' }} />
-        <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, padding: '1rem',
-          textAlign: 'center' }}>
-          <div style={{ fontSize: '.78rem', color: 'rgba(255,255,255,.45)', marginBottom: '.35rem' }}>
-            🔒 Contenu complet déverrouillé après achat
+          background: 'linear-gradient(to bottom, transparent 28%, rgba(12,10,24,.7) 58%, rgba(12,10,24,.97) 100%)' }} />
+
+        {/* CTA */}
+        <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, padding: '1.25rem 1.5rem', textAlign: 'center' }}>
+          <div style={{ fontSize: '.72rem', color: 'rgba(255,255,255,.42)', marginBottom: '.6rem' }}>
+            🔒 Allures personnalisées déverrouillées après achat
           </div>
-          <div style={{ fontSize: '.72rem', fontWeight: 600,
-            background: grad, WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text' }}>
-            15 pages · allures personnalisées · livré en secondes par email
+          <div style={{ display: 'inline-flex', alignItems: 'center', gap: '.5rem',
+            background: grad, borderRadius: 99, padding: '.5rem 1.4rem',
+            fontSize: '.82rem', fontWeight: 800, color: '#fff',
+            boxShadow: '0 6px 22px rgba(232,35,122,.4)' }}>
+            Obtenir mon plan →
           </div>
         </div>
       </div>
@@ -472,13 +452,11 @@ export default function EbookDetail() {
               </div>
             )}
 
-            {/* Aperçu flouté */}
-            <BlurredPreview slug={slug} />
           </div>
 
           {/* ── Colonne droite — achat (sticky) ── */}
           <div style={{ position: 'sticky', top: '1.5rem' }}>
-            <div style={{ background: 'rgba(255,255,255,.05)', border: '1px solid rgba(255,255,255,.1)',
+            <div id="buy-form" style={{ background: 'rgba(255,255,255,.05)', border: '1px solid rgba(255,255,255,.1)',
               borderRadius: 24, padding: '1.75rem' }}>
 
               {/* Prix */}
@@ -589,18 +567,22 @@ export default function EbookDetail() {
               </div>
             </div>
 
-            {/* Calcul VMA */}
-            <div style={{ marginTop: '1rem', background: 'rgba(139,47,201,.1)',
+          </div>
+
+          {/* ── Ligne 2 de la grille : aperçu + box VMA, naturellement alignés ── */}
+          <BlurredPreview slug={slug} />
+          {isVariant && (
+            <div style={{ background: 'rgba(139,47,201,.1)',
               border: '1px solid rgba(139,47,201,.2)', borderRadius: 16, padding: '1rem', textAlign: 'center' }}>
               <div style={{ fontSize: '.8rem', color: 'rgba(255,255,255,.55)', marginBottom: '.5rem', lineHeight: 1.5 }}>
-                💡 Tu ne connais pas ta VMA ?<br />Utilise notre calculateur gratuit.
+                Tu ne connais pas ta VMA ?<br />Utilise notre calculateur gratuit.
               </div>
               <Link to="/calculateur/vma"
                 style={{ color: '#C084FC', fontSize: '.85rem', fontWeight: 700, textDecoration: 'none' }}>
                 Calculateur VMA gratuit →
               </Link>
             </div>
-          </div>
+          )}
         </div>
       </div>
     </div>
