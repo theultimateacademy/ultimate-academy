@@ -5,7 +5,8 @@ module.exports = {
     titre:'14 × 400 mètres', pcts:[[65,65],[97,102]],
     corps:'14 × 400m à {{P}}. Volume relevé d\'entrée car ton niveau le permet. Récupération 90 sec au trot entre chaque. Maintiens la même allure du premier au dernier.',
     note:'RPE 8-9/10 · Si les dernières sont nettement plus lentes, recalibre la prochaine fois.' } } },
-  2: { replace: { Jeudi: {
+  2: { conseil:'Sur les 16 × 400m, l\'objectif c\'est de tenir la même allure sur les 16. Si les dernières sont nettement plus lentes, tu es parti trop vite.',
+    replace: { Jeudi: {
     titre:'16 × 400 mètres', pcts:[[65,65],[97,102]],
     corps:'16 × 400m à {{P}}. Deux répétitions de plus. Récupération 90 sec au trot. Le volume monte vite à ton niveau, la récupération courte reste le levier principal.',
     note:'RPE 8-9/10 · La récupération courte est volontaire pour développer ta résistance.' } } },
@@ -44,5 +45,5 @@ module.exports = {
   7: { replace: { Jeudi: {
     titre:'8 × 400 mètres, volume réduit', pcts:[[97,102]],
     corps:'8 × 400m à {{P}}. Volume réduit par rapport à ta charge habituelle mais intensité maintenue. Récupération 2 min entre chaque. Termine par 3 × 1 km à ton allure objectif 10km ({{OBJ}}), pour garder la sensation fraîche en tête.',
-    note:'RPE 8/10 · Même en affûtage, ton volume reste au-dessus de la moyenne.' } } },
+    note:'RPE 8/10 · Même en consolidation, ton volume reste au-dessus de la moyenne.' } } },
 }

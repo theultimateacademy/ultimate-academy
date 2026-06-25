@@ -525,7 +525,7 @@ function renderHtml({ vma, seances }) {
       `<div class="som-item"><span class="som-label">${l}</span><span class="som-dots"></span><span class="som-page">p.${p}</span></div>`
     ).join('')}
     <div class="som-glbl">Programme semaine par semaine</div>
-    ${[['03','Semaine 1 · Adaptation','5'],['04','Semaine 2 · Adaptation','6'],['05','Semaine 3 · Développement','7'],['06','Semaine 4 · Développement','8'],['07','Semaine 5 · Intensification','9'],['08','Semaine 6 · Intensification','10'],['09','Semaine 7 · Affûtage','11'],['10','Semaine 8 · Semaine de course','12']].map(([n,l,p])=>
+    ${[['03','Semaine 1 · Adaptation','5'],['04','Semaine 2 · Adaptation','6'],['05','Semaine 3 · Développement','7'],['06','Semaine 4 · Développement','8'],['07','Semaine 5 · Intensification','9'],['08','Semaine 6 · Intensification','10'],['09','Semaine 7 · Consolidation','11'],['10','Semaine 8 · Semaine de course','12']].map(([n,l,p])=>
       `<div class="som-item"><span class="som-label">${l}</span><span class="som-dots"></span><span class="som-page">p.${p}</span></div>`
     ).join('')}
     <div class="som-glbl">Course &amp; après</div>

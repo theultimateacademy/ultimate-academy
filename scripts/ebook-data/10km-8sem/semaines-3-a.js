@@ -7,7 +7,8 @@ module.exports = applyOverrides(base, {
     titre:'12 × 400 mètres', pcts:[[65,65],[97,102]],
     corps:'12 × 400m à {{P}}. Volume relevé d\'entrée car ton niveau le permet. Récupération 90 sec au trot entre chaque.',
     note:'RPE 8-9/10 · Avec seulement 3 séances/semaine, cette séance porte une grosse partie de ta charge.' } } },
-  2: { replace: { Jeudi: {
+  2: { conseil:'Sur les 14 × 400m, l\'objectif c\'est de tenir la même allure sur les 14. Si les dernières sont nettement plus lentes, tu es parti trop vite.',
+    replace: { Jeudi: {
     titre:'14 × 400 mètres', pcts:[[65,65],[97,102]],
     corps:'14 × 400m à {{P}}. Deux répétitions de plus. Récupération 90 sec au trot.',
     note:'RPE 8-9/10 · La récupération courte est volontaire pour développer ta résistance.' } } },
@@ -30,5 +31,5 @@ module.exports = applyOverrides(base, {
   7: { replace: { Jeudi: {
     titre:'6 × 400 mètres, volume réduit', pcts:[[97,102]],
     corps:'6 × 400m à {{P}}. Volume réduit par rapport à ta charge habituelle mais intensité maintenue. Récupération 2 min entre chaque. Termine par 2 × 1 km à ton allure objectif 10km ({{OBJ}}).',
-    note:'RPE 8/10 · Même en affûtage, ton volume reste au-dessus de la moyenne.' } } },
+    note:'RPE 8/10 · Même en consolidation, ton volume reste au-dessus de la moyenne.' } } },
 })

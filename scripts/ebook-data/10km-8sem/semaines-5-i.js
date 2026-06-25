@@ -22,7 +22,7 @@ const RENFO_BY_PHASE = {
     corps:'Gainage dynamique (mountain climbers) 3 × 20 · Squats bulgares 3 × 10 par jambe · Corde à sauter ou talons-fesses 3 × 30 sec · Gainage planche 3 × 40 sec. Récupération 30 sec entre chaque série.',
     note:'Le pic de renforcement coïncide avec le pic d\'intensité course à pied — ton corps absorbe mieux la charge.',
   },
-  'Affûtage': {
+  'Consolidation': {
     duree:'15 min',
     corps:'Gainage planche 2 × 20 sec · Squats au poids du corps 2 × 12 · Quelques étirements actifs des mollets et ischio-jambiers. Volume très réduit, l\'objectif est d\'entretenir, pas de fatiguer.',
     note:'Léger volontairement : tes muscles doivent récupérer, pas travailler.',
