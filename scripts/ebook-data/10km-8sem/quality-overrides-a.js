@@ -1,7 +1,8 @@
 // Surcharges des séances de qualité — palier Avancé (VMA 19 à 24).
 // Réutilisé par semaines-4/5/6-a.js uniquement (toutes héritées de semaines-4-i.js).
 module.exports = {
-  1: { replace: { Jeudi: {
+  1: { conseil:'Sur les 14 × 400m, l\'objectif n\'est pas d\'aller le plus vite, mais de tenir la même allure sur les 14. Garde tes 90 secondes de récupération complètes.',
+    replace: { Jeudi: {
     titre:'14 × 400 mètres', pcts:[[65,65],[97,102]],
     corps:'14 × 400m à {{P}}. Volume relevé d\'entrée car ton niveau le permet. Récupération 90 sec au trot entre chaque. Maintiens la même allure du premier au dernier.',
     note:'RPE 8-9/10 · Si les dernières sont nettement plus lentes, recalibre la prochaine fois.' } } },
