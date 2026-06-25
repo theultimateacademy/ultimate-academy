@@ -106,66 +106,87 @@ export default function EbooksPage() {
   )
 }
 
-function CardIllustration10km() {
+function CardIllustrationRunning({ gid, dist, weeksLabel, bars, bw, gap, distFs = 55 }) {
+  const totalW = bars.length * bw + (bars.length - 1) * gap
+  const startX = Math.round(240 - totalW / 2)
+  const maxH = Math.max(...bars)
   return (
     <svg viewBox="0 0 320 160" xmlns="http://www.w3.org/2000/svg"
       style={{ width: '100%', height: '100%', position: 'absolute', inset: 0 }}>
       <defs>
-        <linearGradient id="cd-bg" x1="0" y1="0" x2="1" y2="1">
+        <linearGradient id={`${gid}-bg`} x1="0" y1="0" x2="1" y2="1">
           <stop offset="0%" stopColor="#1A0A2E"/><stop offset="100%" stopColor="#2D0B4E"/>
         </linearGradient>
-        <linearGradient id="cd-g" x1="0" y1="0" x2="1" y2="0">
+        <linearGradient id={`${gid}-g`} x1="0" y1="0" x2="1" y2="0">
           <stop offset="0%" stopColor="#8B2FC9"/><stop offset="100%" stopColor="#E8237A"/>
         </linearGradient>
-        <linearGradient id="cd-gv" x1="0" y1="0" x2="0" y2="1">
+        <linearGradient id={`${gid}-gv`} x1="0" y1="0" x2="0" y2="1">
           <stop offset="0%" stopColor="#8B2FC9"/><stop offset="100%" stopColor="#E8237A"/>
         </linearGradient>
-        <radialGradient id="cd-gl" cx="25%" cy="55%" r="55%">
-          <stop offset="0%" stopColor="#8B2FC9" stopOpacity="0.35"/>
+        <radialGradient id={`${gid}-gl`} cx="22%" cy="52%" r="65%">
+          <stop offset="0%" stopColor="#8B2FC9" stopOpacity="0.26"/>
           <stop offset="100%" stopColor="#8B2FC9" stopOpacity="0"/>
         </radialGradient>
       </defs>
-      <rect width="320" height="160" fill="url(#cd-bg)"/>
-      <rect width="320" height="160" fill="url(#cd-gl)"/>
+      <rect width="320" height="160" fill={`url(#${gid}-bg)`}/>
+      <rect width="320" height="160" fill={`url(#${gid}-gl)`}/>
+      <line x1="158" y1="10" x2="158" y2="150" stroke="rgba(255,255,255,.06)" strokeWidth="1"/>
+      <text x="79" y="90" fontFamily="Poppins,sans-serif" fontSize={distFs} fontWeight="900"
+        fill={`url(#${gid}-g)`} opacity="0.92" letterSpacing="-3" textAnchor="middle">{dist}</text>
+      <text x="79" y="117" fontFamily="Poppins,sans-serif" fontSize="22" fontWeight="900"
+        fill={`url(#${gid}-g)`} opacity="0.80" letterSpacing="5" textAnchor="middle">KM</text>
+      <text x="79" y="134" fontFamily="Poppins,sans-serif" fontSize="7" fontWeight="700"
+        fill="rgba(255,255,255,.35)" letterSpacing="4" textAnchor="middle">{weeksLabel} SEMAINES</text>
+      <rect x="43" y="140" width="72" height="1" rx="1" fill={`url(#${gid}-g)`} opacity="0.35"/>
+      <g>
+        {bars.map((h, i) => {
+          const x = startX + i * (bw + gap)
+          const op = +(0.35 + (h / maxH) * 0.55).toFixed(2)
+          return (
+            <rect key={i} x={x} y={130 - h} width={bw} height={h} rx={Math.min(2, Math.floor(bw / 2))}
+              fill={`url(#${gid}-gv)`} opacity={op}/>
+          )
+        })}
+      </g>
+      <circle cx="28" cy="22" r="1" fill="white" opacity="0.14"/>
+      <circle cx="134" cy="16" r="1.4" fill="white" opacity="0.12"/>
+      <circle cx="296" cy="26" r="1.5" fill="#C084FC" opacity="0.22"/>
+      <circle cx="306" cy="138" r="1" fill="#F472B6" opacity="0.18"/>
+    </svg>
+  )
+}
 
-      {/* Piste */}
-      <ellipse cx="85" cy="82" rx="72" ry="46" fill="none" stroke="url(#cd-g)" strokeWidth="1.5" opacity="0.42"/>
-      <ellipse cx="85" cy="82" rx="50" ry="30" fill="none" stroke="url(#cd-g)" strokeWidth="1" strokeDasharray="4,6" opacity="0.25"/>
-
-      {/* Coureur */}
-      <circle cx="86" cy="44" r="7" fill="url(#cd-g)" opacity="0.85"/>
-      <line x1="86" y1="51" x2="85" y2="68" stroke="url(#cd-g)" strokeWidth="2.5" strokeLinecap="round" opacity="0.85"/>
-      <polyline points="85,58 96,51 99,47" stroke="url(#cd-g)" strokeWidth="1.8" strokeLinecap="round" fill="none" opacity="0.75"/>
-      <polyline points="85,58 75,65 72,70" stroke="url(#cd-g)" strokeWidth="1.8" strokeLinecap="round" fill="none" opacity="0.75"/>
-      <polyline points="85,68 76,86 68,88" stroke="url(#cd-g)" strokeWidth="2.5" strokeLinecap="round" fill="none" opacity="0.85"/>
-      <polyline points="85,68 95,60 100,51" stroke="url(#cd-g)" strokeWidth="2.5" strokeLinecap="round" fill="none" opacity="0.85"/>
-
-      {/* Lignes vitesse */}
-      <line x1="34" y1="66" x2="58" y2="64" stroke="url(#cd-g)" strokeWidth="1.5" opacity="0.3" strokeLinecap="round"/>
-      <line x1="29" y1="73" x2="56" y2="72" stroke="url(#cd-g)" strokeWidth="1" opacity="0.2" strokeLinecap="round"/>
-
-      {/* 10 KM */}
-      <text x="175" y="88" fontFamily="Poppins,sans-serif" fontSize="60" fontWeight="900"
-        fill="url(#cd-g)" opacity="0.08" letterSpacing="-3">10</text>
-      <text x="182" y="94" fontFamily="Poppins,sans-serif" fontSize="32" fontWeight="900"
-        fill="url(#cd-g)" opacity="0.92" letterSpacing="-1">10 KM</text>
-      <text x="186" y="112" fontFamily="Poppins,sans-serif" fontSize="8" fontWeight="700"
-        fill="rgba(255,255,255,0.45)" letterSpacing="3.5">8 SEMAINES</text>
-
-      {/* Barres charge */}
-      <rect x="176" y="128" width="8" height="12" rx="2" fill="url(#cd-gv)" opacity="0.42"/>
-      <rect x="188" y="123" width="8" height="17" rx="2" fill="url(#cd-gv)" opacity="0.52"/>
-      <rect x="200" y="118" width="8" height="22" rx="2" fill="url(#cd-gv)" opacity="0.62"/>
-      <rect x="212" y="112" width="8" height="28" rx="2" fill="url(#cd-gv)" opacity="0.75"/>
-      <rect x="224" y="105" width="8" height="35" rx="2" fill="url(#cd-gv)" opacity="0.88"/>
-      <rect x="236" y="102" width="8" height="38" rx="2" fill="url(#cd-gv)" opacity="0.92"/>
-      <rect x="248" y="120" width="8" height="20" rx="2" fill="url(#cd-gv)" opacity="0.55"/>
-      <rect x="260" y="133" width="8" height="7" rx="2" fill="url(#cd-gv)" opacity="0.30"/>
-
-      {/* Étoiles */}
-      <circle cx="165" cy="22" r="1.5" fill="white" opacity="0.35"/>
-      <circle cx="295" cy="30" r="2" fill="#C084FC" opacity="0.4"/>
-      <circle cx="15" cy="25" r="1.5" fill="white" opacity="0.3"/>
+function CardIllustrationAntiBlessure() {
+  return (
+    <svg viewBox="0 0 320 160" xmlns="http://www.w3.org/2000/svg"
+      style={{ width: '100%', height: '100%', position: 'absolute', inset: 0 }}>
+      <defs>
+        <linearGradient id="cab-bg" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0%" stopColor="#1A0A2E"/><stop offset="100%" stopColor="#2D0B4E"/>
+        </linearGradient>
+        <linearGradient id="cab-g" x1="0" y1="0" x2="1" y2="0">
+          <stop offset="0%" stopColor="#8B2FC9"/><stop offset="100%" stopColor="#E8237A"/>
+        </linearGradient>
+        <radialGradient id="cab-gl" cx="50%" cy="50%" r="60%">
+          <stop offset="0%" stopColor="#8B2FC9" stopOpacity="0.22"/>
+          <stop offset="100%" stopColor="#8B2FC9" stopOpacity="0"/>
+        </radialGradient>
+      </defs>
+      <rect width="320" height="160" fill="url(#cab-bg)"/>
+      <rect width="320" height="160" fill="url(#cab-gl)"/>
+      <path d="M 160,10 L 235,30 L 235,95 C 235,128 160,148 160,148 C 160,148 85,128 85,95 L 85,30 Z"
+        fill="none" stroke="url(#cab-g)" strokeWidth="1.5" opacity="0.22"/>
+      <path d="M 160,18 L 225,36 L 225,92 C 225,121 160,140 160,140 C 160,140 95,121 95,92 L 95,36 Z"
+        fill="rgba(139,47,201,.06)"/>
+      <text x="160" y="68" fontFamily="Poppins,sans-serif" fontSize="18" fontWeight="700"
+        fill="rgba(255,255,255,.45)" letterSpacing="8" textAnchor="middle">ANTI</text>
+      <text x="160" y="102" fontFamily="Poppins,sans-serif" fontSize="28" fontWeight="900"
+        fill="url(#cab-g)" opacity="0.88" textAnchor="middle">BLESSURE</text>
+      <text x="160" y="148" fontFamily="Poppins,sans-serif" fontSize="6.5" fontWeight="700"
+        fill="rgba(255,255,255,.32)" letterSpacing="3.5" textAnchor="middle">COURIR DURABLEMENT</text>
+      <circle cx="42" cy="28" r="1.2" fill="white" opacity="0.14"/>
+      <circle cx="278" cy="22" r="1.5" fill="#C084FC" opacity="0.20"/>
+      <circle cx="292" cy="134" r="1" fill="white" opacity="0.12"/>
     </svg>
   )
 }
@@ -186,20 +207,26 @@ function EbookCard({ ebook }) {
 
         {/* Couverture */}
         <div style={{ height: 170, background: 'linear-gradient(135deg,#1A0A2E,#2D0B4E)', position: 'relative', overflow: 'hidden' }}>
-          {ebook.slug === '10km-8sem'
-            ? <CardIllustration10km />
-            : ebook.cover_image
-              ? <img src={ebook.cover_image} alt={ebook.title} style={{ width: '100%', height: '100%', objectFit: 'cover', position: 'absolute', inset: 0 }} />
-              : <>
-                  <div style={{ position: 'absolute', inset: 0, background: grad, opacity: .18 }} />
-                  <div style={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
-                    <div style={{ fontSize: '2.8rem', marginBottom: '.5rem' }}>{meta.icon || '📋'}</div>
-                    <div style={{ fontSize: '.72rem', fontWeight: 700, letterSpacing: '.1em', textTransform: 'uppercase', color: 'rgba(255,255,255,.5)' }}>
-                      {meta.distance || 'Guide'}
-                    </div>
+          {(() => {
+            if (ebook.slug === '10km-8sem')      return <CardIllustrationRunning gid="c8"   dist="10"   weeksLabel="8"  bars={[17,24,34,41,50,55,32,20]} bw={13} gap={5} />
+            if (ebook.slug === '10km-12sem')     return <CardIllustrationRunning gid="c10"  dist="10"   weeksLabel="12" bars={[13,17,21,27,33,38,43,48,52,55,34,18]} bw={8}  gap={4} />
+            if (ebook.slug === 'semi-12sem')     return <CardIllustrationRunning gid="cs"   dist="21,1" weeksLabel="12" bars={[15,19,23,28,34,38,43,47,51,55,34,17]} bw={8}  gap={4} distFs={42} />
+            if (ebook.slug === 'marathon-12sem') return <CardIllustrationRunning gid="cm12" dist="42"   weeksLabel="12" bars={[13,17,22,27,32,37,41,46,51,55,32,16]} bw={8}  gap={4} />
+            if (ebook.slug === 'marathon-16sem') return <CardIllustrationRunning gid="cm16" dist="42"   weeksLabel="16" bars={[11,13,16,18,22,26,30,35,40,44,48,52,55,37,21,13]} bw={6}  gap={3} />
+            if (ebook.slug === 'anti-blessure')  return <CardIllustrationAntiBlessure />
+            if (ebook.cover_image) return <img src={ebook.cover_image} alt={ebook.title} style={{ width: '100%', height: '100%', objectFit: 'cover', position: 'absolute', inset: 0 }} />
+            return (
+              <>
+                <div style={{ position: 'absolute', inset: 0, background: grad, opacity: .18 }} />
+                <div style={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
+                  <div style={{ fontSize: '2.8rem', marginBottom: '.5rem' }}>{meta.icon || '📋'}</div>
+                  <div style={{ fontSize: '.72rem', fontWeight: 700, letterSpacing: '.1em', textTransform: 'uppercase', color: 'rgba(255,255,255,.5)' }}>
+                    {meta.distance || 'Guide'}
                   </div>
-                </>
-          }
+                </div>
+              </>
+            )
+          })()}
           {/* Badge prix */}
           <div style={{ position: 'absolute', top: 12, right: 12,
             background: grad, borderRadius: 99, padding: '.25rem .75rem',

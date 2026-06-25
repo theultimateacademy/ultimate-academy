@@ -51,7 +51,12 @@ const EBOOK_DETAILS = {
       'Semaine 12 : Consolidation et course',
       'Conseils nutrition et récupération',
     ],
-    for_who: 'Tout coureur souhaitant une progression solide et durable sur 10km.',
+    for_who: [
+      { check: true, text: 'Tu peux courir 30 minutes sans t\'arrêter' },
+      { check: true, text: 'Tu veux une progression en douceur sur 12 semaines, sans brûler les étapes' },
+      { check: true, text: 'Tu veux développer ta VMA et ton endurance de fond' },
+      { check: true, text: 'Tu t\'entraînes de 3 à 6 fois par semaine, le plan s\'adapte à ta disponibilité' },
+    ],
   },
   'semi-12sem': {
     icon: '🏅', weeks: 12, distance: 'Semi-marathon', level: 'Intermédiaire',
@@ -65,7 +70,12 @@ const EBOOK_DETAILS = {
       'Stratégie km par km pour le semi',
       'Ravitaillement et nutrition course',
     ],
-    for_who: 'Coureur ayant déjà couru un 10km, prêt à passer au semi-marathon.',
+    for_who: [
+      { check: true, text: 'Tu as déjà couru un 10km ou tu cours régulièrement depuis 6 mois' },
+      { check: true, text: 'Tu veux préparer ton premier semi-marathon ou améliorer ton record' },
+      { check: true, text: 'Tu es capable de courir 45 minutes sans t\'arrêter' },
+      { check: true, text: 'Tu veux arriver le jour J avec une vraie stratégie de course' },
+    ],
   },
   'marathon-12sem': {
     icon: '🏆', weeks: 12, distance: 'Marathon', level: 'Confirmé',
@@ -79,7 +89,12 @@ const EBOOK_DETAILS = {
       'Stratégie de course par blocs de 5km',
       'Nutrition, ravitaillement et hydratation',
     ],
-    for_who: 'Coureur ayant terminé un semi-marathon, souhaitant aborder le marathon avec un plan structuré.',
+    for_who: [
+      { check: true, text: 'Tu as déjà terminé un semi-marathon' },
+      { check: true, text: 'Tu vises un objectif de temps précis sur marathon' },
+      { check: true, text: 'Tu peux t\'entraîner 4 à 5 fois par semaine' },
+      { check: true, text: 'Tu veux un plan intensif et structuré sur 12 semaines' },
+    ],
   },
   'marathon-16sem': {
     icon: '🏆', weeks: 16, distance: 'Marathon', level: 'Tous niveaux',
@@ -93,7 +108,12 @@ const EBOOK_DETAILS = {
       'Plans A / B / C selon l\'objectif',
       'Guide complet nutrition et hydratation',
     ],
-    for_who: 'Tout coureur souhaitant préparer un marathon avec le temps nécessaire pour progresser sereinement.',
+    for_who: [
+      { check: true, text: 'Tu veux préparer ton premier marathon ou battre ton record personnel' },
+      { check: true, text: 'Tu t\'entraînes de 3 à 6 fois par semaine' },
+      { check: true, text: 'Tu veux progresser sereinement avec 4 mois de préparation devant toi' },
+      { check: true, text: 'Tu cherches un plan complet avec stratégie de course et nutrition' },
+    ],
   },
   'anti-blessure': {
     icon: '🩺', weeks: null, distance: null, level: 'Tous niveaux',
@@ -107,12 +127,19 @@ const EBOOK_DETAILS = {
       'La règle des 10% et gestion de la charge',
       'Équipement et chaussures : ce qui compte vraiment',
     ],
-    for_who: 'Tous les coureurs, débutants ou confirmés, qui veulent courir durablement.',
+    for_who: [
+      { check: true, text: 'Tu as eu des blessures récurrentes et veux enfin les prévenir' },
+      { check: true, text: 'Tu veux renforcer tes zones fragiles : genoux, chevilles, hanches' },
+      { check: true, text: 'Tu veux courir durablement, sans interruptions forcées' },
+      { check: true, text: 'Tu cherches un protocole de reprise après blessure' },
+    ],
   },
 }
 
-// ─── Illustration SVG 10km ────────────────────────────────────────────────────
-function Illustration10km() {
+// ─── Illustrations SVG ───────────────────────────────────────────────────────
+function IllustrationRunning({ dist, weeksLabel, bars, bw = 22, gap = 8 }) {
+  const totalW = bars.length * bw + (bars.length - 1) * gap
+  const startX = Math.round(478 - totalW / 2)
   return (
     <svg viewBox="0 0 640 260" xmlns="http://www.w3.org/2000/svg"
       style={{ width: '100%', height: '100%', position: 'absolute', inset: 0 }}>
@@ -131,49 +158,31 @@ function Illustration10km() {
           <stop offset="100%" stopColor="#8B2FC9" stopOpacity="0" />
         </radialGradient>
       </defs>
-
-      {/* Fond */}
       <rect width="640" height="260" fill="url(#il-bg)" />
       <rect width="640" height="260" fill="url(#il-gl1)" />
-
-      {/* Séparateur */}
       <line x1="316" y1="18" x2="316" y2="244" stroke="rgba(255,255,255,.06)" strokeWidth="1" />
-
-      {/* GAUCHE — Titre centré dans la moitié gauche */}
       <text x="158" y="162" fontFamily="Poppins,sans-serif" fontSize="118" fontWeight="900"
-        fill="url(#il-g)" opacity="0.92" letterSpacing="-5" textAnchor="middle">10</text>
+        fill="url(#il-g)" opacity="0.92" letterSpacing="-5" textAnchor="middle">{dist}</text>
       <text x="158" y="207" fontFamily="Poppins,sans-serif" fontSize="44" fontWeight="900"
         fill="url(#il-g)" opacity="0.80" letterSpacing="8" textAnchor="middle">KM</text>
       <text x="158" y="232" fontFamily="Poppins,sans-serif" fontSize="11" fontWeight="700"
-        fill="rgba(255,255,255,.35)" letterSpacing="7" textAnchor="middle">8 SEMAINES</text>
+        fill="rgba(255,255,255,.35)" letterSpacing="6" textAnchor="middle">{weeksLabel} SEMAINES</text>
       <rect x="122" y="241" width="72" height="1.5" rx="1" fill="url(#il-g)" opacity="0.35" />
-
-      {/* DROITE — Graphique de progression S1→S8 (centré dans la moitié droite) */}
-      <rect x="362" y="190" width="22" height="28" rx="3" fill="url(#il-gv)" opacity="0.36" />
-      <text x="373" y="236" fontFamily="Poppins,sans-serif" fontSize="8" fontWeight="600" fill="rgba(255,255,255,.28)" textAnchor="middle">S1</text>
-
-      <rect x="392" y="178" width="22" height="40" rx="3" fill="url(#il-gv)" opacity="0.46" />
-      <text x="403" y="236" fontFamily="Poppins,sans-serif" fontSize="8" fontWeight="600" fill="rgba(255,255,255,.28)" textAnchor="middle">S2</text>
-
-      <rect x="422" y="162" width="22" height="56" rx="3" fill="url(#il-gv)" opacity="0.56" />
-      <text x="433" y="236" fontFamily="Poppins,sans-serif" fontSize="8" fontWeight="600" fill="rgba(255,255,255,.28)" textAnchor="middle">S3</text>
-
-      <rect x="452" y="150" width="22" height="68" rx="3" fill="url(#il-gv)" opacity="0.65" />
-      <text x="463" y="236" fontFamily="Poppins,sans-serif" fontSize="8" fontWeight="600" fill="rgba(255,255,255,.28)" textAnchor="middle">S4</text>
-
-      <rect x="482" y="136" width="22" height="82" rx="3" fill="url(#il-gv)" opacity="0.76" />
-      <text x="493" y="236" fontFamily="Poppins,sans-serif" fontSize="8" fontWeight="600" fill="rgba(255,255,255,.28)" textAnchor="middle">S5</text>
-
-      <rect x="512" y="128" width="22" height="90" rx="3" fill="url(#il-gv)" opacity="0.90" />
-      <text x="523" y="236" fontFamily="Poppins,sans-serif" fontSize="8" fontWeight="600" fill="rgba(255,255,255,.28)" textAnchor="middle">S6</text>
-
-      <rect x="542" y="166" width="22" height="52" rx="3" fill="url(#il-gv)" opacity="0.58" />
-      <text x="553" y="236" fontFamily="Poppins,sans-serif" fontSize="8" fontWeight="600" fill="rgba(255,255,255,.28)" textAnchor="middle">S7</text>
-
-      <rect x="572" y="186" width="22" height="32" rx="3" fill="url(#il-gv)" opacity="0.40" />
-      <text x="583" y="236" fontFamily="Poppins,sans-serif" fontSize="8" fontWeight="600" fill="rgba(255,255,255,.28)" textAnchor="middle">S8</text>
-
-      {/* Points décoratifs */}
+      <g>
+        {bars.map((h, i) => {
+          const x = startX + i * (bw + gap)
+          const op = +(0.35 + (h / 90) * 0.55).toFixed(2)
+          return (
+            <g key={i}>
+              <rect x={x} y={218 - h} width={bw} height={h} rx={Math.min(3, Math.floor(bw / 2))}
+                fill="url(#il-gv)" opacity={op} />
+              <text x={x + bw / 2} y={236} fontFamily="Poppins,sans-serif"
+                fontSize={bw >= 18 ? 8 : bw >= 12 ? 7 : 6}
+                fontWeight="600" fill="rgba(255,255,255,.28)" textAnchor="middle">S{i + 1}</text>
+            </g>
+          )
+        })}
+      </g>
       <circle cx="58" cy="38" r="1.2" fill="white" opacity="0.14" />
       <circle cx="142" cy="24" r="1.8" fill="white" opacity="0.12" />
       <circle cx="268" cy="48" r="1.4" fill="white" opacity="0.16" />
@@ -184,6 +193,47 @@ function Illustration10km() {
       <circle cx="628" cy="185" r="1" fill="white" opacity="0.12" />
       <circle cx="460" cy="108" r="1.4" fill="#C084FC" opacity="0.22" />
       <circle cx="594" cy="148" r="1.2" fill="#F472B6" opacity="0.20" />
+    </svg>
+  )
+}
+
+function Illustration10km() {
+  return <IllustrationRunning dist="10" weeksLabel="8" bars={[28, 40, 56, 68, 82, 90, 52, 32]} />
+}
+
+function IllustrationAntiBlessure() {
+  return (
+    <svg viewBox="0 0 640 260" xmlns="http://www.w3.org/2000/svg"
+      style={{ width: '100%', height: '100%', position: 'absolute', inset: 0 }}>
+      <defs>
+        <linearGradient id="il-bg" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0%" stopColor="#1A0A2E" /><stop offset="100%" stopColor="#2D0B4E" />
+        </linearGradient>
+        <linearGradient id="il-g" x1="0" y1="0" x2="1" y2="0">
+          <stop offset="0%" stopColor="#8B2FC9" /><stop offset="100%" stopColor="#E8237A" />
+        </linearGradient>
+        <radialGradient id="il-gl2" cx="50%" cy="50%" r="60%">
+          <stop offset="0%" stopColor="#8B2FC9" stopOpacity="0.22" />
+          <stop offset="100%" stopColor="#8B2FC9" stopOpacity="0" />
+        </radialGradient>
+      </defs>
+      <rect width="640" height="260" fill="url(#il-bg)" />
+      <rect width="640" height="260" fill="url(#il-gl2)" />
+      <path d="M 320,18 L 450,55 L 450,145 C 450,195 320,230 320,230 C 320,230 190,195 190,145 L 190,55 Z"
+        fill="none" stroke="url(#il-g)" strokeWidth="1.5" opacity="0.22" />
+      <path d="M 320,30 L 432,62 L 432,142 C 432,186 320,218 320,218 C 320,218 208,186 208,142 L 208,62 Z"
+        fill="rgba(139,47,201,.06)" />
+      <text x="320" y="110" fontFamily="Poppins,sans-serif" fontSize="28" fontWeight="700"
+        fill="rgba(255,255,255,.45)" letterSpacing="12" textAnchor="middle">ANTI</text>
+      <text x="320" y="165" fontFamily="Poppins,sans-serif" fontSize="50" fontWeight="900"
+        fill="url(#il-g)" opacity="0.88" letterSpacing="-1" textAnchor="middle">BLESSURE</text>
+      <text x="320" y="200" fontFamily="Poppins,sans-serif" fontSize="11" fontWeight="700"
+        fill="rgba(255,255,255,.32)" letterSpacing="5" textAnchor="middle">COURIR DURABLEMENT</text>
+      <circle cx="95" cy="45" r="1.5" fill="white" opacity="0.14" />
+      <circle cx="545" cy="38" r="1.8" fill="#C084FC" opacity="0.20" />
+      <circle cx="560" cy="210" r="1.2" fill="white" opacity="0.12" />
+      <circle cx="80" cy="195" r="1" fill="white" opacity="0.13" />
+      <circle cx="480" cy="85" r="1.4" fill="#F472B6" opacity="0.18" />
     </svg>
   )
 }
@@ -365,10 +415,21 @@ export default function EbookDetail() {
 
   const forWhoIsArray = Array.isArray(meta.for_who)
 
+  const RUNNING_ILL_CFG = {
+    '10km-12sem':     { dist: '10',   weeksLabel: '12', bars: [22,28,35,44,54,62,70,78,85,90,55,30], bw: 14, gap: 7 },
+    'semi-12sem':     { dist: '21,1', weeksLabel: '12', bars: [24,30,38,46,55,63,70,78,84,90,55,28], bw: 14, gap: 7 },
+    'marathon-12sem': { dist: '42',   weeksLabel: '12', bars: [22,28,36,44,52,60,68,76,84,90,52,26], bw: 14, gap: 7 },
+    'marathon-16sem': { dist: '42',   weeksLabel: '16', bars: [18,22,26,30,36,42,50,58,65,72,78,85,90,60,34,22], bw: 10, gap: 5 },
+  }
+  const slugIllustration = slug === '10km-8sem' ? <Illustration10km />
+    : RUNNING_ILL_CFG[slug] ? <IllustrationRunning {...RUNNING_ILL_CFG[slug]} />
+    : slug === 'anti-blessure' ? <IllustrationAntiBlessure />
+    : null
+
   return (
     <div style={{ background: C.bg, minHeight: '100vh', color: '#fff', fontFamily: 'inherit' }}>
       <Nav />
-      <div style={{ maxWidth: 940, margin: '0 auto', padding: '3rem 1.5rem 5rem' }}>
+      <div style={{ maxWidth: 940, margin: '0 auto', padding: '5rem 1.5rem 5rem' }}>
         <Link to="/ebooks" style={{ display: 'inline-flex', alignItems: 'center', gap: '.4rem',
           color: 'rgba(255,255,255,.5)', textDecoration: 'none', fontSize: '.85rem',
           marginBottom: '2rem', fontWeight: 500 }}>
@@ -381,12 +442,10 @@ export default function EbookDetail() {
           <div>
             {/* Illustration */}
             <div style={{ height: 260, borderRadius: 20, overflow: 'hidden', position: 'relative', marginBottom: '1.5rem' }}>
-              {slug === '10km-8sem'
-                ? <Illustration10km />
-                : ebook.cover_image
-                  ? <img src={ebook.cover_image} alt={ebook.title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                  : <IllustrationGeneric icon={meta.icon || '📋'} title={ebook.title} />
-              }
+              {slugIllustration ?? (ebook.cover_image
+                ? <img src={ebook.cover_image} alt={ebook.title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                : <IllustrationGeneric icon={meta.icon || '📋'} title={ebook.title} />
+              )}
               {/* Badge prix */}
               <div style={{ position: 'absolute', top: 14, right: 14,
                 borderRadius: 99, padding: '.3rem .85rem',
@@ -434,11 +493,6 @@ export default function EbookDetail() {
                         <span style={{ fontSize: '.88rem', color: 'rgba(255,255,255,.8)', lineHeight: 1.55 }}>{item.text}</span>
                       </div>
                     ))}
-                    <div style={{ marginTop: '.5rem', padding: '.6rem .8rem',
-                      background: 'rgba(16,185,129,.1)', borderRadius: 10,
-                      fontSize: '.8rem', color: '#6EE7B7', fontWeight: 600 }}>
-                      👟 Seul prérequis : pouvoir courir 30 minutes sans s'arrêter
-                    </div>
                   </div>
                 ) : (
                   <p style={{ margin: 0, fontSize: '.9rem', color: 'rgba(255,255,255,.75)', lineHeight: 1.6 }}>{meta.for_who}</p>
@@ -581,20 +635,8 @@ export default function EbookDetail() {
 
           </div>
 
-          {/* ── Ligne 2 de la grille : aperçu + box VMA, naturellement alignés ── */}
+          {/* ── Ligne 2 de la grille : aperçu flouté ── */}
           <BlurredPreview slug={slug} />
-          {isVariant && (
-            <div style={{ background: 'rgba(139,47,201,.1)',
-              border: '1px solid rgba(139,47,201,.2)', borderRadius: 16, padding: '1rem', textAlign: 'center' }}>
-              <div style={{ fontSize: '.8rem', color: 'rgba(255,255,255,.55)', marginBottom: '.5rem', lineHeight: 1.5 }}>
-                Tu ne connais pas ta VMA ?<br />Utilise notre calculateur gratuit.
-              </div>
-              <Link to="/calculateur/vma"
-                style={{ color: '#C084FC', fontSize: '.85rem', fontWeight: 700, textDecoration: 'none' }}>
-                Calculateur VMA gratuit →
-              </Link>
-            </div>
-          )}
         </div>
       </div>
     </div>
