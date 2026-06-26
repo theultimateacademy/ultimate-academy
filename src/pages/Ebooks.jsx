@@ -105,8 +105,15 @@ export default function EbooksPage() {
   )
 }
 
-function CardIllustrationRunning({ gid, dist, weeksLabel }) {
-  const distFs = dist.length <= 2 ? 68 : dist.length <= 4 ? 56 : 48
+function CardIllustrationRunning({ gid, dist, kmText, weeksLabel }) {
+  const isWord = /[A-Za-z]/.test(dist)
+  const distFs = isWord
+    ? (dist.length <= 4 ? 52 : dist.length <= 8 ? 38 : 30)
+    : (dist.length <= 2 ? 68 : dist.length <= 4 ? 56 : 48)
+  const km = kmText !== undefined ? kmText : 'KM'
+  const distY  = km ? '84' : '95'
+  const semsY  = km ? '130' : '118'
+  const lineY  = km ? '136' : '124'
   return (
     <svg viewBox="0 0 320 160" xmlns="http://www.w3.org/2000/svg"
       style={{ width: '100%', height: '100%', position: 'absolute', inset: 0 }}>
@@ -124,13 +131,13 @@ function CardIllustrationRunning({ gid, dist, weeksLabel }) {
       </defs>
       <rect width="320" height="160" fill={`url(#${gid}-bg)`}/>
       <rect width="320" height="160" fill={`url(#${gid}-gl)`}/>
-      <text x="160" y="88" fontFamily="Poppins,sans-serif" fontSize={distFs} fontWeight="900"
+      <text x="160" y={distY} fontFamily="Poppins,sans-serif" fontSize={distFs} fontWeight="900"
         fill={`url(#${gid}-g)`} opacity="0.92" letterSpacing="-1" textAnchor="middle">{dist}</text>
-      <text x="160" y="112" fontFamily="Poppins,sans-serif" fontSize="21" fontWeight="900"
-        fill={`url(#${gid}-g)`} opacity="0.80" letterSpacing="5" textAnchor="middle">KM</text>
-      <text x="160" y="130" fontFamily="Poppins,sans-serif" fontSize="7" fontWeight="700"
+      {km && <text x="160" y="112" fontFamily="Poppins,sans-serif" fontSize={km === 'KM' ? '21' : '16'} fontWeight="900"
+        fill={`url(#${gid}-g)`} opacity="0.80" letterSpacing={km === 'KM' ? '5' : '3'} textAnchor="middle">{km}</text>}
+      <text x="160" y={semsY} fontFamily="Poppins,sans-serif" fontSize="7" fontWeight="700"
         fill="rgba(255,255,255,.35)" letterSpacing="4" textAnchor="middle">{weeksLabel} SEMAINES</text>
-      <rect x="124" y="136" width="72" height="1" rx="1" fill={`url(#${gid}-g)`} opacity="0.35"/>
+      <rect x="124" y={lineY} width="72" height="1" rx="1" fill={`url(#${gid}-g)`} opacity="0.35"/>
       <circle cx="28" cy="22" r="1" fill="white" opacity="0.14"/>
       <circle cx="292" cy="18" r="1.4" fill="#C084FC" opacity="0.22"/>
       <circle cx="44" cy="138" r="1" fill="white" opacity="0.13"/>
@@ -176,7 +183,9 @@ function CardIllustrationAntiBlessure() {
 
 function EbookCard({ ebook }) {
   const meta = EBOOK_META[ebook.slug] || {}
-  const priceLabel = ebook.slug === '10km-12sem' ? 'À partir de 17,99 €' : 'À partir de 14,99 €'
+  const priceLabel = ebook.slug === '10km-12sem' ? 'À partir de 17,99 €'
+    : ebook.slug === 'semi-12sem' ? 'À partir de 19,99 €'
+    : 'À partir de 14,99 €'
 
   return (
     <Link to={`/ebooks/${ebook.slug}`} style={{ textDecoration: 'none', color: '#fff', display: 'flex', flexDirection: 'column' }}>
@@ -189,9 +198,9 @@ function EbookCard({ ebook }) {
           {(() => {
             if (ebook.slug === '10km-8sem')      return <CardIllustrationRunning gid="c8"   dist="10"     weeksLabel="8"  />
             if (ebook.slug === '10km-12sem')     return <CardIllustrationRunning gid="c10"  dist="10"     weeksLabel="12" />
-            if (ebook.slug === 'semi-12sem')     return <CardIllustrationRunning gid="cs"   dist="21,097" weeksLabel="12" />
-            if (ebook.slug === 'marathon-12sem') return <CardIllustrationRunning gid="cm12" dist="42,195" weeksLabel="12" />
-            if (ebook.slug === 'marathon-16sem') return <CardIllustrationRunning gid="cm16" dist="42,195" weeksLabel="16" />
+            if (ebook.slug === 'semi-12sem')     return <CardIllustrationRunning gid="cs"   dist="SEMI"     kmText="MARATHON" weeksLabel="12" />
+            if (ebook.slug === 'marathon-12sem') return <CardIllustrationRunning gid="cm12" dist="MARATHON" kmText=""         weeksLabel="12" />
+            if (ebook.slug === 'marathon-16sem') return <CardIllustrationRunning gid="cm16" dist="MARATHON" kmText=""         weeksLabel="16" />
             if (ebook.slug === 'anti-blessure')  return <CardIllustrationAntiBlessure />
             if (ebook.cover_image) return <img src={ebook.cover_image} alt={ebook.title} style={{ width: '100%', height: '100%', objectFit: 'cover', position: 'absolute', inset: 0 }} />
             return (

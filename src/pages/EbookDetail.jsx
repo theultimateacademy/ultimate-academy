@@ -8,6 +8,7 @@ const grad = 'linear-gradient(135deg,#8B2FC9,#E8237A)'
 const VARIANT_PRICE_TIERS = {
   '10km-8sem':  { 3: 1499, 4: 1799, 5: 1999, 6: 2299 },
   '10km-12sem': { 3: 1799, 4: 1999, 5: 2299, 6: 2499 },
+  'semi-12sem': { 3: 1999, 4: 2299, 5: 2499, 6: 2999 },
 }
 
 // Toutes les VMA disponibles : 10 à 24 par pas de 0.5
@@ -63,21 +64,24 @@ const EBOOK_DETAILS = {
     ],
   },
   'semi-12sem': {
-    icon: '🏅', weeks: 12, distance: 'Semi-marathon', level: 'Intermédiaire',
-    full_description: 'Prépare tes 21,1km avec un plan structuré de 12 semaines alliant volume kilométrique, séances de qualité et gestion de l\'effort sur la distance.',
+    icon: '🏅', weeks: 12, distance: 'Semi-marathon', level: 'Tous niveaux',
+    full_description: 'Prépare ton semi-marathon en 12 semaines avec un plan structuré alliant volume kilométrique progressif, séances de qualité et allures personnalisées selon ta VMA.',
     toc: [
-      'Semaines 1-3 : Base endurance — EF, sorties longues progressives',
-      'Semaines 4-6 : Volume — long runs jusqu\'à 18km, tempo',
-      'Semaines 7-9 : Spécificité — allure semi, seuil lactique',
-      'Semaines 10-11 : Consolidation — intensité maintenue, volume réduit',
-      'Semaine 12 : Semaine de course',
-      'Stratégie km par km pour le semi',
-      'Ravitaillement et nutrition course',
+      'Allures personnalisées en min/km',
+      'Semaines 1-2 · Adaptation',
+      'Semaines 3-4 · Développement aérobie',
+      'Semaines 5-6 · Volume',
+      'Semaines 7-8 · Intensification',
+      'Semaines 9-10 · Spécificité semi',
+      'Semaine 11 · Consolidation',
+      'Semaine 12 · Semaine de course',
+      'Stratégie de course et nutrition',
     ],
     for_who: [
       { check: true, text: 'Tu as déjà couru un 10km ou tu cours régulièrement depuis 6 mois' },
       { check: true, text: 'Tu veux préparer ton premier semi-marathon ou améliorer ton record' },
       { check: true, text: 'Tu es capable de courir 45 minutes sans t\'arrêter' },
+      { check: true, text: 'Tu t\'entraînes de 3 à 6 fois par semaine, le plan s\'adapte à ta disponibilité' },
       { check: true, text: 'Tu veux arriver le jour J avec une vraie stratégie de course' },
     ],
   },
@@ -549,6 +553,12 @@ export default function EbookDetail() {
                   La version longue et progressive pour préparer un 10km en 12 semaines. Plus de temps pour{' '}
                   <strong style={{ fontWeight: 800, background: grad, WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text' }}>construire ta base aérobie, développer ta VMA et arriver en pleine forme</strong>
                   {' '}le jour J.
+                </>
+              ) : slug === 'semi-12sem' ? (
+                <>
+                  Prépare ton semi-marathon en 12 semaines avec un plan structuré alliant{' '}
+                  <strong style={{ fontWeight: 800, background: grad, WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text' }}>volume progressif, séances de qualité et allures personnalisées selon ta VMA</strong>
+                  {' '}pour arriver le jour J prêt à performer.
                 </>
               ) : (meta.full_description || ebook.description)}
             </p>
