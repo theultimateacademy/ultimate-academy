@@ -198,7 +198,7 @@ function EbookCard({ ebook }) {
           {(() => {
             if (ebook.slug === '10km-8sem')      return <CardIllustrationRunning gid="c8"   dist="10"     weeksLabel="8"  />
             if (ebook.slug === '10km-12sem')     return <CardIllustrationRunning gid="c10"  dist="10"     weeksLabel="12" />
-            if (ebook.slug === 'semi-12sem')     return <CardIllustrationRunning gid="cs"   dist="SEMI"     kmText="MARATHON" weeksLabel="12" />
+            if (ebook.slug === 'semi-12sem')     return <CardIllustrationRunning gid="cs"   dist="SEMI"     kmText=""         weeksLabel="12" />
             if (ebook.slug === 'marathon-12sem') return <CardIllustrationRunning gid="cm12" dist="MARATHON" kmText=""         weeksLabel="12" />
             if (ebook.slug === 'marathon-16sem') return <CardIllustrationRunning gid="cm16" dist="MARATHON" kmText=""         weeksLabel="16" />
             if (ebook.slug === 'anti-blessure')  return <CardIllustrationAntiBlessure />
