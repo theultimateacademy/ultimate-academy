@@ -368,7 +368,7 @@ function weekPage(sem, vma) {
     </div>
     <div class="objectif">
       <div class="obj-lbl">Objectif</div>
-      <div class="obj-txt">${sem.objectif}</div>
+      <div class="obj-txt">${fillText(sem.objectif || '', [], vma)}</div>
     </div>
     <div class="sessions-wrap ${denseClass}">${seances.map(s => sessionCard(s)).join('')}</div>
     <div class="conseil">
