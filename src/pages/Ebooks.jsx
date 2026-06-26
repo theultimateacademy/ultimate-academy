@@ -11,12 +11,24 @@ const VARIANT_PRICE_TIERS = {
 }
 
 const EBOOK_META = {
-  '10km-8sem':      { icon: '🏃', weeks: 8,  distance: '10 km',         tags: ['VMA personnalisée', 'Allures en min/km', 'Stratégie course'] },
-  '10km-12sem':     { icon: '🏃', weeks: 12, distance: '10 km',         tags: ['12 semaines', 'Développement VMA', 'Stratégie et nutrition'] },
-  'semi-12sem':     { icon: '🏅', weeks: 12, distance: 'Semi-marathon', tags: ['Long runs 18km', 'Seuil lactique', 'Nutrition course'] },
-  'marathon-12sem': { icon: '🏆', weeks: 12, distance: 'Marathon',      tags: ['Long runs 30km', 'Allure marathon', 'Stratégie ravitaillement'] },
-  'marathon-16sem': { icon: '🏆', weeks: 16, distance: 'Marathon',      tags: ['Progression sur 4 mois', 'Plans A/B/C', 'Hydratation complète'] },
-  'anti-blessure':  { icon: '🩺', weeks: null, distance: null,          tags: ['Prévention blessures', 'Renforcement musculaire', 'Protocoles reprise'] },
+  '10km-8sem':      { icon: '🏃', weeks: 8,  distance: '10 km',
+    desc: '8 semaines de préparation ciblée pour battre ton record sur 10 km. Chaque séance est calculée selon ta VMA réelle — pas de plan générique.',
+    tags: ['Record en 8 semaines'] },
+  '10km-12sem':     { icon: '🏃', weeks: 12, distance: '10 km',
+    desc: 'Le plan le plus complet pour franchir un cap sur 10 km. VMA, seuil lactique et stratégie de course : 12 semaines pour te dépasser.',
+    tags: ['Construis ta VMA'] },
+  'semi-12sem':     { icon: '🏅', weeks: 12, distance: 'Semi-marathon',
+    desc: 'Prépare ton semi-marathon avec des séances sur mesure selon ta VMA. Long runs progressifs jusqu\'à 22 km et allure objectif personnalisée.',
+    tags: ['Long runs jusqu\'à 22 km'] },
+  'marathon-12sem': { icon: '🏆', weeks: 12, distance: 'Marathon',
+    desc: '12 semaines pour préparer le marathon sérieusement. Long runs jusqu\'à 30 km, allure objectif personnalisée et stratégie de ravitaillement.',
+    tags: ['Long runs jusqu\'à 30 km'] },
+  'marathon-16sem': { icon: '🏆', weeks: 16, distance: 'Marathon',
+    desc: '4 mois pour préparer le marathon de ta vie. Progression semaine après semaine, long run de 32 km et trois niveaux d\'objectif A/B/C.',
+    tags: ['4 mois de progression'] },
+  'anti-blessure':  { icon: '🩺', weeks: null, distance: null,
+    desc: 'Cours durablement, sans douleurs. Protocoles de renforcement musculaire, prévention des blessures et reprise progressive validés.',
+    tags: ['Courir sans se blesser'] },
 }
 
 export default function EbooksPage() {
@@ -105,15 +117,16 @@ export default function EbooksPage() {
   )
 }
 
-function CardIllustrationRunning({ gid, dist, kmText, weeksLabel }) {
+function CardIllustrationRunning({ gid, dist, kmText, kmInline, weeksLabel }) {
   const isWord = /[A-Za-z]/.test(dist)
   const distFs = isWord
     ? (dist.length <= 4 ? 52 : dist.length <= 8 ? 38 : 30)
     : (dist.length <= 2 ? 68 : dist.length <= 4 ? 56 : 48)
-  const km = kmText !== undefined ? kmText : 'KM'
-  const distY  = km ? '84' : '95'
-  const semsY  = km ? '130' : '118'
-  const lineY  = km ? '136' : '124'
+  const km = !kmInline && (kmText !== undefined ? kmText : 'KM')
+  const hasBelow = Boolean(km)
+  const distY  = hasBelow ? '84' : '95'
+  const semsY  = hasBelow ? '130' : '118'
+  const lineY  = hasBelow ? '136' : '124'
   return (
     <svg viewBox="0 0 320 160" xmlns="http://www.w3.org/2000/svg"
       style={{ width: '100%', height: '100%', position: 'absolute', inset: 0 }}>
@@ -131,13 +144,28 @@ function CardIllustrationRunning({ gid, dist, kmText, weeksLabel }) {
       </defs>
       <rect width="320" height="160" fill={`url(#${gid}-bg)`}/>
       <rect width="320" height="160" fill={`url(#${gid}-gl)`}/>
-      <text x="160" y={distY} fontFamily="Poppins,sans-serif" fontSize={distFs} fontWeight="900"
-        fill={`url(#${gid}-g)`} opacity="0.92" letterSpacing="-1" textAnchor="middle">{dist}</text>
-      {km && <text x="160" y="112" fontFamily="Poppins,sans-serif" fontSize={km === 'KM' ? '21' : '16'} fontWeight="900"
-        fill={`url(#${gid}-g)`} opacity="0.80" letterSpacing={km === 'KM' ? '5' : '3'} textAnchor="middle">{km}</text>}
-      <text x="160" dx="2" y={semsY} fontFamily="Poppins,sans-serif" fontSize="7" fontWeight="700"
+
+      {kmInline ? (
+        /* "10 KM" sur une seule ligne : "10" grand + "KM" petit en exposant */
+        <text x="160" y="88" textAnchor="middle">
+          <tspan fontFamily="Poppins,sans-serif" fontSize="68" fontWeight="900"
+            fill={`url(#${gid}-g)`} opacity="0.92" letterSpacing="-1">{dist}</tspan>
+          <tspan fontFamily="Poppins,sans-serif" fontSize="24" fontWeight="900"
+            fill={`url(#${gid}-g)`} opacity="0.80" letterSpacing="3" dy="-18" dx="8">KM</tspan>
+        </text>
+      ) : (
+        <text x="160" y={distY} fontFamily="Poppins,sans-serif" fontSize={distFs} fontWeight="900"
+          fill={`url(#${gid}-g)`} opacity="0.92" letterSpacing="-1" textAnchor="middle">{dist}</text>
+      )}
+
+      {!kmInline && km && (
+        <text x="160" y="112" fontFamily="Poppins,sans-serif" fontSize={km === 'KM' ? '21' : '16'} fontWeight="900"
+          fill={`url(#${gid}-g)`} opacity="0.80" letterSpacing={km === 'KM' ? '5' : '3'} textAnchor="middle">{km}</text>
+      )}
+
+      <text x="160" dx="2" y={kmInline ? '118' : semsY} fontFamily="Poppins,sans-serif" fontSize="7" fontWeight="700"
         fill="rgba(255,255,255,.35)" letterSpacing="4" textAnchor="middle">{weeksLabel} SEMAINES</text>
-      <rect x="124" y={lineY} width="72" height="1" rx="1" fill={`url(#${gid}-g)`} opacity="0.35"/>
+      <rect x="124" y={kmInline ? '124' : lineY} width="72" height="1" rx="1" fill={`url(#${gid}-g)`} opacity="0.35"/>
       <circle cx="28" cy="22" r="1" fill="white" opacity="0.14"/>
       <circle cx="292" cy="18" r="1.4" fill="#C084FC" opacity="0.22"/>
       <circle cx="44" cy="138" r="1" fill="white" opacity="0.13"/>
@@ -164,9 +192,9 @@ function CardIllustrationAntiBlessure() {
       </defs>
       <rect width="320" height="160" fill="url(#cab-bg)"/>
       <rect width="320" height="160" fill="url(#cab-gl)"/>
-      <path d="M 160,10 L 235,30 L 235,95 C 235,128 160,148 160,148 C 160,148 85,128 85,95 L 85,30 Z"
+      <path d="M 160,10 L 255,30 L 255,95 C 255,128 160,150 160,150 C 160,150 65,128 65,95 L 65,30 Z"
         fill="none" stroke="url(#cab-g)" strokeWidth="1.5" opacity="0.22"/>
-      <path d="M 160,18 L 225,36 L 225,92 C 225,121 160,140 160,140 C 160,140 95,121 95,92 L 95,36 Z"
+      <path d="M 160,18 L 248,36 L 248,93 C 248,122 160,143 160,143 C 160,143 72,122 72,93 L 72,36 Z"
         fill="rgba(139,47,201,.06)"/>
       <text x="160" y="64" fontFamily="Poppins,sans-serif" fontSize="17" fontWeight="700"
         fill="rgba(255,255,255,.45)" letterSpacing="6" textAnchor="middle">ANTI</text>
@@ -196,8 +224,8 @@ function EbookCard({ ebook }) {
         {/* Couverture */}
         <div style={{ height: 170, background: 'linear-gradient(135deg,#1A0A2E,#2D0B4E)', position: 'relative', overflow: 'hidden' }}>
           {(() => {
-            if (ebook.slug === '10km-8sem')      return <CardIllustrationRunning gid="c8"   dist="10"     weeksLabel="8"  />
-            if (ebook.slug === '10km-12sem')     return <CardIllustrationRunning gid="c10"  dist="10"     weeksLabel="12" />
+            if (ebook.slug === '10km-8sem')      return <CardIllustrationRunning gid="c8"   dist="10" kmInline weeksLabel="8"  />
+            if (ebook.slug === '10km-12sem')     return <CardIllustrationRunning gid="c10"  dist="10" kmInline weeksLabel="12" />
             if (ebook.slug === 'semi-12sem')     return <CardIllustrationRunning gid="cs"   dist="SEMI"     kmText=""         weeksLabel="12" />
             if (ebook.slug === 'marathon-12sem') return <CardIllustrationRunning gid="cm12" dist="MARATHON" kmText=""         weeksLabel="12" />
             if (ebook.slug === 'marathon-16sem') return <CardIllustrationRunning gid="cm16" dist="MARATHON" kmText=""         weeksLabel="16" />
@@ -221,12 +249,12 @@ function EbookCard({ ebook }) {
         <div style={{ padding: '1.25rem', flex: 1, display: 'flex', flexDirection: 'column' }}>
           <h3 style={{ margin: '0 0 .5rem', fontSize: '1rem', fontWeight: 800, lineHeight: 1.3 }}>{ebook.title}</h3>
           <p style={{ margin: '0 0 1rem', fontSize: '.83rem', color: 'rgba(255,255,255,.55)', lineHeight: 1.6, flex: 1 }}>
-            {ebook.description}
+            {meta.desc || ebook.description}
           </p>
           {/* Tags */}
           {meta.tags && (
             <div style={{ display: 'flex', gap: '.4rem', flexWrap: 'wrap', marginBottom: '1rem' }}>
-              {meta.tags.slice(0, 2).map(t => (
+              {meta.tags.slice(0, 1).map(t => (
                 <span key={t} style={{ background: 'rgba(139,47,201,.12)', border: '1px solid rgba(139,47,201,.22)',
                   borderRadius: 99, padding: '.18rem .6rem', fontSize: '.68rem', fontWeight: 600, color: '#C084FC' }}>
                   {t}
