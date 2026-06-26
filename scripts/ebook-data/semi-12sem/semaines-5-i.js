@@ -1,4 +1,4 @@
-// Trame 5 séances/semaine — Ebook Semi-marathon, 12 semaines.
+// Trame 5 séances/semaine, Ebook Semi-marathon, 12 semaines.
 // Base = la trame 4 séances + 1 footing EF supplémentaire par semaine.
 // Semaine 12 (Semaine de course) déjà à 4 séances, ignorée ici.
 const base = require('./semaines-4-i.js')
@@ -25,7 +25,7 @@ const EXTRA_BY_PHASE = {
   },
   'Volume': {
     duree:'40 min', pcts:[[60,65]],
-    corps:'40 min très faciles à {{P}}. La semaine de volume est intense — cette sortie reste légère pour ne pas freiner ta récupération.',
+    corps:'40 min très faciles à {{P}}. La semaine de volume est intense, cette sortie reste légère pour ne pas freiner ta récupération.',
     note:'RPE 3/10 · Si tu sens la fatigue, raccourcis à 25 minutes.',
   },
   'Intensification': {
@@ -35,7 +35,7 @@ const EXTRA_BY_PHASE = {
   },
   'Spécificité semi': {
     duree:'45 min', pcts:[[60,60]],
-    corps:'45 min à {{P}}. Semaine spécifique chargée — cette sortie absorbe la charge et prépare la sortie longue du dimanche.',
+    corps:'45 min à {{P}}. Semaine spécifique chargée, cette sortie absorbe la charge et prépare la sortie longue du dimanche.',
     note:'RPE 3/10 · Facile, sans exception.',
   },
   'Consolidation': {

@@ -1,4 +1,4 @@
-// Surcharges des séances de qualité — palier Avancé (VMA 19 à 24).
+// Surcharges des séances de qualité, palier Avancé (VMA 19 à 24).
 // Réutilisé par semaines-4/5/6-a.js.
 module.exports = {
   1: { replace: { Jeudi: {

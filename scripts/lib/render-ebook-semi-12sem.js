@@ -428,7 +428,7 @@ function renderHtml({ vma, seances }) {
     ${logoB64 ? `<img src="${logoB64}" class="cover-logo"/>` : ''}
     <div class="cover-sep"></div>
     <div class="cover-eyebrow">Plan d'entraînement personnalisé</div>
-    <div class="cover-title">21 KM</div>
+    <div class="cover-title" style="line-height:.8">SEMI<br/><span style="font-size:.52em;letter-spacing:.03em">MARATHON</span></div>
     <div class="cover-subtitle">12 semaines · ${seances} séances/semaine · VMA ${vma} km/h</div>
     <div class="cover-academy">The Ultimate Academy</div>
   </div>
@@ -536,7 +536,7 @@ ${SEMAINES.map(s => weekPage(s, vma)).join('')}
     </div>`).join('')}
   </div>
   <div style="flex-shrink:0;padding:8px 0 8px 11px;border-left:2px solid rgba(139,47,201,.4);font-size:9.5pt;color:rgba(255,255,255,.75);line-height:1.5">
-    <strong style="color:#C084FC">Hydratation :</strong> Eau à chaque ravitaillement (environ toutes les 5km). Si tu utilises des gels, teste-les à l'entraînement avant le jour J — jamais d'essai en course.
+    <strong style="color:#C084FC">Hydratation :</strong> Eau à chaque ravitaillement (environ toutes les 5km). Si tu utilises des gels, teste-les à l'entraînement avant le jour J, jamais d'essai en course.
   </div>
   <div class="pnum">${gradText('17', { sizePt: 14, weight: 800, width: 40, align: 'end' })}</div>
 </div>
@@ -545,7 +545,7 @@ ${SEMAINES.map(s => weekPage(s, vma)).join('')}
 <div class="page">
   ${blobs('B')}
   <div class="page-title">${gradText('Nutrition de course', { sizePt: 27 })}</div>
-  <p class="page-intro">Le semi-marathon dure plus d'une heure — la nutrition et l'hydratation font partie de la performance. Les 48h avant le départ sont cruciales.</p>
+  <p class="page-intro">Le semi-marathon dure plus d'une heure, la nutrition et l'hydratation font partie de la performance. Les 48h avant le départ sont cruciales.</p>
   <div class="nut-cards-wrap">
     <div class="nut-card" style="border-left:3px solid rgba(168,85,247,.7);background:rgba(168,85,247,.07)">
       <div class="nut-head">
@@ -556,7 +556,7 @@ ${SEMAINES.map(s => weekPage(s, vma)).join('')}
         </div>
       </div>
       <div class="nut-items">
-        ${[['Dîner glucides','Pâtes, riz, pain complet — constitue tes réserves de glycogène pour tenir 21km.'],['Aliments à éviter','Légumineuses, crudités, fibres en excès, risque digestif en course.'],['Règle d\'or','Aucun nouvel aliment. Reste sur ce que ton corps connaît.'],['Hydratation','1,5 à 2 litres d\'eau dans la journée.']].map(([k,v])=>`
+        ${[['Dîner glucides','Pâtes, riz, pain complet, constitue tes réserves de glycogène pour tenir 21km.'],['Aliments à éviter','Légumineuses, crudités, fibres en excès, risque digestif en course.'],['Règle d\'or','Aucun nouvel aliment. Reste sur ce que ton corps connaît.'],['Hydratation','1,5 à 2 litres d\'eau dans la journée.']].map(([k,v])=>`
         <div class="nut-item">
           <div class="nut-dot" style="background:#A855F7"></div>
           <div class="nut-text"><span class="nut-key">${k}</span> ${v}</div>
@@ -588,7 +588,7 @@ ${SEMAINES.map(s => weekPage(s, vma)).join('')}
         </div>
       </div>
       <div class="nut-items">
-        ${[['30 min','Banane ou barre de céréales + eau ou boisson isotonique.'],['2 heures','Repas complet protéines + glucides — poulet-riz, omelette-pain.'],['Alcool','Évite les 24h suivantes — ralentit significativement la récupération.'],['Hydratation','Continue à boire toute la journée. La déshydratation persiste plusieurs heures.']].map(([k,v])=>`
+        ${[['30 min','Banane ou barre de céréales + eau ou boisson isotonique.'],['2 heures','Repas complet protéines + glucides, poulet-riz, omelette-pain.'],['Alcool','Évite les 24h suivantes, ralentit significativement la récupération.'],['Hydratation','Continue à boire toute la journée. La déshydratation persiste plusieurs heures.']].map(([k,v])=>`
         <div class="nut-item">
           <div class="nut-dot" style="background:#22C55E"></div>
           <div class="nut-text"><span class="nut-key">${k}</span> ${v}</div>
@@ -611,10 +611,10 @@ ${SEMAINES.map(s => weekPage(s, vma)).join('')}
   <div class="fin-grid">
     ${[
       { n:'01', t:'Plan personnalisé', bar:'#8B2FC9', tag:'100% sur mesure',
-        d:'Généré selon ta VMA réelle, ton objectif précis et ta disponibilité. Chaque semaine est unique — pas un plan générique copié-collé.',
+        d:'Généré selon ta VMA réelle, ton objectif précis et ta disponibilité. Chaque semaine est unique, pas un plan générique copié-collé.',
         icon:`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" width="20" height="20"><circle cx="10" cy="10" r="8" fill="none" stroke="white" stroke-width="2"/><path d="M7 10 L9 12 L13 8" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>` },
       { n:'02', t:'Suivi chaque semaine', bar:'#E8237A', tag:'Bilan hebdo',
-        d:'Un bilan personnalisé chaque semaine. Tu signales de la fatigue — le plan s\'allège. Tu progresses vite — il accélère. Jamais de stagnation.',
+        d:'Un bilan personnalisé chaque semaine. Tu signales de la fatigue, le plan s\'allège. Tu progresses vite, il accélère. Jamais de stagnation.',
         icon:`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" width="20" height="20"><rect x="3" y="3" width="14" height="14" rx="2" fill="none" stroke="white" stroke-width="2"/><line x1="7" y1="10" x2="13" y2="10" stroke="white" stroke-width="2" stroke-linecap="round"/><line x1="10" y1="7" x2="10" y2="13" stroke="white" stroke-width="2" stroke-linecap="round"/></svg>` },
       { n:'03', t:'Analyses de course', bar:'#A855F7', tag:'Avant & après',
         d:'Analyse pré-course J-7 pour finaliser ta stratégie. Analyse post-course pour comprendre tes résultats et identifier les axes de progression.',
@@ -634,7 +634,7 @@ ${SEMAINES.map(s => weekPage(s, vma)).join('')}
     </div>`).join('')}
   </div>
   <div class="fin-cta">
-    <div class="fin-cta-title">14 jours d'essai gratuit — sans engagement</div>
+    <div class="fin-cta-title">14 jours d'essai gratuit, sans engagement</div>
     <div class="fin-cta-sub">Rejoins les athlètes qui progressent chaque semaine avec un plan personnalisé.</div>
   </div>
   <div class="fin-url">

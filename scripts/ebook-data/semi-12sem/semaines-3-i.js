@@ -1,4 +1,4 @@
-// Trame 3 séances/semaine — Ebook Semi-marathon, 12 semaines · Palier Intermédiaire.
+// Trame 3 séances/semaine, Ebook Semi-marathon, 12 semaines · Palier Intermédiaire.
 // Une seule séance de qualité par semaine (Jeudi). Semaine 12 = 4 séances (course).
 module.exports = [
   { num:1, phase:'Adaptation', charge:'Légère',
@@ -30,7 +30,7 @@ module.exports = [
         note:'RPE 5/10 · La sortie longue est la séance la plus importante du plan semi-marathon.' },
     ]},
   { num:3, phase:'Développement aérobie', charge:'Modérée, première séance tempo',
-    objectif:'Introduire le travail au seuil anaérobie. Sur 3 séances, le tempo remplace le fractionné du jeudi — c\'est la séance prioritaire pour progresser sur semi.',
+    objectif:'Introduire le travail au seuil anaérobie. Sur 3 séances, le tempo remplace le fractionné du jeudi, c\'est la séance prioritaire pour progresser sur semi.',
     conseil:'Sur le tempo, tu dois pouvoir prononcer des mots isolés mais pas tenir une conversation. La régularité de l\'allure prime sur la vitesse.',
     seances:[
       { jour:'Mardi', type:'EF', titre:'Footing long EF', duree:'55 min', pcts:[[70,70],[65,65]],
@@ -45,13 +45,13 @@ module.exports = [
     ]},
   { num:4, phase:'Développement aérobie', charge:'Élevée, consolidation du tempo',
     objectif:'Consolider le travail de seuil et allonger la sortie longue. Les 2 × 18 min sont plus longues que la version 4 séances car tu n\'as pas de fractionné cette semaine.',
-    conseil:'Sur les 2 × 18 min, la deuxième répétition est intentionnellement plus difficile. Ne ralentis pas — c\'est ce qui te fait progresser.',
+    conseil:'Sur les 2 × 18 min, la deuxième répétition est intentionnellement plus difficile. Ne ralentis pas, c\'est ce qui te fait progresser.',
     seances:[
       { jour:'Mardi', type:'EF', titre:'Footing long EF', duree:'60 min', pcts:[[70,70],[65,65]],
         echauff:'', corps:'60 min à {{P}}. Long, régulier, facile. Si tu te sens fatigué, passe à {{P}}.', retour:'',
         note:'RPE 5/10 · Si tu te sens fatigué, passe à la version lente.' },
       { jour:'Jeudi', type:'Tempo', titre:'2 × 18 minutes au seuil', duree:'65 min', pcts:[[65,70],[85,85]],
-        echauff:'25 min de footing progressif EF.', corps:'2 × 18 min à {{P}} avec 3 min de récupération entre chaque. Plus long que la version standard car c\'est ta seule séance de qualité. La deuxième se termine fatigué — c\'est voulu.', retour:'10 min de footing léger.',
+        echauff:'25 min de footing progressif à {{P}}.', corps:'2 × 18 min à {{P}} avec 3 min de récupération entre chaque. Plus long que la version standard car c\'est ta seule séance de qualité. La deuxième se termine fatigué, c\'est voulu.', retour:'10 min de footing léger.',
         note:'RPE 7-8/10 · 36 min totales au seuil, la charge la plus importante depuis le début.' },
       { jour:'Dimanche', type:'Sortie longue', titre:'Sortie longue avec fin à allure semi', duree:'85 min', pcts:[[65,70]],
         echauff:'', corps:'75 min à {{P}}, puis les 10 dernières minutes à ton allure objectif semi-marathon ({{OBJ}}). Tu apprends à finir sur la bonne allure quand les jambes sont déjà chargées.', retour:'',
@@ -79,7 +79,7 @@ module.exports = [
         echauff:'', corps:'55 min à {{P}}. Long et facile avant la semaine très chargée. Si tu te sens fatigué, passe à {{P}}.', retour:'',
         note:'RPE 5/10 · Ce footing long est ta récupération active.' },
       { jour:'Jeudi', type:'Tempo', titre:'2 × 22 minutes au seuil', duree:'75 min', pcts:[[65,70],[86,86]],
-        echauff:'25 min de footing progressif à {{P}}.', corps:'2 × 22 min à {{P}} avec 3 min de récupération entre chaque. Plus long que la version 4 séances car c\'est ta seule séance de qualité. 44 min totales au seuil — ton pic absolu sur cette séance.', retour:'10 min de footing léger.',
+        echauff:'25 min de footing progressif à {{P}}.', corps:'2 × 22 min à {{P}} avec 3 min de récupération entre chaque. Plus long que la version 4 séances car c\'est ta seule séance de qualité. 44 min totales au seuil, ton pic absolu sur cette séance.', retour:'10 min de footing léger.',
         note:'RPE 8-9/10 · 44 min au seuil, une charge sérieuse. Récupère bien les jours suivants.' },
       { jour:'Dimanche', type:'Sortie longue', titre:'Sortie longue avec encart allure semi', duree:'100 min', pcts:[[65,70]],
         echauff:'', corps:'80 min à {{P}}, puis 5 km à ton allure objectif semi-marathon ({{OBJ}}), puis retour à l\'allure EF pour finir. Cet encart t\'apprend à tenir l\'allure quand les jambes sont déjà sollicitées.', retour:'',
@@ -93,7 +93,7 @@ module.exports = [
         echauff:'', corps:'60 min à {{P}}. Long et facile avant le tempo du jeudi. Si tu te sens fatigué, passe à {{P}}.', retour:'',
         note:'RPE 5/10 · Ce footing prépare la séance du jeudi.' },
       { jour:'Jeudi', type:'Tempo', titre:'3 × 17 minutes au seuil', duree:'75 min', pcts:[[65,70],[86,86]],
-        echauff:'25 min de footing progressif EF.', corps:'3 × 17 min à {{P}} avec 3 min de récupération entre chaque. La troisième répétition est la plus difficile, maintiens l\'allure. Plus long que la version 4 séances car c\'est ta seule qualité de la semaine.', retour:'10 min de footing léger.',
+        echauff:'25 min de footing progressif à {{P}}.', corps:'3 × 17 min à {{P}} avec 3 min de récupération entre chaque. La troisième répétition est la plus difficile, maintiens l\'allure. Plus long que la version 4 séances car c\'est ta seule qualité de la semaine.', retour:'10 min de footing léger.',
         note:'RPE 8-9/10 · 51 min totales au seuil, ton record absolu. Récupère bien le lendemain.' },
       { jour:'Dimanche', type:'Sortie longue', titre:'Sortie longue 105 minutes', duree:'105 min', pcts:[[65,70]],
         echauff:'', corps:'105 min à {{P}}. Ta sortie longue la plus longue à ce jour. Régularité, respiration, hydratation toutes les 20 min.', retour:'',
@@ -107,7 +107,7 @@ module.exports = [
         echauff:'', corps:'60 min à {{P}}. Long et facile avant la semaine la plus chargée du plan. Si tu te sens fatigué, passe à {{P}}.', retour:'',
         note:'RPE 5/10 · Ce footing long est ta préparation à la séance du jeudi.' },
       { jour:'Jeudi', type:'Tempo', titre:'4 × 14 minutes au seuil', duree:'80 min', pcts:[[65,70],[87,87]],
-        echauff:'25 min de footing progressif EF.', corps:'4 × 14 min à {{P}} avec 3 min de récupération entre chaque. Légèrement plus intense que la semaine 7. La quatrième répétition est la plus difficile, maintiens l\'allure.', retour:'10 min de footing léger.',
+        echauff:'25 min de footing progressif à {{P}}.', corps:'4 × 14 min à {{P}} avec 3 min de récupération entre chaque. Légèrement plus intense que la semaine 7. La quatrième répétition est la plus difficile, maintiens l\'allure.', retour:'10 min de footing léger.',
         note:'RPE 8-9/10 · 56 min au seuil, ton pic absolu de la préparation.' },
       { jour:'Dimanche', type:'Sortie longue', titre:'Sortie longue avec encart allure semi', duree:'110 min', pcts:[[65,70]],
         echauff:'', corps:'90 min à {{P}}, puis 8 km à ton allure objectif semi-marathon ({{OBJ}}), puis retour à l\'allure EF. Ces 8 km à allure objectif après 90 min de course te préparent directement à la fin du semi.', retour:'',
@@ -149,7 +149,7 @@ module.exports = [
         echauff:'', corps:'45 min très faciles à {{P}}. Garder les jambes en mouvement sans les fatiguer. Cours au ressenti, sans montre.', retour:'',
         note:'RPE 3/10 · Tu dois finir comme si tu venais de te promener.' },
       { jour:'Jeudi', type:'Tempo', titre:'2 × 12 minutes au seuil, volume réduit', duree:'55 min', pcts:[[65,70],[84,84]],
-        echauff:'25 min de footing progressif EF.', corps:'2 × 12 min à {{P}}. Volume réduit mais intensité maintenue. Récupération 3 min entre chaque. Termine par 1 km à ton allure objectif semi-marathon ({{OBJ}}).', retour:'10 min de footing léger.',
+        echauff:'25 min de footing progressif à {{P}}.', corps:'2 × 12 min à {{P}}. Volume réduit mais intensité maintenue. Récupération 3 min entre chaque. Termine par 1 km à ton allure objectif semi-marathon ({{OBJ}}).', retour:'10 min de footing léger.',
         note:'RPE 7/10 · Ces répétitions maintiennent tes sensations sans te fatiguer.' },
       { jour:'Samedi', type:'EF', titre:'Footing de 35 minutes', duree:'35 min', pcts:[[65,65]],
         echauff:'', corps:'35 min à {{P}}. Garde les jambes en mouvement sans les fatiguer. Ton corps se recharge pour le jour J.', retour:'',
@@ -171,7 +171,7 @@ module.exports = [
         echauff:'', corps:'20 min de trot à {{P}}. Puis 6 à 8 accélérations progressives de 80m, démarre doucement et accélère jusqu\'à passer sous ton allure objectif {{OBJ}} sur les 20 derniers mètres. Récupère 60 sec en marchant entre chaque.', retour:'',
         note:'Ces accélérations réveillent tes fibres rapides. Efficace la veille d\'une course.' },
       { jour:'Dimanche', type:'Course', titre:'COURSE SEMI-MARATHON', duree:'Jour J',
-        echauff:'10 min de jogging léger avant le départ.', corps:'KM 1-5 : pars à ton allure objectif {{OBJ}}, ne pars surtout pas plus vite. KM 6-15 : maintiens {{OBJ}} exactement, régularité absolue, hydrate-toi à chaque ravitaillement. KM 16-18 : évaluation honnête — si tu as des réserves, accélère légèrement. KM 19-21 : donne absolument tout.', retour:'15-20 min de marche. Ravitaillement dans les 30 min.',
+        echauff:'10 min de jogging léger avant le départ.', corps:'KM 1-5 : pars à ton allure objectif {{OBJ}}, ne pars surtout pas plus vite. KM 6-15 : maintiens {{OBJ}} exactement, régularité absolue, hydrate-toi à chaque ravitaillement. KM 16-18 : évaluation honnête, si tu as des réserves, accélère légèrement. KM 19-21 : donne absolument tout.', retour:'15-20 min de marche. Ravitaillement dans les 30 min.',
         note:'Les sensations difficiles aux km 14-17 sont normales. C\'est là que se gagne un semi-marathon.' },
     ]},
 ]

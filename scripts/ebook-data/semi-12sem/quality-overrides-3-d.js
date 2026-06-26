@@ -16,7 +16,7 @@ module.exports = {
     note:'RPE 6-7/10 · Pas besoin d\'aller plus loin pour progresser à ce stade.' } } },
   4: { replace: { Jeudi: {
     titre:'2 × 14 minutes au seuil', pcts:[[65,70],[82,82]],
-    echauff:'25 min de footing progressif EF.', duree:'60 min',
+    echauff:'25 min de footing progressif à {{P}}.', duree:'60 min',
     corps:'2 × 14 min à {{P}} avec 3 min de récupération. Légèrement moins long que la version standard. La deuxième est plus difficile, c\'est normal.',
     note:'RPE 7/10 · Concentre-toi sur la régularité.' } } },
   5: { replace: { Jeudi: {

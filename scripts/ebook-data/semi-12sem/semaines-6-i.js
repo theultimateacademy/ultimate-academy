@@ -1,4 +1,4 @@
-// Trame 6 séances/semaine — Ebook Semi-marathon, 12 semaines.
+// Trame 6 séances/semaine, Ebook Semi-marathon, 12 semaines.
 // Base = la trame 4 séances + 2 footings EF supplémentaires par semaine.
 // Semaine 12 (Semaine de course) déjà à 4 séances, ignorée ici.
 const base = require('./semaines-4-i.js')
@@ -30,17 +30,17 @@ const EXTRA_BY_PHASE = {
   },
   'Volume': {
     duree:'35 min', pcts:[[60,65]],
-    corps:'35 min très faciles à {{P}}. La semaine de volume est intense — ces footings restent légers pour ne pas accumuler de fatigue.',
+    corps:'35 min très faciles à {{P}}. La semaine de volume est intense, ces footings restent légers pour ne pas accumuler de fatigue.',
     note:'RPE 3/10 · Si tu sens la fatigue s\'installer, raccourcis à 20 minutes.',
   },
   'Intensification': {
     duree:'35 min', pcts:[[60,65]],
-    corps:'35 min très faciles à {{P}}. Semaine de charge maximale — ces footings absorbent la fatigue sans en ajouter.',
+    corps:'35 min très faciles à {{P}}. Semaine de charge maximale, ces footings absorbent la fatigue sans en ajouter.',
     note:'RPE 3/10 · Vraiment léger, sans exception.',
   },
   'Spécificité semi': {
     duree:'40 min', pcts:[[60,60]],
-    corps:'40 min à {{P}}. Semaine spécifique chargée — ces footings absorbent la charge et préservent la récupération.',
+    corps:'40 min à {{P}}. Semaine spécifique chargée, ces footings absorbent la charge et préservent la récupération.',
     note:'RPE 2-3/10 · Facile, sans exception.',
   },
   'Consolidation': {

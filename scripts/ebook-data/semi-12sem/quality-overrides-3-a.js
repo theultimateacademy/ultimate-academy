@@ -16,7 +16,7 @@ module.exports = {
     note:'RPE 8/10 · La régularité prime sur la vitesse, même à ce niveau.' } } },
   4: { replace: { Jeudi: {
     titre:'2 × 22 minutes au seuil', pcts:[[65,70],[87,87]],
-    echauff:'25 min de footing progressif EF.', duree:'70 min',
+    echauff:'25 min de footing progressif à {{P}}.', duree:'70 min',
     corps:'2 × 22 min à {{P}} avec 3 min de récupération entre chaque. Plus long que la version standard. La deuxième est intentionnellement plus dure.',
     note:'RPE 8-9/10 · 44 min au seuil au total, une charge sérieuse.' } } },
   5: { replace: { Jeudi: {

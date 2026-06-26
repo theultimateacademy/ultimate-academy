@@ -1,4 +1,4 @@
-// Surcharges des séances de qualité — palier Débutant (VMA 10 à 13.5).
+// Surcharges des séances de qualité, palier Débutant (VMA 10 à 13.5).
 // Réutilisé par semaines-4/5/6-d.js.
 module.exports = {
   1: { replace: { Jeudi: {
