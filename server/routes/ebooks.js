@@ -8,7 +8,9 @@ const router  = express.Router();
 const stripe  = new Stripe(process.env.STRIPE_SECRET_KEY);
 const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_KEY);
 
-const CLIENT_URL = process.env.CLIENT_URL || 'https://theultimateacademy.fr';
+const _rawClientUrl = process.env.CLIENT_URL || 'https://theultimateacademy.fr';
+const CLIENT_URL = _rawClientUrl.startsWith('http') ? _rawClientUrl.replace(/\/$/, '') : `https://${_rawClientUrl.replace(/\/$/, '')}`;
+if (!CLIENT_URL.startsWith('https://')) console.warn('[Ebooks] CLIENT_URL ne commence pas par https://', CLIENT_URL);
 
 // ─── Ebooks à variantes (VMA × séances/semaine) ───────────────────────────────
 // Tarif par nombre de séances/semaine, identique pour toutes les VMA.

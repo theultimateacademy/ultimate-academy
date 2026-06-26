@@ -145,8 +145,12 @@ const EBOOK_DETAILS = {
 }
 
 // ─── Illustrations SVG ───────────────────────────────────────────────────────
-function IllustrationRunning({ dist, weeksLabel, price }) {
-  const distFs = dist.length <= 2 ? 140 : dist.length <= 4 ? 108 : 78
+function IllustrationRunning({ dist, kmText, weeksLabel, price }) {
+  const isWord = /[A-Za-z]/.test(dist)
+  const distFs = isWord
+    ? (dist.length <= 4 ? 100 : dist.length <= 8 ? 72 : 54)
+    : (dist.length <= 2 ? 140 : dist.length <= 4 ? 108 : 78)
+  const km = kmText !== undefined ? kmText : 'KM'
   return (
     <svg viewBox="0 0 640 260" xmlns="http://www.w3.org/2000/svg"
       style={{ width: '100%', height: '100%', position: 'absolute', inset: 0 }}>
@@ -165,11 +169,11 @@ function IllustrationRunning({ dist, weeksLabel, price }) {
       <rect width="640" height="260" fill="url(#il-bg)" />
       <rect width="640" height="260" fill="url(#il-gl1)" />
 
-      <text x="320" y="162" fontFamily="Poppins,sans-serif" fontSize={distFs} fontWeight="900"
+      <text x="320" y={km ? "155" : "172"} fontFamily="Poppins,sans-serif" fontSize={distFs} fontWeight="900"
         fill="url(#il-g)" opacity="0.92" letterSpacing="-4" textAnchor="middle">{dist}</text>
-      <text x="320" y="207" fontFamily="Poppins,sans-serif" fontSize="44" fontWeight="900"
-        fill="url(#il-g)" opacity="0.80" letterSpacing="8" textAnchor="middle">KM</text>
-      <text x="320" y="232" fontFamily="Poppins,sans-serif" fontSize="11" fontWeight="700"
+      {km && <text x="320" y="200" fontFamily="Poppins,sans-serif" fontSize="38" fontWeight="900"
+        fill="url(#il-g)" opacity="0.80" letterSpacing="6" textAnchor="middle">{km}</text>}
+      <text x="320" y={km ? "228" : "218"} fontFamily="Poppins,sans-serif" fontSize="11" fontWeight="700"
         fill="rgba(255,255,255,.35)" letterSpacing="6" textAnchor="middle">{weeksLabel} SEMAINES</text>
       <rect x="284" y="241" width="72" height="1.5" rx="1" fill="url(#il-g)" opacity="0.35" />
 
@@ -498,10 +502,10 @@ export default function EbookDetail() {
 
   const priceStr = `À partir de ${((minCents || ebook.price_cents) / 100).toFixed(2).replace('.', ',')} €`
   const RUNNING_ILL_CFG = {
-    '10km-12sem':     { dist: '10',     weeksLabel: '12' },
-    'semi-12sem':     { dist: '21,1',   weeksLabel: '12' },
-    'marathon-12sem': { dist: '42,195', weeksLabel: '12' },
-    'marathon-16sem': { dist: '42,195', weeksLabel: '16' },
+    '10km-12sem':     { dist: '10',       weeksLabel: '12' },
+    'semi-12sem':     { dist: 'SEMI',     kmText: 'MARATHON', weeksLabel: '12' },
+    'marathon-12sem': { dist: 'MARATHON', kmText: '',         weeksLabel: '12' },
+    'marathon-16sem': { dist: 'MARATHON', kmText: '',         weeksLabel: '16' },
   }
   const slugIllustration = slug === '10km-8sem' ? <Illustration10km price={priceStr} />
     : RUNNING_ILL_CFG[slug] ? <IllustrationRunning {...RUNNING_ILL_CFG[slug]} price={priceStr} />
