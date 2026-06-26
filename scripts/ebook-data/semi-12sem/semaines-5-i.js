@@ -1,15 +1,19 @@
 // Trame 5 séances/semaine, Ebook Semi-marathon, 12 semaines.
 // Base = la trame 4 séances + 1 séance supplémentaire par semaine.
 //
-// Côtes chaque semaine 1-10 placées le Lundi :
-//  - Wk1-2,5-6,9-10 (qualité Jeudi) : Lun côtes | Mar EF-base | [Mer repos] | Jeu qualité
-//    → 2 jours entre les côtes et la qualité du jeudi (Mar EF + Mer repos)
-//  - Wk3-4,7-8 (qualités Mer + Ven) : Lun côtes | Mar EF-base | Mer qualité
-//    → Mardi EF assure la récupération entre côtes lundi et qualité mercredi
-//  - Progression des côtes : 6×60m (wk1) → 10×100m (wk7-8) → 6×80m (wk10)
+// Côtes semaines 2,3,5,6,7,9,10 placées le Lundi.
+// Wk1,4,8 : footing progressif (pas de côtes en début de plan, semaine double charge, pic).
+//  - Wk1-2,5-6,9-10 (qualité Jeudi) : Lun extra | Mar EF-base | [Mer repos] | Jeu qualité
+//  - Wk3-4,7-8 (qualités Mer + Ven) : Lun extra | Mar EF-base | Mer qualité
+//  - Progression côtes : 8×60m (wk2) → 10×80m (wk5-6) → 10×100m (wk7) → 6×80m (wk10)
 //  - Semaine 11 (affûtage) : aucun extra — base (3 séances) suffit
 //  - Semaine 12 : ignorée (déjà 4 séances dans la base)
 const base = require('./semaines-4-i.js')
+
+const ef = (jour, duree, corps, note, pcts = [[60, 65]]) => ({
+  jour, type: 'EF', titre: 'Footing EF',
+  duree, pcts, echauff: '', corps, retour: '', note,
+})
 
 const cotes = (wk, reps, dist, duree, echauffMin, bodyText, noteText) => ({
   jour: 'Lundi', type: 'Côtes', titre: 'Séance côtes',
@@ -21,10 +25,10 @@ const cotes = (wk, reps, dist, duree, echauffMin, bodyText, noteText) => ({
 })
 
 const EXTRA_BY_WEEK = {
-  // Wk1 – 6 × 60m – adaptation
-  1: cotes(1, 6, 60, '45 min', 15,
-    '6 × 60m en côte à effort intense. Redescends au trot entre chaque montée. Première séance côtes du plan : travail de puissance et gainage naturel. Allure EF à {{P}} à l\'échauffement.',
-    'RPE 8-9/10 sur les montées · Côte 5-8% · Mardi EF + Mercredi repos avant la qualité du jeudi.'),
+  // Wk1 – footing progressif (pas de côtes en première semaine d'adaptation)
+  1: ef('Vendredi', '40 min',
+    '40 min à {{P}}. Volume supplémentaire en récupération après les 6 × 800m du jeudi. Allure très facile, jambes décontractées.',
+    'RPE 3/10 · Finis frais, allure de conversation.'),
 
   // Wk2 – 8 × 60m
   2: cotes(2, 8, 60, '50 min', 15,
@@ -36,10 +40,10 @@ const EXTRA_BY_WEEK = {
     '8 × 80m en côte à effort maximal. Montées plus longues. Redescends au trot. Travail de puissance, stabilité et gainage. Allure EF à {{P}} à l\'échauffement.',
     'RPE 9/10 · Côte 5-8% · Mardi EF assure la récupération avant le tempo de mercredi.'),
 
-  // Wk4 – 10 × 80m – volume côtes à son pic intermédiaire
-  4: cotes(4, 10, 80, '55 min', 20,
-    '10 × 80m en côte à effort maximal. Dix répétitions pour développer la puissance musculaire. Redescends au trot. Allure EF à {{P}} à l\'échauffement.',
-    'RPE 9/10 · Côte 5-8% · Mardi EF puis mercredi qualité : récupération active garantie.'),
+  // Wk4 – footing progressif (semaine double qualité Mer + Ven, pas de côtes supplémentaires)
+  4: ef('Samedi', '45 min',
+    '45 min à {{P}}. Récupération avant la sortie longue du dimanche. Footing progressif, volume maintenu sans empiéter sur la qualité de la semaine.',
+    'RPE 3-4/10 · Foulée légère, respiration nasale si possible.'),
 
   // Wk5 – 10 × 80m – première semaine de volume
   5: cotes(5, 10, 80, '50 min', 20,
@@ -56,10 +60,10 @@ const EXTRA_BY_WEEK = {
     '10 × 100m en côte à effort maximal. Semaine d\'intensification : 10 répétitions longues. Redescends au trot. Gainage, puissance, explosivité. Allure EF à {{P}} à l\'échauffement.',
     'RPE 9/10 · Côte 5-8% · Mardi EF assure la récupération avant le tempo de mercredi.'),
 
-  // Wk8 – 10 × 100m – pic de charge
-  8: cotes(8, 10, 100, '60 min', 20,
-    '10 × 100m en côte à effort maximal. Semaine de charge maximale. Redescends au trot. Dernière semaine de côtes à plein volume avant la spécificité. Allure EF à {{P}} à l\'échauffement.',
-    'RPE 9/10 · Côte 5-8% · Mardi EF puis mercredi qualité : soigne la récupération active.'),
+  // Wk8 – footing progressif (pic de charge Mer + Ven : pas de côtes supplémentaires)
+  8: ef('Samedi', '45 min',
+    '45 min à {{P}}. Activation légère avant la sortie longue de 110 min de demain. Footing progressif, jambes disponibles pour le dimanche.',
+    'RPE 3/10 · Si tu te sens fatigué, réduis à 30 minutes.'),
 
   // Wk9 – 8 × 80m – réduction, phase spécificité
   9: cotes(9, 8, 80, '50 min', 20,
