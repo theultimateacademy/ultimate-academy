@@ -151,6 +151,15 @@ function IllustrationRunning({ dist, kmText, weeksLabel, price }) {
     ? (dist.length <= 4 ? 100 : dist.length <= 8 ? 72 : 54)
     : (dist.length <= 2 ? 140 : dist.length <= 4 ? 108 : 78)
   const km = kmText !== undefined ? kmText : 'KM'
+
+  // Positions Y calculées pour centrer le bloc texte dans le viewBox 640×260 (centre = 130).
+  // Mots (SEMI/MARATHON) : blocs plus petits → positions recalculées.
+  // Chiffres (10) : positions originales conservées.
+  const distY   = isWord ? (km ? 129 : 143) : 162
+  const kmY     = isWord ? 187 : 207
+  const semsY   = isWord ? (km ? 209 : 172) : 232
+  const lineY   = isWord ? (km ? 216 : 180) : 241
+
   return (
     <svg viewBox="0 0 640 260" xmlns="http://www.w3.org/2000/svg"
       style={{ width: '100%', height: '100%', position: 'absolute', inset: 0 }}>
@@ -169,13 +178,13 @@ function IllustrationRunning({ dist, kmText, weeksLabel, price }) {
       <rect width="640" height="260" fill="url(#il-bg)" />
       <rect width="640" height="260" fill="url(#il-gl1)" />
 
-      <text x="320" y={km ? "155" : "172"} fontFamily="Poppins,sans-serif" fontSize={distFs} fontWeight="900"
-        fill="url(#il-g)" opacity="0.92" letterSpacing="-4" textAnchor="middle">{dist}</text>
-      {km && <text x="320" y="200" fontFamily="Poppins,sans-serif" fontSize="38" fontWeight="900"
-        fill="url(#il-g)" opacity="0.80" letterSpacing="6" textAnchor="middle">{km}</text>}
-      <text x="320" y={km ? "228" : "218"} fontFamily="Poppins,sans-serif" fontSize="11" fontWeight="700"
+      <text x="320" y={distY} fontFamily="Poppins,sans-serif" fontSize={distFs} fontWeight="900"
+        fill="url(#il-g)" opacity="0.92" letterSpacing="-2" textAnchor="middle">{dist}</text>
+      {km && <text x="320" y={kmY} fontFamily="Poppins,sans-serif" fontSize={km === 'KM' ? 44 : 36} fontWeight="900"
+        fill="url(#il-g)" opacity="0.80" letterSpacing={km === 'KM' ? '8' : '4'} textAnchor="middle">{km}</text>}
+      <text x="320" y={semsY} fontFamily="Poppins,sans-serif" fontSize="11" fontWeight="700"
         fill="rgba(255,255,255,.35)" letterSpacing="6" textAnchor="middle">{weeksLabel} SEMAINES</text>
-      <rect x="284" y="241" width="72" height="1.5" rx="1" fill="url(#il-g)" opacity="0.35" />
+      <rect x="284" y={lineY} width="72" height="1.5" rx="1" fill="url(#il-g)" opacity="0.35" />
 
       {price && (
         <>
