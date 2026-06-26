@@ -176,7 +176,7 @@ function CardIllustrationAntiBlessure() {
 
 function EbookCard({ ebook }) {
   const meta = EBOOK_META[ebook.slug] || {}
-  const priceLabel = 'À partir de 14,99 €'
+  const priceLabel = ebook.slug === '10km-12sem' ? 'À partir de 17,99 €' : 'À partir de 14,99 €'
 
   return (
     <Link to={`/ebooks/${ebook.slug}`} style={{ textDecoration: 'none', color: '#fff', display: 'flex', flexDirection: 'column' }}>
