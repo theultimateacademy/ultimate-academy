@@ -177,7 +177,7 @@ body {
 .cover-logo { width: 124px; opacity: .95; margin-bottom: 20px; }
 .cover-sep { width: 60px; height: 2px; background: linear-gradient(90deg,#8B2FC9,#E8237A); border-radius: 1px; margin: 20px auto; }
 .cover-eyebrow { font-size: 8pt; font-weight: 700; letter-spacing: .22em; text-transform: uppercase; color: rgba(255,255,255,.38); margin-bottom: 8px; }
-.cover-title { font-size: 60pt; font-weight: 800; line-height: .9; letter-spacing: -.03em; background: linear-gradient(135deg,#8B2FC9,#E8237A); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+.cover-title { font-size: 60pt; font-weight: 800; line-height: .9; letter-spacing: -.03em; }
 .cover-subtitle { font-size: 15pt; font-weight: 600; color: rgba(255,255,255,.75); letter-spacing: .05em; margin-top: 10px; }
 .cover-academy { font-size: 8pt; font-weight: 700; letter-spacing: .16em; text-transform: uppercase; color: rgba(255,255,255,.28); margin-top: 34px; }
 .som-track { flex-shrink: 0; }
@@ -186,7 +186,7 @@ body {
 .som-item { display: flex; align-items: baseline; width: 100%; }
 .som-label { font-size: 10pt; font-weight: 500; color: rgba(255,255,255,.88); flex-shrink: 0; white-space: nowrap; }
 .som-dots { flex: 1; border-bottom: 1px dotted rgba(255,255,255,.15); margin: 0 10px; align-self: flex-end; margin-bottom: 3px; }
-.som-page { font-size: 10pt; font-weight: 800; flex-shrink: 0; color: #C084FC; width: 42px; }
+.som-page { font-size: 10pt; font-weight: 800; flex-shrink: 0; color: #C084FC; min-width: 58px; white-space: nowrap; text-align: right; }
 .zones-wrap { flex: 1; display: flex; flex-direction: column; gap: 5px; min-height: 0; }
 .zone-card { flex: 1; display: flex; align-items: center; padding: 0 14px; border-radius: 10px; gap: 16px; }
 .zone-pct { font-size: 20pt; font-weight: 800; flex-shrink: 0; width: 62px; line-height: 1; }
@@ -428,7 +428,7 @@ function renderHtml({ vma, seances }) {
     ${logoB64 ? `<img src="${logoB64}" class="cover-logo"/>` : ''}
     <div class="cover-sep"></div>
     <div class="cover-eyebrow">Plan d'entraînement personnalisé</div>
-    <div class="cover-title">SEMI</div>
+    <div class="cover-title"><span style="display:inline-block;background:linear-gradient(135deg,#8B2FC9,#E8237A);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">SEMI</span></div>
     <div class="cover-subtitle">12 semaines · ${seances} séances/semaine · VMA ${vma} km/h</div>
     <div class="cover-academy">The Ultimate Academy</div>
   </div>

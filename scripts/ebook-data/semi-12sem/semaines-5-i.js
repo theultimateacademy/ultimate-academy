@@ -1,74 +1,93 @@
 // Trame 5 séances/semaine, Ebook Semi-marathon, 12 semaines.
 // Base = la trame 4 séances + 1 séance supplémentaire par semaine.
-// Variété : EF en adaptation, côtes en volume, VMA en intensification.
-// Semaine 11 (affûtage) : aucun extra, le volume de la base suffit.
-// Semaine 12 (Semaine de course) : déjà à 4 séances, ignorée ici.
+//
+// Logique de placement :
+//  - Base wk1-2,5-6,9-10 : qualité le JEUDI → extra placé VENDREDI (après qualité)
+//    ou LUNDI (avant, avec MARDI EF de la base en tampon puis REPOS le MER avant qualité)
+//  - Base wk3-4,7-8 : qualité MER + VEN → extra placé SAMEDI (après VEN qualité, avant DIM SL)
+//  - Semaine 11 (affûtage) : aucun extra — base (3 séances) suffit
+//  - Semaine 12 : déjà 4 séances, ignorée
+//
+// Variété : côtes en semaine 5 (Lundi), VMA en semaine 9 (Lundi).
+// Footings min 40 min. La côte et la VMA sont bien séparées des séances qualité de la base.
 const base = require('./semaines-4-i.js')
 
-// Config par semaine : null = pas d'extra (affûtage ou semaine de course)
+const EF = (jour, duree, corps, note, pcts = [[60,65]]) => ({
+  jour, type:'EF', titre:'Footing EF',
+  duree, pcts, echauff:'', corps, retour:'', note,
+})
+
 const EXTRA_BY_WEEK = {
-  1: { jour:'Vendredi', type:'EF', titre:'Footing EF',
-    duree:'35 min', pcts:[[60,65]],
-    echauff:'', retour:'',
-    corps:'35 min très faciles à {{P}}. Semaine d\'adaptation, cette sortie en douceur construit ta base aérobie sans stress.',
-    note:'RPE 3/10 · Cours au ressenti, sans montre.' },
+  // Wk1 : base Mar EF | Jeu frac | Sam EF 35 | Dim SL
+  // Extra Vendredi : Jeu qualité → Ven EF → Sam EF → Dim SL
+  1: EF('Vendredi','40 min',
+    '40 min à {{P}}. Récupération active après les 6 × 800m du jeudi. Jambes en mouvement, allure très facile.',
+    'RPE 3/10 · Tu dois finir frais, sans aucune fatigue.',[[60,65]]),
 
-  2: { jour:'Vendredi', type:'EF', titre:'Footing EF',
-    duree:'35 min', pcts:[[60,65]],
-    echauff:'', retour:'',
-    corps:'35 min faciles à {{P}}. Le volume augmente doucement. Régularité et décontraction.',
-    note:'RPE 3/10 · Allure de conversation obligatoire.' },
+  // Wk2 : même structure
+  2: EF('Vendredi','40 min',
+    '40 min à {{P}}. Volume supplémentaire en récupération. Cette sortie prépare ta base aérobie avant les séances de seuil.',
+    'RPE 3/10 · Allure de conversation.',[[60,65]]),
 
-  3: { jour:'Samedi', type:'EF', titre:'Footing EF',
-    duree:'40 min', pcts:[[65,70]],
-    echauff:'', retour:'',
-    corps:'40 min à {{P}}. Volume de base qui prépare le corps aux séances de qualité. Régulier et détendu.',
-    note:'RPE 4/10 · Reste sur une sensation facile.' },
+  // Wk3 : base Mar EF | Mer tempo | Ven frac | Dim SL
+  // Extra Samedi : Ven qualité → Sam EF → Dim SL (2 séances faciles après la qualité)
+  3: EF('Samedi','45 min',
+    '45 min à {{P}}. Récupération active entre la séance de vendredi et la sortie longue du dimanche. Volume progressif.',
+    'RPE 3/10 · Cours détendu, allure confortable.',[[60,65]]),
 
-  4: { jour:'Samedi', type:'EF', titre:'Footing EF',
-    duree:'40 min', pcts:[[65,70]],
-    echauff:'', retour:'',
-    corps:'40 min à {{P}}. Le volume augmente progressivement. Cette sortie prépare la sortie longue du dimanche.',
-    note:'RPE 4/10 · Foulée légère, sans forcer.' },
+  // Wk4 : même structure que wk3
+  4: EF('Samedi','45 min',
+    '45 min à {{P}}. Récupération avant la sortie longue du dimanche. Cette sortie ancre la progression du volume hebdomadaire.',
+    'RPE 4/10 · Foulée légère, respiration nasale si possible.',[[65,70]]),
 
-  5: { jour:'Vendredi', type:'Côtes', titre:'Séance côtes',
+  // Wk5 : base Mar EF | Jeu tempo | Sam EF | Dim SL 90
+  // Extra Lundi : Côtes — isolation parfaite : Lun côtes | Mar EF (tampon) | Mer REPOS | Jeu tempo
+  5: {
+    jour:'Lundi', type:'Côtes', titre:'Séance côtes',
     duree:'50 min', pcts:[[60,65]],
-    echauff:'20 min de footing EF progressif à {{P}}.', retour:'10 min de jogging léger.',
-    corps:'8 × 80m en côte à effort maximal. Redescends au trot entre chaque montée. Travail de puissance, foulée et gainage naturel.',
-    note:'RPE 9/10 sur les montées · Trouve une côte à 5-8% de pente · Les côtes protègent contre les blessures.' },
+    echauff:'20 min de footing EF progressif à {{P}}.',
+    corps:'8 × 80m en côte à effort maximal. Redescends au trot entre chaque. Travail de puissance, foulée et gainage. Première séance côtes du plan.',
+    retour:'10 min de jogging léger.',
+    note:'RPE 9/10 sur les montées · Côte à 5-8% de pente · 2 jours de récup avant le tempo de jeudi.',
+  },
 
-  6: { jour:'Jeudi', type:'EF', titre:'Footing EF',
-    duree:'35 min', pcts:[[60,65]],
-    echauff:'', retour:'',
-    corps:'35 min très faciles à {{P}}. Récupération active après la semaine de volume maximale. Léger, sans aucun effort.',
-    note:'RPE 3/10 · Si tu sens de la fatigue résiduelle, raccourcis à 20 minutes.' },
+  // Wk6 : base Mar EF | Jeu tempo | Sam EF | Dim SL 100
+  // Extra Vendredi : Jeu qualité → Ven EF → Sam EF → Dim SL (récupération)
+  6: EF('Vendredi','40 min',
+    '40 min très faciles à {{P}}. Récupération après le tempo du jeudi, préparation à la grande sortie longue de dimanche.',
+    'RPE 3/10 · Vraiment léger, jambes décontractées.',[[60,65]]),
 
-  7: { jour:'Samedi', type:'VMA', titre:'Fractionnés VMA 400m',
+  // Wk7 : base Mar EF | Mer tempo | Ven frac | Dim SL 105
+  // Extra Samedi : Ven qualité → Sam EF → Dim SL (récupération avant le gros SL)
+  7: EF('Samedi','45 min',
+    '45 min à {{P}}. Récupération active entre les fractionnés de vendredi et la sortie longue de dimanche. Volume maintenu sans fatigue.',
+    'RPE 3/10 · Facile, sans exception. Le dimanche est ta séance la plus importante.',[[60,65]]),
+
+  // Wk8 : base Mar EF | Mer tempo | Ven frac | Dim SL 110
+  // Extra Samedi : même logique, avant le plus gros SL du plan
+  8: EF('Samedi','45 min',
+    '45 min à {{P}}. Activation légère avant la sortie longue de 110 min de demain. Volume minimal, jambes disponibles.',
+    'RPE 3/10 · Si tu te sens fatigué, réduis à 30 minutes.',[[60,65]]),
+
+  // Wk9 : base Mar EF | Jeu spécif 3×5km | Sam EF | Dim SL
+  // Extra Lundi : VMA — isolation parfaite : Lun VMA | Mar EF (tampon) | Mer REPOS | Jeu spécif
+  9: {
+    jour:'Lundi', type:'VMA', titre:'Fractionnés VMA 400m',
     duree:'55 min', pcts:[[60,65],[95,95]],
-    echauff:'20 min de footing EF progressif à {{P}}.', retour:'10 min de jogging léger.',
-    corps:'8 × 400m à {{P}}. Récupération 90 sec au trot entre chaque. Effort intense et contrôlé. Maintiens la même allure du premier au dernier 400m.',
-    note:'RPE 9/10 · La VMA développe ton moteur aérobie et te rend plus rapide sur toutes les distances.' },
+    echauff:'20 min de footing EF progressif à {{P}}.',
+    corps:'8 × 400m à {{P}}. Récupération 90 sec au trot. Effort intense et contrôlé. Maintiens la même allure du 1er au 8e. Mardi EF et mercredi repos assurent la récupération avant le spécifique du jeudi.',
+    retour:'10 min de jogging léger.',
+    note:'RPE 9/10 · La VMA développe ton moteur et te rend plus rapide sur toutes les distances.',
+  },
 
-  8: { jour:'Lundi', type:'Côtes', titre:'Séance côtes',
-    duree:'50 min', pcts:[[60,65]],
-    echauff:'20 min de footing EF progressif à {{P}}.', retour:'10 min de jogging léger.',
-    corps:'10 × 80m en côte à effort maximal. Redescends au trot. Tu prépares tes jambes à la phase de spécificité, deux répétitions de plus que la semaine 5.',
-    note:'RPE 9/10 sur les montées · Posture droite, poussée des bras, foulée courte et dynamique.' },
+  // Wk10 : base Mar EF | Jeu spécif 4×5km | Sam EF | Dim SL
+  // Extra Vendredi : Jeu qualité → Ven EF → Sam EF → Dim SL (deux EF de récupération)
+  10: EF('Vendredi','40 min',
+    '40 min très faciles à {{P}}. Récupération après les 4 × 5 km du jeudi. Deux EF légers (vendredi + samedi) avant la grande sortie longue de dimanche.',
+    'RPE 3/10 · Allure de récupération, aucun effort.',[[60,60]]),
 
-  9: { jour:'Lundi', type:'EF', titre:'Footing EF',
-    duree:'35 min', pcts:[[60,65]],
-    echauff:'', retour:'',
-    corps:'35 min faciles à {{P}}. Récupération active, les séances de spécificité sont les priorités de la semaine. Garde les jambes fraîches pour le jeudi.',
-    note:'RPE 3/10 · Volume minimal, séances spécifiques prioritaires.' },
-
-  10: { jour:'Lundi', type:'EF', titre:'Footing EF',
-    duree:'35 min', pcts:[[60,65]],
-    echauff:'', retour:'',
-    corps:'35 min faciles à {{P}}. Ta dernière semaine chargée. Ce footing prépare les 4 × 5 km du jeudi sans t\'entamer.',
-    note:'RPE 3/10 · Facile, sans exception.' },
-
-  // Semaine 11 : affûtage, aucun extra. La base (3 séances) suffit.
-  // Semaine 12 : ignorée (déjà 4 séances dans la base).
+  // Wk11 (affûtage) : aucun extra — la base a déjà 3 séances avec 2 footings.
+  // Wk12 : ignorée (déjà 4 séances dans la base).
 }
 
 module.exports = base.map(week => {
@@ -76,12 +95,6 @@ module.exports = base.map(week => {
   if (!extra) return week
   return {
     ...week,
-    seances: [
-      ...week.seances,
-      { jour:extra.jour, type:extra.type, titre:extra.titre,
-        duree:extra.duree, pcts:extra.pcts,
-        echauff:extra.echauff, corps:extra.corps, retour:extra.retour,
-        note:extra.note },
-    ],
+    seances: [...week.seances, extra],
   }
 })
