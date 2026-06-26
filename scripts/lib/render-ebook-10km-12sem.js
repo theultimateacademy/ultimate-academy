@@ -203,7 +203,7 @@ body {
   padding-bottom: 4px; border-bottom: 1px solid rgba(192,132,252,.25);
 }
 .som-item { display: flex; align-items: baseline; width: 100%; }
-.som-label { font-size: 10.5pt; font-weight: 500; color: rgba(255,255,255,.88); flex-shrink: 0; }
+.som-label { font-size: 10pt; font-weight: 500; color: rgba(255,255,255,.88); flex-shrink: 0; white-space: nowrap; }
 .som-dots { flex: 1; border-bottom: 1px dotted rgba(255,255,255,.15); margin: 0 10px; align-self: flex-end; margin-bottom: 3px; }
 .som-page { font-size: 10pt; font-weight: 800; flex-shrink: 0; color: #C084FC; width: 42px; }
 

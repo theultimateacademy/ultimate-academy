@@ -184,7 +184,7 @@ body {
 .som-flat { flex: 1; display: flex; flex-direction: column; justify-content: space-evenly; min-height: 0; }
 .som-glbl { font-size: 13pt; font-weight: 800; color: #C084FC; padding-bottom: 4px; border-bottom: 1px solid rgba(192,132,252,.25); }
 .som-item { display: flex; align-items: baseline; width: 100%; }
-.som-label { font-size: 10.5pt; font-weight: 500; color: rgba(255,255,255,.88); flex-shrink: 0; }
+.som-label { font-size: 10pt; font-weight: 500; color: rgba(255,255,255,.88); flex-shrink: 0; white-space: nowrap; }
 .som-dots { flex: 1; border-bottom: 1px dotted rgba(255,255,255,.15); margin: 0 10px; align-self: flex-end; margin-bottom: 3px; }
 .som-page { font-size: 10pt; font-weight: 800; flex-shrink: 0; color: #C084FC; width: 42px; }
 .zones-wrap { flex: 1; display: flex; flex-direction: column; gap: 5px; min-height: 0; }
@@ -383,7 +383,7 @@ const ZONE_DEFS = [
   { pct:65,             name:'Endurance Fondamentale', desc:'Allure conversation · footing EF · 80% du volume total', c:'#06B6D4', rgb:'6,182,212' },
   { pct:75,             name:'Endurance Active',        desc:'Confortable mais soutenu · phrases courtes', c:'#10B981', rgb:'16,185,129' },
   { pct:85,             name:'Seuil Anaérobie',         desc:'Difficile mais tenable 20-40 min · Tempo', c:'#F59E0B', rgb:'245,158,11' },
-  { pct:SEMI_OBJ_PCT,   name:'Allure objectif 21km',    desc:'Ta cible le jour de la course · à mémoriser', c:'#FBBF24', rgb:'251,191,36', obj:true },
+  { pct:SEMI_OBJ_PCT,   name:'Allure objectif semi-marathon',    desc:'Ta cible le jour de la course · à mémoriser', c:'#FBBF24', rgb:'251,191,36', obj:true },
   { pct:95,             name:'VMA 95%',                 desc:'Très difficile · répétitions courtes · fractionnés', c:'#F97316', rgb:'249,115,22' },
   { pct:100,            name:'VMA Max',                 desc:'Effort maximal · côtes et 300 mètres', c:'#EF4444', rgb:'239,68,68' },
 ]
@@ -421,14 +421,14 @@ function renderHtml({ vma, seances }) {
 <!-- P.1 COUVERTURE -->
 <div class="cover-page">
   <div class="cover-wm" style="font-size:180pt">SEMI</div>
-  <div class="cover-deco-tr">${SVG_COVER_CIRCLES}</div>
+
   <div class="cover-deco-bl">${SVG_COVER_LINES}</div>
   <div class="cover-deco-br">${SVG_COVER_DOTS}</div>
   <div class="cover-inner">
     ${logoB64 ? `<img src="${logoB64}" class="cover-logo"/>` : ''}
     <div class="cover-sep"></div>
     <div class="cover-eyebrow">Plan d'entraînement personnalisé</div>
-    <div class="cover-title" style="line-height:.8">SEMI<br/><span style="font-size:.52em;letter-spacing:.03em">MARATHON</span></div>
+    <div class="cover-title">SEMI</div>
     <div class="cover-subtitle">12 semaines · ${seances} séances/semaine · VMA ${vma} km/h</div>
     <div class="cover-academy">The Ultimate Academy</div>
   </div>
@@ -474,7 +474,7 @@ function renderHtml({ vma, seances }) {
   </p>
   ${SVG_HEARTBEAT}
   <div style="flex-shrink:0;text-align:center;font-size:7.5pt;font-weight:700;color:#FBBF24;text-transform:uppercase;letter-spacing:.09em">
-    Ton allure objectif course (21km) : ${objPace}/km
+    Ton allure objectif semi-marathon : ${objPace}/km
   </div>
   <div class="zones-wrap">
     ${ZONES.map(z=>`
