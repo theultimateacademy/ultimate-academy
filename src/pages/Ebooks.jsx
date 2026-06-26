@@ -135,7 +135,7 @@ function CardIllustrationRunning({ gid, dist, kmText, weeksLabel }) {
         fill={`url(#${gid}-g)`} opacity="0.92" letterSpacing="-1" textAnchor="middle">{dist}</text>
       {km && <text x="160" y="112" fontFamily="Poppins,sans-serif" fontSize={km === 'KM' ? '21' : '16'} fontWeight="900"
         fill={`url(#${gid}-g)`} opacity="0.80" letterSpacing={km === 'KM' ? '5' : '3'} textAnchor="middle">{km}</text>}
-      <text x="160" y={semsY} fontFamily="Poppins,sans-serif" fontSize="7" fontWeight="700"
+      <text x="160" dx="2" y={semsY} fontFamily="Poppins,sans-serif" fontSize="7" fontWeight="700"
         fill="rgba(255,255,255,.35)" letterSpacing="4" textAnchor="middle">{weeksLabel} SEMAINES</text>
       <rect x="124" y={lineY} width="72" height="1" rx="1" fill={`url(#${gid}-g)`} opacity="0.35"/>
       <circle cx="28" cy="22" r="1" fill="white" opacity="0.14"/>
