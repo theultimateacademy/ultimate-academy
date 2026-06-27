@@ -17,7 +17,8 @@ const EBOOK_META = {
   '10km-12sem':     { icon: '🏃', weeks: 12, distance: '10 km',
     desc: 'Le plan le plus complet pour franchir un cap sur 10 km. VMA, seuil lactique et stratégie de course : 12 semaines pour te dépasser.',
     tags: ['Allures sur mesure', 'VMA + seuil + stratégie'] },
-  'semi-12sem':     { icon: '🏅', weeks: 12, distance: 'Semi-marathon',
+  'semi-12sem':     { icon: '🏅', weeks: 12, distance: 'Semi-Marathon',
+    title: 'Plan Semi-Marathon — 12 semaines',
     desc: 'Prépare ton Semi-Marathon avec des séances sur mesure selon ta VMA. Long runs progressifs jusqu\'à 22 km et allure objectif personnalisée.',
     tags: ['Long runs jusqu\'à 22 km', 'Allure objectif sur mesure'] },
   'marathon-12sem': { icon: '🏆', weeks: 12, distance: 'Marathon',
@@ -248,7 +249,7 @@ function EbookCard({ ebook }) {
 
         {/* Contenu */}
         <div style={{ padding: '1.25rem', flex: 1, display: 'flex', flexDirection: 'column' }}>
-          <h3 style={{ margin: '0 0 .5rem', fontSize: '1rem', fontWeight: 800, lineHeight: 1.3 }}>{ebook.title}</h3>
+          <h3 style={{ margin: '0 0 .5rem', fontSize: '1rem', fontWeight: 800, lineHeight: 1.3 }}>{meta.title || ebook.title}</h3>
           <p style={{ margin: '0 0 1rem', fontSize: '.83rem', color: 'rgba(255,255,255,.55)', lineHeight: 1.6, flex: 1, textAlign: 'justify' }}>
             {meta.desc || ebook.description}
           </p>
