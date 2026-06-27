@@ -125,9 +125,9 @@ function CardIllustrationRunning({ gid, dist, kmText, kmInline, weeksLabel }) {
     : (dist.length <= 2 ? 68 : dist.length <= 4 ? 56 : 48)
   const km = !kmInline && (kmText !== undefined ? kmText : 'KM')
   const hasBelow = Boolean(km)
-  const distY  = hasBelow ? '84' : '94'
-  const semsY  = hasBelow ? '132' : '121'
-  const lineY  = hasBelow ? '138' : '128'
+  const distY  = hasBelow ? '84' : distFs <= 30 ? '73' : '94'
+  const semsY  = hasBelow ? '132' : distFs <= 30 ? '100' : '121'
+  const lineY  = hasBelow ? '138' : distFs <= 30 ? '107' : '128'
   return (
     <svg viewBox="0 0 320 160" xmlns="http://www.w3.org/2000/svg"
       style={{ width: '100%', height: '100%', position: 'absolute', inset: 0 }}>
@@ -228,7 +228,7 @@ function EbookCard({ ebook }) {
           {(() => {
             if (ebook.slug === '10km-8sem')      return <CardIllustrationRunning gid="c8"   dist="10" kmInline weeksLabel="8"  />
             if (ebook.slug === '10km-12sem')     return <CardIllustrationRunning gid="c10"  dist="10" kmInline weeksLabel="12" />
-            if (ebook.slug === 'semi-12sem')     return <CardIllustrationRunning gid="cs"   dist="Semi-Marathon" kmText="" weeksLabel="12" />
+            if (ebook.slug === 'semi-12sem')     return <CardIllustrationRunning gid="cs"   dist="SEMI-MARATHON" kmText="" weeksLabel="12" />
             if (ebook.slug === 'marathon-12sem') return <CardIllustrationRunning gid="cm12" dist="MARATHON" kmText=""         weeksLabel="12" />
             if (ebook.slug === 'marathon-16sem') return <CardIllustrationRunning gid="cm16" dist="MARATHON" kmText=""         weeksLabel="16" />
             if (ebook.slug === 'anti-blessure')  return <CardIllustrationAntiBlessure />
