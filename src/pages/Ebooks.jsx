@@ -18,7 +18,7 @@ const EBOOK_META = {
     desc: 'Le plan le plus complet pour franchir un cap sur 10 km. VMA, seuil lactique et stratégie de course : 12 semaines pour te dépasser.',
     tags: ['Allures sur mesure', 'VMA + seuil + stratégie'] },
   'semi-12sem':     { icon: '🏅', weeks: 12, distance: 'Semi-marathon',
-    desc: 'Prépare ton semi-marathon avec des séances sur mesure selon ta VMA. Long runs progressifs jusqu\'à 22 km et allure objectif personnalisée.',
+    desc: 'Prépare ton Semi-Marathon avec des séances sur mesure selon ta VMA. Long runs progressifs jusqu\'à 22 km et allure objectif personnalisée.',
     tags: ['Long runs jusqu\'à 22 km', 'Allure objectif sur mesure'] },
   'marathon-12sem': { icon: '🏆', weeks: 12, distance: 'Marathon',
     desc: '12 semaines pour préparer le marathon sérieusement. Long runs jusqu\'à 30 km, allure objectif personnalisée et stratégie de ravitaillement.',
@@ -124,9 +124,9 @@ function CardIllustrationRunning({ gid, dist, kmText, kmInline, weeksLabel }) {
     : (dist.length <= 2 ? 68 : dist.length <= 4 ? 56 : 48)
   const km = !kmInline && (kmText !== undefined ? kmText : 'KM')
   const hasBelow = Boolean(km)
-  const distY  = hasBelow ? '84' : '95'
-  const semsY  = hasBelow ? '130' : '118'
-  const lineY  = hasBelow ? '136' : '124'
+  const distY  = hasBelow ? '84' : '94'
+  const semsY  = hasBelow ? '132' : '121'
+  const lineY  = hasBelow ? '138' : '128'
   return (
     <svg viewBox="0 0 320 160" xmlns="http://www.w3.org/2000/svg"
       style={{ width: '100%', height: '100%', position: 'absolute', inset: 0 }}>
@@ -164,9 +164,9 @@ function CardIllustrationRunning({ gid, dist, kmText, kmInline, weeksLabel }) {
           fill={`url(#${gid}-g)`} opacity="0.80" letterSpacing={km === 'KM' ? '5' : '3'} textAnchor="middle">{km}</text>
       )}
 
-      <text x="160" dx="2" y={kmInline ? '118' : semsY} fontFamily="Poppins,sans-serif" fontSize="7" fontWeight="700"
+      <text x="160" dx="2" y={kmInline ? '121' : semsY} fontFamily="Poppins,sans-serif" fontSize="9.5" fontWeight="700"
         fill="rgba(255,255,255,.35)" letterSpacing="4" textAnchor="middle">{weeksLabel} SEMAINES</text>
-      <rect x="124" y={kmInline ? '124' : lineY} width="72" height="1" rx="1" fill={`url(#${gid}-g)`} opacity="0.35"/>
+      <rect x="118" y={kmInline ? '128' : lineY} width="84" height="1" rx="1" fill={`url(#${gid}-g)`} opacity="0.35"/>
       <circle cx="28" cy="22" r="1" fill="white" opacity="0.14"/>
       <circle cx="292" cy="18" r="1.4" fill="#C084FC" opacity="0.22"/>
       <circle cx="44" cy="138" r="1" fill="white" opacity="0.13"/>
