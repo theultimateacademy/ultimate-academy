@@ -145,20 +145,17 @@ const EBOOK_DETAILS = {
 }
 
 // ─── Illustrations SVG ───────────────────────────────────────────────────────
-function IllustrationRunning({ dist, kmText, weeksLabel, price }) {
+function IllustrationRunning({ dist, kmText, kmInline, weeksLabel, price }) {
   const isWord = /[A-Za-z]/.test(dist)
   const distFs = isWord
     ? (dist.length <= 4 ? 100 : dist.length <= 8 ? 72 : 54)
     : (dist.length <= 2 ? 140 : dist.length <= 4 ? 108 : 78)
-  const km = kmText !== undefined ? kmText : 'KM'
+  const km = !kmInline && (kmText !== undefined ? kmText : 'KM')
 
-  // Positions Y calculées pour centrer le bloc texte dans le viewBox 640×260 (centre = 130).
-  // Mots (SEMI/MARATHON) : blocs plus petits → positions recalculées.
-  // Chiffres (10) : positions originales conservées.
-  const distY   = isWord ? (km ? 129 : 143) : 162
-  const kmY     = isWord ? 187 : 207
-  const semsY   = isWord ? (km ? 209 : 172) : 232
-  const lineY   = isWord ? (km ? 216 : 180) : 241
+  const distY  = isWord ? (km ? 129 : 143) : 162
+  const kmY    = isWord ? 187 : 207
+  const semsY  = isWord ? (km ? 212 : 175) : 232
+  const lineY  = isWord ? (km ? 220 : 184) : 241
 
   return (
     <svg viewBox="0 0 640 260" xmlns="http://www.w3.org/2000/svg"
@@ -178,13 +175,22 @@ function IllustrationRunning({ dist, kmText, weeksLabel, price }) {
       <rect width="640" height="260" fill="url(#il-bg)" />
       <rect width="640" height="260" fill="url(#il-gl1)" />
 
-      <text x="320" y={distY} fontFamily="Poppins,sans-serif" fontSize={distFs} fontWeight="900"
-        fill="url(#il-g)" opacity="0.92" letterSpacing="-2" textAnchor="middle">{dist}</text>
-      {km && <text x="320" y={kmY} fontFamily="Poppins,sans-serif" fontSize={km === 'KM' ? 44 : 36} fontWeight="900"
+      {kmInline ? (
+        <text x="320" y="162" textAnchor="middle"
+          fontFamily="Poppins,sans-serif" fontWeight="900"
+          fill="url(#il-g)" opacity="0.92">
+          <tspan fontSize="140" letterSpacing="-2">{dist}</tspan>
+          <tspan fontSize="50" letterSpacing="4" dx="16">KM</tspan>
+        </text>
+      ) : (
+        <text x="320" y={distY} fontFamily="Poppins,sans-serif" fontSize={distFs} fontWeight="900"
+          fill="url(#il-g)" opacity="0.92" letterSpacing="-2" textAnchor="middle">{dist}</text>
+      )}
+      {!kmInline && km && <text x="320" y={kmY} fontFamily="Poppins,sans-serif" fontSize={km === 'KM' ? 44 : 36} fontWeight="900"
         fill="url(#il-g)" opacity="0.80" letterSpacing={km === 'KM' ? '8' : '4'} textAnchor="middle">{km}</text>}
-      <text x="320" y={semsY} fontFamily="Poppins,sans-serif" fontSize="11" fontWeight="700"
+      <text x="320" dx="3" y={kmInline ? '232' : semsY} fontFamily="Poppins,sans-serif" fontSize="15" fontWeight="700"
         fill="rgba(255,255,255,.35)" letterSpacing="6" textAnchor="middle">{weeksLabel} SEMAINES</text>
-      <rect x="284" y={lineY} width="72" height="1.5" rx="1" fill="url(#il-g)" opacity="0.35" />
+      <rect x="278" y={kmInline ? '241' : lineY} width="88" height="1.5" rx="1" fill="url(#il-g)" opacity="0.35" />
 
       {price && (
         <>
@@ -209,7 +215,7 @@ function IllustrationRunning({ dist, kmText, weeksLabel, price }) {
 }
 
 function Illustration10km({ price }) {
-  return <IllustrationRunning dist="10" weeksLabel="8" price={price} />
+  return <IllustrationRunning dist="10" kmInline weeksLabel="8" price={price} />
 }
 
 function IllustrationAntiBlessure({ price }) {
@@ -230,9 +236,9 @@ function IllustrationAntiBlessure({ price }) {
       </defs>
       <rect width="640" height="260" fill="url(#il-bg)" />
       <rect width="640" height="260" fill="url(#il-gl2)" />
-      <path d="M 320,18 L 450,55 L 450,145 C 450,195 320,230 320,230 C 320,230 190,195 190,145 L 190,55 Z"
+      <path d="M 320,18 L 470,55 L 470,145 C 470,195 320,232 320,232 C 320,232 170,195 170,145 L 170,55 Z"
         fill="none" stroke="url(#il-g)" strokeWidth="1.5" opacity="0.22" />
-      <path d="M 320,30 L 432,62 L 432,142 C 432,186 320,218 320,218 C 320,218 208,186 208,142 L 208,62 Z"
+      <path d="M 320,30 L 455,62 L 455,142 C 455,186 320,220 320,220 C 320,220 185,186 185,142 L 185,62 Z"
         fill="rgba(139,47,201,.06)" />
       <text x="320" y="104" fontFamily="Poppins,sans-serif" fontSize="28" fontWeight="700"
         fill="rgba(255,255,255,.45)" letterSpacing="12" textAnchor="middle">ANTI</text>
@@ -511,10 +517,10 @@ export default function EbookDetail() {
 
   const priceStr = `À partir de ${((minCents || ebook.price_cents) / 100).toFixed(2).replace('.', ',')} €`
   const RUNNING_ILL_CFG = {
-    '10km-12sem':     { dist: '10',       weeksLabel: '12' },
-    'semi-12sem':     { dist: 'SEMI',     kmText: '',         weeksLabel: '12' },
-    'marathon-12sem': { dist: 'MARATHON', kmText: '',         weeksLabel: '12' },
-    'marathon-16sem': { dist: 'MARATHON', kmText: '',         weeksLabel: '16' },
+    '10km-12sem':     { dist: '10',       kmInline: true,  weeksLabel: '12' },
+    'semi-12sem':     { dist: 'SEMI',     kmText: '',      weeksLabel: '12' },
+    'marathon-12sem': { dist: 'MARATHON', kmText: '',      weeksLabel: '12' },
+    'marathon-16sem': { dist: 'MARATHON', kmText: '',      weeksLabel: '16' },
   }
   const slugIllustration = slug === '10km-8sem' ? <Illustration10km price={priceStr} />
     : RUNNING_ILL_CFG[slug] ? <IllustrationRunning {...RUNNING_ILL_CFG[slug]} price={priceStr} />
