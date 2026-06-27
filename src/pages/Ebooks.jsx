@@ -13,22 +13,22 @@ const VARIANT_PRICE_TIERS = {
 const EBOOK_META = {
   '10km-8sem':      { icon: '🏃', weeks: 8,  distance: '10 km',
     desc: '8 semaines de préparation ciblée pour battre ton record sur 10 km. Chaque séance est calculée selon ta VMA réelle — pas de plan générique.',
-    tags: ['Record en 8 semaines'] },
+    tags: ['Plan 100% personnalisé', 'Résultats en 8 semaines'] },
   '10km-12sem':     { icon: '🏃', weeks: 12, distance: '10 km',
     desc: 'Le plan le plus complet pour franchir un cap sur 10 km. VMA, seuil lactique et stratégie de course : 12 semaines pour te dépasser.',
-    tags: ['Construis ta VMA'] },
+    tags: ['Allures sur mesure', 'VMA + seuil + stratégie'] },
   'semi-12sem':     { icon: '🏅', weeks: 12, distance: 'Semi-marathon',
     desc: 'Prépare ton semi-marathon avec des séances sur mesure selon ta VMA. Long runs progressifs jusqu\'à 22 km et allure objectif personnalisée.',
-    tags: ['Long runs jusqu\'à 22 km'] },
+    tags: ['Long runs jusqu\'à 22 km', 'Allure objectif sur mesure'] },
   'marathon-12sem': { icon: '🏆', weeks: 12, distance: 'Marathon',
     desc: '12 semaines pour préparer le marathon sérieusement. Long runs jusqu\'à 30 km, allure objectif personnalisée et stratégie de ravitaillement.',
-    tags: ['Long runs jusqu\'à 30 km'] },
+    tags: ['Long runs jusqu\'à 30 km', 'Stratégie complète incluse'] },
   'marathon-16sem': { icon: '🏆', weeks: 16, distance: 'Marathon',
-    desc: '4 mois pour préparer le marathon de ta vie. Progression semaine après semaine, long run de 32 km et trois niveaux d\'objectif A/B/C.',
-    tags: ['4 mois de progression'] },
+    desc: '4 mois pour préparer le marathon de ta vie. Progression semaine après semaine, long run de 32 km et une stratégie de course complète.',
+    tags: ['Long run 32 km inclus', '4 mois de progression'] },
   'anti-blessure':  { icon: '🩺', weeks: null, distance: null,
     desc: 'Cours durablement, sans douleurs. Protocoles de renforcement musculaire, prévention des blessures et reprise progressive validés.',
-    tags: ['Courir sans se blesser'] },
+    tags: ['Reprends sans douleur', 'Protocoles validés'] },
 }
 
 export default function EbooksPage() {
@@ -146,12 +146,13 @@ function CardIllustrationRunning({ gid, dist, kmText, kmInline, weeksLabel }) {
       <rect width="320" height="160" fill={`url(#${gid}-gl)`}/>
 
       {kmInline ? (
-        /* "10 KM" sur une seule ligne : "10" grand + "KM" petit en exposant */
-        <text x="160" y="88" textAnchor="middle">
-          <tspan fontFamily="Poppins,sans-serif" fontSize="68" fontWeight="900"
-            fill={`url(#${gid}-g)`} opacity="0.92" letterSpacing="-1">{dist}</tspan>
-          <tspan fontFamily="Poppins,sans-serif" fontSize="24" fontWeight="900"
-            fill={`url(#${gid}-g)`} opacity="0.80" letterSpacing="3" dy="-18" dx="8">KM</tspan>
+        /* "10 KM" sur une ligne : gradient sur le parent évite la disparité 1 vs 0,
+           pas de dy → KM aligné sur la même baseline que 10 (en bas) */
+        <text x="160" y="88" textAnchor="middle"
+          fontFamily="Poppins,sans-serif" fontWeight="900"
+          fill={`url(#${gid}-g)`} opacity="0.92">
+          <tspan fontSize="68" letterSpacing="-1">{dist}</tspan>
+          <tspan fontSize="24" letterSpacing="3" dx="8">KM</tspan>
         </text>
       ) : (
         <text x="160" y={distY} fontFamily="Poppins,sans-serif" fontSize={distFs} fontWeight="900"
@@ -248,13 +249,13 @@ function EbookCard({ ebook }) {
         {/* Contenu */}
         <div style={{ padding: '1.25rem', flex: 1, display: 'flex', flexDirection: 'column' }}>
           <h3 style={{ margin: '0 0 .5rem', fontSize: '1rem', fontWeight: 800, lineHeight: 1.3 }}>{ebook.title}</h3>
-          <p style={{ margin: '0 0 1rem', fontSize: '.83rem', color: 'rgba(255,255,255,.55)', lineHeight: 1.6, flex: 1 }}>
+          <p style={{ margin: '0 0 1rem', fontSize: '.83rem', color: 'rgba(255,255,255,.55)', lineHeight: 1.6, flex: 1, textAlign: 'justify' }}>
             {meta.desc || ebook.description}
           </p>
           {/* Tags */}
           {meta.tags && (
             <div style={{ display: 'flex', gap: '.4rem', flexWrap: 'wrap', marginBottom: '1rem' }}>
-              {meta.tags.slice(0, 1).map(t => (
+              {meta.tags.slice(0, 2).map(t => (
                 <span key={t} style={{ background: 'rgba(139,47,201,.12)', border: '1px solid rgba(139,47,201,.22)',
                   borderRadius: 99, padding: '.18rem .6rem', fontSize: '.68rem', fontWeight: 600, color: '#C084FC' }}>
                   {t}
