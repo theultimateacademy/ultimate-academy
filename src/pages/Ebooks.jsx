@@ -125,9 +125,9 @@ function CardIllustrationRunning({ gid, dist, kmText, kmInline, weeksLabel }) {
     : (dist.length <= 2 ? 68 : dist.length <= 4 ? 56 : 48)
   const km = !kmInline && (kmText !== undefined ? kmText : 'KM')
   const hasBelow = Boolean(km)
-  const distY  = hasBelow ? '84' : distFs <= 30 ? '73' : '94'
-  const semsY  = hasBelow ? '132' : distFs <= 30 ? '100' : '121'
-  const lineY  = hasBelow ? '138' : distFs <= 30 ? '107' : '128'
+  const distY  = hasBelow ? '84' : '94'
+  const semsY  = hasBelow ? '132' : '121'
+  const lineY  = hasBelow ? '138' : '128'
   return (
     <svg viewBox="0 0 320 160" xmlns="http://www.w3.org/2000/svg"
       style={{ width: '100%', height: '100%', position: 'absolute', inset: 0 }}>

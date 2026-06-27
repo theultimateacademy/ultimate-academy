@@ -152,10 +152,10 @@ function IllustrationRunning({ dist, kmText, kmInline, weeksLabel, price }) {
     : (dist.length <= 2 ? 140 : dist.length <= 4 ? 108 : 78)
   const km = !kmInline && (kmText !== undefined ? kmText : 'KM')
 
-  const distY  = isWord ? (km ? 129 : distFs <= 54 ? 119 : 143) : 162
+  const distY  = isWord ? (km ? 129 : 143) : 162
   const kmY    = isWord ? 187 : 207
-  const semsY  = isWord ? (km ? 212 : distFs <= 54 ? 163 : 175) : 232
-  const lineY  = isWord ? (km ? 220 : distFs <= 54 ? 174 : 184) : 241
+  const semsY  = isWord ? (km ? 212 : 175) : 232
+  const lineY  = isWord ? (km ? 220 : 184) : 241
 
   return (
     <svg viewBox="0 0 640 260" xmlns="http://www.w3.org/2000/svg"
