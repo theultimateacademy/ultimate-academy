@@ -228,7 +228,7 @@ function EbookCard({ ebook }) {
           {(() => {
             if (ebook.slug === '10km-8sem')      return <CardIllustrationRunning gid="c8"   dist="10" kmInline weeksLabel="8"  />
             if (ebook.slug === '10km-12sem')     return <CardIllustrationRunning gid="c10"  dist="10" kmInline weeksLabel="12" />
-            if (ebook.slug === 'semi-12sem')     return <CardIllustrationRunning gid="cs"   dist="SEMI"     kmText=""         weeksLabel="12" />
+            if (ebook.slug === 'semi-12sem')     return <CardIllustrationRunning gid="cs"   dist="Semi-Marathon" kmText="" weeksLabel="12" />
             if (ebook.slug === 'marathon-12sem') return <CardIllustrationRunning gid="cm12" dist="MARATHON" kmText=""         weeksLabel="12" />
             if (ebook.slug === 'marathon-16sem') return <CardIllustrationRunning gid="cm16" dist="MARATHON" kmText=""         weeksLabel="16" />
             if (ebook.slug === 'anti-blessure')  return <CardIllustrationAntiBlessure />
@@ -250,7 +250,7 @@ function EbookCard({ ebook }) {
         {/* Contenu */}
         <div style={{ padding: '1.25rem', flex: 1, display: 'flex', flexDirection: 'column' }}>
           <h3 style={{ margin: '0 0 .5rem', fontSize: '1rem', fontWeight: 800, lineHeight: 1.3 }}>{meta.title || ebook.title}</h3>
-          <p style={{ margin: '0 0 1rem', fontSize: '.83rem', color: 'rgba(255,255,255,.55)', lineHeight: 1.6, flex: 1, textAlign: 'justify' }}>
+          <p style={{ margin: '0 0 1rem', fontSize: '.83rem', color: 'rgba(255,255,255,.55)', lineHeight: 1.6, flex: 1, textAlign: 'justify', minHeight: '4.8rem' }}>
             {meta.desc || ebook.description}
           </p>
           {/* Tags */}

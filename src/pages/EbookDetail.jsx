@@ -518,7 +518,7 @@ export default function EbookDetail() {
   const priceStr = `À partir de ${((minCents || ebook.price_cents) / 100).toFixed(2).replace('.', ',')} €`
   const RUNNING_ILL_CFG = {
     '10km-12sem':     { dist: '10',       kmInline: true,  weeksLabel: '12' },
-    'semi-12sem':     { dist: 'SEMI',     kmText: '',      weeksLabel: '12' },
+    'semi-12sem':     { dist: 'Semi-Marathon', kmText: '', weeksLabel: '12' },
     'marathon-12sem': { dist: 'MARATHON', kmText: '',      weeksLabel: '12' },
     'marathon-16sem': { dist: 'MARATHON', kmText: '',      weeksLabel: '16' },
   }
