@@ -34,7 +34,7 @@ function PlanView({ plan, completions, coachWeekIdx, setCoachWeekIdx, currentWee
     if (!activeSem) return <p style={{ color:'var(--text-muted)', padding:'2rem', textAlign:'center' }}>Aucune semaine dans ce plan.</p>
 
     const seances = activeSem.seances || []
-    const weekComps = completions.filter(c => c.week_number === activeSem.numero)
+    const weekComps = completions.filter(c => c.plan_id === plan.id && c.week_number === activeSem.numero)
     const chargeRaw = (activeSem.charge||'').replace(/\s*\(S\d+\)/gi,'')
     const chargeShort = chargeRaw.split(/[—–(]/)[0].trim()
     const chargeColor = chargeShort.toLowerCase().includes('élevée')?'#F97316':chargeShort.toLowerCase().includes('modérée')?'#06B6D4':chargeShort.toLowerCase().includes('affûtage')?'#8B2FC9':'#10B981'
