@@ -17,7 +17,8 @@ export default function AthleteLayout() {
   const { profile, signOut } = useAuth()
   const navigate  = useNavigate()
   const location  = useLocation()
-  const [unread, setUnread] = useState(0)
+  const [unread,         setUnread]         = useState(0)
+  const [newAnalysis,    setNewAnalysis]    = useState(false)
 
   useEffect(() => {
     if (!profile?.id) return
@@ -55,6 +56,38 @@ export default function AthleteLayout() {
     }
   }, [location.pathname, profile?.id])
 
+  // Badge "nouvelle analyse" sur Accueil
+  useEffect(() => {
+    if (!profile?.id) return
+    const analysisSeenKey = `ua_analysis_seen_${profile.id}`
+
+    const checkAnalysis = async () => {
+      if (window.location.pathname === '/app/home') return
+      const seenAt = localStorage.getItem(analysisSeenKey)
+      let q = supabase.from('weekly_analyses')
+        .select('id', { count: 'exact', head: true })
+        .eq('user_id', profile.id).eq('status', 'sent')
+      if (seenAt) q = q.gt('sent_at', seenAt)
+      const { count } = await q
+      setNewAnalysis((count || 0) > 0)
+    }
+
+    checkAnalysis()
+    const interval = setInterval(checkAnalysis, 20000)
+    const sub = supabase.channel('analysis-badge')
+      .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'weekly_analyses',
+          filter: `user_id=eq.${profile.id}` }, checkAnalysis)
+      .subscribe()
+    return () => { clearInterval(interval); sub.unsubscribe() }
+  }, [profile?.id])
+
+  useEffect(() => {
+    if (location.pathname === '/app/home' && profile?.id) {
+      setNewAnalysis(false)
+      localStorage.setItem(`ua_analysis_seen_${profile.id}`, new Date().toISOString())
+    }
+  }, [location.pathname, profile?.id])
+
   const handleSignOut = async () => { await signOut(); navigate('/') }
 
   return (
@@ -75,6 +108,7 @@ export default function AthleteLayout() {
               <span className="icon">{item.icon}</span>
               {item.label}
               {item.label === 'Messages' && unread > 0 && location.pathname !== '/app/messages' && <span className="notif" />}
+              {item.label === 'Accueil' && newAnalysis && location.pathname !== '/app/home' && <span className="notif" style={{ background: '#8B2FC9' }} />}
             </NavLink>
           ))}
         </nav>
@@ -136,6 +170,7 @@ export default function AthleteLayout() {
             <span className="icon">{item.icon}</span>
             <span>{item.label}</span>
             {item.label === 'Messages' && unread > 0 && location.pathname !== '/app/messages' && <span className="notif" />}
+            {item.label === 'Accueil' && newAnalysis && location.pathname !== '/app/home' && <span className="notif" style={{ background: '#8B2FC9' }} />}
           </NavLink>
         ))}
       </nav>

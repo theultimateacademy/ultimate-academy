@@ -333,20 +333,90 @@ export default function AthleteHome() {
         </div>
       )}
 
-      {/* Latest analysis */}
-      {analysis && (
-        <div style={{ marginBottom: '1.5rem' }}>
-          <h3 style={{ marginBottom: '.75rem' }}>Analyse de la semaine</h3>
-          <div className="card card--subtle">
-            <p style={{ fontSize: '.9375rem', lineHeight: 1.7, fontStyle: 'italic' }}>
-              "{analysis.coach_message}"
-            </p>
-            <div style={{ marginTop: '.75rem', fontSize: '.8rem', color: 'var(--text-muted)' }}>
-             , Alexis
+      {/* Latest analysis — rich card */}
+      {analysis && (() => {
+        const d = analysis.analysis_data || {}
+        const intro = analysis.coach_message || d.intro || ''
+        const sessions = d.sessions_comments || []
+        const conseil  = d.conseil || d.ajustement_semaine_suivante || ''
+        const rpe      = d.rpe_moyen
+        const mood     = d.mood || 'good'
+        const moodMap  = { fire: { icon: '🔥', color: '#F97316', label: 'En feu !' }, good: { icon: '💪', color: '#10B981', label: 'Bonne semaine' }, ok: { icon: '👌', color: '#3B82F6', label: 'Semaine solide' }, attention: { icon: '⚠️', color: '#F59E0B', label: 'À surveiller' } }
+        const moodMeta = moodMap[mood] || moodMap.good
+        const rpeColor = r => !r ? '#fff' : r >= 8 ? '#EF4444' : r >= 6 ? '#F59E0B' : '#10B981'
+        return (
+          <div style={{ marginBottom: '1.5rem' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '.75rem' }}>
+              <h3>Analyse de ta semaine</h3>
+              <span style={{ fontSize: '.7rem', background: moodMeta.color + '20', color: moodMeta.color, border: `1px solid ${moodMeta.color}40`, borderRadius: 99, padding: '.15rem .6rem', fontWeight: 700 }}>
+                {moodMeta.icon} {moodMeta.label}
+              </span>
+            </div>
+
+            <div style={{ background: 'linear-gradient(135deg, rgba(139,47,201,.09), rgba(232,35,122,.04))', border: '1px solid rgba(139,47,201,.22)', borderRadius: 16, overflow: 'hidden' }}>
+
+              {/* Coach intro */}
+              <div style={{ padding: '1.2rem 1.25rem 1rem', borderBottom: sessions.length || conseil || rpe ? '1px solid rgba(255,255,255,.06)' : 'none' }}>
+                <div style={{ display: 'flex', gap: '.75rem', alignItems: 'flex-start' }}>
+                  <img src="/Coach.JPG" alt="Alexis" style={{ width: 42, height: 42, borderRadius: '50%', objectFit: 'cover', flexShrink: 0, border: '2px solid rgba(139,47,201,.45)' }} />
+                  <div style={{ flex: 1 }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '.5rem', marginBottom: '.35rem' }}>
+                      <span style={{ fontWeight: 700, fontSize: '.8rem', color: '#C084FC' }}>Alexis</span>
+                      <span style={{ fontSize: '.7rem', color: 'rgba(255,255,255,.3)', background: 'rgba(255,255,255,.06)', borderRadius: 99, padding: '.08rem .5rem' }}>
+                        Semaine {analysis.week_number}
+                      </span>
+                    </div>
+                    <p style={{ fontSize: '.9375rem', lineHeight: 1.65, margin: 0 }}>{intro}</p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Session comments */}
+              {sessions.length > 0 && (
+                <div style={{ padding: '.9rem 1.25rem', borderBottom: conseil || rpe ? '1px solid rgba(255,255,255,.06)' : 'none' }}>
+                  <div style={{ fontSize: '.65rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '.09em', color: 'rgba(255,255,255,.3)', marginBottom: '.6rem' }}>Ce que j'en pense</div>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '.45rem' }}>
+                    {sessions.map((s, i) => (
+                      <div key={i} style={{ background: 'rgba(255,255,255,.04)', border: '1px solid rgba(255,255,255,.07)', borderRadius: 9, padding: '.55rem .875rem' }}>
+                        <div style={{ fontWeight: 700, fontSize: '.78rem', color: 'rgba(255,255,255,.9)', marginBottom: '.15rem' }}>{s.titre}</div>
+                        <div style={{ fontSize: '.8rem', color: 'rgba(255,255,255,.65)', lineHeight: 1.5 }}>{s.note}</div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Stats row */}
+              {rpe && (
+                <div style={{ padding: '.75rem 1.25rem', display: 'flex', alignItems: 'center', gap: '1rem', borderBottom: conseil ? '1px solid rgba(255,255,255,.06)' : 'none' }}>
+                  <div style={{ textAlign: 'center', minWidth: 52 }}>
+                    <div style={{ fontSize: '1.4rem', fontWeight: 900, lineHeight: 1, color: rpeColor(rpe) }}>{rpe}</div>
+                    <div style={{ fontSize: '.62rem', color: 'rgba(255,255,255,.35)', marginTop: '.15rem' }}>RPE moy.</div>
+                  </div>
+                  <div style={{ flex: 1, height: 6, borderRadius: 3, background: 'rgba(255,255,255,.08)', overflow: 'hidden' }}>
+                    <div style={{ height: '100%', borderRadius: 3, width: `${Math.min(rpe * 10, 100)}%`, background: `linear-gradient(90deg, #10B981, ${rpeColor(rpe)})`, transition: 'width .6s ease' }} />
+                  </div>
+                  <div style={{ fontSize: '.72rem', color: rpeColor(rpe), fontWeight: 700, minWidth: 40, textAlign: 'right' }}>
+                    {rpe < 5 ? 'Facile' : rpe < 7 ? 'Modéré' : rpe < 9 ? 'Intense' : 'Max'}
+                  </div>
+                </div>
+              )}
+
+              {/* Conseil */}
+              {conseil && (
+                <div style={{ padding: '.9rem 1.25rem', background: 'rgba(139,47,201,.08)' }}>
+                  <div style={{ fontSize: '.65rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '.09em', color: '#C084FC', marginBottom: '.35rem' }}>Focus semaine prochaine</div>
+                  <p style={{ fontSize: '.875rem', lineHeight: 1.6, margin: 0, color: 'rgba(255,255,255,.85)' }}>{conseil}</p>
+                </div>
+              )}
+            </div>
+
+            <div style={{ textAlign: 'right', marginTop: '.4rem', fontSize: '.7rem', color: 'rgba(255,255,255,.25)' }}>
+              {analysis.sent_at && new Date(analysis.sent_at).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long' })}
             </div>
           </div>
-        </div>
-      )}
+        )
+      })()}
 
       {/* Monthly message from coach (from plan_data) */}
       {plan?.plan_data?.message_du_mois && (
