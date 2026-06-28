@@ -38,12 +38,13 @@ import PreRaceAnalysis     from './pages/athlete/PreRaceAnalysis'
 import PostRaceFlow        from './pages/athlete/PostRaceFlow'
 
 import DevLogin        from './pages/DevLogin'
-import AdminEbooks     from './pages/admin/Ebooks'
-import AdminDashboard  from './pages/admin/Dashboard'
-import AdminAthletes   from './pages/admin/Athletes'
-import AdminPlans      from './pages/admin/Plans'
-import AdminAnalyses   from './pages/admin/Analyses'
-import AdminMessaging  from './pages/admin/Messaging'
+import AdminEbooks          from './pages/admin/Ebooks'
+import AdminDashboard       from './pages/admin/Dashboard'
+import AdminAthletes        from './pages/admin/Athletes'
+import AdminPlans           from './pages/admin/Plans'
+import AdminAnalyses        from './pages/admin/Analyses'
+import AdminMessaging       from './pages/admin/Messaging'
+import AdminSessionLibrary  from './pages/admin/SessionLibrary'
 
 function RequireAuth({ children }) {
   const { user, loading } = useAuth()
@@ -118,6 +119,7 @@ function AppRoutes() {
         <Route path="analyses"  element={<AdminAnalyses />} />
         <Route path="messages"  element={<AdminMessaging />} />
         <Route path="ebooks"    element={<AdminEbooks />} />
+        <Route path="sessions"  element={<AdminSessionLibrary />} />
       </Route>
 
       <Route path="*" element={<Navigate to="/" replace />} />
