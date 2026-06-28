@@ -351,12 +351,12 @@ const SEMAINES = [
   // ── S2 (6 juillet) — Développement ───────────────────────────────────────
   {
     numero: 2, phase: 'Développement', charge: 'Modérée',
-    objectif: 'Première séance piste 300m — la distance que tu aimes. Tempo 3×800m en natation pour ancrer le seuil. Sweet spot vélo pour bâtir la puissance cycliste.',
+    objectif: 'Première séance piste 300m — la distance que tu aimes. Footing EF pour récupérer des 300m. SL classique pour construire le volume.',
     seances: [
       fc300('Lundi', 12),
       NAT['NAT-07']('Mardi'),
       VEL['VEL-08']('Mercredi'),
-      fp('Jeudi'),
+      ef('Jeudi', 45),
       NAT['NAT-06']('Vendredi'),
       VEL['VEL-02']('Samedi'),
       RENFO['RENFO-02']('Samedi'),
@@ -383,32 +383,44 @@ const SEMAINES = [
   // ── S4 (20 juillet) — Intensification ────────────────────────────────────
   {
     numero: 4, phase: 'Intensification', charge: 'Élevée',
-    objectif: 'Pyramide piste (200-300-400-500-400-300-200m) pour varier et développer toutes les vitesses. Premier test 1900m en natation — mémorise la sensation. Tempo 2×15min sur route.',
+    objectif: 'Pyramide piste (200-300-400-500-400-300-200m) pour toutes les vitesses. Premier test 1900m en natation. SL avec 2×15 min de seuil intégrés en fin de sortie.',
     seances: [
       pyramide('Lundi'),
       NAT['NAT-11']('Mardi'),
       VEL['VEL-08']('Mercredi'),
-      tempo('Jeudi', '2x15'),
+      ef('Jeudi', 45),
       NAT['NAT-05']('Vendredi'),
       VEL['VEL-03']('Samedi'),
       RENFO['RENFO-04']('Samedi'),
-      sl('Dimanche', 90),
+      sl('Dimanche', 90, `55 min à ${EF}, puis 2 × 15 min à ${SE} avec 5 min facile entre les blocs, puis 5 min à ${EF} pour finir. Tempo dans les jambes fatiguées — c'est là que ça se construit vraiment.`),
     ],
   },
 
   // ── S5 (27 juillet) — Fin juillet / transition ────────────────────────────
   {
     numero: 5, phase: 'Spécifique', charge: 'Élevée',
-    objectif: 'Semaine clé avant août : 6×500m pour la puissance-vitesse, première brique vélo-course, et 3×2km à 5:00/km pour ancrer l\'allure 10km objectif. Les deux objectifs avancent ensemble.',
+    objectif: 'Semaine clé avant août : 6×500m pour la puissance-vitesse, première brique vélo-course, SL 100 min avec 3×1 km à allure 10km en fin de sortie. Footing EF jeudi pour récupérer entre les deux qualités.',
     seances: [
       fc500('Lundi', 6),
       NAT['NAT-07']('Mardi'),
       VEL['VEL-10']('Mercredi'),
-      sp10km('Jeudi', 3),
+      ef('Jeudi', 45),
       NAT['NAT-06']('Vendredi'),
       brique_courte('Samedi'),
       RENFO['RENFO-02']('Samedi'),
-      sl('Dimanche', 100),
+      {
+        jour: 'Dimanche', type: 'Sortie Longue', titre: 'Sortie longue 100 min — blocs allure 10km',
+        duree_min: 100, id_seance: 'SL-03',
+        allures: [
+          { zone: 'EF', allure_min_km: EF, pourcentage_vma: 68 },
+          { zone: 'Allure 10km', allure_min_km: SP, pourcentage_vma: 92 },
+        ],
+        echauffement: null,
+        corps: `65 min à ${EF}, puis 3 × 1 km à ${SP} avec 2 min trot lent à ${RA} entre chaque, puis 10 min à ${EF} pour terminer. Grave cette allure dans tes jambes fatiguées — c'est exactement ce que tu vivras en course.`,
+        retour_au_calme: null,
+        note: "L'allure 10km dans une sortie longue, c'est la séance la plus spécifique qui soit. Si tu tiens les 3 km à 5:00 après 65 min de course, tu es sur la bonne voie.",
+        est_course: true,
+      },
     ],
   },
 ]
