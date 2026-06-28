@@ -1,10 +1,251 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../../contexts/AuthContext'
 import { supabase } from '../../lib/supabase'
 import { api } from '../../lib/api'
 import { daysUntil, OBJECTIVE_LABELS, getPlanStartMonday, getPlanWeeksElapsed } from '../../lib/utils'
 import LoadingSpinner from '../../components/UI/LoadingSpinner'
+
+// ── Helpers visuels ────────────────────────────────────────────────────────────
+const rpeColor = r => !r ? 'rgba(255,255,255,.3)' : r >= 8 ? '#EF4444' : r >= 6 ? '#F59E0B' : '#10B981'
+const rpeBg    = r => !r ? 'transparent' : r >= 8 ? 'rgba(239,68,68,.12)' : r >= 6 ? 'rgba(245,158,11,.12)' : 'rgba(16,185,129,.12)'
+const typeColor = (type) => {
+  if (!type) return '#10B981'
+  const t = (type || '').toLowerCase()
+  if (t.includes('nat'))                      return '#3B82F6'
+  if (t.includes('vél') || t.includes('vel') || t.includes('velo')) return '#F97316'
+  if (t.includes('brique'))                   return '#8B2FC9'
+  if (t.includes('renfo'))                    return '#EC4899'
+  return '#10B981'
+}
+
+// Barre RPE : 10 segments colorés
+function RpeBar({ rpe }) {
+  const c = rpeColor(rpe)
+  return (
+    <div style={{ display: 'flex', alignItems: 'center', gap: '.35rem' }}>
+      <div style={{ display: 'flex', gap: 2 }}>
+        {Array.from({ length: 10 }).map((_, i) => (
+          <div key={i} style={{ width: 5, height: 12, borderRadius: 2, background: i < rpe ? c : 'rgba(255,255,255,.1)', transition: 'background .3s' }} />
+        ))}
+      </div>
+      <span style={{ fontSize: '.78rem', fontWeight: 800, color: c, minWidth: 14 }}>{rpe || '—'}</span>
+    </div>
+  )
+}
+
+// Jauge arc SVG pour RPE moyen
+function RpeGauge({ value, max = 10 }) {
+  if (!value) return null
+  const r = 34, cx = 44, cy = 44
+  const circ = 2 * Math.PI * r
+  const arcPct = 0.72
+  const arc = circ * arcPct
+  const fill = arc * Math.min(value / max, 1)
+  const c = rpeColor(value)
+  const label = value < 5 ? 'Facile' : value < 7 ? 'Modéré' : value < 9 ? 'Intense' : 'Max'
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+      <svg width="88" height="66" viewBox="0 0 88 66">
+        <circle cx={cx} cy={cx} r={r} fill="none" stroke="rgba(255,255,255,.07)" strokeWidth="7"
+          strokeDasharray={`${arc} ${circ - arc}`} strokeLinecap="round"
+          transform={`rotate(144, ${cx}, ${cx})`} />
+        <circle cx={cx} cy={cx} r={r} fill="none" stroke={c} strokeWidth="7"
+          strokeDasharray={`${fill} ${circ - fill}`} strokeLinecap="round"
+          transform={`rotate(144, ${cx}, ${cx})`} style={{ transition: 'stroke-dasharray .8s ease' }} />
+        <text x={cx} y={cx - 2} textAnchor="middle" fill={c} fontSize="16" fontWeight="900" fontFamily="inherit">{value}</text>
+        <text x={cx} y={cx + 12} textAnchor="middle" fill="rgba(255,255,255,.3)" fontSize="8" fontFamily="inherit">/10</text>
+      </svg>
+      <span style={{ fontSize: '.65rem', color: c, fontWeight: 700, marginTop: -6 }}>{label}</span>
+    </div>
+  )
+}
+
+// Grille hebdomadaire — 7 jours avec dots colorés
+const DAYS_SHORT = ['L', 'M', 'M', 'J', 'V', 'S', 'D']
+const JOUR_IDX = { Lundi: 0, Mardi: 1, Mercredi: 2, Jeudi: 3, Vendredi: 4, Samedi: 5, Dimanche: 6 }
+
+function WeekGrid({ sessions }) {
+  const byDay = sessions.reduce((acc, s) => {
+    const i = JOUR_IDX[s.jour]
+    if (i !== undefined) { if (!acc[i]) acc[i] = []; acc[i].push(s) }
+    return acc
+  }, {})
+  return (
+    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: '.3rem', textAlign: 'center' }}>
+      {DAYS_SHORT.map((d, i) => {
+        const dayS = byDay[i] || []
+        const s0 = dayS[0]
+        const color = s0 ? typeColor(s0.type) : null
+        const done  = s0?.done !== false
+        return (
+          <div key={i} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '.25rem' }}>
+            <span style={{ fontSize: '.62rem', color: 'rgba(255,255,255,.3)', fontWeight: 600 }}>{d}</span>
+            <div style={{
+              width: 30, height: 30, borderRadius: '50%',
+              background: color ? (done ? color + '28' : 'transparent') : 'transparent',
+              border: color ? `2px solid ${color}` : '2px solid rgba(255,255,255,.08)',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              position: 'relative',
+            }}>
+              {done && color && <div style={{ width: 8, height: 8, borderRadius: '50%', background: color }} />}
+              {dayS.length > 1 && (
+                <div style={{ position: 'absolute', top: -3, right: -3, width: 10, height: 10, borderRadius: '50%', background: typeColor(dayS[1].type), border: '1.5px solid var(--bg)', fontSize: '.45rem', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontWeight: 700 }}>{dayS.length}</div>
+              )}
+            </div>
+            {color && <div style={{ width: 3, height: 3, borderRadius: '50%', background: color, opacity: .6 }} />}
+          </div>
+        )
+      })}
+    </div>
+  )
+}
+
+// Légende sport
+function SportLegend({ sessions }) {
+  const types = [...new Set(sessions.map(s => s.type).filter(Boolean))]
+  const grouped = types.slice(0, 4)
+  return (
+    <div style={{ display: 'flex', gap: '.5rem', flexWrap: 'wrap' }}>
+      {grouped.map((t, i) => (
+        <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '.25rem' }}>
+          <div style={{ width: 7, height: 7, borderRadius: '50%', background: typeColor(t) }} />
+          <span style={{ fontSize: '.62rem', color: 'rgba(255,255,255,.35)' }}>{t.split(' ')[0]}</span>
+        </div>
+      ))}
+    </div>
+  )
+}
+
+// Modale analyse visuelle complète
+function WeeklyAnalysisModal({ analysis, onClose }) {
+  const d = analysis.analysis_data || {}
+  const intro    = analysis.coach_message || d.intro || ''
+  const sessions = d.sessions_comments || []
+  const conseil  = d.conseil || d.ajustement_semaine_suivante || ''
+  const rpe      = d.rpe_moyen
+  const mood     = d.mood || 'good'
+  const MOOD = { fire: { icon: '🔥', color: '#F97316', label: 'En feu !' }, good: { icon: '💪', color: '#10B981', label: 'Bonne semaine' }, ok: { icon: '👌', color: '#3B82F6', label: 'Semaine solide' }, attention: { icon: '⚠️', color: '#F59E0B', label: 'À surveiller' } }
+  const m = MOOD[mood] || MOOD.good
+  const scrollRef = useRef(null)
+
+  const done  = sessions.filter(s => s.done !== false).length
+  const total = sessions.length
+
+  return (
+    <div
+      onClick={e => e.target === e.currentTarget && onClose()}
+      style={{ position: 'fixed', inset: 0, zIndex: 500, background: 'rgba(0,0,0,.82)', backdropFilter: 'blur(8px)', display: 'flex', alignItems: 'flex-end', justifyContent: 'center' }}>
+      <div
+        ref={scrollRef}
+        style={{ width: '100%', maxWidth: 560, maxHeight: '94vh', overflowY: 'auto', borderRadius: '20px 20px 0 0', background: '#0E0E18', border: '1px solid rgba(255,255,255,.08)', borderBottom: 'none' }}>
+
+        {/* ── Header gradient ── */}
+        <div style={{ background: `linear-gradient(160deg, ${m.color}28 0%, rgba(9,9,15,.9) 60%)`, padding: '1.5rem 1.5rem 1.25rem', borderBottom: '1px solid rgba(255,255,255,.07)', position: 'sticky', top: 0, backdropFilter: 'blur(20px)', zIndex: 2 }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+            <div>
+              <div style={{ fontSize: '2.2rem', lineHeight: 1, marginBottom: '.35rem' }}>{m.icon}</div>
+              <div style={{ fontWeight: 800, fontSize: '1.1rem', color: '#fff', marginBottom: '.15rem' }}>
+                Semaine {analysis.week_number} · {m.label}
+              </div>
+              {analysis.sent_at && (
+                <div style={{ fontSize: '.72rem', color: 'rgba(255,255,255,.35)' }}>
+                  {new Date(analysis.sent_at).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })}
+                </div>
+              )}
+            </div>
+            <button onClick={onClose} style={{ background: 'rgba(255,255,255,.08)', border: 'none', borderRadius: 10, width: 34, height: 34, cursor: 'pointer', color: 'rgba(255,255,255,.6)', fontSize: '1rem', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'inherit' }}>✕</button>
+          </div>
+        </div>
+
+        <div style={{ padding: '1.25rem 1.5rem', display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+
+          {/* ── Vue semaine ── */}
+          <div>
+            <div style={{ fontSize: '.65rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '.1em', color: 'rgba(255,255,255,.3)', marginBottom: '.75rem' }}>Ta semaine</div>
+            <WeekGrid sessions={sessions} />
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '.75rem' }}>
+              <SportLegend sessions={sessions} />
+              <span style={{ fontSize: '.7rem', color: 'rgba(255,255,255,.35)', fontWeight: 600 }}>
+                {done}/{total} séances
+              </span>
+            </div>
+          </div>
+
+          {/* ── Séparateur ── */}
+          <div style={{ height: 1, background: 'rgba(255,255,255,.06)' }} />
+
+          {/* ── Séances + RPE ── */}
+          {sessions.length > 0 && (
+            <div>
+              <div style={{ fontSize: '.65rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '.1em', color: 'rgba(255,255,255,.3)', marginBottom: '.875rem' }}>Retour par séance</div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 1, borderRadius: 12, overflow: 'hidden', border: '1px solid rgba(255,255,255,.07)' }}>
+                {sessions.map((s, i) => {
+                  const c = typeColor(s.type)
+                  return (
+                    <div key={i} style={{ background: i % 2 === 0 ? 'rgba(255,255,255,.025)' : 'rgba(255,255,255,.015)', display: 'flex', gap: 0 }}>
+                      <div style={{ width: 3, background: c, flexShrink: 0 }} />
+                      <div style={{ flex: 1, padding: '.75rem .875rem .6rem' }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '.5rem', marginBottom: '.35rem' }}>
+                          <div>
+                            <span style={{ fontWeight: 700, fontSize: '.8rem' }}>{s.titre}</span>
+                            <span style={{ fontSize: '.68rem', color: 'rgba(255,255,255,.3)', marginLeft: '.4rem' }}>· {s.jour}</span>
+                          </div>
+                          <div style={{ flexShrink: 0 }}>
+                            <RpeBar rpe={s.rpe} />
+                          </div>
+                        </div>
+                        {s.note && <p style={{ fontSize: '.78rem', lineHeight: 1.55, color: 'rgba(255,255,255,.6)', margin: 0 }}>{s.note}</p>}
+                      </div>
+                    </div>
+                  )
+                })}
+              </div>
+            </div>
+          )}
+
+          {/* ── RPE moyen gauge ── */}
+          {rpe && (
+            <div style={{ background: 'rgba(255,255,255,.03)', border: '1px solid rgba(255,255,255,.07)', borderRadius: 12, padding: '1rem 1.25rem', display: 'flex', alignItems: 'center', gap: '1.25rem' }}>
+              <RpeGauge value={rpe} />
+              <div>
+                <div style={{ fontWeight: 700, fontSize: '.88rem', marginBottom: '.3rem' }}>RPE moyen · {rpe}/10</div>
+                <div style={{ fontSize: '.78rem', color: 'rgba(255,255,255,.45)', lineHeight: 1.5 }}>
+                  {rpe < 5 ? 'Semaine légère — bonne récupération active.' : rpe < 7 ? 'Charge modérée bien gérée — endurance de fond qui progresse.' : rpe < 9 ? 'Semaine chargée — assure-toi de bien dormir et bien manger.' : 'Semaine très intense — récupération prioritaire.'}
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* ── Message coach ── */}
+          {intro && (
+            <div style={{ background: 'linear-gradient(135deg, rgba(139,47,201,.1), rgba(232,35,122,.05))', border: '1px solid rgba(139,47,201,.2)', borderRadius: 14, overflow: 'hidden' }}>
+              <div style={{ padding: '1rem 1.25rem' }}>
+                <div style={{ display: 'flex', gap: '.75rem', alignItems: 'flex-start' }}>
+                  <img src="/Coach.JPG" alt="Alexis" style={{ width: 40, height: 40, borderRadius: '50%', objectFit: 'cover', flexShrink: 0, border: '2px solid rgba(139,47,201,.5)' }} />
+                  <div>
+                    <div style={{ fontWeight: 700, fontSize: '.75rem', color: '#C084FC', marginBottom: '.3rem' }}>Alexis · Coach</div>
+                    <p style={{ fontSize: '.875rem', lineHeight: 1.65, margin: 0, color: 'rgba(255,255,255,.9)' }}>{intro}</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* ── Focus semaine prochaine ── */}
+          {conseil && (
+            <div style={{ background: 'rgba(59,130,246,.07)', border: '1px solid rgba(59,130,246,.2)', borderRadius: 12, padding: '.875rem 1.125rem' }}>
+              <div style={{ fontSize: '.65rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '.1em', color: '#60A5FA', marginBottom: '.35rem' }}>→ Focus semaine prochaine</div>
+              <p style={{ fontSize: '.875rem', lineHeight: 1.6, margin: 0, color: 'rgba(255,255,255,.85)' }}>{conseil}</p>
+            </div>
+          )}
+
+          <div style={{ height: '1rem' }} />
+        </div>
+      </div>
+    </div>
+  )
+}
 
 export default function AthleteHome() {
   const { profile } = useAuth()
@@ -15,6 +256,7 @@ export default function AthleteHome() {
   const [lastMessage,   setLastMessage]   = useState(null)
   const [loading,       setLoading]       = useState(true)
   const [analysis,      setAnalysis]      = useState(null)
+  const [analysisOpen,  setAnalysisOpen]  = useState(false)
   const [preRaceAnalysis, setPreRaceAnalysis] = useState(null)
   const [hasPostRace,     setHasPostRace]     = useState(false)
 
@@ -333,90 +575,56 @@ export default function AthleteHome() {
         </div>
       )}
 
-      {/* Latest analysis — rich card */}
+      {/* Analyse — trigger compact */}
       {analysis && (() => {
-        const d = analysis.analysis_data || {}
-        const intro = analysis.coach_message || d.intro || ''
+        const d    = analysis.analysis_data || {}
+        const mood = d.mood || 'good'
+        const MOOD = { fire: { icon: '🔥', color: '#F97316' }, good: { icon: '💪', color: '#10B981' }, ok: { icon: '👌', color: '#3B82F6' }, attention: { icon: '⚠️', color: '#F59E0B' } }
+        const m    = MOOD[mood] || MOOD.good
         const sessions = d.sessions_comments || []
-        const conseil  = d.conseil || d.ajustement_semaine_suivante || ''
-        const rpe      = d.rpe_moyen
-        const mood     = d.mood || 'good'
-        const moodMap  = { fire: { icon: '🔥', color: '#F97316', label: 'En feu !' }, good: { icon: '💪', color: '#10B981', label: 'Bonne semaine' }, ok: { icon: '👌', color: '#3B82F6', label: 'Semaine solide' }, attention: { icon: '⚠️', color: '#F59E0B', label: 'À surveiller' } }
-        const moodMeta = moodMap[mood] || moodMap.good
-        const rpeColor = r => !r ? '#fff' : r >= 8 ? '#EF4444' : r >= 6 ? '#F59E0B' : '#10B981'
+        const done = sessions.filter(s => s.done !== false).length
         return (
           <div style={{ marginBottom: '1.5rem' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '.75rem' }}>
-              <h3>Analyse de ta semaine</h3>
-              <span style={{ fontSize: '.7rem', background: moodMeta.color + '20', color: moodMeta.color, border: `1px solid ${moodMeta.color}40`, borderRadius: 99, padding: '.15rem .6rem', fontWeight: 700 }}>
-                {moodMeta.icon} {moodMeta.label}
-              </span>
-            </div>
-
-            <div style={{ background: 'linear-gradient(135deg, rgba(139,47,201,.09), rgba(232,35,122,.04))', border: '1px solid rgba(139,47,201,.22)', borderRadius: 16, overflow: 'hidden' }}>
-
-              {/* Coach intro */}
-              <div style={{ padding: '1.2rem 1.25rem 1rem', borderBottom: sessions.length || conseil || rpe ? '1px solid rgba(255,255,255,.06)' : 'none' }}>
-                <div style={{ display: 'flex', gap: '.75rem', alignItems: 'flex-start' }}>
-                  <img src="/Coach.JPG" alt="Alexis" style={{ width: 42, height: 42, borderRadius: '50%', objectFit: 'cover', flexShrink: 0, border: '2px solid rgba(139,47,201,.45)' }} />
-                  <div style={{ flex: 1 }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '.5rem', marginBottom: '.35rem' }}>
-                      <span style={{ fontWeight: 700, fontSize: '.8rem', color: '#C084FC' }}>Alexis</span>
-                      <span style={{ fontSize: '.7rem', color: 'rgba(255,255,255,.3)', background: 'rgba(255,255,255,.06)', borderRadius: 99, padding: '.08rem .5rem' }}>
-                        Semaine {analysis.week_number}
-                      </span>
-                    </div>
-                    <p style={{ fontSize: '.9375rem', lineHeight: 1.65, margin: 0 }}>{intro}</p>
+            <button
+              onClick={() => setAnalysisOpen(true)}
+              style={{
+                width: '100%', background: 'none', border: 'none', padding: 0, cursor: 'pointer', fontFamily: 'inherit', textAlign: 'left',
+              }}>
+              <div style={{
+                display: 'flex', alignItems: 'center', gap: '.875rem',
+                background: `linear-gradient(135deg, ${m.color}14, rgba(255,255,255,.02))`,
+                border: `1px solid ${m.color}35`, borderRadius: 14,
+                padding: '.875rem 1.1rem',
+                transition: 'transform .15s, box-shadow .15s',
+              }}
+                onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-1px)'; e.currentTarget.style.boxShadow = `0 6px 24px ${m.color}22` }}
+                onMouseLeave={e => { e.currentTarget.style.transform = ''; e.currentTarget.style.boxShadow = '' }}>
+                <div style={{ fontSize: '1.6rem', lineHeight: 1, flexShrink: 0 }}>{m.icon}</div>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{ fontWeight: 800, fontSize: '.88rem', color: '#fff', marginBottom: '.15rem' }}>
+                    Analyse S{analysis.week_number} disponible
+                  </div>
+                  <div style={{ fontSize: '.75rem', color: 'rgba(255,255,255,.4)' }}>
+                    {done} séance{done > 1 ? 's' : ''} commentée{done > 1 ? 's' : ''} · Retour d'Alexis
                   </div>
                 </div>
+                {d.rpe_moyen && (
+                  <div style={{ textAlign: 'center', flexShrink: 0, background: rpeBg(d.rpe_moyen), border: `1px solid ${rpeColor(d.rpe_moyen)}30`, borderRadius: 8, padding: '.3rem .6rem' }}>
+                    <div style={{ fontSize: '1rem', fontWeight: 900, color: rpeColor(d.rpe_moyen), lineHeight: 1 }}>{d.rpe_moyen}</div>
+                    <div style={{ fontSize: '.58rem', color: 'rgba(255,255,255,.3)' }}>RPE</div>
+                  </div>
+                )}
+                <div style={{ color: m.color, fontSize: '1rem', flexShrink: 0 }}>›</div>
               </div>
-
-              {/* Session comments */}
-              {sessions.length > 0 && (
-                <div style={{ padding: '.9rem 1.25rem', borderBottom: conseil || rpe ? '1px solid rgba(255,255,255,.06)' : 'none' }}>
-                  <div style={{ fontSize: '.65rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '.09em', color: 'rgba(255,255,255,.3)', marginBottom: '.6rem' }}>Ce que j'en pense</div>
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '.45rem' }}>
-                    {sessions.map((s, i) => (
-                      <div key={i} style={{ background: 'rgba(255,255,255,.04)', border: '1px solid rgba(255,255,255,.07)', borderRadius: 9, padding: '.55rem .875rem' }}>
-                        <div style={{ fontWeight: 700, fontSize: '.78rem', color: 'rgba(255,255,255,.9)', marginBottom: '.15rem' }}>{s.titre}</div>
-                        <div style={{ fontSize: '.8rem', color: 'rgba(255,255,255,.65)', lineHeight: 1.5 }}>{s.note}</div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {/* Stats row */}
-              {rpe && (
-                <div style={{ padding: '.75rem 1.25rem', display: 'flex', alignItems: 'center', gap: '1rem', borderBottom: conseil ? '1px solid rgba(255,255,255,.06)' : 'none' }}>
-                  <div style={{ textAlign: 'center', minWidth: 52 }}>
-                    <div style={{ fontSize: '1.4rem', fontWeight: 900, lineHeight: 1, color: rpeColor(rpe) }}>{rpe}</div>
-                    <div style={{ fontSize: '.62rem', color: 'rgba(255,255,255,.35)', marginTop: '.15rem' }}>RPE moy.</div>
-                  </div>
-                  <div style={{ flex: 1, height: 6, borderRadius: 3, background: 'rgba(255,255,255,.08)', overflow: 'hidden' }}>
-                    <div style={{ height: '100%', borderRadius: 3, width: `${Math.min(rpe * 10, 100)}%`, background: `linear-gradient(90deg, #10B981, ${rpeColor(rpe)})`, transition: 'width .6s ease' }} />
-                  </div>
-                  <div style={{ fontSize: '.72rem', color: rpeColor(rpe), fontWeight: 700, minWidth: 40, textAlign: 'right' }}>
-                    {rpe < 5 ? 'Facile' : rpe < 7 ? 'Modéré' : rpe < 9 ? 'Intense' : 'Max'}
-                  </div>
-                </div>
-              )}
-
-              {/* Conseil */}
-              {conseil && (
-                <div style={{ padding: '.9rem 1.25rem', background: 'rgba(139,47,201,.08)' }}>
-                  <div style={{ fontSize: '.65rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '.09em', color: '#C084FC', marginBottom: '.35rem' }}>Focus semaine prochaine</div>
-                  <p style={{ fontSize: '.875rem', lineHeight: 1.6, margin: 0, color: 'rgba(255,255,255,.85)' }}>{conseil}</p>
-                </div>
-              )}
-            </div>
-
-            <div style={{ textAlign: 'right', marginTop: '.4rem', fontSize: '.7rem', color: 'rgba(255,255,255,.25)' }}>
-              {analysis.sent_at && new Date(analysis.sent_at).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long' })}
-            </div>
+            </button>
           </div>
         )
       })()}
+
+      {/* Modale analyse immersive */}
+      {analysisOpen && analysis && (
+        <WeeklyAnalysisModal analysis={analysis} onClose={() => setAnalysisOpen(false)} />
+      )}
 
       {/* Monthly message from coach (from plan_data) */}
       {plan?.plan_data?.message_du_mois && (

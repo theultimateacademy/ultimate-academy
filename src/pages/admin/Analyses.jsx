@@ -126,14 +126,37 @@ function AnalysisModal({ analysis, athlete, onClose, onSend }) {
             <div style={{ display: 'flex', flexDirection: 'column', gap: '.65rem' }}>
               {sessions.map((s, i) => (
                 <div key={i} style={{ background: 'rgba(255,255,255,.03)', border: '1px solid rgba(255,255,255,.08)', borderRadius: 10, padding: '.75rem' }}>
-                  <div style={{ display: 'flex', gap: '.5rem', marginBottom: '.4rem' }}>
-                    <input value={s.titre} onChange={e => updateSession(i, 'titre', e.target.value)}
-                      placeholder="Titre séance (ex : Côtes lundi, 12×300m piste...)"
-                      style={{ ...inp, flex: 1, fontSize: '.82rem' }} />
+                  {/* Titre + jour + type + RPE */}
+                  <div style={{ display: 'flex', gap: '.4rem', marginBottom: '.4rem', flexWrap: 'wrap' }}>
+                    <input value={s.titre || ''} onChange={e => updateSession(i, 'titre', e.target.value)}
+                      placeholder="Titre (ex : Côtes 8×80m)"
+                      style={{ ...inp, flex: 2, minWidth: 140, fontSize: '.82rem' }} />
+                    <select value={s.jour || ''} onChange={e => updateSession(i, 'jour', e.target.value)}
+                      style={{ ...inp, flex: '0 0 90px', fontSize: '.8rem', cursor: 'pointer' }}>
+                      <option value="">Jour</option>
+                      {['Lundi','Mardi','Mercredi','Jeudi','Vendredi','Samedi','Dimanche'].map(j => <option key={j} value={j}>{j.slice(0,3)}</option>)}
+                    </select>
+                    <select value={s.type || ''} onChange={e => updateSession(i, 'type', e.target.value)}
+                      style={{ ...inp, flex: '0 0 100px', fontSize: '.8rem', cursor: 'pointer' }}>
+                      <option value="">Sport</option>
+                      <option value="Cotes">Côtes</option>
+                      <option value="Endurance Fondamentale">EF</option>
+                      <option value="Fractionné Court">Frac Court</option>
+                      <option value="Fractionné Long">Frac Long</option>
+                      <option value="Sortie Longue">SL</option>
+                      <option value="Tempo / Seuil">Tempo</option>
+                      <option value="Natation">Natation</option>
+                      <option value="Velo">Vélo</option>
+                      <option value="Brique">Brique</option>
+                      <option value="Renforcement">Renfo</option>
+                    </select>
+                    <input value={s.rpe || ''} onChange={e => updateSession(i, 'rpe', +e.target.value || '')}
+                      type="number" min="1" max="10" placeholder="RPE"
+                      style={{ ...inp, flex: '0 0 60px', fontSize: '.82rem' }} />
                     <button onClick={() => removeSession(i)} style={{ background: 'rgba(239,68,68,.12)', border: '1px solid rgba(239,68,68,.2)', borderRadius: 6, padding: '.2rem .5rem', color: '#F87171', cursor: 'pointer', fontFamily: 'inherit', fontSize: '.8rem' }}>✕</button>
                   </div>
-                  <textarea value={s.note} onChange={e => updateSession(i, 'note', e.target.value)}
-                    placeholder="Ton commentaire sur cette séance..."
+                  <textarea value={s.note || ''} onChange={e => updateSession(i, 'note', e.target.value)}
+                    placeholder="Ton retour sur cette séance..."
                     rows={2}
                     style={{ ...inp, resize: 'vertical', fontSize: '.82rem', lineHeight: 1.5 }} />
                 </div>
