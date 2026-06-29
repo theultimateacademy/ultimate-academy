@@ -1,0 +1,77 @@
+// Marathon 12 semaines · 3 séances/semaine · Palier Avancé (VMA > 18.5)
+// Surcharges : intervalles plus longs, allures plus hautes, SL plus longues, blocs allure marathon plus longs
+const { applyOverrides } = require('../../lib/tier-overrides')
+const base = require('./semaines-3-i.js')
+
+module.exports = applyOverrides(base, {
+  1: { replace: { Jeudi: {
+    titre:'6 × 1000 mètres', pcts:[[65,65],[90,95]],
+    corps:'6 × 1000m à {{P}}. Effort soutenu et maîtrisé. Récupération 90 sec au trot. Maintiens la même allure sur les 6.',
+    note:'RPE 7-8/10 · Pour le palier avancé, on démarre directement sur des 1000m.' },
+    Dimanche: { duree:'80 min',
+    corps:'80 min à {{P}}. Légèrement plus long que la trame standard. Régulier et contrôlé.',
+    note:'RPE 5/10 · Durée augmentée pour le palier avancé.' } } },
+  2: { replace: { Jeudi: {
+    titre:'8 × 1000 mètres', pcts:[[65,65],[90,95]],
+    corps:'8 × 1000m à {{P}}. Deux répétitions de plus. Récupération 90 sec au trot. Maintiens la même allure.',
+    note:'RPE 7-8/10 · La régularité est plus importante que la vitesse maximale.' },
+    Dimanche: { duree:'90 min',
+    corps:'90 min à {{P}}. Légèrement plus long que la trame standard. Hydrate-toi toutes les 20-25 min.',
+    note:'RPE 5/10 · La sortie longue avancée est plus longue dès le départ.' } } },
+  3: { replace: { Jeudi: {
+    titre:'Tempo continu, 25 minutes', pcts:[[65,70],[86,86]],
+    corps:'25 minutes continues à {{P}}. Allure légèrement plus haute que la trame standard. Difficile mais tenable sur toute la durée.',
+    note:'RPE 8/10 · L\'allure seuil à 86% VMA est adaptée au palier avancé.' },
+    Dimanche: { duree:'105 min',
+    corps:'105 min à {{P}}. Légèrement plus long que la trame standard. Régulier, hydraté.',
+    note:'RPE 5-6/10 · Sortie longue allongée pour le palier avancé.' } } },
+  4: { replace: { Jeudi: {
+    titre:'2 × 18 minutes au seuil', pcts:[[65,70],[87,87]],
+    corps:'2 × 18 min à {{P}} avec 3 min de récupération entre chaque. Allure légèrement plus haute que la trame. La deuxième répétition se termine fatigué, c\'est voulu.',
+    note:'RPE 8/10 · 36 min totales au seuil à allure avancée.' },
+    Dimanche: { duree:'115 min',
+    corps:'100 min à {{P}}, puis les 15 dernières minutes à ton allure objectif marathon ({{OBJ}}). Tu apprends à finir sur la bonne allure quand les jambes sont déjà sollicitées.',
+    note:'RPE 6/10 puis 7-8/10 · Bloc final allongé pour le palier avancé.' } } },
+  5: { replace: { Jeudi: {
+    titre:'3 × 15 minutes au seuil', pcts:[[65,70],[87,87]],
+    corps:'3 × 15 min à {{P}} avec 3 min de récupération entre chaque. La troisième répétition est la plus difficile. Maintiens l\'allure.',
+    note:'RPE 8-9/10 · 45 min totales au seuil à allure avancée.' },
+    Dimanche: { duree:'2h10',
+    corps:'2h10 à {{P}}. Plus long que la trame standard. Gel à 1h et à 1h35. Régularité, hydratation toutes les 20 min.',
+    note:'RPE 5-6/10 · Sortie longue allongée pour le palier avancé.' } } },
+  6: { replace: { Jeudi: {
+    titre:'2 × 25 minutes au seuil', pcts:[[65,70],[87,87]],
+    corps:'2 × 25 min à {{P}} avec 3 min de récupération entre chaque. 50 min totales au seuil. Ta séance tempo la plus longue à ce stade.',
+    note:'RPE 8-9/10 · 50 min au seuil, charge élevée. Récupère bien le lendemain.' },
+    Dimanche: { duree:'2h30',
+    corps:'100 min à {{P}}, puis 10 km à ton allure objectif marathon ({{OBJ}}), puis retour à l\'allure EF. Gel à 1h, à 1h30, à 2h.',
+    note:'RPE 6/10 en EF · 7-8/10 sur les 10 km · Bloc allure marathon allongé pour ce palier.' } } },
+  7: { replace: { Jeudi: {
+    titre:'4 × 15 minutes au seuil', pcts:[[65,70],[87,87]],
+    corps:'4 × 15 min à {{P}} avec 3 min de récupération entre chaque. La quatrième répétition est la plus difficile. Maintiens l\'allure.',
+    note:'RPE 8-9/10 · 60 min totales au seuil. Ton pic de charge au seuil pour ce plan.' },
+    Dimanche: { duree:'2h45',
+    corps:'2h45 à {{P}}. Ta sortie longue la plus longue jusqu\'ici. Gel à 1h, à 1h30 et à 2h15. Régularité, respiration, hydratation toutes les 20 min.',
+    note:'RPE 6/10 · Sortie longue avancée plus longue que la trame standard.' } } },
+  8: { replace: { Jeudi: {
+    titre:'4 × 15 minutes au seuil, intensif', pcts:[[65,70],[88,88]],
+    corps:'4 × 15 min à {{P}} avec 3 min de récupération entre chaque. Allure légèrement plus haute. La quatrième répétition est la plus difficile.',
+    note:'RPE 9/10 · 60 min au seuil à allure avancée. Ton pic de charge absolu.' },
+    Dimanche: { duree:'3h',
+    corps:'2h15 à {{P}}, puis 15 km à ton allure objectif marathon ({{OBJ}}), puis retour à l\'allure EF. Gel à 1h, à 1h30, à 2h. Ces 15 km après 2h15 simulent directement la 2e partie du marathon.',
+    note:'RPE 6/10 en EF · 8/10 sur les 15 km · Après cette semaine, l\'entraînement dur est terminé.' } } },
+  9: { replace: { Jeudi: {
+    titre:'3 × 8 km à allure marathon', duree:'85 min',
+    corps:'3 × 8 km exactement à ton allure objectif marathon ({{OBJ}}). Récupération 2 min au trot entre chaque. Blocs plus longs que la trame standard.',
+    note:'RPE 7-8/10 · 24 km à l\'allure objectif. Si tu les tiens facilement, ton objectif est peut-être trop prudent.' },
+    Dimanche: { duree:'2h30',
+    corps:'90 min à {{P}}, puis 12 km à ton allure objectif marathon ({{OBJ}}), puis retour à l\'allure EF. Gel à 1h, à 1h20, à 1h45.',
+    note:'RPE 6/10 en EF · 7-8/10 sur les 12 km · Mémorise cette sensation.' } } },
+  10: { replace: { Jeudi: {
+    titre:'4 × 8 km à allure marathon', duree:'100 min',
+    corps:'4 × 8 km exactement à ton allure objectif marathon ({{OBJ}}). Récupération 2 min au trot entre chaque. La quatrième est ta répétition générale avant le jour J.',
+    note:'RPE 7-8/10 · 32 km à l\'allure objectif. Un niveau de spécificité rarement atteint.' },
+    Dimanche: { duree:'2h30',
+    corps:'50 min à {{P}}, puis 18 km à ton allure objectif marathon ({{OBJ}}), puis retour à l\'allure EF. Gel à 45 min, à 1h15, à 1h45, à 2h10.',
+    note:'RPE 6/10 en EF · 8/10 sur les 18 km · Après cette séance, les séances dures sont terminées.' } } },
+})
