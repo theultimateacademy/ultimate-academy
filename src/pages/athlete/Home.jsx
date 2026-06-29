@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../../contexts/AuthContext'
 import { supabase } from '../../lib/supabase'
@@ -9,6 +9,17 @@ import LoadingSpinner from '../../components/UI/LoadingSpinner'
 // ── Helpers visuels ────────────────────────────────────────────────────────────
 const rpeColor = r => !r ? 'rgba(255,255,255,.3)' : r >= 8 ? '#EF4444' : r >= 6 ? '#F59E0B' : '#10B981'
 const rpeBg    = r => !r ? 'transparent' : r >= 8 ? 'rgba(239,68,68,.12)' : r >= 6 ? 'rgba(245,158,11,.12)' : 'rgba(16,185,129,.12)'
+
+// Rendu riche : **texte** → gras violet/rose
+function renderRich(text, accent = '#C084FC') {
+  if (!text) return null
+  return text.split(/(\*\*[^*]+\*\*)/g).map((part, i) =>
+    part.startsWith('**') && part.endsWith('**')
+      ? <strong key={i} style={{ color: accent, fontWeight: 800 }}>{part.slice(2, -2)}</strong>
+      : <span key={i}>{part}</span>
+  )
+}
+
 const typeColor = (type) => {
   if (!type) return '#10B981'
   const t = (type || '').toLowerCase()
@@ -117,7 +128,7 @@ function SportLegend({ sessions }) {
   )
 }
 
-// Modale analyse visuelle complète
+// Modale analyse — pleine page
 function WeeklyAnalysisModal({ analysis, onClose }) {
   const d = analysis.analysis_data || {}
   const intro    = analysis.coach_message || d.intro || ''
@@ -125,78 +136,110 @@ function WeeklyAnalysisModal({ analysis, onClose }) {
   const conseil  = d.conseil || d.ajustement_semaine_suivante || ''
   const rpe      = d.rpe_moyen
   const mood     = d.mood || 'good'
-  const MOOD = { fire: { icon: '🔥', color: '#F97316', label: 'En feu !' }, good: { icon: '💪', color: '#10B981', label: 'Bonne semaine' }, ok: { icon: '👌', color: '#3B82F6', label: 'Semaine solide' }, attention: { icon: '⚠️', color: '#F59E0B', label: 'À surveiller' } }
+  const MOOD = {
+    fire:      { icon: '🔥', color: '#F97316', label: 'En feu !' },
+    good:      { icon: '💪', color: '#10B981', label: 'Bonne semaine' },
+    ok:        { icon: '👌', color: '#3B82F6', label: 'Semaine solide' },
+    attention: { icon: '⚠️', color: '#F59E0B', label: 'À surveiller' },
+  }
   const m = MOOD[mood] || MOOD.good
-  const scrollRef = useRef(null)
-
   const done  = sessions.filter(s => s.done !== false).length
   const total = sessions.length
 
-  return (
-    <div
-      onClick={e => e.target === e.currentTarget && onClose()}
-      style={{ position: 'fixed', inset: 0, zIndex: 500, background: 'rgba(0,0,0,.82)', backdropFilter: 'blur(8px)', display: 'flex', alignItems: 'flex-end', justifyContent: 'center' }}>
-      <div
-        ref={scrollRef}
-        style={{ width: '100%', maxWidth: 560, maxHeight: '94vh', overflowY: 'auto', borderRadius: '20px 20px 0 0', background: '#0E0E18', border: '1px solid rgba(255,255,255,.08)', borderBottom: 'none' }}>
+  // Prevent body scroll when modal open
+  useEffect(() => {
+    const prev = document.body.style.overflow
+    document.body.style.overflow = 'hidden'
+    return () => { document.body.style.overflow = prev }
+  }, [])
 
-        {/* ── Header gradient ── */}
-        <div style={{ background: `linear-gradient(160deg, ${m.color}28 0%, rgba(9,9,15,.9) 60%)`, padding: '1.5rem 1.5rem 1.25rem', borderBottom: '1px solid rgba(255,255,255,.07)', position: 'sticky', top: 0, backdropFilter: 'blur(20px)', zIndex: 2 }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-            <div>
-              <div style={{ fontSize: '2.2rem', lineHeight: 1, marginBottom: '.35rem' }}>{m.icon}</div>
-              <div style={{ fontWeight: 800, fontSize: '1.1rem', color: '#fff', marginBottom: '.15rem' }}>
-                Semaine {analysis.week_number} · {m.label}
-              </div>
-              {analysis.sent_at && (
-                <div style={{ fontSize: '.72rem', color: 'rgba(255,255,255,.35)' }}>
-                  {new Date(analysis.sent_at).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })}
-                </div>
-              )}
+  return (
+    <div style={{ position: 'fixed', inset: 0, zIndex: 500, background: '#09090F', overflowY: 'auto' }}>
+      <div style={{ maxWidth: 700, margin: '0 auto' }}>
+
+        {/* ── Header sticky ── */}
+        <div style={{
+          position: 'sticky', top: 0, zIndex: 2,
+          background: `linear-gradient(160deg, ${m.color}1e 0%, #09090F 75%)`,
+          backdropFilter: 'blur(20px)',
+          borderBottom: '1px solid rgba(255,255,255,.07)',
+          padding: '1rem 1.5rem',
+          display: 'flex', alignItems: 'center', gap: '.875rem',
+        }}>
+          <button
+            onClick={onClose}
+            style={{
+              background: 'rgba(255,255,255,.07)', border: 'none', borderRadius: 10,
+              padding: '.4rem .85rem', cursor: 'pointer', color: 'rgba(255,255,255,.65)',
+              fontSize: '.8rem', fontWeight: 700, fontFamily: 'inherit', flexShrink: 0,
+              display: 'flex', alignItems: 'center', gap: '.3rem',
+            }}>
+            ← Retour
+          </button>
+          <div style={{ flex: 1, minWidth: 0 }}>
+            <div style={{ fontWeight: 800, fontSize: '.95rem', color: '#fff', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+              {m.icon} Semaine {analysis.week_number} · {m.label}
             </div>
-            <button onClick={onClose} style={{ background: 'rgba(255,255,255,.08)', border: 'none', borderRadius: 10, width: 34, height: 34, cursor: 'pointer', color: 'rgba(255,255,255,.6)', fontSize: '1rem', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'inherit' }}>✕</button>
+            {analysis.sent_at && (
+              <div style={{ fontSize: '.65rem', color: 'rgba(255,255,255,.28)' }}>
+                {new Date(analysis.sent_at).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })}
+              </div>
+            )}
           </div>
+          <span style={{ fontSize: '.72rem', color: 'rgba(255,255,255,.3)', fontWeight: 700, flexShrink: 0 }}>
+            {done}/{total} séances
+          </span>
         </div>
 
-        <div style={{ padding: '1.25rem 1.5rem', display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+        {/* ── Contenu ── */}
+        <div style={{ padding: '1.75rem 1.5rem 5rem', display: 'flex', flexDirection: 'column', gap: '2rem' }}>
 
-          {/* ── Vue semaine ── */}
+          {/* Vue semaine */}
           <div>
-            <div style={{ fontSize: '.65rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '.1em', color: 'rgba(255,255,255,.3)', marginBottom: '.75rem' }}>Ta semaine</div>
+            <div style={{ fontSize: '.6rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '.12em', color: 'rgba(255,255,255,.22)', marginBottom: '1rem' }}>Vue de la semaine</div>
             <WeekGrid sessions={sessions} />
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '.75rem' }}>
+            <div style={{ marginTop: '.875rem' }}>
               <SportLegend sessions={sessions} />
-              <span style={{ fontSize: '.7rem', color: 'rgba(255,255,255,.35)', fontWeight: 600 }}>
-                {done}/{total} séances
-              </span>
             </div>
           </div>
 
-          {/* ── Séparateur ── */}
           <div style={{ height: 1, background: 'rgba(255,255,255,.06)' }} />
 
-          {/* ── Séances + RPE ── */}
+          {/* Retour par séance */}
           {sessions.length > 0 && (
             <div>
-              <div style={{ fontSize: '.65rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '.1em', color: 'rgba(255,255,255,.3)', marginBottom: '.875rem' }}>Retour par séance</div>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 1, borderRadius: 12, overflow: 'hidden', border: '1px solid rgba(255,255,255,.07)' }}>
+              <div style={{ fontSize: '.6rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '.12em', color: 'rgba(255,255,255,.22)', marginBottom: '1.125rem' }}>Retour par séance</div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
                 {sessions.map((s, i) => {
-                  const c = typeColor(s.type)
+                  const c   = typeColor(s.type)
+                  const isDone = s.done !== false
                   return (
-                    <div key={i} style={{ background: i % 2 === 0 ? 'rgba(255,255,255,.025)' : 'rgba(255,255,255,.015)', display: 'flex', gap: 0 }}>
-                      <div style={{ width: 3, background: c, flexShrink: 0 }} />
-                      <div style={{ flex: 1, padding: '.75rem .875rem .6rem' }}>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '.5rem', marginBottom: '.35rem' }}>
-                          <div>
-                            <span style={{ fontWeight: 700, fontSize: '.8rem' }}>{s.titre}</span>
-                            <span style={{ fontSize: '.68rem', color: 'rgba(255,255,255,.3)', marginLeft: '.4rem' }}>· {s.jour}</span>
+                    <div key={i} style={{
+                      background: 'rgba(255,255,255,.03)',
+                      border: `1px solid ${c}1a`,
+                      borderLeft: `4px solid ${c}`,
+                      borderRadius: 14,
+                      padding: '1rem 1.25rem',
+                    }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '.75rem', marginBottom: '.625rem' }}>
+                        <div>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '.5rem', flexWrap: 'wrap' }}>
+                            <span style={{ fontWeight: 800, fontSize: '.88rem', color: isDone ? '#fff' : 'rgba(255,255,255,.38)' }}>{s.titre}</span>
+                            {!isDone && <span style={{ fontSize: '.62rem', color: '#F59E0B', fontWeight: 700, background: 'rgba(245,158,11,.1)', borderRadius: 4, padding: '.1rem .35rem' }}>Non effectuée</span>}
                           </div>
-                          <div style={{ flexShrink: 0 }}>
-                            <RpeBar rpe={s.rpe} />
+                          <div style={{ fontSize: '.7rem', color: `${c}bb`, fontWeight: 600, marginTop: '.2rem' }}>
+                            {s.jour}{s.type ? ` · ${s.type}` : ''}
                           </div>
                         </div>
-                        {s.note && <p style={{ fontSize: '.78rem', lineHeight: 1.55, color: 'rgba(255,255,255,.6)', margin: 0 }}>{s.note}</p>}
+                        <div style={{ flexShrink: 0 }}>
+                          <RpeBar rpe={s.rpe} />
+                        </div>
                       </div>
+                      {s.note && (
+                        <p style={{ fontSize: '.855rem', lineHeight: 1.65, color: 'rgba(255,255,255,.72)', margin: 0 }}>
+                          {renderRich(s.note)}
+                        </p>
+                      )}
                     </div>
                   )
                 })}
@@ -204,43 +247,49 @@ function WeeklyAnalysisModal({ analysis, onClose }) {
             </div>
           )}
 
-          {/* ── RPE moyen gauge ── */}
+          {/* RPE moyen gauge */}
           {rpe && (
-            <div style={{ background: 'rgba(255,255,255,.03)', border: '1px solid rgba(255,255,255,.07)', borderRadius: 12, padding: '1rem 1.25rem', display: 'flex', alignItems: 'center', gap: '1.25rem' }}>
+            <div style={{ background: 'rgba(255,255,255,.03)', border: '1px solid rgba(255,255,255,.07)', borderRadius: 14, padding: '1.25rem 1.5rem', display: 'flex', alignItems: 'center', gap: '1.5rem' }}>
               <RpeGauge value={rpe} />
               <div>
-                <div style={{ fontWeight: 700, fontSize: '.88rem', marginBottom: '.3rem' }}>RPE moyen · {rpe}/10</div>
-                <div style={{ fontSize: '.78rem', color: 'rgba(255,255,255,.45)', lineHeight: 1.5 }}>
-                  {rpe < 5 ? 'Semaine légère — bonne récupération active.' : rpe < 7 ? 'Charge modérée bien gérée — endurance de fond qui progresse.' : rpe < 9 ? 'Semaine chargée — assure-toi de bien dormir et bien manger.' : 'Semaine très intense — récupération prioritaire.'}
+                <div style={{ fontWeight: 800, fontSize: '.92rem', marginBottom: '.35rem' }}>
+                  RPE moyen · <span style={{ color: rpeColor(rpe) }}>{rpe}/10</span>
                 </div>
+                <p style={{ fontSize: '.82rem', color: 'rgba(255,255,255,.45)', lineHeight: 1.55, margin: 0 }}>
+                  {rpe < 5 ? 'Semaine légère, bonne récupération active.' : rpe < 7 ? 'Charge modérée bien gérée. Endurance de fond qui progresse.' : rpe < 9 ? 'Semaine chargée. Assure-toi de bien dormir et bien manger.' : 'Semaine très intense. Récupération prioritaire.'}
+                </p>
               </div>
             </div>
           )}
 
-          {/* ── Message coach ── */}
+          {/* Message coach */}
           {intro && (
-            <div style={{ background: 'linear-gradient(135deg, rgba(139,47,201,.1), rgba(232,35,122,.05))', border: '1px solid rgba(139,47,201,.2)', borderRadius: 14, overflow: 'hidden' }}>
-              <div style={{ padding: '1rem 1.25rem' }}>
-                <div style={{ display: 'flex', gap: '.75rem', alignItems: 'flex-start' }}>
-                  <img src="/Coach.JPG" alt="Alexis" style={{ width: 40, height: 40, borderRadius: '50%', objectFit: 'cover', flexShrink: 0, border: '2px solid rgba(139,47,201,.5)' }} />
+            <div style={{ background: 'linear-gradient(135deg, rgba(139,47,201,.1), rgba(232,35,122,.04))', border: '1px solid rgba(139,47,201,.22)', borderRadius: 16 }}>
+              <div style={{ padding: '1.25rem 1.5rem' }}>
+                <div style={{ display: 'flex', gap: '.875rem', alignItems: 'center', marginBottom: '.875rem' }}>
+                  <img src="/Coach.JPG" alt="Alexis" style={{ width: 44, height: 44, borderRadius: '50%', objectFit: 'cover', flexShrink: 0, border: '2px solid rgba(139,47,201,.5)' }} />
                   <div>
-                    <div style={{ fontWeight: 700, fontSize: '.75rem', color: '#C084FC', marginBottom: '.3rem' }}>Alexis · Coach</div>
-                    <p style={{ fontSize: '.875rem', lineHeight: 1.65, margin: 0, color: 'rgba(255,255,255,.9)' }}>{intro}</p>
+                    <div style={{ fontWeight: 800, fontSize: '.8rem', color: '#C084FC' }}>Alexis · Coach</div>
+                    <div style={{ fontSize: '.65rem', color: 'rgba(255,255,255,.25)' }}>Retour semaine {analysis.week_number}</div>
                   </div>
                 </div>
+                <p style={{ fontSize: '.9rem', lineHeight: 1.75, margin: 0, color: 'rgba(255,255,255,.9)', textAlign: 'justify' }}>
+                  {renderRich(intro)}
+                </p>
               </div>
             </div>
           )}
 
-          {/* ── Focus semaine prochaine ── */}
+          {/* Focus semaine prochaine */}
           {conseil && (
-            <div style={{ background: 'rgba(59,130,246,.07)', border: '1px solid rgba(59,130,246,.2)', borderRadius: 12, padding: '.875rem 1.125rem' }}>
-              <div style={{ fontSize: '.65rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '.1em', color: '#60A5FA', marginBottom: '.35rem' }}>→ Focus semaine prochaine</div>
-              <p style={{ fontSize: '.875rem', lineHeight: 1.6, margin: 0, color: 'rgba(255,255,255,.85)' }}>{conseil}</p>
+            <div style={{ background: 'rgba(59,130,246,.07)', border: '1px solid rgba(59,130,246,.22)', borderRadius: 14, padding: '1.25rem 1.5rem' }}>
+              <div style={{ fontSize: '.6rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '.12em', color: '#60A5FA', marginBottom: '.625rem' }}>→ Focus semaine prochaine</div>
+              <p style={{ fontSize: '.9rem', lineHeight: 1.75, margin: 0, color: 'rgba(255,255,255,.85)', textAlign: 'justify' }}>
+                {renderRich(conseil, '#60A5FA')}
+              </p>
             </div>
           )}
 
-          <div style={{ height: '1rem' }} />
         </div>
       </div>
     </div>
