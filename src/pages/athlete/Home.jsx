@@ -163,7 +163,7 @@ function WeeklyAnalysisModal({ analysis, onClose }) {
           background: `linear-gradient(160deg, ${m.color}1e 0%, #09090F 75%)`,
           backdropFilter: 'blur(20px)',
           borderBottom: '1px solid rgba(255,255,255,.07)',
-          padding: '1rem 1.5rem',
+          padding: 'calc(env(safe-area-inset-top, 0px) + 1.25rem) 1.5rem 1rem',
           display: 'flex', alignItems: 'center', gap: '.875rem',
         }}>
           <button
