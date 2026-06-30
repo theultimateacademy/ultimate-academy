@@ -94,7 +94,7 @@ module.exports = applyOverrides(base, {
     retour:'10 min footing très lent.',
     note:'RPE 8-9/10 · 35 min en continu est le pic du palier avancé au seuil.' },
     Dimanche: { duree:'2h10',
-    corps:'2h10 à {{P}}, avec 30 min à allure marathon ({{OBJ}}) sur la fin. Gel à 1h et à 1h30.',
+    corps:'100 min à {{P}}, puis 30 min à ton allure objectif marathon ({{OBJ}}). Gel à 1h et à 1h30. Bloc OBJ à volume complet.',
     note:'RPE 6/10 puis 7-8/10 · Sortie allongée + bloc OBJ à volume complet.' } } },
   6: { replace: {
     Mardi: {
@@ -110,8 +110,8 @@ module.exports = applyOverrides(base, {
     retour:'10 min footing très lent.',
     note:'RPE 8-9/10 · 3×5000m = 15 km à intensité. Séance marathon de référence avancée.' },
     Dimanche: { duree:'2h30',
-    corps:'2h à {{P}}, puis 10 km à ton allure objectif marathon ({{OBJ}}). Gel à 1h, à 1h30, à 1h50.',
-    note:'RPE 6/10 en EF · 7-8/10 sur les 10 km · Sortie longue allongée pour ce palier.' } } },
+    corps:'120 min à {{P}}, puis 30 min à ton allure objectif marathon ({{OBJ}}). Gel à 1h, à 1h30, à 1h50.',
+    note:'RPE 6/10 en EF · 7-8/10 sur les 30 min · Sortie longue allongée pour ce palier.' } } },
   7: { replace: {
     Mardi: {
     titre:'10 côtes de 200 mètres', duree:'70 min', pcts:[[65,70]],
@@ -126,8 +126,8 @@ module.exports = applyOverrides(base, {
     retour:'10 min footing très lent.',
     note:'RPE 8-9/10 · 50 min au seuil avancé en fin de semaine exigeante.' },
     Dimanche: { duree:'2h35',
-    corps:'1h55 à {{P}}, puis 18 km à ton allure objectif marathon ({{OBJ}}). Gel à 1h, à 1h20, à 2h.',
-    note:'RPE 6/10 en EF · 7-8/10 sur les 18 km · 18 km à {{OBJ}} après 1h55 — répétition générale avancée.' } } },
+    corps:'120 min à {{P}}, puis 35 min à ton allure objectif marathon ({{OBJ}}). Gel à 1h, à 1h20, à 2h.',
+    note:'RPE 6/10 en EF · 7-8/10 sur les 35 min · 35 min à {{OBJ}} après 2h — ta plus grande séance.' } } },
   8: { replace: {
     Vendredi: {
     titre:'10 × 1000 mètres — volume VMA élevé', pcts:[[65,65],[88,93]],
@@ -136,8 +136,8 @@ module.exports = applyOverrides(base, {
     retour:'10 min footing très lent.',
     note:'RPE 8/10 · Semaine de charge maximale avancée.' },
     Dimanche: { duree:'2h45',
-    corps:'2h à {{P}}, puis 18 km à ton allure objectif marathon ({{OBJ}}). Gel à 1h, à 1h30, à 2h.',
-    note:'RPE 6/10 en EF · 8/10 sur les 18 km · Après cette semaine, l\'entraînement dur est terminé.' } } },
+    corps:'120 min à {{P}}, puis 45 min à ton allure objectif marathon ({{OBJ}}). Gel à 1h, à 1h30, à 2h.',
+    note:'RPE 6/10 en EF · 8/10 sur les 45 min · Après cette semaine, l\'entraînement dur est terminé.' } } },
   9: { replace: {
     Mercredi: {
     titre:'4 × 5 km à allure marathon', duree:'100 min', pcts:[[65,65]],
@@ -146,8 +146,8 @@ module.exports = applyOverrides(base, {
     retour:'10 min footing léger.',
     note:'RPE 7-8/10 · 4×5km = 20 km à {{OBJ}}. Si les 4 blocs sont réguliers, ton objectif est validé.' },
     Dimanche: { duree:'2h20',
-    corps:'1h45 à {{P}}, puis 15 km à ton allure objectif marathon ({{OBJ}}). Gel à 1h, à 1h15, à 1h45.',
-    note:'RPE 6/10 en EF · 7-8/10 sur les 15 km · Sortie spécifique allongée pour ce palier.' } } },
+    corps:'100 min à {{P}}, puis 40 min à ton allure objectif marathon ({{OBJ}}). Gel à 1h, à 1h15, à 1h45.',
+    note:'RPE 6/10 en EF · 7-8/10 sur les 40 min · Sortie spécifique allongée pour ce palier.' } } },
   10: { replace: {
     Mercredi: {
     titre:'3 × 5000 mètres — pic de spécificité', pcts:[[65,65],[78,83]],
@@ -162,6 +162,6 @@ module.exports = applyOverrides(base, {
     retour:'10 min footing léger.',
     note:'RPE 7-8/10 · Après cette séance, les séances dures sont terminées.' },
     Dimanche: { duree:'2h10',
-    corps:'1h35 à {{P}}, puis 12 km à ton allure objectif marathon ({{OBJ}}). Gel à 1h et à 1h10.',
-    note:'RPE 6/10 en EF · 7-8/10 sur les 12 km · Dernière sortie longue chargée pour le palier avancé.' } } },
+    corps:'100 min à {{P}}, puis 30 min à ton allure objectif marathon ({{OBJ}}). Gel à 1h et à 1h10.',
+    note:'RPE 6/10 en EF · 7-8/10 sur les 30 min · Dernière sortie longue chargée pour le palier avancé.' } } },
 })

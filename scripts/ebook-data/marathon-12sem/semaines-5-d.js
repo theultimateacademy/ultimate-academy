@@ -68,8 +68,8 @@ module.exports = applyOverrides(base, {
     retour:'10 min footing très lent.',
     note:'RPE 7/10 · 2×2000m avant d\'attaquer les 5000m dans les semaines suivantes.' },
     Dimanche: { duree:'2h',
-    corps:'2h à {{P}}, avec 6 km à allure marathon ({{OBJ}}) en fin de sortie. Gel à 1h et à 1h20. Bloc OBJ raccourci pour ce palier.',
-    note:'RPE 5-6/10 en EF · 6-7/10 sur les 6 km · Mémorise la sensation de {{OBJ}}.' } } },
+    corps:'100 min à {{P}}, puis 20 min à ton allure objectif marathon ({{OBJ}}). Gel à 1h et à 1h20. Bloc OBJ raccourci pour ce palier.',
+    note:'RPE 5-6/10 en EF · 6-7/10 sur les 20 min · Mémorise la sensation de {{OBJ}}.' } } },
   7: { replace: { Mercredi: {
     titre:'2000m / 3000m / 2000m progressif', pcts:[[65,65],[80,82],[82,84],[84,87]],
     echauff:'25 min progressif à {{P}}, finir par 4 accélérations 80m.',
@@ -98,8 +98,8 @@ module.exports = applyOverrides(base, {
     retour:'10 min footing très lent.',
     note:'RPE 7-8/10 · Semaine de charge maximale adaptée au palier débutant.' },
     Dimanche: { duree:'2h20',
-    corps:'1h50 à {{P}}, puis 10 km à ton allure objectif marathon ({{OBJ}}). Gel à 1h et à 1h20.',
-    note:'RPE 5-6/10 en EF · 7/10 sur les 10 km · Le pic de charge du plan débutant.' } } },
+    corps:'1h50 à {{P}}, puis 30 min à ton allure objectif marathon ({{OBJ}}). Gel à 1h et à 1h20. Le pic de charge du plan débutant.',
+    note:'RPE 5-6/10 en EF · 7/10 sur les 30 min · Le pic de charge du plan débutant.' } } },
   9: { replace: { Mercredi: {
     titre:'2 × 4 km à allure marathon', duree:'65 min', pcts:[[65,65]],
     echauff:'20 min footing EF à {{P}}.',
@@ -107,8 +107,8 @@ module.exports = applyOverrides(base, {
     retour:'10 min footing léger.',
     note:'RPE 6-7/10 · La régularité sur les 2 blocs est l\'objectif.' },
     Dimanche: { duree:'1h55',
-    corps:'1h20 à {{P}}, puis 8 km à ton allure objectif marathon ({{OBJ}}). Gel à 1h et à 1h10.',
-    note:'RPE 5-6/10 en EF · 6-7/10 sur les 8 km · Mémorise cette sensation.' } } },
+    corps:'80 min à {{P}}, puis 35 min à ton allure objectif marathon ({{OBJ}}). Gel à 1h et à 1h10. Mémorise cette sensation.',
+    note:'RPE 5-6/10 en EF · 6-7/10 sur les 35 min · Mémorise cette sensation.' } } },
   10: { replace: { Mercredi: {
     titre:'1 × 5000 mètres — répétition générale', duree:'65 min', pcts:[[65,65],[78,83]],
     echauff:'25 min progressif à {{P}}, finir par 4 accélérations 80m.',
@@ -122,6 +122,6 @@ module.exports = applyOverrides(base, {
     retour:'10 min footing léger.',
     note:'RPE 7/10 · Après cette séance, les séances dures sont terminées.' },
     Dimanche: { duree:'1h50',
-    corps:'1h25 à {{P}}, puis 8 km à ton allure objectif marathon ({{OBJ}}). Gel à 1h et à 1h10. Dernière sortie longue chargée.',
-    note:'RPE 5-6/10 en EF · 7/10 sur les 8 km · Après cette sortie, les séances dures sont terminées.' } } },
+    corps:'80 min à {{P}}, puis 30 min à ton allure objectif marathon ({{OBJ}}). Gel à 1h et à 1h10. Dernière sortie longue chargée.',
+    note:'RPE 5-6/10 en EF · 7/10 sur les 30 min · Après cette sortie, les séances dures sont terminées.' } } },
 })
