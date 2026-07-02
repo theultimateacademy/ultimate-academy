@@ -278,6 +278,7 @@ body {
 }
 .s-meta { flex-shrink: 0; font-size: 8pt; color: rgba(255,255,255,.4); display: flex; gap: 10px; justify-content: center; }
 .s-corps { font-size: 10pt; line-height: 1.55; color: rgba(255,255,255,.9); text-align: center; }
+.hl { font-weight: 700; background: linear-gradient(135deg, #E8237A, #8B2FC9); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
 .s-note {
   flex-shrink: 0; padding: 5px 13px;
   font-size: 7.5pt; font-style: italic; color: rgba(255,255,255,.42);
@@ -374,15 +375,26 @@ function gradText(text, { sizePt, weight = 800, width = CONTENT_W, height, lette
   </svg>`
 }
 
+const HL = t => `<strong class="hl">${t}</strong>`
+const INTERVAL_RE = /\b(\d+\s*×\s*\d[\d,.]*\s*(?:km|mètres?|minutes?|min(?=[\s/,.]|$)|m(?=[^a-zA-Zéèêàùœ]|$)|secondes?)(?:\s*\/\s*\d[\d,.]*\s*(?:km|mètres?|minutes?|min(?=[\s/,.]|$)|m(?=[^a-zA-Zéèêàùœ]|$)|secondes?))?)/g
+
+function applyHL(text) {
+  text = text.replace(/\*\*(.+?)\*\*/g, (_, t) => HL(t))
+  text = text.replace(INTERVAL_RE, (m) => HL(m))
+  return text
+}
+
 function fillText(text, pctQueue, vma) {
   if (!text) return text
   let out = text.replace(/{{P}}/g, () => {
     const range = pctQueue.shift()
     if (!range) return ''
     const [min, max] = range
-    return min === max ? `${formatPace(vma, min)}/km` : formatPaceRange(vma, min, max)
+    const pace = min === max ? `${formatPace(vma, min)}/km` : formatPaceRange(vma, min, max)
+    return HL(pace)
   })
-  out = out.replace(/{{OBJ}}/g, () => formatObjPace(vma))
+  out = out.replace(/{{OBJ}}/g, () => HL(formatObjPace(vma)))
+  out = applyHL(out)
   return out
 }
 

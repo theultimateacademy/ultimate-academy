@@ -340,7 +340,6 @@ function fillSession(s, vma) {
   const queue = (s.pcts || []).map(p => p.slice())
   return {
     ...s,
-    titre:   applyHL(s.titre   || ''),
     echauff: fillText(s.echauff || '', queue, vma),
     corps:   fillText(s.corps   || '', queue, vma),
     retour:  fillText(s.retour  || '', queue, vma),
