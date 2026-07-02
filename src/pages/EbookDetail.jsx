@@ -10,6 +10,7 @@ const VARIANT_PRICE_TIERS = {
   '10km-12sem':    { 3: 1799, 4: 1999, 5: 2299, 6: 2499 },
   'semi-12sem':    { 3: 1999, 4: 2299, 5: 2499, 6: 2999 },
   'marathon-12sem':{ 3: 1999, 4: 2299, 5: 2499, 6: 2999 },
+  'marathon-16sem':{ 3: 2299, 4: 2599, 5: 2799, 6: 3299 },
 }
 
 // Toutes les VMA disponibles : 10 à 24 par pas de 0.5
@@ -749,8 +750,6 @@ export default function EbookDetail() {
 
           </div>
 
-          {/* ── Ligne 2 de la grille : aperçu flouté ── */}
-          <BlurredPreview slug={slug} />
         </div>
       </div>
     </div>
