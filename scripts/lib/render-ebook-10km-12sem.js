@@ -594,12 +594,12 @@ ${SEMAINES.map(s => weekPage(s, vma)).join('')}
 <div class="page">
   ${blobs('A')}
   <div class="page-title">${gradText('Stratégie de course', { sizePt: 27 })}</div>
-  <p class="page-intro">La majorité des coureurs ratent leur 10km en partant trop vite. Cette stratégie en split négatif — deuxième moitié plus rapide que la première — fait la différence entre un bon 10km et un record personnel.</p>
+  <p class="page-intro">La majorité des coureurs ratent leur 10km en partant trop vite. Cette stratégie en split négatif, deuxième moitié plus rapide que la première, fait la différence entre un bon 10km et un record personnel.</p>
   ${SVG_HEARTBEAT}
   <div class="strats-wrap">
     ${[
       ['KM 1-5','Sous-allure','Départ contrôlé',`Pars 5 à 8 sec/km PLUS LENTEMENT que ${objPace}/km. L\'adrénaline du départ est ton pire ennemi sur 10km. Chaque seconde gagnée trop tôt peut coûter 30 à 60 secondes sur les 3 derniers kilomètres.`],
-      ['KM 6-10','Accélération progressive','Split négatif — finir fort',`À partir du km 6, accélère progressivement toutes les 500m. Les km 8-9-10 doivent être tes plus rapides. Si tu as géré le départ, tes réserves te permettent de finir bien plus vite que tu n\'as commencé. C\'est le split négatif.`],
+      ['KM 6-10','Accélération progressive','Split négatif, finir fort',`À partir du km 6, accélère progressivement toutes les 500m. Les km 8-9-10 doivent être tes plus rapides. Si tu as géré le départ, tes réserves te permettent de finir bien plus vite que tu n\'as commencé. C\'est le split négatif.`],
     ].map(([km,allure,titre,desc])=>`
     <div class="strat">
       <div class="strat-km"><div class="strat-km-l">${km}</div><div class="strat-km-a">${allure}</div></div>
@@ -659,7 +659,7 @@ ${SEMAINES.map(s => weekPage(s, vma)).join('')}
         </div>
       </div>
       <div class="nut-items">
-        ${[['30 min','Banane ou barre de céréales + eau ou boisson isotonique.'],['2 heures','Repas complet protéines + glucides — poulet-riz, omelette-pain.'],['Alcool','Évite les 24h suivantes — ralentit significativement la récupération.'],['Hydratation','Continue à boire toute la journée. La déshydratation persiste.']].map(([k,v])=>`
+        ${[['30 min','Banane ou barre de céréales + eau ou boisson isotonique.'],['2 heures','Repas complet protéines + glucides, poulet-riz, omelette-pain.'],['Alcool','Évite les 24h suivantes, ralentit significativement la récupération.'],['Hydratation','Continue à boire toute la journée. La déshydratation persiste.']].map(([k,v])=>`
         <div class="nut-item">
           <div class="nut-dot" style="background:#22C55E"></div>
           <div class="nut-text"><span class="nut-key">${k}</span> ${v}</div>
@@ -682,10 +682,10 @@ ${SEMAINES.map(s => weekPage(s, vma)).join('')}
   <div class="fin-grid">
     ${[
       { n:'01', t:'Plan personnalisé', bar:'#8B2FC9', tag:'100% sur mesure',
-        d:'Généré selon ta VMA réelle, ton objectif précis et ta disponibilité. Chaque semaine est unique — pas un plan générique copié-collé.',
+        d:'Généré selon ta VMA réelle, ton objectif précis et ta disponibilité. Chaque semaine est unique, pas un plan générique copié-collé.',
         icon:`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" width="20" height="20"><circle cx="10" cy="10" r="8" fill="none" stroke="white" stroke-width="2"/><path d="M7 10 L9 12 L13 8" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>` },
       { n:'02', t:'Suivi chaque semaine', bar:'#E8237A', tag:'Bilan hebdo',
-        d:'Un bilan personnalisé chaque semaine. Tu signales de la fatigue — le plan s\'allège. Tu progresses vite — il accélère. Jamais de stagnation.',
+        d:'Un bilan personnalisé chaque semaine. Tu signales de la fatigue, le plan s\'allège. Tu progresses vite, il accélère. Jamais de stagnation.',
         icon:`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" width="20" height="20"><rect x="3" y="3" width="14" height="14" rx="2" fill="none" stroke="white" stroke-width="2"/><line x1="7" y1="10" x2="13" y2="10" stroke="white" stroke-width="2" stroke-linecap="round"/><line x1="10" y1="7" x2="10" y2="13" stroke="white" stroke-width="2" stroke-linecap="round"/></svg>` },
       { n:'03', t:'Analyses de course', bar:'#A855F7', tag:'Avant & après',
         d:'Analyse pré-course J-7 pour finaliser ta stratégie. Analyse post-course pour comprendre tes résultats et identifier les axes de progression.',
@@ -705,7 +705,7 @@ ${SEMAINES.map(s => weekPage(s, vma)).join('')}
     </div>`).join('')}
   </div>
   <div class="fin-cta">
-    <div class="fin-cta-title">14 jours d'essai gratuit — sans engagement</div>
+    <div class="fin-cta-title">14 jours d'essai gratuit, sans engagement</div>
     <div class="fin-cta-sub">Rejoins les athlètes qui progressent chaque semaine avec un plan personnalisé.</div>
   </div>
   <div class="fin-url">

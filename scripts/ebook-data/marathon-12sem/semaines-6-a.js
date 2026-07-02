@@ -8,7 +8,7 @@ module.exports = applyOverrides(base, {
     Mardi: {
     titre:'10 côtes de 80 mètres', duree:'55 min', pcts:[[65,70]],
     echauff:'22 min progressif à {{P}}, finir par 4 lignes droites.',
-    corps:'10 montées de 80m — deux de plus que la trame. Effort maximal sur chaque montée. Genoux hauts, bras actifs. Descente en marchant complète.',
+    corps:'10 montées de 80m, deux de plus que la trame. Effort maximal sur chaque montée. Genoux hauts, bras actifs. Descente en marchant complète.',
     retour:'10 min footing léger.',
     note:'RPE 8-9/10 sur les montées · Plus de répétitions pour le palier avancé dès la semaine 1.' },
     Jeudi: {
@@ -16,7 +16,7 @@ module.exports = applyOverrides(base, {
     echauff:'25 min progressif à {{P}}, terminer par 4 accélérations de 80m.',
     corps:'8 × 1000m à {{P}}. Trois de plus que la trame. Récupération 90 sec au trot. Le palier avancé démarre avec un volume VMA élevé.',
     retour:'10 min footing très lent.',
-    note:'RPE 7-8/10 · 8×1000m pour le palier avancé — régularité sur les 8 blocs.' },
+    note:'RPE 7-8/10 · 8×1000m pour le palier avancé, régularité sur les 8 blocs.' },
     Dimanche: { duree:'80 min',
     corps:'80 min à {{P}}. Légèrement plus long que la trame. Régulier et contrôlé.',
     note:'RPE 5/10 · Durée allongée pour le palier avancé.' } } },
@@ -24,11 +24,11 @@ module.exports = applyOverrides(base, {
     Mardi: {
     titre:'10 côtes de 100 mètres', duree:'60 min', pcts:[[65,70]],
     echauff:'22 min progressif à {{P}}, finir par 4 lignes droites.',
-    corps:'10 montées de 100m — deux de plus que la trame. Effort régulier sur toute la distance. Genoux hauts, bras actifs. Descente au trot pour récupération active.',
+    corps:'10 montées de 100m, deux de plus que la trame. Effort régulier sur toute la distance. Genoux hauts, bras actifs. Descente au trot pour récupération active.',
     retour:'10 min footing léger.',
     note:'RPE 7-8/10 sur les montées · Volume de côtes progressivement plus élevé.' },
     Jeudi: {
-    titre:'5 × 2000 mètres — volume seuil élevé', pcts:[[65,65],[82,88]],
+    titre:'5 × 2000 mètres, volume seuil élevé', pcts:[[65,65],[82,88]],
     echauff:'25 min progressif à {{P}}, finir par 4 accélérations 80m.',
     corps:'5 × 2000m à {{P}}. Une répétition de plus que la trame. Récupération 3 min. 10 km à intensité. Régularité sur les 5.',
     retour:'10 min footing très lent.',
@@ -40,7 +40,7 @@ module.exports = applyOverrides(base, {
     Mardi: {
     titre:'12 côtes de 100 mètres', duree:'65 min', pcts:[[65,70]],
     echauff:'25 min progressif à {{P}}, finir par 4 lignes droites.',
-    corps:'12 montées de 100m — deux de plus que la trame. Effort régulier sur toute la distance. Le volume de côtes du palier avancé atteint son record de semaine 3.',
+    corps:'12 montées de 100m, deux de plus que la trame. Effort régulier sur toute la distance. Le volume de côtes du palier avancé atteint son record de semaine 3.',
     retour:'10 min footing léger.',
     note:'RPE 7-8/10 sur les montées · Volume de côtes élevé pour ce palier.' },
     Mercredi: {
@@ -48,9 +48,9 @@ module.exports = applyOverrides(base, {
     echauff:'25 min progressif à {{P}}, finir par 4 accélérations 80m.',
     corps:'25 min continus à {{P}}. 5 min de plus que la trame. Allure légèrement plus haute.',
     retour:'10 min footing très lent.',
-    note:'RPE 8/10 · 25 min en continu à allure haute — le cap du coureur avancé.' },
+    note:'RPE 8/10 · 25 min en continu à allure haute, le cap du coureur avancé.' },
     Vendredi: {
-    titre:'4 × 3000 mètres — volume fractionné long', pcts:[[65,65],[82,87]],
+    titre:'4 × 3000 mètres, volume fractionné long', pcts:[[65,65],[82,87]],
     echauff:'25 min progressif à {{P}}, finir par 4 accélérations 80m.',
     corps:'4 × 3000m à {{P}}. Une répétition de plus que la trame. Récupération 4 min. 12 km à intensité.',
     retour:'10 min footing très lent.',
@@ -62,7 +62,7 @@ module.exports = applyOverrides(base, {
     Mardi: {
     titre:'8 côtes de 200 mètres', duree:'65 min', pcts:[[65,70]],
     echauff:'25 min progressif à {{P}}, finir par 4 lignes droites.',
-    corps:'8 montées de 200m — deux de plus que la trame. Effort soutenu sur les 200m entiers. Descente au trot pour récupération active.',
+    corps:'8 montées de 200m, deux de plus que la trame. Effort soutenu sur les 200m entiers. Descente au trot pour récupération active.',
     retour:'10 min footing léger.',
     note:'RPE 7-8/10 sur les montées · Côtes à 200m avec deux répétitions de plus que la trame.' },
     Mercredi: {
@@ -76,7 +76,7 @@ module.exports = applyOverrides(base, {
     echauff:'25 min progressif à {{P}}, finir par 4 accélérations 80m.',
     corps:'4 × 3000m à {{P}}. Récupération 4 min. Après le dernier et 2 min de récup, 2 km à ton allure objectif marathon ({{OBJ}}).',
     retour:'10 min footing très lent.',
-    note:'RPE 8-9/10 · 4×3000m + bloc OBJ — semaine de double qualité élevée.' },
+    note:'RPE 8-9/10 · 4×3000m + bloc OBJ, semaine de double qualité élevée.' },
     Dimanche: { duree:'115 min',
     corps:'95 min à {{P}}, puis 20 min à ton allure objectif marathon ({{OBJ}}). Gel à 1h. Bloc OBJ allongé.',
     note:'RPE 6/10 puis 7-8/10 · Bloc OBJ allongé par rapport à la trame.' } } },
@@ -84,9 +84,9 @@ module.exports = applyOverrides(base, {
     Mardi: {
     titre:'10 côtes de 150 mètres', duree:'65 min', pcts:[[65,70]],
     echauff:'22 min progressif à {{P}}, finir par 4 lignes droites.',
-    corps:'10 montées de 150m — deux de plus que la trame. Effort régulier sur toute la distance. Volume de côtes à mi-plan.',
+    corps:'10 montées de 150m, deux de plus que la trame. Effort régulier sur toute la distance. Volume de côtes à mi-plan.',
     retour:'10 min footing léger.',
-    note:'RPE 7-8/10 sur les montées · 10 côtes de 150m — le pic de volume long côtes avancé.' },
+    note:'RPE 7-8/10 sur les montées · 10 côtes de 150m, le pic de volume long côtes avancé.' },
     Mercredi: {
     titre:'Tempo 35 minutes en continu', duree:'80 min', pcts:[[65,70],[84,88]],
     echauff:'25 min progressif à {{P}}, finir par 4 accélérations 80m.',
@@ -100,11 +100,11 @@ module.exports = applyOverrides(base, {
     Mardi: {
     titre:'12 côtes de 150 mètres', duree:'70 min', pcts:[[65,70]],
     echauff:'25 min progressif à {{P}}, finir par 4 lignes droites.',
-    corps:'12 montées de 150m — deux de plus que la trame. Volume maximal de côtes du plan. Effort régulier sur les 150m.',
+    corps:'12 montées de 150m, deux de plus que la trame. Volume maximal de côtes du plan. Effort régulier sur les 150m.',
     retour:'10 min footing léger.',
     note:'RPE 7-8/10 sur les montées · Pic absolu de côtes dans le plan. Après cette semaine, le volume diminue.' },
     Mercredi: {
-    titre:'3 × 5000 mètres — volume marathon extrême', pcts:[[65,65],[78,83]],
+    titre:'3 × 5000 mètres, volume marathon extrême', pcts:[[65,65],[78,83]],
     echauff:'25 min progressif à {{P}}, finir par 4 accélérations 80m.',
     corps:'3 × 5000m à {{P}}. Récupération 5 min. Une répétition de plus que la trame. 15 km à intensité. Pars très conservateur.',
     retour:'10 min footing très lent.',
@@ -116,7 +116,7 @@ module.exports = applyOverrides(base, {
     Mardi: {
     titre:'10 côtes de 200 mètres', duree:'70 min', pcts:[[65,70]],
     echauff:'25 min progressif à {{P}}, finir par 4 lignes droites.',
-    corps:'10 montées de 200m — deux de plus que la trame. Effort maintenu sur les 200m entiers. C\'est le volume maximal de côtes longues du plan.',
+    corps:'10 montées de 200m, deux de plus que la trame. Effort maintenu sur les 200m entiers. C\'est le volume maximal de côtes longues du plan.',
     retour:'10 min footing léger.',
     note:'RPE 8/10 sur les montées · Pic de côtes à 200m. Distance et volume maximaux pour ce palier.' },
     Vendredi: {
@@ -127,10 +127,10 @@ module.exports = applyOverrides(base, {
     note:'RPE 8-9/10 · 50 min au seuil avancé en fin de semaine exigeante.' },
     Dimanche: { duree:'2h35',
     corps:'120 min à {{P}}, puis 35 min à ton allure objectif marathon ({{OBJ}}). Gel à 1h, à 1h20, à 2h.',
-    note:'RPE 6/10 en EF · 7-8/10 sur les 35 min · 35 min à {{OBJ}} après 2h — ta plus grande séance.' } } },
+    note:'RPE 6/10 en EF · 7-8/10 sur les 35 min · 35 min à {{OBJ}} après 2h, ta plus grande séance.' } } },
   8: { replace: {
     Vendredi: {
-    titre:'10 × 1000 mètres — volume VMA élevé', pcts:[[65,65],[88,93]],
+    titre:'10 × 1000 mètres, volume VMA élevé', pcts:[[65,65],[88,93]],
     echauff:'25 min progressif à {{P}}, finir par 4 accélérations 80m.',
     corps:'10 × 1000m à {{P}}. Deux de plus que la trame. Récupération 90 sec au trot. Volume élevé mais allure maîtrisée.',
     retour:'10 min footing très lent.',
@@ -150,15 +150,15 @@ module.exports = applyOverrides(base, {
     note:'RPE 6/10 en EF · 7-8/10 sur les 40 min · Sortie spécifique allongée pour ce palier.' } } },
   10: { replace: {
     Mercredi: {
-    titre:'Séance de finisher avancée — 8 km seuil + 4 × 3 km allure marathon', duree:'105 min', pcts:[[65,65],[80,85]],
+    titre:'Séance de finisher avancée, 8 km seuil + 4 × 3 km allure marathon', duree:'105 min', pcts:[[65,65],[80,85]],
     echauff:'25 min progressif à {{P}}, finir par 4 accélérations 80m.',
     corps:'8 km à {{P}} (effort seuil, régulier) → 5 min de récupération au trot → 4 × 3 km exactement à ton allure objectif marathon ({{OBJ}}), récupération 2 min trot entre chaque. Transition seuil → allure marathon étendue pour le palier avancé : 20 km de qualité totaux.',
     retour:'10 min footing très lent.',
     note:'RPE 8-9/10 sur le seuil · 8/10 sur les 3km · Après cette séance, les séances dures sont terminées.' },
     Vendredi: {
-    titre:'6 × 2 km à allure marathon — blocs courts', duree:'80 min', pcts:[[65,65]],
+    titre:'6 × 2 km à allure marathon, blocs courts', duree:'80 min', pcts:[[65,65]],
     echauff:'20 min footing EF à {{P}}.',
-    corps:'6 × 2 km exactement à ton allure objectif marathon ({{OBJ}}). Récupération 90 sec au trot — volontairement serrée. 12 km à {{OBJ}} en 6 blocs courts : complètement différent des 4×5km de la semaine 9.',
+    corps:'6 × 2 km exactement à ton allure objectif marathon ({{OBJ}}). Récupération 90 sec au trot, volontairement serrée. 12 km à {{OBJ}} en 6 blocs courts : complètement différent des 4×5km de la semaine 9.',
     retour:'10 min footing léger.',
     note:'RPE 8/10 · 6 blocs courts, récup serrée : adaptation neuromusculaire finale avant l\'affûtage.' },
     Dimanche: { duree:'2h10',

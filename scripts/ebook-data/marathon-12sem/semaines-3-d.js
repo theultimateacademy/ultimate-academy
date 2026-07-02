@@ -7,7 +7,7 @@ module.exports = applyOverrides(base, {
   1: { replace: { Jeudi: {
     titre:'5 × 800 mètres', pcts:[[65,65],[85,90]],
     echauff:'25 min progressif à {{P}}, finir par 4 accélérations 80m.',
-    corps:'5 × 800m à {{P}}. Distance plus courte que la trame — adapté pour construire la résistance progressivement. Récupération 2 min au trot entre chaque. Régularité sur les 5.',
+    corps:'5 × 800m à {{P}}. Distance plus courte que la trame, adapté pour construire la résistance progressivement. Récupération 2 min au trot entre chaque. Régularité sur les 5.',
     retour:'10 min footing très lent.',
     note:'RPE 6-7/10 · 800m est la distance d\'entrée idéale pour un premier plan marathon.' },
     Dimanche: { duree:'70 min',
@@ -43,14 +43,14 @@ module.exports = applyOverrides(base, {
   5: { replace: { Jeudi: {
     titre:'2 × 15 minutes au seuil', duree:'65 min', pcts:[[65,70],[80,83]],
     echauff:'25 min progressif à {{P}}, finir par 4 accélérations 80m.',
-    corps:'2 × 15 min à {{P}}. Récupération 4 min entre les 2 blocs. Allure adaptée ce palier. Le deuxième bloc se termine fatigué — c\'est voulu.',
+    corps:'2 × 15 min à {{P}}. Récupération 4 min entre les 2 blocs. Allure adaptée ce palier. Le deuxième bloc se termine fatigué, c\'est voulu.',
     retour:'10 min footing très lent.',
     note:'RPE 7/10 · 30 min totales au seuil léger, adapté au palier débutant.' },
     Dimanche: { duree:'2h',
     corps:'2h à {{P}}. Cap des 2 heures pour ce palier. Gel à 1h. Hydratation toutes les 20 min. Pas de bloc marathon cette semaine.',
     note:'RPE 5-6/10 · Le palier débutant atteint 2h au lieu de 2h15+30min.' } } },
   6: { replace: { Jeudi: {
-    titre:'2 × 2000 mètres — premier contact avec le long fractionné', pcts:[[65,65],[77,82]],
+    titre:'2 × 2000 mètres, premier contact avec le long fractionné', pcts:[[65,65],[77,82]],
     echauff:'25 min progressif à {{P}}, finir par 4 accélérations 80m.',
     corps:'2 × 2000m à {{P}}. Récupération 5 min au trot entre les 2 blocs. Volume réduit par rapport à 2×5000m. Pars conservateur sur le premier.',
     retour:'10 min footing très lent.',
@@ -74,7 +74,7 @@ module.exports = applyOverrides(base, {
     retour:'10 min footing très lent.',
     note:'RPE 7-8/10 · Même concept que FL-14 mais avec des distances adaptées à ce palier.' },
     Dimanche: { duree:'2h25',
-    corps:'115 min à {{P}}, puis 30 min à ton allure objectif marathon ({{OBJ}}). Gel à 1h et à 1h20. Ces 30 min à {{OBJ}} après 1h55 — ta grande séance de la semaine.',
+    corps:'115 min à {{P}}, puis 30 min à ton allure objectif marathon ({{OBJ}}). Gel à 1h et à 1h20. Ces 30 min à {{OBJ}} après 1h55, ta grande séance de la semaine.',
     note:'RPE 5-6/10 en EF · 7/10 sur les 30 min · Le pic de charge du plan débutant.' } } },
   9: { replace: { Jeudi: {
     titre:'2 × 4 km à allure marathon', duree:'70 min', pcts:[[65,65]],
@@ -86,9 +86,9 @@ module.exports = applyOverrides(base, {
     corps:'80 min à {{P}}, puis 35 min à ton allure objectif marathon ({{OBJ}}). Gel à 1h et à 1h10.',
     note:'RPE 5-6/10 en EF · 6-7/10 sur les 35 min · Mémorise cette sensation.' } } },
   10: { replace: { Jeudi: {
-    titre:'1 × 5000 mètres — répétition générale', duree:'65 min', pcts:[[65,65],[78,83]],
+    titre:'1 × 5000 mètres, répétition générale', duree:'65 min', pcts:[[65,65],[78,83]],
     echauff:'25 min progressif à {{P}}, finir par 4 accélérations 80m.',
-    corps:'1 × 5000m à {{P}}. Un seul bloc mais tenu de bout en bout — c\'est ta répétition générale. Après 4 min de récup, 2 km à {{OBJ}} pour graver l\'allure avant la course.',
+    corps:'1 × 5000m à {{P}}. Un seul bloc mais tenu de bout en bout, c\'est ta répétition générale. Après 4 min de récup, 2 km à {{OBJ}} pour graver l\'allure avant la course.',
     retour:'10 min footing très lent.',
     note:'RPE 7-8/10 sur le 5000m · Un seul bloc de 5000m est le pic spécifique adapté à ce palier.' },
     Dimanche: { duree:'2h',

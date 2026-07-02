@@ -231,7 +231,18 @@ body {
 .sessions-wrap.dense-5 .s-note, .sessions-wrap.dense-6 .s-note { font-size: 7pt; }
 .sessions-wrap.dense-5 .s-head, .sessions-wrap.dense-6 .s-head { height: 32px; }
 .sessions-wrap.dense-5 .s-titre, .sessions-wrap.dense-6 .s-titre { font-size: 9pt; }
-.sessions-wrap.dense-6 .s-body { padding: 5px 14px; gap: 3px; }
+.sessions-wrap.dense-6 .s-corps { font-size: 7.8pt; line-height: 1.28; }
+.sessions-wrap.dense-6 .s-note { font-size: 6.5pt; }
+.sessions-wrap.dense-6 .s-head { height: 26px; }
+.sessions-wrap.dense-6 .s-titre { font-size: 8.3pt; }
+.sessions-wrap.dense-6 .s-body { padding: 3px 10px; gap: 1px; }
+.sessions-wrap.dense-6 .s-meta { font-size: 7pt; }
+.sessions-wrap.dense-6 { gap: 3px; }
+.dense-page-6 .obj-txt { font-size: 8.5pt; line-height: 1.4; }
+.dense-page-6 .conseil-txt { font-size: 8.5pt; line-height: 1.4; }
+.dense-page-6 .objectif { padding: 4px 0 4px 11px; }
+.dense-page-6 .conseil { padding: 4px 0 4px 11px; }
+.dense-page-6 .week-hero { padding-bottom: 4px; }
 .conseil { flex-shrink: 0; padding: 7px 0 7px 11px; border-left: 2px solid rgba(232,35,122,.5); }
 .conseil-lbl { font-size: 6.5pt; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: rgba(232,35,122,.9); margin-bottom: 3px; }
 .conseil-txt { font-size: 9.5pt; color: rgba(255,255,255,.8); line-height: 1.5; }
@@ -359,8 +370,9 @@ function weekPage(sem, vma) {
   const ordered = [...sem.seances].sort((a, b) => JOUR_ORDER.indexOf(a.jour) - JOUR_ORDER.indexOf(b.jour))
   const seances = ordered.map(s => fillSession(s, vma))
   const denseClass = seances.length >= 6 ? 'dense-6' : seances.length === 5 ? 'dense-5' : ''
+  const pageDense = seances.length >= 6 ? 'dense-page-6' : ''
   return `
-  <div class="page">
+  <div class="page ${pageDense}">
     ${blobs(sem.num % 2 === 0 ? 'B' : 'A')}
     <div class="week-hero">
       <div class="week-num">${gradText(`Semaine ${sem.num} sur 12`, { sizePt: 11, weight: 700, letterSpacing: '0.07em', uppercase: true })}</div>
@@ -521,17 +533,17 @@ ${SEMAINES.map(s => weekPage(s, vma)).join('')}
 <div class="page">
   ${blobs('A')}
   <div class="page-title">${gradText('Stratégie de course', { sizePt: 27 })}</div>
-  <p class="page-intro">90% des coureurs amateurs ratent leur marathon sur la seconde moitié parce qu'ils partent trop vite. Cette stratégie en négatif — chaque tranche de 5 km plus rapide que la précédente — change tout.</p>
+  <p class="page-intro">90% des coureurs amateurs ratent leur marathon sur la seconde moitié parce qu'ils partent trop vite. Cette stratégie en négatif, chaque tranche de 5 km plus rapide que la précédente, change tout.</p>
   ${SVG_HEARTBEAT}
   <div class="strats-wrap">
     ${[
       ['KM 1-5','Sous-allure','Départ contrôlé',`Pars 10 à 15 sec/km PLUS LENTEMENT que ${objPace}/km. L'adrénaline du départ est ton pire ennemi. Le split négatif se gagne ou se perd dans ces 5 premiers kilomètres. Résiste à tout.`],
       ['KM 6-10','Approche allure',`–5 sec/km vs ${objPace}`,`Reviens progressivement vers ton allure cible. Tu dois arriver au km 10 à 3-5 sec/km de ${objPace}/km. Hydrate-toi à chaque ravitaillement, premier gel si tu cours plus d'1h30.`],
       ['KM 11-20',`${objPace}/km`,'Allure cible établie',`Tu es sur ton allure objectif. Régularité absolue au GPS. Pense par blocs de 5 km, pas aux kilomètres restants. Foulée relâchée, respiration maîtrisée. Gel km 18-19.`],
-      ['KM 21-25',`${objPace}/km`,'Le vrai marathon commence',`Tu dépasses le semi. C'est ici que les coureurs mal préparés commencent à souffrir — toi tu as encore de l'énergie parce que tu as géré le départ. Gel km 22-23. Maintiens ${objPace}/km.`],
+      ['KM 21-25',`${objPace}/km`,'Le vrai marathon commence',`Tu dépasses le semi. C'est ici que les coureurs mal préparés commencent à souffrir, toi tu as encore de l'énergie parce que tu as géré le départ. Gel km 22-23. Maintiens ${objPace}/km.`],
       ['KM 26-30','Légère accélération','Rembourser la patience',`Si tu as respecté la stratégie, tu es plus fort que la moyenne. Accélère très légèrement (3-5 sec/km). Augmente la cadence, ne force pas. Gel km 28-29.`],
-      ['KM 31-35','Résistance maximale','Passer le mur',`Le "mur" du marathon se situe ici. Raccourcis la foulée, garde les bras actifs, cadence à 180/min. Gel toutes les 25-30 min. Ne t'arrête jamais — reprendre après un arrêt coûte 2-3 minutes.`],
-      ['KM 36-42','Tout ce qui reste','Finish fort — split négatif',`Les 6 derniers km sont 100% mentaux. Chaque borne est un objectif. Si tu es plus rapide ici que sur la première heure : tu as réussi le split négatif. La douleur est temporaire, le chrono est permanent.`],
+      ['KM 31-35','Résistance maximale','Passer le mur',`Le "mur" du marathon se situe ici. Raccourcis la foulée, garde les bras actifs, cadence à 180/min. Gel toutes les 25-30 min. Ne t'arrête jamais, reprendre après un arrêt coûte 2-3 minutes.`],
+      ['KM 36-42','Tout ce qui reste','Finish fort, split négatif',`Les 6 derniers km sont 100% mentaux. Chaque borne est un objectif. Si tu es plus rapide ici que sur la première heure : tu as réussi le split négatif. La douleur est temporaire, le chrono est permanent.`],
     ].map(([km,allure,titre,desc])=>`
     <div class="strat">
       <div class="strat-km"><div class="strat-km-l">${km}</div><div class="strat-km-a">${allure}</div></div>

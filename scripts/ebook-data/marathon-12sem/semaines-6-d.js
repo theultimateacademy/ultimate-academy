@@ -8,7 +8,7 @@ module.exports = applyOverrides(base, {
     Mardi: {
     titre:'4 côtes de 100 mètres', duree:'40 min', pcts:[[65,70]],
     echauff:'15 min progressif à {{P}}.',
-    corps:'4 montées de 100m à effort soutenu — moins de répétitions que la trame (8×80m). Genoux hauts, bras actifs. Descente en marchant pour récupération complète.',
+    corps:'4 montées de 100m à effort soutenu, moins de répétitions que la trame (8×80m). Genoux hauts, bras actifs. Descente en marchant pour récupération complète.',
     retour:'8 min footing léger.',
     note:'RPE 6-7/10 sur les montées · Moins de répétitions, priorité à la technique.' },
     Jeudi: {
@@ -24,13 +24,13 @@ module.exports = applyOverrides(base, {
     Mardi: {
     titre:'4 côtes de 100 mètres', duree:'40 min', pcts:[[65,70]],
     echauff:'15 min progressif à {{P}}.',
-    corps:'4 montées de 100m — même volume que semaine 1. Genoux hauts, bras actifs. Descente au trot pour récupération active.',
+    corps:'4 montées de 100m, même volume que semaine 1. Genoux hauts, bras actifs. Descente au trot pour récupération active.',
     retour:'8 min footing léger.',
     note:'RPE 6-7/10 sur les montées · Côtes réduites pour ce palier.' },
     Jeudi: {
     titre:'4 × 1000 mètres', pcts:[[65,65],[85,90]],
     echauff:'25 min progressif à {{P}}, finir par 4 accélérations 80m.',
-    corps:'4 × 1000m à {{P}}. Plus court que 4×2000m — adapté pour progresser. Récupération 2 min au trot entre chaque.',
+    corps:'4 × 1000m à {{P}}. Plus court que 4×2000m, adapté pour progresser. Récupération 2 min au trot entre chaque.',
     retour:'10 min footing très lent.',
     note:'RPE 7/10 · La progression vers les 2000m se fera dans les semaines suivantes.' },
     Dimanche: { duree:'80 min',
@@ -40,7 +40,7 @@ module.exports = applyOverrides(base, {
     Mardi: {
     titre:'6 côtes de 100 mètres', duree:'45 min', pcts:[[65,70]],
     echauff:'18 min progressif à {{P}}.',
-    corps:'6 montées de 100m — progression vers le volume. Effort soutenu sur toute la montée. Descente au trot pour récupération active.',
+    corps:'6 montées de 100m, progression vers le volume. Effort soutenu sur toute la montée. Descente au trot pour récupération active.',
     retour:'8 min footing léger.',
     note:'RPE 6-7/10 sur les montées · Légère progression du volume de côtes.' },
     Mercredi: {
@@ -62,7 +62,7 @@ module.exports = applyOverrides(base, {
     Mardi: {
     titre:'4 côtes de 200 mètres', duree:'45 min', pcts:[[65,70]],
     echauff:'20 min progressif à {{P}}.',
-    corps:'4 montées de 200m à effort soutenu. Distance plus longue que les semaines précédentes — effort sur 200m entiers. Moins de répétitions que la trame (6×200m).',
+    corps:'4 montées de 200m à effort soutenu. Distance plus longue que les semaines précédentes, effort sur 200m entiers. Moins de répétitions que la trame (6×200m).',
     retour:'10 min footing léger.',
     note:'RPE 6-7/10 sur les montées · Distance allongée à 200m, volume réduit pour ce palier.' },
     Mercredi: {
@@ -92,7 +92,7 @@ module.exports = applyOverrides(base, {
     echauff:'25 min progressif à {{P}}, finir par 4 accélérations 80m.',
     corps:'2 × 15 min à {{P}} avec 4 min de récupération. 30 min totales au seuil. Allure adaptée à ce palier.',
     retour:'10 min footing très lent.',
-    note:'RPE 7/10 · 30 min au seuil léger — premier grand cap tempo.' },
+    note:'RPE 7/10 · 30 min au seuil léger, premier grand cap tempo.' },
     Dimanche: { duree:'1h50',
     corps:'1h50 à {{P}}. Premier cap proche des 2 heures. Gel à 1h. Pas de bloc marathon cette semaine.',
     note:'RPE 5-6/10 · Le palier débutant atteint 1h50 au lieu de 2h+30min.' } } },
@@ -104,7 +104,7 @@ module.exports = applyOverrides(base, {
     retour:'8 min footing léger.',
     note:'RPE 7/10 sur les montées · Progression douce vers le volume de côtes.' },
     Mercredi: {
-    titre:'2 × 2000 mètres — premier contact avec le long fractionné', pcts:[[65,65],[77,82]],
+    titre:'2 × 2000 mètres, premier contact avec le long fractionné', pcts:[[65,65],[77,82]],
     echauff:'25 min progressif à {{P}}, finir par 4 accélérations 80m.',
     corps:'2 × 2000m à {{P}}. Récupération 5 min. Version raccourcie de 2×5000m.',
     retour:'10 min footing très lent.',
@@ -130,7 +130,7 @@ module.exports = applyOverrides(base, {
     echauff:'25 min progressif à {{P}}, finir par 4 accélérations 80m.',
     corps:'2 × 15 min à {{P}}. Récupération 4 min. Maintiens l\'allure sur les 2 blocs.',
     retour:'10 min footing très lent.',
-    note:'RPE 7/10 · 30 min au seuil — maintient la forme sans surcharger.' },
+    note:'RPE 7/10 · 30 min au seuil, maintient la forme sans surcharger.' },
     Dimanche: { duree:'2h10',
     corps:'2h10 à {{P}}. Sortie longue sans bloc allure marathon pour ce palier.',
     note:'RPE 6/10 · Durée maximale sans bloc OBJ pour consolider le volume.' } } },
@@ -162,15 +162,15 @@ module.exports = applyOverrides(base, {
     note:'RPE 5-6/10 en EF · 6-7/10 sur les 35 min · Mémorise cette sensation.' } } },
   10: { replace: {
     Mercredi: {
-    titre:'1 × 5000 mètres — répétition générale', duree:'65 min', pcts:[[65,65],[78,83]],
+    titre:'1 × 5000 mètres, répétition générale', duree:'65 min', pcts:[[65,65],[78,83]],
     echauff:'25 min progressif à {{P}}, finir par 4 accélérations 80m.',
     corps:'1 × 5000m à {{P}}. Un seul bloc tenu de bout en bout. Après 4 min de récup, 2 km à {{OBJ}}.',
     retour:'10 min footing très lent.',
     note:'RPE 7-8/10 · Un 5000m complet est le pic spécifique pour ce palier.' },
     Vendredi: {
-    titre:'3 × 2 km à allure marathon — blocs courts', duree:'50 min', pcts:[[65,65]],
+    titre:'3 × 2 km à allure marathon, blocs courts', duree:'50 min', pcts:[[65,65]],
     echauff:'20 min footing EF à {{P}}.',
-    corps:'3 × 2 km exactement à ton allure objectif marathon ({{OBJ}}). Récupération 90 sec au trot — plus serrée que les 3 min des 2×4km. 6 km à {{OBJ}} en blocs courts : stimulus différent de la semaine 9.',
+    corps:'3 × 2 km exactement à ton allure objectif marathon ({{OBJ}}). Récupération 90 sec au trot, plus serrée que les 3 min des 2×4km. 6 km à {{OBJ}} en blocs courts : stimulus différent de la semaine 9.',
     retour:'10 min footing léger.',
     note:'RPE 7/10 · Blocs courts, récup serrée : le stimulus différent de la semaine 9. Après cette séance, les séances dures sont terminées.' },
     Dimanche: { duree:'1h50',

@@ -521,14 +521,14 @@ ${SEMAINES.map(s => weekPage(s, vma)).join('')}
 <div class="page">
   ${blobs('A')}
   <div class="page-title">${gradText('Stratégie de course', { sizePt: 27 })}</div>
-  <p class="page-intro">La majorité des coureurs ratent leur semi-marathon parce qu'ils partent trop vite. Cette stratégie en split négatif — chaque 5 km plus rapide que le précédent — transforme ta course.</p>
+  <p class="page-intro">La majorité des coureurs ratent leur semi-marathon parce qu'ils partent trop vite. Cette stratégie en split négatif, chaque 5 km plus rapide que le précédent, transforme ta course.</p>
   ${SVG_HEARTBEAT}
   <div class="strats-wrap">
     ${[
-      ['KM 1-5','Sous-allure','Départ contrôlé',`Pars 5 à 10 sec/km PLUS LENTEMENT que ${objPace}/km. L\'adrénaline du départ va te pousser à partir vite — résiste. Le split négatif se gagne dans ces 5 premiers kilomètres.`],
+      ['KM 1-5','Sous-allure','Départ contrôlé',`Pars 5 à 10 sec/km PLUS LENTEMENT que ${objPace}/km. L\'adrénaline du départ va te pousser à partir vite, résiste. Le split négatif se gagne dans ces 5 premiers kilomètres.`],
       ['KM 6-10',`${objPace}/km`,'Allure cible établie',`Tu es sur ton allure objectif. Régularité au GPS, foulée relâchée. Hydrate-toi à chaque ravitaillement. Gel au km 10-11 si ta course dure plus d\'1h30. La patience commence à payer.`],
-      ['KM 11-15',`${objPace}/km`,'Régularité et gestion',`Maintiens ${objPace}/km. Le semi est à mi-chemin mais le plus dur est à venir. Si tu te sens bien, c\'est normal — ne craque pas et n\'accélère pas encore. Le dernier tiers se joue ici.`],
-      ['KM 16-21','Accélération progressive','Finish négatif — tout donner',`C\'est le moment du split négatif. Accélère progressivement — pas d\'un coup. Si tu as respecté l\'allure, tes réserves te permettent d\'aller plus vite. Raccourcis la foulée, cadence à 180/min, bras actifs. Finir plus fort que tu n\'as démarré.`],
+      ['KM 11-15',`${objPace}/km`,'Régularité et gestion',`Maintiens ${objPace}/km. Le semi est à mi-chemin mais le plus dur est à venir. Si tu te sens bien, c\'est normal, ne craque pas et n\'accélère pas encore. Le dernier tiers se joue ici.`],
+      ['KM 16-21','Accélération progressive','Finish négatif, tout donner',`C\'est le moment du split négatif. Accélère progressivement, pas d\'un coup. Si tu as respecté l\'allure, tes réserves te permettent d\'aller plus vite. Raccourcis la foulée, cadence à 180/min, bras actifs. Finir plus fort que tu n\'as démarré.`],
     ].map(([km,allure,titre,desc])=>`
     <div class="strat">
       <div class="strat-km"><div class="strat-km-l">${km}</div><div class="strat-km-a">${allure}</div></div>
