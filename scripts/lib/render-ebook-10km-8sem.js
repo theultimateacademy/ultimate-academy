@@ -593,14 +593,12 @@ ${SEMAINES.map(s => weekPage(s, vma)).join('')}
 <div class="page">
   ${blobs('A')}
   <div class="page-title">${gradText('Stratégie de course', { sizePt: 27 })}</div>
-  <p class="page-intro">La majorité des coureurs ratent leur 10km sur les 2 premiers kilomètres. Cette stratégie en 4 phases fonctionne à tous les niveaux.</p>
+  <p class="page-intro">La majorité des coureurs ratent leur 10km en partant trop vite. Cette stratégie en split négatif — deuxième moitié plus rapide que la première — fait la différence entre un bon 10km et un record personnel.</p>
   ${SVG_HEARTBEAT}
   <div class="strats-wrap">
     ${[
-      ['KM 1-2',`${objPace}/km`,'Patience et retenue',`Pars exactement à ton allure objectif ${objPace}/km, ne pars surtout pas plus vite. L\'adrénaline du départ va te pousser à accélérer, résiste. Partir trop vite peut te coûter 30 à 60 secondes sur les 3 derniers kilomètres.`],
-      ['KM 3-8',`${objPace}/km`,'Régularité absolue',`Utilise ta montre GPS pour rester sur ${objPace}/km. Un 10km régulier est toujours plus rapide qu\'un 10km en yoyo. Foulée, respiration, posture.`],
-      ['KM 9','Si réserves','Évaluation et décision','Fais un bilan honnête. Si tu as des réserves, accélère progressivement sous ton allure objectif. Si tu souffres, maintiens l\'allure, ne t\'engage pas dans une accélération que tu ne pourras pas tenir.'],
-      ['KM 10','Tout ce qui reste','Donner absolument tout','Donne tout. La douleur est temporaire, le chrono est permanent. Raccourcis ta foulée, augmente ta cadence. Tout ce que tu as conservé, c\'est maintenant.'],
+      ['KM 1-5','Sous-allure','Départ contrôlé',`Pars 5 à 8 sec/km PLUS LENTEMENT que ${objPace}/km. L\'adrénaline du départ est ton pire ennemi sur 10km. Chaque seconde gagnée trop tôt peut coûter 30 à 60 secondes sur les 3 derniers kilomètres.`],
+      ['KM 6-10','Accélération progressive','Split négatif — finir fort',`À partir du km 6, accélère progressivement toutes les 500m. Les km 8-9-10 doivent être tes plus rapides. Si tu as géré le départ, tes réserves te permettent de finir bien plus vite que tu n\'as commencé. C\'est le split négatif.`],
     ].map(([km,allure,titre,desc])=>`
     <div class="strat">
       <div class="strat-km"><div class="strat-km-l">${km}</div><div class="strat-km-a">${allure}</div></div>

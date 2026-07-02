@@ -521,14 +521,14 @@ ${SEMAINES.map(s => weekPage(s, vma)).join('')}
 <div class="page">
   ${blobs('A')}
   <div class="page-title">${gradText('Stratégie de course', { sizePt: 27 })}</div>
-  <p class="page-intro">La majorité des coureurs ratent leur semi-marathon sur les 5 premiers kilomètres. Cette stratégie en 4 phases fonctionne à tous les niveaux.</p>
+  <p class="page-intro">La majorité des coureurs ratent leur semi-marathon parce qu'ils partent trop vite. Cette stratégie en split négatif — chaque 5 km plus rapide que le précédent — transforme ta course.</p>
   ${SVG_HEARTBEAT}
   <div class="strats-wrap">
     ${[
-      ['KM 1-5',`${objPace}/km`,'Patience et retenue',`Pars exactement à ton allure objectif ${objPace}/km, ne pars surtout pas plus vite. L\'adrénaline du départ va te pousser à accélérer, résiste. Partir 10 secondes trop vite au km peut te coûter plusieurs minutes sur la fin.`],
-      ['KM 6-15',`${objPace}/km`,'Régularité absolue',`Utilise ta montre GPS pour rester sur ${objPace}/km. Contrôle ta respiration et ta posture. Hydrate-toi à chaque ravitaillement, même si tu n\'as pas soif. Un semi régulier est toujours plus rapide qu\'un semi en yoyo.`],
-      ['KM 16-18','Évaluation','Bilan et ajustement','Fais un bilan honnête de tes réserves. Si tu as encore de l\'énergie, accélère progressivement. Si tu souffres, maintiens coûte que coûte ton allure objectif. Ne t\'engage jamais dans une accélération que tu ne pourras pas tenir.'],
-      ['KM 19-21','Tout ce qui reste','Donner absolument tout','Donne absolument tout. La douleur est temporaire, le chrono est permanent. Raccourcis ta foulée, augmente ta cadence. Tout ce que tu as conservé depuis le km 1, c\'est maintenant que tu le dépenses.'],
+      ['KM 1-5','Sous-allure','Départ contrôlé',`Pars 5 à 10 sec/km PLUS LENTEMENT que ${objPace}/km. L\'adrénaline du départ va te pousser à partir vite — résiste. Le split négatif se gagne dans ces 5 premiers kilomètres.`],
+      ['KM 6-10',`${objPace}/km`,'Allure cible établie',`Tu es sur ton allure objectif. Régularité au GPS, foulée relâchée. Hydrate-toi à chaque ravitaillement. Gel au km 10-11 si ta course dure plus d\'1h30. La patience commence à payer.`],
+      ['KM 11-15',`${objPace}/km`,'Régularité et gestion',`Maintiens ${objPace}/km. Le semi est à mi-chemin mais le plus dur est à venir. Si tu te sens bien, c\'est normal — ne craque pas et n\'accélère pas encore. Le dernier tiers se joue ici.`],
+      ['KM 16-21','Accélération progressive','Finish négatif — tout donner',`C\'est le moment du split négatif. Accélère progressivement — pas d\'un coup. Si tu as respecté l\'allure, tes réserves te permettent d\'aller plus vite. Raccourcis la foulée, cadence à 180/min, bras actifs. Finir plus fort que tu n\'as démarré.`],
     ].map(([km,allure,titre,desc])=>`
     <div class="strat">
       <div class="strat-km"><div class="strat-km-l">${km}</div><div class="strat-km-a">${allure}</div></div>

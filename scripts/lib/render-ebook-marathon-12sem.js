@@ -521,15 +521,17 @@ ${SEMAINES.map(s => weekPage(s, vma)).join('')}
 <div class="page">
   ${blobs('A')}
   <div class="page-title">${gradText('Stratégie de course', { sizePt: 27 })}</div>
-  <p class="page-intro">90% des coureurs amateurs ratent leur marathon sur la seconde moitié. Cette stratégie en 5 phases, testée par des milliers de coureurs, s\'applique à tous les niveaux.</p>
+  <p class="page-intro">90% des coureurs amateurs ratent leur marathon sur la seconde moitié parce qu'ils partent trop vite. Cette stratégie en négatif — chaque tranche de 5 km plus rapide que la précédente — change tout.</p>
   ${SVG_HEARTBEAT}
   <div class="strats-wrap">
     ${[
-      ['KM 1-8',`${objPace}/km`,'Retenue absolue',`Pars exactement à ton allure objectif ${objPace}/km, ou légèrement plus lentement. Ne te laisse jamais griser par l'adrénaline du départ. Chaque seconde gagnée ici peut coûter une minute aux km 35-40.`],
-      ['KM 9-21',`${objPace}/km`,'Régularité mécanique',`Utilise ta montre GPS pour rester sur ${objPace}/km. Gère ta respiration, ta posture, et prends un gel à chaque ravitaillement prévu. Un marathon régulier est toujours plus rapide qu'un marathon en yoyo.`],
-      ['KM 22-30','Écoute ton corps','Gestion de la charge',`C'est ici que la course commence vraiment. Si tu as géré les 21 premiers km correctement, tu dois encore avoir de l'énergie. Maintiens ${objPace}/km, ne ralentis pas. Hydrate-toi à chaque ravitaillement.`],
-      ['KM 31-35','Le mur','Passer le cap',`Entre le km 30 et 35, les réserves de glycogène s'épuisent. C'est le "mur" du marathon. Si tu sens tes jambes se bloquer, raccourcis ta foulée, augmente la cadence, prends un gel. Ne t'arrête pas.`],
-      ['KM 36-42','Tout ce qui reste','Donner absolument tout',`Les 6 derniers kilomètres sont mentaux. La douleur est là mais tu peux la gérer. Raccourcis la foulée, cadence à 180/min, fixe un objectif à chaque borne. Le chrono est permanent, la douleur ne l'est pas.`],
+      ['KM 1-5','Sous-allure','Départ contrôlé',`Pars 10 à 15 sec/km PLUS LENTEMENT que ${objPace}/km. L'adrénaline du départ est ton pire ennemi. Le split négatif se gagne ou se perd dans ces 5 premiers kilomètres. Résiste à tout.`],
+      ['KM 6-10','Approche allure',`–5 sec/km vs ${objPace}`,`Reviens progressivement vers ton allure cible. Tu dois arriver au km 10 à 3-5 sec/km de ${objPace}/km. Hydrate-toi à chaque ravitaillement, premier gel si tu cours plus d'1h30.`],
+      ['KM 11-20',`${objPace}/km`,'Allure cible établie',`Tu es sur ton allure objectif. Régularité absolue au GPS. Pense par blocs de 5 km, pas aux kilomètres restants. Foulée relâchée, respiration maîtrisée. Gel km 18-19.`],
+      ['KM 21-25',`${objPace}/km`,'Le vrai marathon commence',`Tu dépasses le semi. C'est ici que les coureurs mal préparés commencent à souffrir — toi tu as encore de l'énergie parce que tu as géré le départ. Gel km 22-23. Maintiens ${objPace}/km.`],
+      ['KM 26-30','Légère accélération','Rembourser la patience',`Si tu as respecté la stratégie, tu es plus fort que la moyenne. Accélère très légèrement (3-5 sec/km). Augmente la cadence, ne force pas. Gel km 28-29.`],
+      ['KM 31-35','Résistance maximale','Passer le mur',`Le "mur" du marathon se situe ici. Raccourcis la foulée, garde les bras actifs, cadence à 180/min. Gel toutes les 25-30 min. Ne t'arrête jamais — reprendre après un arrêt coûte 2-3 minutes.`],
+      ['KM 36-42','Tout ce qui reste','Finish fort — split négatif',`Les 6 derniers km sont 100% mentaux. Chaque borne est un objectif. Si tu es plus rapide ici que sur la première heure : tu as réussi le split négatif. La douleur est temporaire, le chrono est permanent.`],
     ].map(([km,allure,titre,desc])=>`
     <div class="strat">
       <div class="strat-km"><div class="strat-km-l">${km}</div><div class="strat-km-a">${allure}</div></div>

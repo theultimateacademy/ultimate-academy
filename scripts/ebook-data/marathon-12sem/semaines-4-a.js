@@ -34,8 +34,8 @@ module.exports = applyOverrides(base, {
     corps:'4 × 3000m à {{P}}. Une répétition de plus que la trame. Récupération 4 min. 12 km à intensité. Régularité sur les 4.',
     retour:'10 min footing très lent.',
     note:'RPE 8/10 · 4×3000m en complément du tempo. Semaine de qualité élevée.' },
-    Dimanche: { duree:'110 min',
-    corps:'110 min à {{P}}. Sortie longue allongée. Plus 15 min à {{OBJ}} en fin de sortie.',
+    Dimanche: { duree:'2h05',
+    corps:'110 min à {{P}}, puis 15 min à ton allure objectif marathon ({{OBJ}}). Gel à 1h05. Bloc OBJ allongé pour le palier avancé.',
     note:'RPE 5-6/10 puis 6-7/10 · Bloc OBJ allongé pour le palier avancé.' } } },
   4: { replace: { Mercredi: {
     titre:'2 × 25 minutes au seuil', pcts:[[65,70],[84,88]],
@@ -65,7 +65,7 @@ module.exports = applyOverrides(base, {
     retour:'10 min footing très lent.',
     note:'RPE 8/10 · 8×1000m à allure haute — volume VMA élevé.' },
     Dimanche: { duree:'2h10',
-    corps:'2h10 à {{P}}, avec 30 min à allure marathon ({{OBJ}}) en fin de sortie. Gel à 1h et à 1h30.',
+    corps:'100 min à {{P}}, puis 30 min à ton allure objectif marathon ({{OBJ}}). Gel à 1h et à 1h20. Sortie allongée pour le palier avancé.',
     note:'RPE 6/10 puis 7-8/10 · Sortie allongée + bloc OBJ à volume complet.' } } },
   6: { replace: { Mercredi: {
     titre:'3 × 5000 mètres — volume marathon extrême', pcts:[[65,65],[78,83]],
@@ -74,8 +74,8 @@ module.exports = applyOverrides(base, {
     retour:'10 min footing très lent.',
     note:'RPE 8-9/10 · 3×5000m = 15 km à intensité. Séance marathon de référence avancée.' },
     Dimanche: { duree:'2h30',
-    corps:'2h à {{P}}, puis 10 km à ton allure objectif marathon ({{OBJ}}). Gel à 1h, à 1h30, à 1h50.',
-    note:'RPE 6/10 en EF · 7-8/10 sur les 10 km · Sortie longue allongée pour ce palier.' } } },
+    corps:'120 min à {{P}}, puis 30 min à ton allure objectif marathon ({{OBJ}}). Gel à 1h, à 1h30, à 1h50.',
+    note:'RPE 6/10 en EF · 7-8/10 sur les 30 min · Sortie longue allongée pour ce palier.' } } },
   7: { replace: {
     Vendredi: {
     titre:'2 × 25 minutes au seuil', pcts:[[65,70],[84,88]],
@@ -84,8 +84,8 @@ module.exports = applyOverrides(base, {
     retour:'10 min footing très lent.',
     note:'RPE 8-9/10 · 50 min au seuil à allure avancée avec la fatigue de mercredi dans les jambes.' },
     Dimanche: { duree:'2h35',
-    corps:'1h55 à {{P}}, puis 18 km à ton allure objectif marathon ({{OBJ}}). Gel à 1h, à 1h20, à 2h.',
-    note:'RPE 6/10 en EF · 7-8/10 sur les 18 km · 18 km à {{OBJ}} après 1h55 — ta plus grande séance.' } } },
+    corps:'120 min à {{P}}, puis 35 min à ton allure objectif marathon ({{OBJ}}). Gel à 1h, à 1h20, à 2h.',
+    note:'RPE 6/10 en EF · 7-8/10 sur les 35 min · 35 min à {{OBJ}} après 2h — ta plus grande séance.' } } },
   8: { replace: {
     Vendredi: {
     titre:'10 × 1000 mètres — volume VMA élevé', pcts:[[65,65],[88,93]],
@@ -94,8 +94,8 @@ module.exports = applyOverrides(base, {
     retour:'10 min footing très lent.',
     note:'RPE 8/10 · Semaine de charge maximale avancée.' },
     Dimanche: { duree:'2h45',
-    corps:'2h à {{P}}, puis 18 km à ton allure objectif marathon ({{OBJ}}). Gel à 1h, à 1h30, à 2h.',
-    note:'RPE 6/10 en EF · 8/10 sur les 18 km · Après cette semaine, l\'entraînement dur est terminé.' } } },
+    corps:'120 min à {{P}}, puis 45 min à ton allure objectif marathon ({{OBJ}}). Gel à 1h, à 1h30, à 2h.',
+    note:'RPE 6/10 en EF · 8/10 sur les 45 min · Après cette semaine, l\'entraînement dur est terminé.' } } },
   9: { replace: { Mercredi: {
     titre:'4 × 5 km à allure marathon', duree:'100 min', pcts:[[65,65]],
     echauff:'20 min footing EF à {{P}}.',
@@ -103,8 +103,8 @@ module.exports = applyOverrides(base, {
     retour:'10 min footing léger.',
     note:'RPE 7-8/10 · 4×5km = 20 km à {{OBJ}}. Si les 4 blocs sont réguliers, ton objectif est validé.' },
     Dimanche: { duree:'2h20',
-    corps:'1h45 à {{P}}, puis 15 km à ton allure objectif marathon ({{OBJ}}). Gel à 1h, à 1h15, à 1h45.',
-    note:'RPE 6/10 en EF · 7-8/10 sur les 15 km · Sortie spécifique allongée pour ce palier.' } } },
+    corps:'100 min à {{P}}, puis 40 min à ton allure objectif marathon ({{OBJ}}). Gel à 1h, à 1h10, à 1h40.',
+    note:'RPE 6/10 en EF · 7-8/10 sur les 40 min · Sortie spécifique allongée pour ce palier.' } } },
   10: { replace: { Mercredi: {
     titre:'3 × 5000 mètres — pic de spécificité', pcts:[[65,65],[78,83]],
     echauff:'25 min progressif à {{P}}, finir par 4 accélérations 80m.',
@@ -112,12 +112,12 @@ module.exports = applyOverrides(base, {
     retour:'10 min footing très lent.',
     note:'RPE 8/10 · 3×5000m — après cette séance, les séances dures sont terminées.' },
     Vendredi: {
-    titre:'4 × 5 km à allure marathon — version finale', duree:'100 min', pcts:[[65,65]],
+    titre:'6 × 2 km à allure marathon — blocs courts', duree:'80 min', pcts:[[65,65]],
     echauff:'20 min footing EF à {{P}}.',
-    corps:'4 × 5 km exactement à ton allure objectif marathon ({{OBJ}}). Récupération 4 min au trot. La même séance qu\'en semaine 9 — avec la fatigue de mercredi. Si les 4 blocs tiennent, la préparation est terminée.',
+    corps:'6 × 2 km exactement à ton allure objectif marathon ({{OBJ}}). Récupération 90 sec au trot — volontairement serrée. 12 km à {{OBJ}} en 6 blocs courts : complètement différent des 4×5km de la semaine 9.',
     retour:'10 min footing léger.',
-    note:'RPE 7-8/10 · Après cette séance, les séances dures sont terminées.' },
+    note:'RPE 8/10 · 6 blocs courts, récup serrée : adaptation neuromusculaire finale. Après cette séance, les séances dures sont terminées.' },
     Dimanche: { duree:'2h10',
-    corps:'1h35 à {{P}}, puis 12 km à ton allure objectif marathon ({{OBJ}}). Gel à 1h et à 1h10.',
-    note:'RPE 6/10 en EF · 7-8/10 sur les 12 km · Dernière sortie longue chargée pour le palier avancé.' } } },
+    corps:'100 min à {{P}}, puis 30 min à ton allure objectif marathon ({{OBJ}}). Gel à 1h et à 1h10.',
+    note:'RPE 6/10 en EF · 7-8/10 sur les 30 min · Dernière sortie longue chargée pour le palier avancé.' } } },
 })
