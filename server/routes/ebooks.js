@@ -15,9 +15,10 @@ if (!CLIENT_URL.startsWith('https://')) console.warn('[Ebooks] CLIENT_URL ne com
 // ─── Ebooks à variantes (VMA × séances/semaine) ───────────────────────────────
 // Tarif par nombre de séances/semaine, identique pour toutes les VMA.
 const PRICE_TIERS = {
-  '10km-8sem':  { 3: 1499, 4: 1799, 5: 1999, 6: 2299 },
-  '10km-12sem': { 3: 1799, 4: 1999, 5: 2299, 6: 2499 },
-  'semi-12sem': { 3: 1999, 4: 2299, 5: 2499, 6: 2999 },
+  '10km-8sem':     { 3: 1499, 4: 1799, 5: 1999, 6: 2299 },
+  '10km-12sem':    { 3: 1799, 4: 1999, 5: 2299, 6: 2499 },
+  'semi-12sem':    { 3: 1999, 4: 2299, 5: 2499, 6: 2999 },
+  'marathon-12sem':{ 3: 1999, 4: 2299, 5: 2499, 6: 2999 },
 };
 
 const VMA_MIN = 10;

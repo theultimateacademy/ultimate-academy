@@ -6,9 +6,10 @@ const C = { purple: '#8B2FC9', pink: '#E8237A', bg: '#0C0A18' }
 const grad = 'linear-gradient(135deg,#8B2FC9,#E8237A)'
 
 const VARIANT_PRICE_TIERS = {
-  '10km-8sem':  { 3: 1499, 4: 1799, 5: 1999, 6: 2299 },
-  '10km-12sem': { 3: 1799, 4: 1999, 5: 2299, 6: 2499 },
-  'semi-12sem': { 3: 1999, 4: 2299, 5: 2499, 6: 2999 },
+  '10km-8sem':     { 3: 1499, 4: 1799, 5: 1999, 6: 2299 },
+  '10km-12sem':    { 3: 1799, 4: 1999, 5: 2299, 6: 2499 },
+  'semi-12sem':    { 3: 1999, 4: 2299, 5: 2499, 6: 2999 },
+  'marathon-12sem':{ 3: 1999, 4: 2299, 5: 2499, 6: 2999 },
 }
 
 // Toutes les VMA disponibles : 10 à 24 par pas de 0.5
@@ -86,22 +87,24 @@ const EBOOK_DETAILS = {
     ],
   },
   'marathon-12sem': {
-    icon: '🏆', weeks: 12, distance: 'Marathon', level: 'Confirmé',
-    full_description: 'Un plan intense de 12 semaines pour les coureurs confirmés visant un objectif de temps sur marathon. Exigeant, efficace, structuré.',
+    icon: '🏆', weeks: 12, distance: 'Marathon', level: 'Tous niveaux',
+    full_description: 'Un plan complet de 12 semaines pour préparer ton marathon. Chaque séance est calculée depuis ta VMA réelle, adaptée à ton palier (débutant, intermédiaire ou avancé). Tu cours aux bonnes allures, au bon moment, sans jamais avoir à convertir des pourcentages.',
     toc: [
-      'Semaines 1-3 : Construction du volume — base kilométrique',
-      'Semaines 4-6 : Long runs jusqu\'à 30km, allure marathon',
-      'Semaines 7-9 : Qualité — seuil, allure spécifique, fractionnés',
-      'Semaines 10-11 : Consolidation progressive',
-      'Semaine 12 : Semaine de course',
-      'Stratégie de course par blocs de 5km',
-      'Nutrition, ravitaillement et hydratation',
+      'Allures personnalisées en min/km selon ta VMA',
+      'Semaines 1-2 · Adaptation et mise en route',
+      'Semaines 3-5 · Développement aérobie et première allures marathon',
+      'Semaines 6-8 · Volume maximum et pic de charge',
+      'Semaines 9-10 · Spécificité marathon — blocs à allure objectif',
+      'Semaine 11 · Consolidation et préparation finale',
+      'Semaine 12 · Semaine de course et stratégie',
+      'Nutrition, ravitaillement et gestion des gels',
     ],
     for_who: [
-      { check: true, text: 'Tu as déjà terminé un semi-marathon' },
-      { check: true, text: 'Tu vises un objectif de temps précis sur marathon' },
-      { check: true, text: 'Tu peux t\'entraîner 4 à 5 fois par semaine' },
-      { check: true, text: 'Tu veux un plan intensif et structuré sur 12 semaines' },
+      { check: true, text: 'Tu as déjà couru un semi-marathon ou tu cours régulièrement depuis 6 mois' },
+      { check: true, text: 'Tu prépares ton premier marathon ou tu veux améliorer ton record' },
+      { check: true, text: 'Tu vises un objectif de temps précis, de sub-5h à sub-3h selon ton niveau' },
+      { check: true, text: 'Tu t\'entraînes de 3 à 6 fois par semaine, le plan s\'adapte à ta disponibilité' },
+      { check: true, text: 'Tu veux arriver le jour J avec une vraie stratégie et les bonnes allures gravées en mémoire' },
     ],
   },
   'marathon-16sem': {
@@ -578,6 +581,12 @@ export default function EbookDetail() {
                   Prépare ton semi-marathon en 12 semaines avec un plan structuré alliant{' '}
                   <strong style={{ fontWeight: 800, background: grad, WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text' }}>volume progressif, séances de qualité et allures personnalisées selon ta VMA</strong>
                   {' '}pour arriver le jour J prêt à performer.
+                </>
+              ) : slug === 'marathon-12sem' ? (
+                <>
+                  Un plan complet de 12 semaines pour préparer ton marathon. Chaque séance est{' '}
+                  <strong style={{ fontWeight: 800, background: grad, WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text' }}>calculée depuis ta VMA réelle et adaptée à ton palier</strong>
+                  {' '}: tu cours aux bonnes allures, au bon moment, sans jamais avoir à convertir des pourcentages.
                 </>
               ) : (meta.full_description || ebook.description)}
             </p>
