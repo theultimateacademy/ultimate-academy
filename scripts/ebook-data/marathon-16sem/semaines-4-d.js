@@ -6,7 +6,7 @@ const base = require('./semaines-4-i.js')
 module.exports = applyOverrides(base, {
   1: { replace: { Mercredi: {
     titre:'4 × 400 mètres, réveil neuromusculaire', pcts:[[65,65],[88,92]],
-    echauff:'20 min progressif à {{P}}, finir par 4 accélérations de 60m.',
+    echauff:'25 min progressif à {{P}}, finir par 4 accélérations de 60m.',
     corps:'4 × 400 mètres à {{P}}. Récupération 2 min au trot. Effort régulier sur les 4.',
     retour:'10 min footing très lent.',
     note:'RPE 6/10 · 4×400m adapté à ce palier.' },
@@ -15,7 +15,7 @@ module.exports = applyOverrides(base, {
     note:'RPE 4/10 · La durée prime.' } } },
   2: { replace: { Mercredi: {
     titre:'6 côtes de 80 mètres', pcts:[[65,65],[100,105]],
-    echauff:'20 min progressif à {{P}}, finir par 4 foulées bondissantes.',
+    echauff:'25 min progressif à {{P}}, finir par 4 foulées bondissantes.',
     corps:'6 côtes de 80 mètres à effort maximal. Récupération : redescente en marchant.',
     retour:'10 min footing très lent.',
     note:'RPE 8/10 · 6 côtes au lieu de 8.' },
@@ -24,7 +24,7 @@ module.exports = applyOverrides(base, {
     note:'RPE 4/10.' } } },
   3: { replace: { Mercredi: {
     titre:'1 × 12 minutes au seuil aérobie', duree:'45 min', pcts:[[65,70],[78,82]],
-    echauff:'20 min progressif à {{P}}.',
+    echauff:'25 min progressif à {{P}}.',
     corps:'12 min continus à {{P}}. Premier contact avec l\'effort soutenu. Tu dois pouvoir prononcer quelques mots.',
     retour:'10 min footing très lent.',
     note:'RPE 6/10 · Seuil léger adapté à ce palier.' },
@@ -78,7 +78,7 @@ module.exports = applyOverrides(base, {
     note:'RPE 5/10.' } } },
   9: { replace: { Mercredi: {
     titre:'8 côtes de 80 mètres, puissance marathon', pcts:[[65,65],[100,105]],
-    echauff:'20 min progressif à {{P}}, finir par 4 foulées bondissantes.',
+    echauff:'25 min progressif à {{P}}, finir par 4 foulées bondissantes.',
     corps:'8 côtes de 80 mètres à effort maximal. Récupération : redescente en marchant. 2 de moins que la trame.',
     retour:'10 min footing très lent.',
     note:'RPE 8/10.' },
@@ -96,7 +96,7 @@ module.exports = applyOverrides(base, {
     note:'RPE 5/10 en EF · 7/10 sur les 20 min.' } } },
   11: { replace: { Mercredi: {
     titre:'1 × 5000 mètres à allure marathon', duree:'60 min', pcts:[[65,65],[78,82]],
-    echauff:'20 min progressif à {{P}}.',
+    echauff:'25 min progressif à {{P}}.',
     corps:'1 × 5000 mètres à {{P}}. Après 4 min de récup, 2 km à {{OBJ}}.',
     retour:'10 min footing très lent.',
     note:'RPE 7-8/10 · 1×5000m adapté à ce palier.' },
@@ -105,7 +105,7 @@ module.exports = applyOverrides(base, {
     note:'RPE 5/10 en EF · 7/10 sur les 25 min.' } } },
   12: { replace: { Mercredi: {
     titre:'3 × 3 km à allure marathon', duree:'65 min', pcts:[[65,65],[78,82]],
-    echauff:'20 min footing EF à {{P}}.',
+    echauff:'25 min footing EF à {{P}}.',
     corps:'3 × 3 km à ton allure objectif marathon ({{OBJ}}). Récupération 3 min. Version simplifiée du finisher.',
     retour:'10 min footing léger.',
     note:'RPE 7/10 · Séance spécifique adaptée à ce palier.' },
@@ -114,7 +114,7 @@ module.exports = applyOverrides(base, {
     note:'RPE 5-6/10 en EF · 7/10 sur les 30 min.' } } },
   13: { replace: { Mercredi: {
     titre:'3 × 3 km à allure marathon', duree:'65 min', pcts:[[65,65],[78,82]],
-    echauff:'20 min footing EF à {{P}}.',
+    echauff:'25 min footing EF à {{P}}.',
     corps:'3 × 3 km à ton allure objectif marathon ({{OBJ}}). Récupération 3 min.',
     retour:'10 min footing léger.',
     note:'RPE 7/10.' },

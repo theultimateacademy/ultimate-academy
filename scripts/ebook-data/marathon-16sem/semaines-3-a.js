@@ -6,7 +6,7 @@ const base = require('./semaines-3-i.js')
 module.exports = applyOverrides(base, {
   1: { replace: { Jeudi: {
     titre:'8 × 400 mètres, volume VMA élevé', pcts:[[65,65],[92,97]],
-    echauff:'20 min progressif à {{P}}, finir par 4 accélérations de 60m.',
+    echauff:'25 min progressif à {{P}}, finir par 4 accélérations de 60m.',
     corps:'8 × 400 mètres à {{P}}. Récupération 90 sec au trot. Deux de plus que la trame. Volume VMA élevé dès la semaine 1 pour ce palier.',
     retour:'10 min footing très lent.',
     note:'RPE 7-8/10 · 8×400m pour ancrer les qualités neuromusculaires dès S1.' },
@@ -15,7 +15,7 @@ module.exports = applyOverrides(base, {
     note:'RPE 4-5/10 · SL allongée pour le palier avancé.' } } },
   2: { replace: { Jeudi: {
     titre:'12 côtes de 80 mètres, puissance maximale', pcts:[[65,65],[100,107]],
-    echauff:'20 min progressif à {{P}}, finir par 4 foulées bondissantes.',
+    echauff:'25 min progressif à {{P}}, finir par 4 foulées bondissantes.',
     corps:'12 côtes de 80 mètres à effort maximal. Récupération : redescente en marchant. 4 de plus que la trame. Renforcement neuromusculaire maximal.',
     retour:'10 min footing très lent.',
     note:'RPE 8/10 sur chaque côte · 12 côtes pour ce palier.' },
@@ -78,7 +78,7 @@ module.exports = applyOverrides(base, {
     note:'RPE 5/10 en EF · 7-8/10 sur les 40 min · Grosse sortie avancée.' } } },
   9: { replace: { Jeudi: {
     titre:'12 côtes de 80 mètres, maintien puissance en phase spécifique', pcts:[[65,65],[100,107]],
-    echauff:'20 min progressif à {{P}}, finir par 4 foulées bondissantes.',
+    echauff:'25 min progressif à {{P}}, finir par 4 foulées bondissantes.',
     corps:'12 côtes de 80 mètres à effort maximal. Récupération : redescente en marchant. 2 de plus que la trame.',
     retour:'10 min footing très lent.',
     note:'RPE 8/10 · Puissance neuromusculaire maximale en phase spécifique.' },
@@ -87,7 +87,7 @@ module.exports = applyOverrides(base, {
     note:'RPE 6/10 en EF · 7-8/10 sur les 40 min.' } } },
   10: { replace: { Jeudi: {
     titre:'Séance finisher avancée, 6 km seuil + 3 × 3 km allure marathon', duree:'90 min', pcts:[[65,65],[82,87],[78,82]],
-    echauff:'20 min footing EF à {{P}}.',
+    echauff:'25 min footing EF à {{P}}.',
     corps:'6 km à {{P}} (effort seuil élevé) → 5 min récupération → 3 × 3 km à ton allure objectif marathon ({{OBJ}}), récup 3 min. Plus de volume au seuil que la trame.',
     retour:'10 min footing léger.',
     note:'RPE 9/10 sur le seuil · 8/10 sur les blocs OBJ · Séance de référence marathon avancé.' },
@@ -96,7 +96,7 @@ module.exports = applyOverrides(base, {
     note:'RPE 6/10 en EF · 8/10 sur les 40 min.' } } },
   11: { replace: { Jeudi: {
     titre:'3 × 5000 mètres à allure marathon, volume élevé', duree:'90 min', pcts:[[65,65],[78,82]],
-    echauff:'20 min progressif à {{P}}, finir par 4 accélérations de 80m.',
+    echauff:'25 min progressif à {{P}}, finir par 4 accélérations de 80m.',
     corps:'3 × 5000 mètres à {{P}}. Récupération 5 min. Un de plus que la trame. 15 km à allure marathon avec récupération. Pars très conservateur.',
     retour:'10 min footing très lent.',
     note:'RPE 8-9/10 · 3×5000m = 15 km à {{OBJ}}. Séance phare du marathon avancé.' },
@@ -105,7 +105,7 @@ module.exports = applyOverrides(base, {
     note:'RPE 6/10 en EF · 8/10 sur les 40 min · Sortie longue maximale avancée.' } } },
   12: { replace: { Jeudi: {
     titre:'Séance finisher avancée, 8 km seuil + 4 × 3 km allure marathon', duree:'100 min', pcts:[[65,65],[83,87],[78,82]],
-    echauff:'20 min footing EF à {{P}}.',
+    echauff:'25 min footing EF à {{P}}.',
     corps:'8 km à {{P}} (effort seuil élevé) → 5 min récupération → 4 × 3 km à ton allure objectif marathon ({{OBJ}}), récup 3 min. Plus de volume que la trame.',
     retour:'10 min footing léger.',
     note:'RPE 9/10 sur le seuil · 8/10 sur les 4 blocs OBJ · Pic de charge absolu du palier avancé.' },
@@ -114,7 +114,7 @@ module.exports = applyOverrides(base, {
     note:'RPE 6/10 en EF · 8/10 sur les 40 min · 2h50 totales : la sortie de référence.' } } },
   13: { replace: { Jeudi: {
     titre:'5 × 3 km à allure marathon, consolidation', duree:'85 min', pcts:[[65,65],[78,82]],
-    echauff:'20 min footing EF à {{P}}.',
+    echauff:'25 min footing EF à {{P}}.',
     corps:'5 × 3 km à ton allure objectif marathon ({{OBJ}}). Récupération 3 min. Un de plus que la trame. 15 km à {{OBJ}} en blocs.',
     retour:'10 min footing léger.',
     note:'RPE 7-8/10 · 5×3km pour le palier avancé vs 4×3km pour la trame.' },

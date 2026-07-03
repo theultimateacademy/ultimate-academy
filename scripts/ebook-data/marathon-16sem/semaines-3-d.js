@@ -6,7 +6,7 @@ const base = require('./semaines-3-i.js')
 module.exports = applyOverrides(base, {
   1: { replace: { Jeudi: {
     titre:'4 × 400 mètres, réveil neuromusculaire', pcts:[[65,65],[88,92]],
-    echauff:'20 min progressif à {{P}}, finir par 4 accélérations de 60m.',
+    echauff:'25 min progressif à {{P}}, finir par 4 accélérations de 60m.',
     corps:'4 × 400 mètres à {{P}}. Récupération 2 min au trot. Effort régulier. Mémorise la sensation sur chaque répétition.',
     retour:'10 min footing très lent.',
     note:'RPE 6/10 · 4×400m est la distance d\'entrée idéale pour ce palier.' },
@@ -15,7 +15,7 @@ module.exports = applyOverrides(base, {
     note:'RPE 4/10 · La durée prime. Si tu dois ralentir, ralentis.' } } },
   2: { replace: { Jeudi: {
     titre:'6 côtes de 80 mètres', pcts:[[65,65],[100,105]],
-    echauff:'20 min progressif à {{P}}, finir par 4 foulées bondissantes.',
+    echauff:'25 min progressif à {{P}}, finir par 4 foulées bondissantes.',
     corps:'6 côtes de 80 mètres à effort maximal. Récupération : redescente en marchant. Appui avant-pied, genoux hauts.',
     retour:'10 min footing très lent.',
     note:'RPE 8/10 sur chaque côte · 6 côtes au lieu de 8. Qualité sur chacune.' },
@@ -24,7 +24,7 @@ module.exports = applyOverrides(base, {
     note:'RPE 4/10.' } } },
   3: { replace: { Jeudi: {
     titre:'1 × 12 minutes au seuil aérobie, premier contact', duree:'45 min', pcts:[[65,70],[78,82]],
-    echauff:'20 min progressif à {{P}}, finir par 4 accélérations de 60m.',
+    echauff:'25 min progressif à {{P}}, finir par 4 accélérations de 60m.',
     corps:'12 min continus à {{P}}. Allure légèrement plus douce que la trame. Tu dois pouvoir prononcer quelques mots. Premier contact avec l\'effort soutenu.',
     retour:'10 min footing très lent.',
     note:'RPE 6/10 · 12 min en continu au seuil léger est un cap pour ce palier.' },
@@ -78,7 +78,7 @@ module.exports = applyOverrides(base, {
     note:'RPE 5/10 · 2h : cap symbolique pour ce palier.' } } },
   9: { replace: { Jeudi: {
     titre:'8 côtes de 80 mètres, puissance marathon', pcts:[[65,65],[100,105]],
-    echauff:'20 min progressif à {{P}}, finir par 4 foulées bondissantes.',
+    echauff:'25 min progressif à {{P}}, finir par 4 foulées bondissantes.',
     corps:'8 côtes de 80 mètres à effort maximal. Récupération : redescente en marchant.',
     retour:'10 min footing très lent.',
     note:'RPE 8/10 · 8 côtes au lieu de 10. Qualité sur chacune.' },
@@ -96,7 +96,7 @@ module.exports = applyOverrides(base, {
     note:'RPE 5/10 en EF · 7/10 sur les 20 min.' } } },
   11: { replace: { Jeudi: {
     titre:'1 × 5000 mètres à allure marathon, répétition de référence', duree:'60 min', pcts:[[65,65],[78,82]],
-    echauff:'20 min progressif à {{P}}, finir par 4 accélérations de 80m.',
+    echauff:'25 min progressif à {{P}}, finir par 4 accélérations de 80m.',
     corps:'1 × 5000 mètres à {{P}}. Un seul bloc tenu de bout en bout. Après 4 min de récup, 2 km à {{OBJ}} pour graver l\'allure.',
     retour:'10 min footing très lent.',
     note:'RPE 7-8/10 · 1×5000m est le pic spécifique adapté à ce palier.' },
@@ -105,7 +105,7 @@ module.exports = applyOverrides(base, {
     note:'RPE 5/10 en EF · 7/10 sur les 25 min.' } } },
   12: { replace: { Jeudi: {
     titre:'3 × 3 km à allure marathon', duree:'65 min', pcts:[[65,65],[78,82]],
-    echauff:'20 min footing EF à {{P}}.',
+    echauff:'25 min footing EF à {{P}}.',
     corps:'3 × 3 km à ton allure objectif marathon ({{OBJ}}). Récupération 3 min au trot. Version simplifiée de la séance finisher. Régularité sur les 3 blocs.',
     retour:'10 min footing léger.',
     note:'RPE 7/10 · Séance spécifique sans la partie seuil. Adapté au palier débutant.' },
@@ -114,7 +114,7 @@ module.exports = applyOverrides(base, {
     note:'RPE 5-6/10 en EF · 7/10 sur les 30 min.' } } },
   13: { replace: { Jeudi: {
     titre:'3 × 3 km à allure marathon', duree:'65 min', pcts:[[65,65],[78,82]],
-    echauff:'20 min footing EF à {{P}}.',
+    echauff:'25 min footing EF à {{P}}.',
     corps:'3 × 3 km à ton allure objectif marathon ({{OBJ}}). Récupération 3 min. Maintien de la mémoire allure. Volume identique à S12 pour ce palier.',
     retour:'10 min footing léger.',
     note:'RPE 7/10.' },
