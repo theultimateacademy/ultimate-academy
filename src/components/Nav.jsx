@@ -104,7 +104,7 @@ export default function Nav() {
 
         {/* Logo — always scrolls to top */}
         <Link to="/" onClick={handleLogoClick} style={{ lineHeight: 0, flexShrink: 0 }}>
-          <img src="/LogoSymbol.png" alt="The Ultimate Academy" style={{ height: 44, width: 'auto', display: 'block' }} />
+          <img src="/Logo.png" alt="The Ultimate Academy" style={{ height: 72, width: 'auto', display: 'block' }} />
         </Link>
 
         {/* Desktop centre links — in scroll order */}
