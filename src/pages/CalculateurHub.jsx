@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom'
 import Nav from '../components/Nav'
 import SiteFooter from '../components/SiteFooter'
+import PricingCTA from '../components/PricingCTA'
 import PageHero, { gradText } from '../components/PageHero'
 
 const CALCULATEURS = [
@@ -119,6 +120,10 @@ export default function CalculateurHub() {
         </div>
       </main>
 
+      <PricingCTA
+        title={<>Ces outils t'aident à planifier. <span style={{ background:'linear-gradient(135deg,#8B2FC9,#E8237A)', WebkitBackgroundClip:'text', WebkitTextFillColor:'transparent', backgroundClip:'text', display:'inline' }}>Le coaching fait le reste.</span></>}
+        subtitle="Un plan sur mesure, ajusté chaque semaine selon tes résultats. Pas un programme générique."
+      />
       <SiteFooter />
     </div>
   )
