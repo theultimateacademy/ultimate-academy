@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom'
 import Nav from '../components/Nav'
+import SiteFooter from '../components/SiteFooter'
 import PageHero, { gradText } from '../components/PageHero'
 
 const CALCULATEURS = [
@@ -117,6 +118,8 @@ export default function CalculateurHub() {
           ))}
         </div>
       </main>
+
+      <SiteFooter />
     </div>
   )
 }

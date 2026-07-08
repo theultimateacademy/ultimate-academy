@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import Nav from '../components/Nav'
+import SiteFooter from '../components/SiteFooter'
 import PageHero, { gradText } from '../components/PageHero'
 
 const C = { purple: '#8B2FC9', pink: '#E8237A', bg: '#0C0A18' }
@@ -101,6 +102,8 @@ export default function EbooksPage() {
           </div>
         </div>
       </div>
+
+      <SiteFooter />
     </div>
   )
 }

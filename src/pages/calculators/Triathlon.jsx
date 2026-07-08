@@ -1,7 +1,7 @@
 import { useState, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
 import Nav from '../../components/Nav'
-import ToolsFooter from '../../components/Layout/ToolsFooter'
+import SiteFooter from '../../components/SiteFooter'
 
 const C = { purple: '#8B2FC9', pink: '#E8237A', dark: '#1a1230', light: '#F8F5FF' }
 const grad = `linear-gradient(135deg,${C.purple},${C.pink})`
@@ -525,7 +525,7 @@ export default function Triathlon() {
         </div>
       </section>
 
-      <ToolsFooter />
+      <SiteFooter />
     </div>
   )
 }

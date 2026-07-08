@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from 'react'
 import { useNavigate, useLocation, Link } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
 import Nav from '../components/Nav'
-import ToolsFooter from '../components/Layout/ToolsFooter'
+import SiteFooter from '../components/SiteFooter'
 import { TESTIMONIALS_CALCULATOR, FUEL_PLAN } from '../lib/toolsContent'
 import TestimonialsCarousel from '../components/TestimonialsCarousel'
 
@@ -468,7 +468,7 @@ export default function Calculator() {
         <button onClick={handleCTA} style={{ padding:'.85rem 2.25rem', borderRadius:50, border:'none', background:`linear-gradient(135deg,${C.purple},${C.pink})`, color:'#fff', fontSize:'1rem', fontWeight:700, cursor:'pointer', boxShadow:'0 6px 24px rgba(232,35,122,.4)' }}>Démarrer mon coaching</button>
       </section>
 
-      <ToolsFooter />
+      <SiteFooter />
     </div>
   )
 }

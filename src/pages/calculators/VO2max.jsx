@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
 import Nav from '../../components/Nav'
-import ToolsFooter from '../../components/Layout/ToolsFooter'
+import SiteFooter from '../../components/SiteFooter'
 import { TESTIMONIALS_VO2MAX } from '../../lib/toolsContent'
 import TestimonialsCarousel from '../../components/TestimonialsCarousel'
 
@@ -703,7 +703,7 @@ export default function VO2maxCalculator() {
         </button>
       </section>
 
-      <ToolsFooter />
+      <SiteFooter />
     </div>
   )
 }

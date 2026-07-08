@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import Nav from '../../components/Nav'
-import ToolsFooter from '../../components/Layout/ToolsFooter'
+import SiteFooter from '../../components/SiteFooter'
 import { fmtHMS, DIST_PRESETS } from '../../lib/runCalc'
 import { TESTIMONIALS_PREDICTOR, FUEL_PLAN, EQUIV_TABLE } from '../../lib/toolsContent'
 import TestimonialsCarousel from '../../components/TestimonialsCarousel'
@@ -650,7 +650,7 @@ export default function PredictorCalculator() {
         </button>
       </section>
 
-      <ToolsFooter />
+      <SiteFooter />
     </div>
   )
 }

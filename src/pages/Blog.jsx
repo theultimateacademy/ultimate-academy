@@ -2,7 +2,8 @@ import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
 import Nav from '../components/Nav'
-import BlogFooter from '../components/BlogFooter'
+import SiteFooter from '../components/SiteFooter'
+
 import PageHero, { gradText } from '../components/PageHero'
 
 function formatDate(iso) {
@@ -209,7 +210,7 @@ export default function Blog() {
 
       </main>
 
-      <BlogFooter />
+      <SiteFooter />
 
       <style>{`
         .featured-card { transition: border-color .2s, transform .15s; }

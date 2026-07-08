@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react'
 import { useNavigate, Link, useLocation } from 'react-router-dom'
 import Nav from '../../components/Nav'
-import ToolsFooter from '../../components/Layout/ToolsFooter'
+import SiteFooter from '../../components/SiteFooter'
 import { kmhToPace, DIST_PRESETS, VMA_ZONES } from '../../lib/runCalc'
 import { TESTIMONIALS_ALLURES } from '../../lib/toolsContent'
 import TestimonialsCarousel from '../../components/TestimonialsCarousel'
@@ -347,7 +347,7 @@ export default function AlluresCalculator() {
         <button onClick={handleCTA} style={{ padding:'.85rem 2.25rem', borderRadius:50, border:'none', background:`linear-gradient(135deg,${C.purple},${C.pink})`, color:'#fff', fontSize:'1rem', fontWeight:700, cursor:'pointer', boxShadow:'0 6px 24px rgba(232,35,122,.4)' }}>Démarrer mon coaching</button>
       </section>
 
-      <ToolsFooter />
+      <SiteFooter />
     </div>
   )
 }

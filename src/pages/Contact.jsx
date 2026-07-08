@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import Nav from '../components/Nav'
+import SiteFooter from '../components/SiteFooter'
 import PageHero, { gradText } from '../components/PageHero'
 
 const grad = 'linear-gradient(135deg,#8B2FC9,#E8237A)'
@@ -148,6 +149,8 @@ export default function Contact() {
           </form>
         )}
       </main>
+
+      <SiteFooter />
     </div>
   )
 }

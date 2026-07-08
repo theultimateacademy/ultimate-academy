@@ -2,6 +2,7 @@ import { Link, useNavigate } from 'react-router-dom'
 import { useState, useEffect, useRef } from 'react'
 import { useAuth } from '../contexts/AuthContext'
 import Nav from '../components/Nav'
+import SiteFooter from '../components/SiteFooter'
 
 const TOOLS = [
   { label: 'Temps de passage',        path: '/calculateur' },
@@ -571,36 +572,7 @@ export default function Landing() {
       </section>
 
       {/* ── FOOTER ───────────────────────────────────────────── */}
-      <footer style={{ padding: '3rem 1.5rem 2rem', borderTop: '1px solid rgba(255,255,255,.06)', background: '#000' }}>
-        <div style={{ maxWidth: 900, margin: '0 auto' }}>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px,1fr))', gap: '2.5rem', marginBottom: '2rem' }}>
-            <div>
-              <img src="/Logo.png" alt="The Ultimate Academy" style={{ height: 60, width: 'auto', objectFit: 'contain', opacity: .8, marginBottom: '.85rem' }} />
-              <p style={{ color: 'rgba(255,255,255,.2)', fontSize: '.78rem', margin: 0 }}>
-                © 2026 The Ultimate Academy<br />Tous droits réservés.
-              </p>
-            </div>
-            <div>
-              <p style={{ fontSize: '.72rem', fontWeight: 700, letterSpacing: '.12em', textTransform: 'uppercase', color: 'rgba(255,255,255,.25)', marginBottom: '.85rem' }}>Outils gratuits</p>
-              {TOOLS.map(t => (
-                <Link key={t.path} to={t.path} style={{ display: 'block', color: 'rgba(255,255,255,.38)', fontSize: '.82rem', textDecoration: 'none', marginBottom: '.5rem' }}>{t.label}</Link>
-              ))}
-            </div>
-            <div>
-              <p style={{ fontSize: '.72rem', fontWeight: 700, letterSpacing: '.12em', textTransform: 'uppercase', color: 'rgba(255,255,255,.25)', marginBottom: '.85rem' }}>Blog</p>
-              {['Tous les articles','Plans d\'entraînement','Nutrition','Trail & Marathon'].map(l => (
-                <Link key={l} to="/blog" style={{ display: 'block', color: 'rgba(255,255,255,.38)', fontSize: '.82rem', textDecoration: 'none', marginBottom: '.5rem' }}>{l}</Link>
-              ))}
-            </div>
-            <div>
-              <p style={{ fontSize: '.72rem', fontWeight: 700, letterSpacing: '.12em', textTransform: 'uppercase', color: 'rgba(255,255,255,.25)', marginBottom: '.85rem' }}>Légal</p>
-              <Link to="/privacy" style={{ display: 'block', color: 'rgba(255,255,255,.38)', fontSize: '.82rem', textDecoration: 'none', marginBottom: '.5rem' }}>Politique de confidentialité</Link>
-              <Link to="/terms"   style={{ display: 'block', color: 'rgba(255,255,255,.38)', fontSize: '.82rem', textDecoration: 'none', marginBottom: '.5rem' }}>CGV</Link>
-              <Link to="/cookies" style={{ display: 'block', color: 'rgba(255,255,255,.38)', fontSize: '.82rem', textDecoration: 'none', marginBottom: '.5rem' }}>Cookies</Link>
-            </div>
-          </div>
-        </div>
-      </footer>
+      <SiteFooter />
     </div>
   )
 }

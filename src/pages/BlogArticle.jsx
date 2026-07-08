@@ -2,7 +2,8 @@ import { useState, useEffect } from 'react'
 import { Link, useParams, Navigate } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
 import Nav from '../components/Nav'
-import BlogFooter from '../components/BlogFooter'
+import SiteFooter from '../components/SiteFooter'
+
 
 function formatDate(iso) {
   return new Date(iso).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })
@@ -220,7 +221,7 @@ export default function BlogArticle() {
 
       </article>
 
-      <BlogFooter />
+      <SiteFooter />
 
       <style>{`
         .article-content h2 {
