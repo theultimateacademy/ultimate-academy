@@ -54,7 +54,7 @@ export default function Contact() {
       <PageHero
         badge="Nous contacter"
         title={<>Une question ? <span style={gradText}>Écris-moi.</span></>}
-        subtitle="Je réponds personnellement à chaque message sous 24h."
+        subtitle="Je réponds personnellement à chaque message sous 48h."
       />
 
       <main style={{ maxWidth: 640, margin: '0 auto', padding: '4rem 1.5rem 6rem' }}>
@@ -67,7 +67,7 @@ export default function Contact() {
             <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>✅</div>
             <h2 style={{ fontSize: '1.4rem', fontWeight: 800, marginBottom: '.5rem' }}>Message envoyé !</h2>
             <p style={{ color: 'rgba(255,255,255,.5)', lineHeight: 1.7 }}>
-              Ton message a bien été transmis. Je te répondrai dans les 24 heures.
+              Ton message a bien été transmis. Je te répondrai dans les 48 heures.
             </p>
             <button
               onClick={() => setStatus('idle')}
