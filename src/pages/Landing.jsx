@@ -67,7 +67,7 @@ const FAQ = [
 ]
 
 
-const gd = () => ({
+const gd = (text) => ({
   background: 'linear-gradient(135deg, #8B2FC9 0%, #E8237A 100%)',
   WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text',
   display: 'inline',
@@ -91,7 +91,7 @@ export default function Landing() {
   const scrollTo = (id) => document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' })
 
   return (
-    <div style={{ background: '#F9F7FF', color: '#0C0A18', overflowX: 'hidden' }}>
+    <div style={{ background: '#000', color: '#fff', overflowX: 'hidden' }}>
       <Nav />
 
       {/* ── HERO ─────────────────────────────────────────────── */}
@@ -99,13 +99,13 @@ export default function Landing() {
         minHeight: '100dvh', display: 'flex', flexDirection: 'column',
         alignItems: 'center', justifyContent: 'center', textAlign: 'center',
         padding: '7rem 1.5rem 4rem', position: 'relative', overflow: 'hidden',
-        background: 'radial-gradient(ellipse at 50% 45%, rgba(139,47,201,.12) 0%, rgba(232,35,122,.07) 42%, transparent 68%), #F9F7FF',
+        background: 'radial-gradient(ellipse at 50% 45%, rgba(139,47,201,.18) 0%, rgba(232,35,122,.10) 42%, transparent 68%), #0C0A18',
       }}>
         {/* Glow accent secondaire */}
         <div style={{
           position: 'absolute', top: '60%', left: '65%', transform: 'translate(-50%,-50%)',
           width: 600, height: 500, pointerEvents: 'none',
-          background: 'radial-gradient(ellipse, rgba(232,35,122,.05) 0%, transparent 65%)',
+          background: 'radial-gradient(ellipse, rgba(232,35,122,.07) 0%, transparent 65%)',
         }} />
         <div style={{
           position: 'absolute', bottom: 0, left: 0, right: 0, height: 1,
@@ -122,7 +122,7 @@ export default function Landing() {
           </h1>
 
           <p style={{
-            color: 'rgba(12,10,24,.6)', fontSize: 'clamp(1.05rem, 2.5vw, 1.3rem)',
+            color: 'rgba(255,255,255,.6)', fontSize: 'clamp(1.05rem, 2.5vw, 1.3rem)',
             maxWidth: 560, margin: '0 auto 2.75rem', lineHeight: 1.8,
           }}>
             Je conçois ton plan sur-mesure, suis ta progression semaine après semaine
@@ -141,48 +141,48 @@ export default function Landing() {
 
         <div style={{
           position: 'absolute', bottom: '2rem', left: '50%', transform: 'translateX(-50%)',
-          color: 'rgba(12,10,24,.3)', fontSize: '1.4rem',
+          color: 'rgba(255,255,255,.3)', fontSize: '1.4rem',
           animation: 'floatDown 2s ease-in-out infinite',
         }}>↓</div>
       </header>
 
       {/* ── STATS ────────────────────────────────────────────── */}
       <section style={{
-        background: '#fff', padding: '2.5rem 1.5rem',
-        borderTop: '1px solid rgba(0,0,0,.07)', borderBottom: '1px solid rgba(0,0,0,.07)',
+        background: '#0A0A0A', padding: '2.5rem 1.5rem',
+        borderTop: '1px solid rgba(255,255,255,.06)', borderBottom: '1px solid rgba(255,255,255,.06)',
       }}>
         <div style={{ maxWidth: 900, margin: '0 auto', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))', gap: '1.5rem', textAlign: 'center' }}>
           {[['250+','Athlètes accompagnés'],['4.9/5','Satisfaction'],['93%','Objectifs atteints'],['12 sem.','Durée moyenne']].map(([val,lbl]) => (
             <div key={lbl}>
               <div style={{ fontSize: 'clamp(1.8rem,4vw,2.5rem)', fontWeight: 800, letterSpacing: '-0.02em', ...gd() }}>{val}</div>
-              <div style={{ color: 'rgba(12,10,24,.5)', fontSize: '.85rem', marginTop: '.3rem' }}>{lbl}</div>
+              <div style={{ color: 'rgba(255,255,255,.45)', fontSize: '.85rem', marginTop: '.3rem' }}>{lbl}</div>
             </div>
           ))}
         </div>
       </section>
 
       {/* ── FEATURES BENTO ───────────────────────────────────── */}
-      <section id="features" style={{ padding: '6rem 1.5rem', background: '#F9F7FF', borderTop: '1px solid rgba(0,0,0,.07)' }}>
+      <section id="features" style={{ padding: '6rem 1.5rem', background: '#000', borderTop: '1px solid rgba(255,255,255,.06)' }}>
         <div className="container">
           <div style={{ textAlign: 'center', marginBottom: '3.5rem' }}>
             <h2 style={{ fontSize: 'clamp(2rem,5vw,3rem)', fontWeight: 800, letterSpacing: '-0.02em', marginBottom: '.75rem' }}>
               Ce que je <span style={gd()}>t'apporte</span>
             </h2>
-            <p style={{ color: 'rgba(12,10,24,.5)', fontSize: '1rem' }}>Un accompagnement complet pour progresser intelligemment</p>
+            <p style={{ color: 'rgba(255,255,255,.4)', fontSize: '1rem' }}>Un accompagnement complet pour progresser intelligemment</p>
           </div>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '.75rem' }}>
             {FEATURES.map(f => (
               <div key={f.title} style={{
                 display: 'flex', alignItems: 'flex-start', gap: '1rem', padding: '1.1rem 1.25rem',
-                borderRadius: 18, background: '#fff',
-                border: '1px solid rgba(139,47,201,.12)',
-                boxShadow: '0 2px 8px rgba(0,0,0,.05)',
+                borderRadius: 18, background: 'rgba(255,255,255,.04)',
+                border: '1px solid rgba(255,255,255,.08)',
+                backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)',
                 transition: 'border-color .2s',
               }}>
                 <div style={{ fontSize: '1.6rem', flexShrink: 0, marginTop: '.1rem' }}>{f.icon}</div>
                 <div>
-                  <div style={{ fontWeight: 700, fontSize: '.95rem', color: '#0C0A18', marginBottom: '.25rem' }}>{f.title}</div>
-                  <div style={{ fontSize: '.82rem', color: 'rgba(12,10,24,.5)', lineHeight: 1.6 }}>{f.desc}</div>
+                  <div style={{ fontWeight: 700, fontSize: '.95rem', color: '#fff', marginBottom: '.25rem' }}>{f.title}</div>
+                  <div style={{ fontSize: '.82rem', color: 'rgba(255,255,255,.45)', lineHeight: 1.6 }}>{f.desc}</div>
                 </div>
               </div>
             ))}
@@ -191,21 +191,21 @@ export default function Landing() {
       </section>
 
       {/* ── COACH ────────────────────────────────────────────── */}
-      <section id="coach" style={{ padding: '6rem 1.5rem', background: '#fff', borderTop: '1px solid rgba(0,0,0,.07)' }}>
+      <section id="coach" style={{ padding: '6rem 1.5rem', background: '#0A0A0A', borderTop: '1px solid rgba(255,255,255,.06)' }}>
         <div className="container" style={{ maxWidth: 960 }}>
           <div style={{ display: 'flex', gap: '4rem', alignItems: 'center', flexWrap: 'wrap' }}>
             <div style={{ flexShrink: 0, width: 'min(100%, 300px)' }}>
               <div style={{ borderRadius: 28, overflow: 'hidden', position: 'relative',
-                boxShadow: '0 0 60px rgba(232,35,122,.15), 0 32px 64px rgba(0,0,0,.12)',
-                border: '1px solid rgba(139,47,201,.2)' }}>
+                boxShadow: '0 0 60px rgba(232,35,122,.25), 0 32px 64px rgba(0,0,0,.5)',
+                border: '1px solid rgba(255,255,255,.12)' }}>
                 <img src="/Coach.JPG" alt="Alexis" style={{ width: '100%', display: 'block', objectFit: 'cover', aspectRatio: '3/4' }} />
                 <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: 3, background: 'linear-gradient(90deg,#8B2FC9,#E8237A)' }} />
               </div>
             </div>
             <div style={{ flex: 1, minWidth: 260 }}>
               <div style={{ display: 'inline-flex', alignItems: 'center', gap: '.5rem', padding: '.35rem 1rem',
-                borderRadius: 99, background: 'rgba(139,47,201,.1)', border: '1px solid rgba(139,47,201,.3)',
-                fontSize: '.8rem', fontWeight: 600, color: '#7C3AED', marginBottom: '1.25rem' }}>
+                borderRadius: 99, background: 'rgba(139,47,201,.18)', border: '1px solid rgba(139,47,201,.35)',
+                fontSize: '.8rem', fontWeight: 600, color: '#C084FC', marginBottom: '1.25rem' }}>
                 Ton coach
               </div>
               <h2 style={{ fontSize: 'clamp(2.5rem,6vw,4rem)', fontWeight: 800, letterSpacing: '-0.03em', marginBottom: '1.75rem' }}>Alexis</h2>
@@ -215,15 +215,15 @@ export default function Landing() {
                   "Sur route, je cours le 10km en 34 minutes et le semi en 1h19. En montagne, j'ai enchaîné plusieurs ultras dont un 126km avec 6500m de dénivelé positif.",
                   "Je connais la discipline qu'exige un objectif ambitieux et la fierté de le franchir. C'est cette expérience que je mets entièrement au service de ton programme.",
                 ].map((t, i) => (
-                  <p key={i} style={{ lineHeight: 1.8, color: 'rgba(12,10,24,.65)', fontSize: '.9875rem', textAlign: 'justify' }}>{t}</p>
+                  <p key={i} style={{ lineHeight: 1.8, color: 'rgba(255,255,255,.62)', fontSize: '.9875rem', textAlign: 'justify' }}>{t}</p>
                 ))}
               </div>
               <div style={{ display: 'flex', flexWrap: 'wrap', gap: '.6rem', marginTop: '2rem' }}>
                 {[['🏃','10km en 34min'],['🥈','Semi en 1h19'],['🏔️','126km / 6500m D+'],['🎿','Moniteur de ski'],['🎓','Éducateur sportif · STAPS']].map(([icon,label]) => (
                   <div key={label} style={{ display: 'flex', alignItems: 'center', gap: '.4rem',
                     padding: '.4rem .9rem', borderRadius: 99,
-                    background: 'rgba(139,47,201,.07)', border: '1px solid rgba(139,47,201,.18)',
-                    fontSize: '.8rem', fontWeight: 500, color: 'rgba(12,10,24,.75)' }}>
+                    background: 'rgba(255,255,255,.06)', border: '1px solid rgba(255,255,255,.1)',
+                    fontSize: '.8rem', fontWeight: 500, color: 'rgba(255,255,255,.8)' }}>
                     <span>{icon}</span> {label}
                   </div>
                 ))}
@@ -237,13 +237,13 @@ export default function Landing() {
       </section>
 
       {/* ── PRICING ──────────────────────────────────────────── */}
-      <section id="tarifs" style={{ padding: '6rem 1.5rem', background: '#F9F7FF', borderTop: '1px solid rgba(0,0,0,.07)' }}>
+      <section id="tarifs" style={{ padding: '6rem 1.5rem', background: '#000', borderTop: '1px solid rgba(255,255,255,.06)' }}>
         <div className="container" style={{ maxWidth: 820 }}>
           <div style={{ textAlign: 'center', marginBottom: '3rem' }}>
             <h2 style={{ fontSize: 'clamp(2rem,5vw,3rem)', fontWeight: 800, letterSpacing: '-0.02em', marginBottom: '.6rem' }}>
               Une seule offre, <span style={gd()}>sans compromis</span>
             </h2>
-            <p style={{ color: 'rgba(12,10,24,.5)', fontSize: '1rem' }}>Tout ce qu'il faut pour progresser. Rien de superflu.</p>
+            <p style={{ color: 'rgba(255,255,255,.4)', fontSize: '1rem' }}>Tout ce qu'il faut pour progresser. Rien de superflu.</p>
           </div>
 
           <div className="pricing-card pricing-card--featured" style={{ padding: '3rem 2.5rem' }}>
@@ -257,23 +257,23 @@ export default function Landing() {
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(260px,100%),1fr))', gap: '3rem', alignItems: 'center', marginTop: '.5rem' }}>
 
               <div style={{ textAlign: 'center' }}>
-                <div style={{ fontSize: '.78rem', fontWeight: 700, color: 'rgba(12,10,24,.5)', letterSpacing: '.12em', textTransform: 'uppercase', marginBottom: '1rem', textAlign: 'center', width: '100%' }}>
+                <div style={{ fontSize: '.78rem', fontWeight: 700, color: 'rgba(255,255,255,.55)', letterSpacing: '.12em', textTransform: 'uppercase', marginBottom: '1rem', textAlign: 'center', width: '100%' }}>
                   Coaching Personnalisé
                 </div>
                 <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'center', gap: '.4rem', marginBottom: '.3rem' }}>
                   <span className="price-amount">30€</span>
                   <span className="price-period">/mois</span>
                 </div>
-                <p style={{ color: 'rgba(12,10,24,.6)', fontSize: '.85rem', marginBottom: '.4rem', lineHeight: 1.6 }}>
+                <p style={{ color: 'rgba(255,255,255,.65)', fontSize: '.85rem', marginBottom: '.4rem', lineHeight: 1.6 }}>
                   après 14 jours offerts
                 </p>
-                <p style={{ color: 'rgba(12,10,24,.5)', fontSize: '.78rem', marginBottom: '2rem', lineHeight: 1.5 }}>
+                <p style={{ color: 'rgba(255,255,255,.5)', fontSize: '.78rem', marginBottom: '2rem', lineHeight: 1.5 }}>
                   Sans engagement. Annule à tout moment.
                 </p>
                 <button onClick={handleCTA} className="btn-liquid-primary" style={{ width: '100%', fontSize: '1rem', padding: '1rem 1.5rem' }}>
                   Commencer gratuitement →
                 </button>
-                <p style={{ color: 'rgba(12,10,24,.45)', fontSize: '.72rem', marginTop: '.75rem' }}>
+                <p style={{ color: 'rgba(255,255,255,.45)', fontSize: '.72rem', marginTop: '.75rem' }}>
                   Carte requise · aucun débit pendant 14 jours
                 </p>
               </div>
@@ -287,7 +287,7 @@ export default function Landing() {
                   'Messagerie directe avec moi',
                   'Analyse continue de ta progression',
                 ].map(f => (
-                  <div key={f} style={{ display: 'flex', gap: '.75rem', alignItems: 'center', fontSize: '.9rem', color: 'rgba(12,10,24,.75)' }}>
+                  <div key={f} style={{ display: 'flex', gap: '.75rem', alignItems: 'center', fontSize: '.9rem', color: 'rgba(255,255,255,.78)' }}>
                     <span style={{ ...gd(), fontWeight: 700, fontSize: '1rem', flexShrink: 0 }}>✓</span> {f}
                   </div>
                 ))}
@@ -300,23 +300,23 @@ export default function Landing() {
       </section>
 
       {/* ── TESTIMONIALS ─────────────────────────────────────── */}
-      <section id="resultats" style={{ padding: '5rem 0', background: '#fff', overflow: 'hidden', borderTop: '1px solid rgba(0,0,0,.07)' }}>
+      <section id="resultats" style={{ padding: '5rem 0', background: '#0A0A0A', overflow: 'hidden', borderTop: '1px solid rgba(255,255,255,.06)' }}>
         <div style={{ textAlign: 'center', marginBottom: '2.5rem', padding: '0 1.5rem' }}>
           <h2 style={{ fontSize: 'clamp(1.8rem,4vw,2.8rem)', fontWeight: 800, letterSpacing: '-0.02em', marginBottom: '.5rem' }}>
             Ils l'ont <span style={gd()}>fait</span>
           </h2>
-          <p style={{ color: 'rgba(12,10,24,.5)', fontSize: '1rem' }}>Des vrais résultats, de vraies personnes</p>
+          <p style={{ color: 'rgba(255,255,255,.4)', fontSize: '1rem' }}>Des vrais résultats, de vraies personnes</p>
         </div>
         <div className="testimonials-viewport">
           <div className="testimonials-track">
             {TESTIMONIALS_LOOP.map((t, i) => (
               <div key={i} className="testimonial-card">
                 <div style={{ fontSize: '2rem', marginBottom: '.75rem' }}>{t.emoji}</div>
-                <p style={{ fontSize: '.9375rem', lineHeight: 1.75, color: 'rgba(12,10,24,.65)', fontStyle: 'italic', marginBottom: '1rem', flex: 1 }}>
+                <p style={{ fontSize: '.9375rem', lineHeight: 1.75, color: 'rgba(255,255,255,.65)', fontStyle: 'italic', marginBottom: '1rem', flex: 1 }}>
                   "{t.quote}"
                 </p>
                 <div>
-                  <div style={{ fontWeight: 700, color: '#0C0A18', fontSize: '.9375rem' }}>{t.name}{t.age ? `, ${t.age} ans` : ''}</div>
+                  <div style={{ fontWeight: 700, color: '#fff', fontSize: '.9375rem' }}>{t.name}{t.age ? `, ${t.age} ans` : ''}</div>
                   <div style={{ fontSize: '.78rem', marginTop: '.2rem', fontWeight: 600, ...gd() }}>{t.role}</div>
                 </div>
               </div>
@@ -326,13 +326,13 @@ export default function Landing() {
       </section>
 
       {/* ── FAQ ──────────────────────────────────────────────── */}
-      <section id="faq" style={{ padding: '6rem 1.5rem', background: '#F9F7FF', borderTop: '1px solid rgba(0,0,0,.07)' }}>
+      <section id="faq" style={{ padding: '6rem 1.5rem', background: '#000', borderTop: '1px solid rgba(255,255,255,.06)' }}>
         <div className="container" style={{ maxWidth: 760 }}>
           <div style={{ textAlign: 'center', marginBottom: '3.5rem' }}>
             <h2 style={{ fontSize: 'clamp(2rem,5vw,3rem)', fontWeight: 800, letterSpacing: '-0.02em', marginBottom: '.6rem' }}>
               Questions <span style={gd()}>fréquentes</span>
             </h2>
-            <p style={{ color: 'rgba(12,10,24,.5)', fontSize: '1rem' }}>Tout ce que tu veux savoir avant de commencer</p>
+            <p style={{ color: 'rgba(255,255,255,.4)', fontSize: '1rem' }}>Tout ce que tu veux savoir avant de commencer</p>
           </div>
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: '.75rem' }}>
@@ -341,26 +341,26 @@ export default function Landing() {
               return (
                 <div key={i} onClick={() => setOpenFaq(open ? null : i)} style={{
                   borderRadius: 20, overflow: 'hidden', cursor: 'pointer',
-                  background: open ? 'rgba(139,47,201,.08)' : '#fff',
-                  border: `1px solid ${open ? 'rgba(139,47,201,.35)' : 'rgba(0,0,0,.08)'}`,
+                  background: open ? 'rgba(139,47,201,.12)' : 'rgba(255,255,255,.04)',
+                  border: `1px solid ${open ? 'rgba(139,47,201,.35)' : 'rgba(255,255,255,.08)'}`,
+                  backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)',
                   transition: 'background .2s, border-color .2s',
-                  boxShadow: '0 2px 8px rgba(0,0,0,.04)',
                 }}>
                   <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '1rem', padding: '1.25rem 1.5rem' }}>
-                    <span style={{ fontWeight: 600, fontSize: '.975rem', color: open ? '#0C0A18' : 'rgba(12,10,24,.8)', lineHeight: 1.5 }}>
+                    <span style={{ fontWeight: 600, fontSize: '.975rem', color: open ? '#fff' : 'rgba(255,255,255,.8)', lineHeight: 1.5 }}>
                       {item.q}
                     </span>
                     <span style={{
                       flexShrink: 0, width: 28, height: 28, borderRadius: '50%',
-                      background: open ? 'linear-gradient(135deg,#8B2FC9,#E8237A)' : 'rgba(0,0,0,.08)',
+                      background: open ? 'linear-gradient(135deg,#8B2FC9,#E8237A)' : 'rgba(255,255,255,.08)',
                       display: 'flex', alignItems: 'center', justifyContent: 'center',
-                      fontSize: '.9rem', fontWeight: 700, color: open ? '#fff' : '#0C0A18',
+                      fontSize: '.9rem', fontWeight: 700, color: '#fff',
                       transition: 'background .2s, transform .25s',
                       transform: open ? 'rotate(45deg)' : 'none',
                     }}>+</span>
                   </div>
                   {open && (
-                    <div style={{ padding: '0 1.5rem 1.25rem', color: 'rgba(12,10,24,.65)', fontSize: '.925rem', lineHeight: 1.8 }}>
+                    <div style={{ padding: '0 1.5rem 1.25rem', color: 'rgba(255,255,255,.6)', fontSize: '.925rem', lineHeight: 1.8 }}>
                       {item.a}
                     </div>
                   )}
@@ -370,7 +370,7 @@ export default function Landing() {
           </div>
 
           <div style={{ textAlign: 'center', marginTop: '3rem' }}>
-            <p style={{ color: 'rgba(12,10,24,.45)', fontSize: '.9rem', marginBottom: '1.25rem' }}>
+            <p style={{ color: 'rgba(255,255,255,.35)', fontSize: '.9rem', marginBottom: '1.25rem' }}>
               Tu as une autre question ?
             </p>
             <button onClick={() => scrollTo('tarifs')} className="btn-liquid-primary">
@@ -381,33 +381,33 @@ export default function Landing() {
       </section>
 
       {/* ── FOOTER ───────────────────────────────────────────── */}
-      <footer style={{ padding: '3rem 1.5rem 2rem', borderTop: '1px solid rgba(0,0,0,.08)', background: '#fff' }}>
+      <footer style={{ padding: '3rem 1.5rem 2rem', borderTop: '1px solid rgba(255,255,255,.06)', background: '#000' }}>
         <div style={{ maxWidth: 900, margin: '0 auto' }}>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px,1fr))', gap: '2.5rem', marginBottom: '2rem' }}>
             <div>
-              <img src="/Logo.png" alt="The Ultimate Academy" style={{ height: 60, width: 'auto', objectFit: 'contain', opacity: .9, marginBottom: '.85rem' }} />
-              <p style={{ color: 'rgba(12,10,24,.35)', fontSize: '.78rem', margin: 0 }}>
+              <img src="/Logo.png" alt="The Ultimate Academy" style={{ height: 60, width: 'auto', objectFit: 'contain', opacity: .8, marginBottom: '.85rem' }} />
+              <p style={{ color: 'rgba(255,255,255,.2)', fontSize: '.78rem', margin: 0 }}>
                 © 2026 The Ultimate Academy<br />Tous droits réservés.
               </p>
             </div>
             <div>
-              <p style={{ fontSize: '.72rem', fontWeight: 700, letterSpacing: '.12em', textTransform: 'uppercase', color: 'rgba(12,10,24,.4)', marginBottom: '.85rem' }}>Outils gratuits</p>
+              <p style={{ fontSize: '.72rem', fontWeight: 700, letterSpacing: '.12em', textTransform: 'uppercase', color: 'rgba(255,255,255,.25)', marginBottom: '.85rem' }}>Outils gratuits</p>
               {TOOLS.map(t => (
-                <Link key={t.path} to={t.path} style={{ display: 'block', color: 'rgba(12,10,24,.5)', fontSize: '.82rem', textDecoration: 'none', marginBottom: '.5rem' }}>{t.label}</Link>
+                <Link key={t.path} to={t.path} style={{ display: 'block', color: 'rgba(255,255,255,.38)', fontSize: '.82rem', textDecoration: 'none', marginBottom: '.5rem' }}>{t.label}</Link>
               ))}
             </div>
             <div>
-              <p style={{ fontSize: '.72rem', fontWeight: 700, letterSpacing: '.12em', textTransform: 'uppercase', color: 'rgba(12,10,24,.4)', marginBottom: '.85rem' }}>Blog</p>
-              <Link to="/blog" style={{ display: 'block', color: 'rgba(12,10,24,.5)', fontSize: '.82rem', textDecoration: 'none', marginBottom: '.5rem' }}>Tous les articles</Link>
-              <Link to="/blog" style={{ display: 'block', color: 'rgba(12,10,24,.5)', fontSize: '.82rem', textDecoration: 'none', marginBottom: '.5rem' }}>Plans d'entraînement</Link>
-              <Link to="/blog" style={{ display: 'block', color: 'rgba(12,10,24,.5)', fontSize: '.82rem', textDecoration: 'none', marginBottom: '.5rem' }}>Nutrition</Link>
-              <Link to="/blog" style={{ display: 'block', color: 'rgba(12,10,24,.5)', fontSize: '.82rem', textDecoration: 'none', marginBottom: '.5rem' }}>Trail & Marathon</Link>
+              <p style={{ fontSize: '.72rem', fontWeight: 700, letterSpacing: '.12em', textTransform: 'uppercase', color: 'rgba(255,255,255,.25)', marginBottom: '.85rem' }}>Blog</p>
+              <Link to="/blog" style={{ display: 'block', color: 'rgba(255,255,255,.38)', fontSize: '.82rem', textDecoration: 'none', marginBottom: '.5rem' }}>Tous les articles</Link>
+              <Link to="/blog" style={{ display: 'block', color: 'rgba(255,255,255,.38)', fontSize: '.82rem', textDecoration: 'none', marginBottom: '.5rem' }}>Plans d'entraînement</Link>
+              <Link to="/blog" style={{ display: 'block', color: 'rgba(255,255,255,.38)', fontSize: '.82rem', textDecoration: 'none', marginBottom: '.5rem' }}>Nutrition</Link>
+              <Link to="/blog" style={{ display: 'block', color: 'rgba(255,255,255,.38)', fontSize: '.82rem', textDecoration: 'none', marginBottom: '.5rem' }}>Trail & Marathon</Link>
             </div>
             <div>
-              <p style={{ fontSize: '.72rem', fontWeight: 700, letterSpacing: '.12em', textTransform: 'uppercase', color: 'rgba(12,10,24,.4)', marginBottom: '.85rem' }}>Légal</p>
-              <Link to="/privacy" style={{ display: 'block', color: 'rgba(12,10,24,.5)', fontSize: '.82rem', textDecoration: 'none', marginBottom: '.5rem' }}>Politique de confidentialité</Link>
-              <Link to="/terms"   style={{ display: 'block', color: 'rgba(12,10,24,.5)', fontSize: '.82rem', textDecoration: 'none', marginBottom: '.5rem' }}>CGV</Link>
-              <Link to="/cookies" style={{ display: 'block', color: 'rgba(12,10,24,.5)', fontSize: '.82rem', textDecoration: 'none', marginBottom: '.5rem' }}>Cookies</Link>
+              <p style={{ fontSize: '.72rem', fontWeight: 700, letterSpacing: '.12em', textTransform: 'uppercase', color: 'rgba(255,255,255,.25)', marginBottom: '.85rem' }}>Légal</p>
+              <Link to="/privacy" style={{ display: 'block', color: 'rgba(255,255,255,.38)', fontSize: '.82rem', textDecoration: 'none', marginBottom: '.5rem' }}>Politique de confidentialité</Link>
+              <Link to="/terms"   style={{ display: 'block', color: 'rgba(255,255,255,.38)', fontSize: '.82rem', textDecoration: 'none', marginBottom: '.5rem' }}>CGV</Link>
+              <Link to="/cookies" style={{ display: 'block', color: 'rgba(255,255,255,.38)', fontSize: '.82rem', textDecoration: 'none', marginBottom: '.5rem' }}>Cookies</Link>
             </div>
           </div>
         </div>
