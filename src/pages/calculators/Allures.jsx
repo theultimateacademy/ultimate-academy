@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react'
 import { useNavigate, Link, useLocation } from 'react-router-dom'
 import Nav from '../../components/Nav'
 import SiteFooter from '../../components/SiteFooter'
+import PageHero, { gradText } from '../../components/PageHero'
 import { kmhToPace, DIST_PRESETS, VMA_ZONES } from '../../lib/runCalc'
 import { TESTIMONIALS_ALLURES } from '../../lib/toolsContent'
 import TestimonialsCarousel from '../../components/TestimonialsCarousel'
@@ -78,19 +79,13 @@ export default function AlluresCalculator() {
     <div style={{ background:'#000', color:'#fff', overflowX:'hidden' }}>
       <Nav />
 
-      {/* HERO */}
-      <section style={{ position:'relative', minHeight:'100vh', display:'flex', flexDirection:'column', justifyContent:'center', alignItems:'center', textAlign:'center', background:'linear-gradient(-45deg, #080818, #1a0a2e, #2d0a4e, #5a1fa0, #2d0a4e, #1a0a2e, #080818)', overflow:'hidden' }}>
-        <div style={{ position:'absolute', top:'-20%', left:'-10%', width:'60vw', height:'60vw', maxWidth:700, maxHeight:700, borderRadius:'50%', background:'radial-gradient(circle,rgba(139,47,201,.22) 0%,transparent 70%)', pointerEvents:'none' }}/>
-        <div style={{ position:'absolute', bottom:'-10%', right:'-8%', width:'50vw', height:'50vw', maxWidth:600, maxHeight:600, borderRadius:'50%', background:'radial-gradient(circle,rgba(232,35,122,.18) 0%,transparent 70%)', pointerEvents:'none' }}/>
-        <div style={{ position:'relative', zIndex:1, padding:'8rem 1.5rem 4rem', maxWidth:760 }}>
-          <h1 style={{ fontSize:'clamp(2.2rem,6vw,4rem)', fontWeight:900, lineHeight:1.05, marginBottom:'1.25rem' }}>
-            <span style={{ background:'linear-gradient(135deg,#8B2FC9,#E8237A)', WebkitBackgroundClip:'text', WebkitTextFillColor:'transparent', backgroundClip:'text', display:'inline' }}>Allures d'entraînement</span> & zones FC
-          </h1>
-          <p style={{ fontSize:'clamp(1rem,2.5vw,1.2rem)', color:'rgba(255,255,255,.75)', maxWidth:520, margin:'0 auto 2.5rem', lineHeight:1.6 }}>Entraîne-toi dans les bonnes zones pour progresser sans te blesser, avec ta VMA et ta fréquence cardiaque</p>
-          <button onClick={()=>calcRef.current?.scrollIntoView({behavior:'smooth'})} style={{ padding:'1rem 2.5rem', borderRadius:50, border:'none', background:`linear-gradient(135deg,${C.purple},${C.pink})`, color:'#fff', fontSize:'1.05rem', fontWeight:700, cursor:'pointer', boxShadow:'0 8px 32px rgba(232,35,122,.5)' }}>Calculer mes allures ↓</button>
-        </div>
-        <div style={{ position:'absolute', bottom:0, left:0, right:0, height:3, background:`linear-gradient(90deg,${C.purple},${C.pink})` }}/>
-      </section>
+      <PageHero
+        badge="Allures running"
+        title={<><span style={gradText}>Allures d'entraînement</span> &amp; zones FC</>}
+        subtitle="Entraîne-toi dans les bonnes zones pour progresser sans te blesser, avec ta VMA et ta fréquence cardiaque"
+      >
+        <button onClick={()=>calcRef.current?.scrollIntoView({behavior:'smooth'})} style={{ padding:'1rem 2.5rem', borderRadius:50, border:'none', background:`linear-gradient(135deg,${C.purple},${C.pink})`, color:'#fff', fontSize:'1.05rem', fontWeight:700, cursor:'pointer', boxShadow:'0 8px 32px rgba(232,35,122,.5)' }}>Calculer mes allures ↓</button>
+      </PageHero>
 
       {/* CALCULATOR */}
       <section ref={calcRef} id="outil" style={{ background:C.light, padding:'5rem 1.5rem' }}>

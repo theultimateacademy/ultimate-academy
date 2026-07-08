@@ -17,7 +17,7 @@ export const gradText = {
   backgroundClip: 'text',
 }
 
-export default function PageHero({ title, subtitle, badge }) {
+export default function PageHero({ title, subtitle, badge, children }) {
   return (
     <div style={{
       background: 'linear-gradient(-45deg, #0a0a0a, #1a0a2e, #2d0a4e, #8B2FC9, #5a1fa0, #1a0a2e, #0a0a0a)',
@@ -91,8 +91,9 @@ export default function PageHero({ title, subtitle, badge }) {
           marginBottom: subtitle ? '.6rem' : 0,
         }}>{title}</h1>
         {subtitle && (
-          <p style={{ color: 'rgba(255,255,255,.5)', fontSize: '1rem', margin: 0 }}>{subtitle}</p>
+          <p style={{ color: 'rgba(255,255,255,.5)', fontSize: '1rem', margin: 0, marginBottom: children ? '2rem' : 0 }}>{subtitle}</p>
         )}
+        {children}
       </div>
     </div>
   )

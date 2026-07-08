@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import Nav from '../../components/Nav'
 import SiteFooter from '../../components/SiteFooter'
+import PageHero, { gradText } from '../../components/PageHero'
 import { fmtHMS, DIST_PRESETS } from '../../lib/runCalc'
 import { TESTIMONIALS_PREDICTOR, FUEL_PLAN, EQUIV_TABLE } from '../../lib/toolsContent'
 import TestimonialsCarousel from '../../components/TestimonialsCarousel'
@@ -110,42 +111,16 @@ export default function PredictorCalculator() {
     <div style={{ background: '#fff', color: '#1a1a2e', overflowX: 'hidden', minHeight: '100vh' }}>
       <Nav />
 
-      {/* ── HERO ───────────────────────────────────────── */}
-      <section style={{
-        minHeight: '100dvh', position: 'relative', display: 'flex', flexDirection: 'column',
-        alignItems: 'center', justifyContent: 'center', textAlign: 'center',
-        padding: '8rem 1.5rem 5rem',
-        background: 'linear-gradient(-45deg, #080818, #1a0a2e, #2d0a4e, #5a1fa0, #2d0a4e, #1a0a2e, #080818)',
-        overflow: 'hidden',
-      }}>
-        <div style={{ position:'absolute', top:'-20%', left:'-10%', width:'60vw', height:'60vw', maxWidth:700, maxHeight:700, borderRadius:'50%', background:'radial-gradient(circle,rgba(139,47,201,.22) 0%,transparent 70%)', pointerEvents:'none' }}/>
-        <div style={{ position:'absolute', bottom:'-10%', right:'-8%', width:'50vw', height:'50vw', maxWidth:600, maxHeight:600, borderRadius:'50%', background:'radial-gradient(circle,rgba(232,35,122,.18) 0%,transparent 70%)', pointerEvents:'none' }}/>
-        <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: 1,
-          background: `linear-gradient(90deg, transparent, ${C.purple}, ${C.pink}, transparent)` }} />
-        <div style={{ position: 'relative', zIndex: 1, maxWidth: 760 }}>
-          <h1 style={{ fontSize: 'clamp(2.2rem,6vw,4rem)', fontWeight: 900, lineHeight: 1.05,
-            color: '#fff', letterSpacing: '-0.03em', marginBottom: '1.25rem' }}>
-            Estime ton chrono sur<br />
-            <span style={{ background: `linear-gradient(135deg,${C.purple},${C.pink})`,
-              WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
-              n'importe quelle distance
-            </span>
-          </h1>
-          <p style={{ fontSize: 'clamp(1rem,2.5vw,1.2rem)', color: 'rgba(255,255,255,.65)',
-            maxWidth: 540, margin: '0 auto 2.5rem', lineHeight: 1.75 }}>
-            À partir d'un chrono récent, estime ta performance sur 5km, 10km, semi ou marathon grâce à la formule de Riegel.
-          </p>
-          <button onClick={() => document.getElementById('predictor-tool')?.scrollIntoView({ behavior:'smooth' })}
-            style={{ padding: '.85rem 2.2rem', borderRadius: 50, cursor: 'pointer', fontWeight: 800,
-              fontSize: '1rem', border: 'none', color: '#fff',
-              background: `linear-gradient(135deg,${C.purple},${C.pink})`,
-              boxShadow: '0 8px 32px rgba(232,35,122,.45)' }}>
-            Calculer mon chrono →
-          </button>
-        </div>
-        <div style={{ position: 'absolute', bottom: '2rem', left: '50%', transform: 'translateX(-50%)',
-          color: 'rgba(255,255,255,.3)', fontSize: '1.4rem', animation: 'floatDown 2s ease-in-out infinite' }}>↓</div>
-      </section>
+      <PageHero
+        badge="Prédicteur de chrono"
+        title={<>Estime ton chrono sur <span style={gradText}>n'importe quelle distance</span></>}
+        subtitle="À partir d'un chrono récent, estime ta performance sur 5km, 10km, semi ou marathon grâce à la formule de Riegel."
+      >
+        <button onClick={() => document.getElementById('predictor-tool')?.scrollIntoView({ behavior:'smooth' })}
+          style={{ padding:'.85rem 2.2rem', borderRadius:50, cursor:'pointer', fontWeight:800, fontSize:'1rem', border:'none', color:'#fff', background:`linear-gradient(135deg,${C.purple},${C.pink})`, boxShadow:'0 8px 32px rgba(232,35,122,.45)' }}>
+          Calculer mon chrono →
+        </button>
+      </PageHero>
 
       {/* ── CALCULATOR ─────────────────────────────────── */}
       <section id="predictor-tool" style={{ background: C.light, padding: '5rem 1.5rem' }}>

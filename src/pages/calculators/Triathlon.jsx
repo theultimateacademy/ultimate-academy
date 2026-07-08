@@ -2,6 +2,7 @@ import { useState, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
 import Nav from '../../components/Nav'
 import SiteFooter from '../../components/SiteFooter'
+import PageHero, { gradText } from '../../components/PageHero'
 
 const C = { purple: '#8B2FC9', pink: '#E8237A', dark: '#1a1230', light: '#F8F5FF' }
 const grad = `linear-gradient(135deg,${C.purple},${C.pink})`
@@ -229,41 +230,16 @@ export default function Triathlon() {
     <div style={{ background: '#000', color: '#fff', overflowX: 'hidden' }}>
       <Nav />
 
-      {/* ── HERO ──────────────────────────────────────────── */}
-      <section style={{
-        position: 'relative', minHeight: '100vh',
-        display: 'flex', flexDirection: 'column', justifyContent: 'center',
-        alignItems: 'center', textAlign: 'center',
-        background: 'linear-gradient(-45deg, #080818, #1a0a2e, #2d0a4e, #5a1fa0, #2d0a4e, #1a0a2e, #080818)',
-        overflow: 'hidden',
-      }}>
-        <div style={{ position: 'absolute', top: '-20%', left: '-10%', width: '60vw', height: '60vw', maxWidth: 700, maxHeight: 700, borderRadius: '50%', background: 'radial-gradient(circle,rgba(139,47,201,.22) 0%,transparent 70%)', pointerEvents: 'none' }} />
-        <div style={{ position: 'absolute', bottom: '-10%', right: '-8%', width: '50vw', height: '50vw', maxWidth: 600, maxHeight: 600, borderRadius: '50%', background: 'radial-gradient(circle,rgba(232,35,122,.18) 0%,transparent 70%)', pointerEvents: 'none' }} />
-        <div style={{ position: 'relative', zIndex: 1, padding: '8rem 1.5rem 4rem', maxWidth: 780 }}>
-
-          {/* Badge format triathlon */}
-          <div style={{ display: 'inline-flex', alignItems: 'center', gap: '.5rem', background: 'rgba(139,47,201,.15)', border: '1px solid rgba(139,47,201,.3)', borderRadius: 50, padding: '.4rem 1.25rem', marginBottom: '2rem' }}>
-            <span>🏊</span><span style={{ color: 'rgba(255,255,255,.5)', fontSize: '.9rem' }}>+</span>
-            <span>🚴</span><span style={{ color: 'rgba(255,255,255,.5)', fontSize: '.9rem' }}>+</span>
-            <span>🏃</span>
-          </div>
-
-          <h1 style={{ fontSize: 'clamp(2.2rem,6vw,4rem)', fontWeight: 900, lineHeight: 1.05, marginBottom: '1.25rem' }}>
-            Calcule tes allures{' '}
-            <span style={{ background: grad, WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text' }}>
-              triathlon
-            </span>
-          </h1>
-          <p style={{ fontSize: 'clamp(1rem,2.5vw,1.2rem)', color: 'rgba(255,255,255,.7)', maxWidth: 540, margin: '0 auto 2.5rem', lineHeight: 1.65 }}>
-            Renseigne tes distances et tes temps cibles pour chaque discipline. Obtiens ton allure natation, ta vitesse vélo, ton allure course et ton temps total.
-          </p>
-          <button onClick={() => calcRef.current?.scrollIntoView({ behavior: 'smooth' })}
-            style={{ padding: '1rem 2.5rem', borderRadius: 50, border: 'none', background: grad, color: '#fff', fontSize: '1.05rem', fontWeight: 700, cursor: 'pointer', boxShadow: '0 8px 32px rgba(232,35,122,.5)' }}>
-            Calculer mes allures ↓
-          </button>
-        </div>
-        <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: 3, background: grad }} />
-      </section>
+      <PageHero
+        badge="🏊 + 🚴 + 🏃 Triathlon"
+        title={<>Calcule tes allures <span style={gradText}>triathlon</span></>}
+        subtitle="Renseigne tes distances et tes temps cibles pour chaque discipline. Obtiens ton allure natation, ta vitesse vélo, ton allure course et ton temps total."
+      >
+        <button onClick={() => calcRef.current?.scrollIntoView({ behavior: 'smooth' })}
+          style={{ padding:'1rem 2.5rem', borderRadius:50, border:'none', background:grad, color:'#fff', fontSize:'1.05rem', fontWeight:700, cursor:'pointer', boxShadow:'0 8px 32px rgba(232,35,122,.5)' }}>
+          Calculer mes allures ↓
+        </button>
+      </PageHero>
 
       {/* ── CALCULATOR ────────────────────────────────────── */}
       <section ref={calcRef} style={{ background: C.light, padding: '5rem 1.5rem' }}>
