@@ -3,7 +3,7 @@ import Nav from '../components/Nav'
 import PageHero, { gradText } from '../components/PageHero'
 
 const grad = 'linear-gradient(135deg,#8B2FC9,#E8237A)'
-const TARGET = 'theultimateacademy.ua@gmail.com'
+const WEB3FORMS_KEY = import.meta.env.VITE_WEB3FORMS_KEY || ''
 
 const inputSt = {
   width: '100%', background: 'rgba(255,255,255,.05)',
@@ -24,21 +24,19 @@ export default function Contact() {
     if (!email || !subject || !message) return
     setStatus('sending')
     try {
-      const fd = new FormData()
-      fd.append('email', email)
-      fd.append('_subject', subject)
-      fd.append('message', message)
-      fd.append('_captcha', 'false')
-      fd.append('_template', 'table')
-      fd.append('_next', window.location.href)
-
-      const res = await fetch(`https://formsubmit.co/ajax/${TARGET}`, {
+      const res = await fetch('https://api.web3forms.com/submit', {
         method: 'POST',
-        headers: { Accept: 'application/json' },
-        body: fd,
+        headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+        body: JSON.stringify({
+          access_key: WEB3FORMS_KEY,
+          subject: `[Contact UA] ${subject}`,
+          from_name: email,
+          email,
+          message,
+        }),
       })
       const data = await res.json()
-      if (data.success === 'true' || data.success === true) {
+      if (data.success) {
         setStatus('success')
         setEmail(''); setSubject(''); setMessage('')
       } else {
@@ -127,7 +125,7 @@ export default function Contact() {
 
             {status === 'error' && (
               <div style={{ background: 'rgba(239,68,68,.08)', border: '1px solid rgba(239,68,68,.25)', borderRadius: 12, padding: '.85rem 1.1rem', fontSize: '.875rem', color: '#FCA5A5' }}>
-                Une erreur est survenue. Réessaie ou contacte-moi directement à <strong>{TARGET}</strong>.
+                Une erreur est survenue. Réessaie ou contacte-moi directement à <strong>theultimateacademy.ua@gmail.com</strong>.
               </div>
             )}
 
