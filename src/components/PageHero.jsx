@@ -1,4 +1,12 @@
 const BG = 'linear-gradient(-45deg, #080818, #1a0a2e, #2d0a4e, #5a1fa0, #2d0a4e, #1a0a2e, #080818)'
+const GRAD = 'linear-gradient(135deg, #8B2FC9, #E8237A)'
+
+export const gradText = {
+  background: GRAD,
+  WebkitBackgroundClip: 'text',
+  WebkitTextFillColor: 'transparent',
+  backgroundClip: 'text',
+}
 
 export default function PageHero({ title, subtitle, badge }) {
   return (
@@ -15,18 +23,18 @@ export default function PageHero({ title, subtitle, badge }) {
         transform: 'translate(-50%,-50%)',
         width: '60vw', height: '60vw', maxWidth: 600, maxHeight: 600,
         borderRadius: '50%',
-        background: 'radial-gradient(circle, rgba(139,47,201,.25) 0%, transparent 70%)',
+        background: 'radial-gradient(circle, rgba(139,47,201,.3) 0%, transparent 70%)',
         pointerEvents: 'none',
       }} />
       <div style={{ position: 'relative', zIndex: 1 }}>
         {badge && (
           <div style={{
             display: 'inline-block',
-            background: 'rgba(139,47,201,.18)',
-            border: '1px solid rgba(139,47,201,.35)',
-            borderRadius: 100, padding: '.3rem 1rem',
-            fontSize: '.75rem', fontWeight: 700, color: '#C084FC',
-            textTransform: 'uppercase', letterSpacing: '.06em', marginBottom: '1rem',
+            background: GRAD,
+            borderRadius: 100, padding: '.3rem 1.1rem',
+            fontSize: '.75rem', fontWeight: 700, color: '#fff',
+            textTransform: 'uppercase', letterSpacing: '.07em', marginBottom: '1.1rem',
+            boxShadow: '0 4px 16px rgba(232,35,122,.3)',
           }}>{badge}</div>
         )}
         <h1 style={{

@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
 import Nav from '../components/Nav'
 import BlogFooter from '../components/BlogFooter'
-import PageHero from '../components/PageHero'
+import PageHero, { gradText } from '../components/PageHero'
 
 function formatDate(iso) {
   return new Date(iso).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })
@@ -55,7 +55,7 @@ export default function Blog() {
 
       <PageHero
         badge="Blog Running"
-        title="Conseils & Programmes"
+        title={<>Conseils & <span style={gradText}>Programmes</span></>}
         subtitle="Articles et plans d'entraînement pour progresser en course à pied."
       />
 

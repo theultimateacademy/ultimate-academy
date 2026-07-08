@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import Nav from '../components/Nav'
-import PageHero from '../components/PageHero'
+import PageHero, { gradText } from '../components/PageHero'
 
 const C = { purple: '#8B2FC9', pink: '#E8237A', bg: '#0C0A18' }
 const grad = 'linear-gradient(135deg,#8B2FC9,#E8237A)'
@@ -53,12 +53,12 @@ export default function EbooksPage() {
 
       <PageHero
         badge="Plans d'entraînement PDF"
-        title="Ebooks Running"
+        title={<>Ebooks <span style={gradText}>Running</span></>}
         subtitle="Des plans complets selon ta VMA — À partir de 14,99 € — Paiement unique"
       />
 
       {/* ── GRILLE ── */}
-      <div style={{ maxWidth: 1100, margin: '0 auto', padding: '0 1.5rem 4rem' }}>
+      <div style={{ maxWidth: 1100, margin: '0 auto', padding: '3.5rem 1.5rem 4rem' }}>
         {loading ? (
           <div style={{ textAlign: 'center', padding: '4rem', color: 'rgba(255,255,255,.4)' }}>Chargement…</div>
         ) : (

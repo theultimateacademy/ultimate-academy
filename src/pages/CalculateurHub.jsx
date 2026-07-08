@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom'
 import Nav from '../components/Nav'
-import PageHero from '../components/PageHero'
+import PageHero, { gradText } from '../components/PageHero'
 
 const CALCULATEURS = [
   {
@@ -54,7 +54,7 @@ export default function CalculateurHub() {
 
       <PageHero
         badge="Outils gratuits"
-        title="Calculateurs Running"
+        title={<>Calculateurs <span style={gradText}>Running</span></>}
         subtitle="Tous les outils pour optimiser ton entraînement et préparer tes courses."
       />
 
