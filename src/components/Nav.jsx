@@ -59,7 +59,6 @@ export default function Nav() {
   // Close mobile menu on route change, reset active section when leaving home
   useEffect(() => {
     setMobileMenu(false)
-    setMobileTools(false)
     if (!isHome) setActiveSection(null)
   }, [location.pathname])
 
