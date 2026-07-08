@@ -10,10 +10,13 @@ const grad = 'linear-gradient(135deg,#8B2FC9,#E8237A)'
 
 const scrollBtnStyle = {
   display: 'inline-flex', alignItems: 'center', gap: '.5rem',
-  padding: '.75rem 1.75rem', borderRadius: 50, border: '1.5px solid rgba(255,255,255,.2)',
-  background: 'rgba(255,255,255,.07)', backdropFilter: 'blur(12px)',
-  color: '#fff', fontSize: '.9rem', fontWeight: 600, cursor: 'pointer',
-  transition: 'background .2s, border-color .2s',
+  padding: '.75rem 1.75rem', borderRadius: 50, border: 'none',
+  background: 'linear-gradient(90deg,#8B2FC9,#E8237A,#8B2FC9)',
+  backgroundSize: '200% auto',
+  animation: 'shimmer 2.5s linear infinite',
+  color: '#fff', fontSize: '.9rem', fontWeight: 700, cursor: 'pointer',
+  boxShadow: '0 6px 24px rgba(232,35,122,.4)',
+  transition: 'transform .2s, box-shadow .2s',
 }
 
 // Ebooks à variantes : prix qui dépend du nombre de séances/semaine choisi à l'achat.
