@@ -24,11 +24,17 @@ export default function PageHero({ title, subtitle, badge }) {
       overflow: 'hidden',
     }}>
       <div style={{
-        position: 'absolute', top: '50%', left: '50%',
-        transform: 'translate(-50%,-50%)',
-        width: '60vw', height: '60vw', maxWidth: 600, maxHeight: 600,
+        position: 'absolute', top: '-20%', left: '-10%',
+        width: '60vw', height: '60vw', maxWidth: 700, maxHeight: 700,
         borderRadius: '50%',
-        background: 'radial-gradient(circle, rgba(139,47,201,.3) 0%, transparent 70%)',
+        background: 'radial-gradient(circle, rgba(139,47,201,.22) 0%, transparent 70%)',
+        pointerEvents: 'none',
+      }} />
+      <div style={{
+        position: 'absolute', bottom: '-10%', right: '-8%',
+        width: '50vw', height: '50vw', maxWidth: 600, maxHeight: 600,
+        borderRadius: '50%',
+        background: 'radial-gradient(circle, rgba(139,47,201,.25) 0%, transparent 70%)',
         pointerEvents: 'none',
       }} />
       <div style={{ position: 'relative', zIndex: 1 }}>
