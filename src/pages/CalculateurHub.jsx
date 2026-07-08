@@ -5,23 +5,23 @@ import PageHero, { gradText } from '../components/PageHero'
 const CALCULATEURS = [
   {
     icon: '🏃',
-    title: 'Temps de passage',
-    desc: 'Génère ton tableau de bord complet avec tes temps de passage à chaque kilomètre selon ton allure cible. Idéal pour préparer ta stratégie de course et éviter de partir trop vite.',
+    title: 'Calcule tes temps de passage',
+    desc: 'Génère ton tableau complet avec tes temps de passage à chaque kilomètre selon ton allure cible. Idéal pour préparer ta stratégie de course et éviter de partir trop vite.',
     path: '/calculateur/passage',
     label: 'Calculer mes temps de passage',
     tag: 'Course à pied',
   },
   {
     icon: '⚡',
-    title: 'Calculateur de VMA',
-    desc: 'Calcule ta Vitesse Maximale Aérobie (VMA) à partir de ton test de Cooper, ton test 6 minutes ou un chrono récent. Obtiens tes zones d\'entraînement personnalisées.',
+    title: 'Calcule ta VMA',
+    desc: 'Détermine ta Vitesse Maximale Aérobie à partir de ton test de Cooper, ton test 6 minutes ou un chrono récent. Obtiens tes zones d\'entraînement personnalisées.',
     path: '/calculateur/vma',
     label: 'Calculer ma VMA',
     tag: 'VMA & Zones',
   },
   {
     icon: '📊',
-    title: 'Allures running & zones FC',
+    title: 'Calcule tes allures & zones FC',
     desc: 'Génère un tableau complet de toutes tes allures d\'entraînement (EF, Seuil, Tempo, VMA) et tes zones de fréquence cardiaque selon ta VMA et ta FCmax.',
     path: '/calculateur/allures',
     label: 'Voir mes allures',
@@ -29,16 +29,16 @@ const CALCULATEURS = [
   },
   {
     icon: '🎯',
-    title: 'Prédicteur de chrono',
-    desc: 'À partir d\'un chrono récent sur une distance, prédit ton temps cible sur une autre distance grâce à la formule de Riegel. Idéal pour fixer un objectif réaliste.',
+    title: 'Prédit ton chrono de course',
+    desc: 'À partir d\'un chrono récent sur une distance, estime ton temps cible sur une autre distance grâce à la formule de Riegel. Idéal pour fixer un objectif réaliste.',
     path: '/calculateur/predicteur',
     label: 'Prédire mon chrono',
     tag: 'Objectif course',
   },
   {
     icon: '🫁',
-    title: 'Test de Cooper & VO2max',
-    desc: 'Calcule ton VO2max estimé à partir du test de Cooper (12 minutes) ou d\'autres protocoles. Situe ton niveau par rapport aux normes internationales selon ton âge et ton sexe.',
+    title: 'Calcule ton VO2max',
+    desc: 'Estime ton VO2max à partir du test de Cooper (12 minutes) ou d\'autres protocoles. Situe ton niveau par rapport aux normes internationales selon ton âge et ton sexe.',
     path: '/calculateur/vo2max',
     label: 'Tester mon VO2max',
     tag: 'VO2max',
@@ -92,7 +92,7 @@ export default function CalculateurHub() {
 
                 <div>
                   <h2 style={{ fontSize: '1.2rem', fontWeight: 800, color: '#fff', margin: '0 0 .5rem' }}>{c.title}</h2>
-                  <p style={{ fontSize: '.875rem', color: 'rgba(255,255,255,.5)', lineHeight: 1.7, margin: 0 }}>{c.desc}</p>
+                  <p style={{ fontSize: '.875rem', color: 'rgba(255,255,255,.5)', lineHeight: 1.7, margin: 0, textAlign: 'justify' }}>{c.desc}</p>
                 </div>
 
                 <div style={{
