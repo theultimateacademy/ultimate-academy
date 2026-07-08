@@ -152,7 +152,7 @@ export default function Landing() {
         borderTop: '1px solid rgba(255,255,255,.06)', borderBottom: '1px solid rgba(255,255,255,.06)',
       }}>
         <div style={{ maxWidth: 900, margin: '0 auto', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))', gap: '1.5rem', textAlign: 'center' }}>
-          {[['250+','Athlètes accompagnés'],['4.9/5','Satisfaction'],['93%','Objectifs atteints'],['12 sem.','Durée moyenne']].map(([val,lbl]) => (
+          {[['70+','Athlètes accompagnés'],['4.9/5','Satisfaction'],['93%','Objectifs atteints'],['12 sem.','Durée moyenne']].map(([val,lbl]) => (
             <div key={lbl}>
               <div style={{ fontSize: 'clamp(1.8rem,4vw,2.5rem)', fontWeight: 800, letterSpacing: '-0.02em', ...gd() }}>{val}</div>
               <div style={{ color: 'rgba(255,255,255,.45)', fontSize: '.85rem', marginTop: '.3rem' }}>{lbl}</div>
