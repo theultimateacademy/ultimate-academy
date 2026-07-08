@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from 'react'
+import { useState, useEffect } from 'react'
 import { Link, useNavigate, useLocation } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
 
@@ -37,13 +37,6 @@ const mobileStyle = `
   }
 `
 
-const TOOLS = [
-  { label: 'Temps de passage course',    path: '/calculateur' },
-  { label: 'Calculateur de VMA',         path: '/calculateur/vma' },
-  { label: 'Test de Cooper & VO2max',     path: '/calculateur/vo2max' },
-  { label: 'Allures running & zones FC', path: '/calculateur/allures' },
-  { label: 'Prédicteur de chrono',       path: '/calculateur/predicteur' },
-]
 
 const SECTIONS = [
   { label: 'Programme',  id: 'features' },
@@ -57,18 +50,11 @@ export default function Nav() {
   const { } = useAuth()
   const navigate = useNavigate()
   const location = useLocation()
-  const [openTools,    setOpenTools]    = useState(false)
   const [mobileMenu,   setMobileMenu]   = useState(false)
-  const [mobileTools,  setMobileTools]  = useState(false)
   const [activeSection, setActiveSection] = useState(null)
-  const toolsRef = useRef()
   const isHome = location.pathname === '/'
 
-  useEffect(() => {
-    function onDown(e) { if (toolsRef.current && !toolsRef.current.contains(e.target)) setOpenTools(false) }
-    document.addEventListener('mousedown', onDown)
-    return () => document.removeEventListener('mousedown', onDown)
-  }, [])
+
 
   // Close mobile menu on route change, reset active section when leaving home
   useEffect(() => {
@@ -136,37 +122,9 @@ export default function Nav() {
           <Link to="/ebooks" className="landing-nav-link" style={{ textDecoration: 'none', color: location.pathname.startsWith('/ebooks') ? '#C084FC' : undefined, fontWeight: location.pathname.startsWith('/ebooks') ? 600 : undefined }}>
             Ebooks
           </Link>
-          <div ref={toolsRef} style={{ position: 'relative' }}>
-            <button className="landing-nav-link"
-              onClick={() => setOpenTools(o => !o)}
-              style={{ display: 'flex', alignItems: 'center', gap: '.3rem',
-                color: TOOLS.some(t => t.path === location.pathname) ? '#C084FC' : undefined,
-                fontWeight: TOOLS.some(t => t.path === location.pathname) ? 600 : undefined }}>
-              Calculateur
-              <svg width="10" height="10" viewBox="0 0 10 10" fill="currentColor"
-                style={{ transition: 'transform .2s', transform: openTools ? 'rotate(180deg)' : 'none', opacity: .7 }}>
-                <path d="M1 3l4 4 4-4" stroke="currentColor" strokeWidth="1.5" fill="none" strokeLinecap="round"/>
-              </svg>
-            </button>
-            {openTools && (
-              <div style={{ position: 'absolute', top: 'calc(100% + .85rem)', right: '-1rem', minWidth: 230,
-                background: '#16132A', border: '1px solid rgba(139,47,201,.35)', borderRadius: 12,
-                padding: '.4rem', zIndex: 300, boxShadow: '0 16px 48px rgba(0,0,0,.65)' }}>
-                {TOOLS.map(t => (
-                  <Link key={t.path} to={t.path} onClick={() => setOpenTools(false)} style={{
-                    display: 'block', padding: '.55rem .85rem', borderRadius: 8, textDecoration: 'none',
-                    fontSize: '.85rem', color: location.pathname === t.path ? '#C084FC' : 'rgba(255,255,255,.75)',
-                    background: location.pathname === t.path ? 'rgba(139,47,201,.15)' : 'transparent',
-                    transition: 'background .12s',
-                  }}
-                  onMouseEnter={e => { if (location.pathname !== t.path) e.currentTarget.style.background = 'rgba(255,255,255,.05)' }}
-                  onMouseLeave={e => { if (location.pathname !== t.path) e.currentTarget.style.background = 'transparent' }}>
-                    {t.label}
-                  </Link>
-                ))}
-              </div>
-            )}
-          </div>
+          <Link to="/calculateur" className="landing-nav-link" style={{ textDecoration: 'none', color: location.pathname.startsWith('/calculateur') ? '#C084FC' : undefined, fontWeight: location.pathname.startsWith('/calculateur') ? 600 : undefined }}>
+            Calculateur
+          </Link>
         </div>
 
         {/* Right: auth + hamburger */}
@@ -203,17 +161,7 @@ export default function Nav() {
           ))}
           <Link to="/blog" className="nav-mobile-link accent" onClick={() => setMobileMenu(false)}>Blog</Link>
           <Link to="/ebooks" className="nav-mobile-link accent" onClick={() => setMobileMenu(false)}>Ebooks 📚</Link>
-          <button className="nav-mobile-link accent"
-            onClick={e => { e.stopPropagation(); setMobileTools(v => !v) }}>
-            Calculateur {mobileTools ? '▴' : '▾'}
-          </button>
-          {mobileTools && (
-            <div className="nav-mobile-sub" onClick={e => e.stopPropagation()}>
-              {TOOLS.map(t => (
-                <Link key={t.path} to={t.path} onClick={() => setMobileMenu(false)}>{t.label}</Link>
-              ))}
-            </div>
-          )}
+          <Link to="/calculateur" className="nav-mobile-link accent" onClick={() => setMobileMenu(false)}>Calculateur</Link>
           <div style={{ display: 'flex', gap: '.75rem', padding: '.75rem .5rem .25rem', borderTop: '1px solid rgba(255,255,255,.08)', marginTop: '.25rem' }}>
             <Link to="/login" onClick={() => setMobileMenu(false)}
               style={{ flex: 1, padding: '.75rem', borderRadius: 10, textAlign: 'center', fontWeight: 600, fontSize: '.9rem',

@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
 import Nav from '../components/Nav'
 import BlogFooter from '../components/BlogFooter'
+import PageHero from '../components/PageHero'
 
 function formatDate(iso) {
   return new Date(iso).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })
@@ -48,25 +49,17 @@ export default function Blog() {
     : articles
 
   return (
-    <div style={{ background: '#000', minHeight: '100vh', color: '#fff', paddingTop: 72 }}>
+    <div style={{ background: '#000', minHeight: '100vh', color: '#fff' }}>
 
-      {/* Nav */}
       <Nav />
 
-      <main style={{ maxWidth: 1140, margin: '0 auto', padding: '3.5rem 1.25rem 6rem' }}>
+      <PageHero
+        badge="Blog Running"
+        title="Conseils & Programmes"
+        subtitle="Articles et plans d'entraînement pour progresser en course à pied."
+      />
 
-        {/* Header */}
-        <div style={{ textAlign: 'center', marginBottom: '4rem' }}>
-          <div style={{ display: 'inline-block', background: 'rgba(139,47,201,.12)', border: '1px solid rgba(139,47,201,.25)', borderRadius: 100, padding: '.35rem 1rem', fontSize: '.78rem', color: '#C084FC', fontWeight: 700, marginBottom: '1.25rem', letterSpacing: '.04em', textTransform: 'uppercase' }}>
-            Blog Running
-          </div>
-          <h1 style={{ fontSize: 'clamp(2rem,5vw,3.2rem)', fontWeight: 800, letterSpacing: '-0.025em', marginBottom: '.75rem', lineHeight: 1.1 }}>
-            Conseils &amp; <span style={{ background: 'linear-gradient(135deg,#8B2FC9,#E8237A)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>Programmes</span>
-          </h1>
-          <p style={{ color: 'rgba(255,255,255,.4)', fontSize: '1rem', maxWidth: 460, margin: '0 auto .5rem' }}>
-            Articles et plans d'entraînement pour progresser en course à pied.
-          </p>
-        </div>
+      <main style={{ maxWidth: 1140, margin: '0 auto', padding: '3.5rem 1.25rem 6rem' }}>
 
         {/* Search bar */}
         <div style={{ maxWidth: 560, margin: '0 auto 3.5rem', position: 'relative' }}>

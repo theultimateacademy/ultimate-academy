@@ -20,6 +20,7 @@ import Privacy        from './pages/legal/Privacy'
 import Terms          from './pages/legal/Terms'
 import Cookies        from './pages/legal/Cookies'
 import Calculator     from './pages/Calculator'
+import CalculateurHub from './pages/CalculateurHub'
 import Ebooks         from './pages/Ebooks'
 import EbookDetail    from './pages/EbookDetail'
 import EbookMerci     from './pages/EbookMerci'
@@ -94,11 +95,12 @@ function AppRoutes() {
       <Route path="/ebooks"           element={<Ebooks />} />
       <Route path="/ebooks/merci"     element={<EbookMerci />} />
       <Route path="/ebooks/:slug"     element={<EbookDetail />} />
-      <Route path="/calculateur"             element={<Calculator />} />
-      <Route path="/calculateur/vma"         element={<VMACalculator />} />
-      <Route path="/calculateur/allures"     element={<AlluresCalculator />} />
-      <Route path="/calculateur/predicteur"  element={<PredictorCalculator />} />
-      <Route path="/calculateur/vo2max"      element={<VO2maxCalculator />} />
+      <Route path="/calculateur"                    element={<CalculateurHub />} />
+      <Route path="/calculateur/passage"            element={<Calculator />} />
+      <Route path="/calculateur/vma"                element={<VMACalculator />} />
+      <Route path="/calculateur/allures"            element={<AlluresCalculator />} />
+      <Route path="/calculateur/predicteur"         element={<PredictorCalculator />} />
+      <Route path="/calculateur/vo2max"             element={<VO2maxCalculator />} />
 
       <Route path="/app" element={<RequireActive><AthleteLayout /></RequireActive>}>
         <Route index element={<Navigate to="/app/home" replace />} />

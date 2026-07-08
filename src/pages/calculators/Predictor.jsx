@@ -115,7 +115,7 @@ export default function PredictorCalculator() {
         minHeight: '100dvh', position: 'relative', display: 'flex', flexDirection: 'column',
         alignItems: 'center', justifyContent: 'center', textAlign: 'center',
         padding: '8rem 1.5rem 5rem',
-        background: 'linear-gradient(135deg,#0C0A18 0%,#12102a 50%,#1a0d30 100%)',
+        background: 'linear-gradient(-45deg, #080818, #1a0a2e, #2d0a4e, #5a1fa0, #2d0a4e, #1a0a2e, #080818)',
         overflow: 'hidden',
       }}>
         <div style={{ position:'absolute', top:'-20%', left:'-10%', width:'60vw', height:'60vw', maxWidth:700, maxHeight:700, borderRadius:'50%', background:'radial-gradient(circle,rgba(139,47,201,.22) 0%,transparent 70%)', pointerEvents:'none' }}/>

@@ -76,7 +76,7 @@ export default function VMACalculator() {
       <Nav />
 
       {/* HERO */}
-      <section style={{ position:'relative', minHeight:'100vh', display:'flex', flexDirection:'column', justifyContent:'center', alignItems:'center', textAlign:'center', background:'linear-gradient(135deg,#0C0A18 0%,#12102a 50%,#1a0d30 100%)', overflow:'hidden' }}>
+      <section style={{ position:'relative', minHeight:'100vh', display:'flex', flexDirection:'column', justifyContent:'center', alignItems:'center', textAlign:'center', background:'linear-gradient(-45deg, #080818, #1a0a2e, #2d0a4e, #5a1fa0, #2d0a4e, #1a0a2e, #080818)', overflow:'hidden' }}>
         <div style={{ position:'absolute', top:'-20%', left:'-10%', width:'60vw', height:'60vw', maxWidth:700, maxHeight:700, borderRadius:'50%', background:'radial-gradient(circle,rgba(139,47,201,.22) 0%,transparent 70%)', pointerEvents:'none' }}/>
         <div style={{ position:'absolute', bottom:'-10%', right:'-8%', width:'50vw', height:'50vw', maxWidth:600, maxHeight:600, borderRadius:'50%', background:'radial-gradient(circle,rgba(232,35,122,.18) 0%,transparent 70%)', pointerEvents:'none' }}/>
         <div style={{ position:'relative', zIndex:1, padding:'8rem 1.5rem 4rem', maxWidth:760 }}>
