@@ -215,6 +215,8 @@ function EbookCard({ ebook }) {
   const meta = EBOOK_META[ebook.slug] || {}
   const priceLabel = ebook.slug === '10km-12sem' ? 'À partir de 17,99 €'
     : ebook.slug === 'semi-12sem' ? 'À partir de 19,99 €'
+    : ebook.slug === 'marathon-12sem' ? 'À partir de 22,99 €'
+    : ebook.slug === 'marathon-16sem' ? 'À partir de 24,99 €'
     : 'À partir de 14,99 €'
 
   return (
