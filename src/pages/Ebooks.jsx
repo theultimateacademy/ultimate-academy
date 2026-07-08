@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import Nav from '../components/Nav'
 import SiteFooter from '../components/SiteFooter'
+import PricingCTA from '../components/PricingCTA'
 import PageHero, { gradText } from '../components/PageHero'
 
 const C = { purple: '#8B2FC9', pink: '#E8237A', bg: '#0C0A18' }
@@ -87,22 +88,13 @@ export default function EbooksPage() {
             ))}
           </div>
 
-          {/* CTA coaching */}
-          <div style={{ background: 'rgba(139,47,201,.1)', border: '1px solid rgba(139,47,201,.25)', borderRadius: 24, padding: '2.5rem', maxWidth: 560, margin: '0 auto' }}>
-            <div style={{ fontSize: '1.5rem', marginBottom: '.75rem' }}>🎯</div>
-            <h3 style={{ fontSize: '1.15rem', fontWeight: 800, marginBottom: '.75rem' }}>
-              Tu préfères un suivi personnalisé ?
-            </h3>
-            <p style={{ color: 'rgba(255,255,255,.6)', fontSize: '.9rem', marginBottom: '1.5rem', lineHeight: 1.6 }}>
-              Avec le coaching The Ultimate Academy, ton plan s'adapte chaque semaine selon tes sensations et tes progrès.
-            </p>
-            <Link to="/register" style={{ display: 'inline-block', background: grad, color: '#fff', textDecoration: 'none', borderRadius: 99, padding: '.75rem 2rem', fontWeight: 700, fontSize: '.95rem', boxShadow: '0 8px 24px rgba(232,35,122,.35)' }}>
-              Coaching personnalisé — 14 jours gratuits
-            </Link>
-          </div>
         </div>
       </div>
 
+      <PricingCTA
+        title={<>Tu préfères un <span style={{ background:'linear-gradient(135deg,#8B2FC9,#E8237A)', WebkitBackgroundClip:'text', WebkitTextFillColor:'transparent', backgroundClip:'text', display:'inline' }}>suivi personnalisé</span> ?</>}
+        subtitle="Avec le coaching The Ultimate Academy, ton plan s'adapte chaque semaine selon tes sensations et tes progrès."
+      />
       <SiteFooter />
     </div>
   )

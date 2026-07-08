@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import Nav from '../../components/Nav'
 import SiteFooter from '../../components/SiteFooter'
 import PageHero, { gradText } from '../../components/PageHero'
+import PricingCTA from '../../components/PricingCTA'
 
 const C = { purple: '#8B2FC9', pink: '#E8237A', dark: '#1a1230', light: '#F8F5FF' }
 const grad = `linear-gradient(135deg,${C.purple},${C.pink})`
@@ -482,24 +483,10 @@ export default function Triathlon() {
         </div>
       </section>
 
-      {/* ── CTA ───────────────────────────────────────────── */}
-      <section style={{ background: 'linear-gradient(-45deg, #080818, #1a0a2e, #2d0a4e, #5a1fa0, #2d0a4e, #1a0a2e, #080818)', padding: '5rem 1.5rem', textAlign: 'center', position: 'relative', overflow: 'hidden' }}>
-        <div style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%,-50%)', width: '60vw', height: '60vw', maxWidth: 500, maxHeight: 500, borderRadius: '50%', background: 'radial-gradient(circle,rgba(139,47,201,.25) 0%,transparent 70%)', pointerEvents: 'none' }} />
-        <div style={{ position: 'relative', zIndex: 1, maxWidth: 560, margin: '0 auto' }}>
-          <h2 style={{ fontSize: 'clamp(1.8rem,4vw,2.8rem)', fontWeight: 900, marginBottom: '1rem' }}>
-            Un coach pour{' '}
-            <span style={{ background: grad, WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text' }}>
-              aller plus loin
-            </span>
-          </h2>
-          <p style={{ color: 'rgba(255,255,255,.55)', fontSize: '1rem', lineHeight: 1.7, marginBottom: '2rem' }}>
-            Ces calculateurs t'aident à planifier. Mais pour progresser vraiment en triathlon, il faut un plan structuré, un suivi des charges et des adaptations hebdomadaires.
-          </p>
-          <button onClick={handleCTA} style={{ padding: '1.1rem 2.75rem', borderRadius: 50, border: 'none', background: grad, color: '#fff', fontSize: '1.1rem', fontWeight: 800, cursor: 'pointer', boxShadow: '0 8px 32px rgba(232,35,122,.5)' }}>
-            Je rejoins The Ultimate Academy
-          </button>
-        </div>
-      </section>
+      <PricingCTA
+        title={<>Un coach pour <span style={{ background:'linear-gradient(135deg,#8B2FC9,#E8237A)', WebkitBackgroundClip:'text', WebkitTextFillColor:'transparent', backgroundClip:'text', display:'inline' }}>aller plus loin</span></>}
+        subtitle="Un plan structuré, un suivi des charges et des adaptations hebdomadaires pour progresser vraiment."
+      />
 
       <SiteFooter />
     </div>

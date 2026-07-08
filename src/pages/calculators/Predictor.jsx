@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import Nav from '../../components/Nav'
 import SiteFooter from '../../components/SiteFooter'
 import PageHero, { gradText } from '../../components/PageHero'
+import PricingCTA from '../../components/PricingCTA'
 import { fmtHMS, DIST_PRESETS } from '../../lib/runCalc'
 import { TESTIMONIALS_PREDICTOR, FUEL_PLAN, EQUIV_TABLE } from '../../lib/toolsContent'
 import TestimonialsCarousel from '../../components/TestimonialsCarousel'
@@ -546,31 +547,10 @@ export default function PredictorCalculator() {
         <TestimonialsCarousel testimonials={TESTIMONIALS_PREDICTOR} />
       </section>
 
-      {/* ── CTA ─────────────────────────────────────────── */}
-      <section style={{ padding: '6rem 1.5rem', background: C.dark, textAlign: 'center', position: 'relative', overflow: 'hidden' }}>
-        <div style={{ position: 'absolute', top: '10%', left: '-5%', width: '40vw', height: '40vw', maxWidth: 420, maxHeight: 420, borderRadius: '50%', background: 'radial-gradient(circle,rgba(139,47,201,.22) 0%,transparent 70%)', pointerEvents: 'none' }} />
-        <div style={{ position: 'absolute', bottom: '10%', right: '-5%', width: '35vw', height: '35vw', maxWidth: 360, maxHeight: 360, borderRadius: '50%', background: 'radial-gradient(circle,rgba(232,35,122,.16) 0%,transparent 70%)', pointerEvents: 'none' }} />
-        <div style={{ maxWidth: 620, margin: '0 auto', position: 'relative', zIndex: 1 }}>
-          <div style={{ background: 'rgba(255,255,255,.03)', border: '1px solid rgba(255,255,255,.08)', borderRadius: 24, padding: '3.5rem 2.5rem' }}>
-            <p style={{ fontSize: '.75rem', letterSpacing: '.18em', textTransform: 'uppercase', color: 'rgba(192,132,252,.8)', marginBottom: '.75rem', fontWeight: 600 }}>Coaching personnalisé</p>
-            <h2 style={{ fontSize: 'clamp(1.4rem,4vw,2rem)', fontWeight: 900, color: '#fff', marginBottom: '1rem', lineHeight: 1.25 }}>
-              Atteins ce chrono avec un vrai coaching
-            </h2>
-            <p style={{ color: 'rgba(255,255,255,.55)', maxWidth: 440, margin: '0 auto 2rem', lineHeight: 1.65 }}>
-              Je construis ton programme semaine par semaine pour que les prédictions deviennent réalité : plan structuré, suivi hebdomadaire, ajustements en temps réel.
-            </p>
-            <button onClick={() => navigate('/register')} style={{
-              padding: '.9rem 2.4rem', borderRadius: 50, border: 'none', cursor: 'pointer',
-              background: `linear-gradient(135deg,${C.purple},${C.pink})`, color: '#fff', fontSize: '1rem', fontWeight: 800,
-              boxShadow: '0 8px 32px rgba(232,35,122,.5)', transition: 'transform .15s',
-            }}
-            onMouseEnter={e => e.currentTarget.style.transform = 'translateY(-2px)'}
-            onMouseLeave={e => e.currentTarget.style.transform = 'none'}>
-              Démarrer mon coaching · 30€/mois
-            </button>
-          </div>
-        </div>
-      </section>
+      <PricingCTA
+        title={<>Atteins ce chrono avec un <span style={{ background:'linear-gradient(135deg,#8B2FC9,#E8237A)', WebkitBackgroundClip:'text', WebkitTextFillColor:'transparent', backgroundClip:'text', display:'inline' }}>vrai coaching</span></>}
+        subtitle="Je construis ton programme semaine par semaine pour que les prédictions deviennent réalité."
+      />
 
       {/* ── FAQ ─────────────────────────────────────────── */}
       <section style={{ background: '#fff', padding: '5rem 1.5rem' }}>
@@ -604,26 +584,6 @@ export default function PredictorCalculator() {
         </div>
       </section>
 
-      {/* ── FOOTER CTA ──────────────────────────────────── */}
-      <section style={{ background: C.dark, padding: '5rem 1.5rem', textAlign: 'center' }}>
-        <p style={{ fontSize: '.72rem', letterSpacing: '.2em', textTransform: 'uppercase',
-          color: 'rgba(255,255,255,.3)', marginBottom: '1.25rem' }}>The Ultimate Academy</p>
-        <h2 style={{ fontSize: 'clamp(1.8rem,5vw,3.2rem)', fontWeight: 900, color: '#fff',
-          letterSpacing: '-0.03em', marginBottom: '1.5rem', lineHeight: 1.1 }}>
-          Ton objectif, ton plan,<br />
-          <span style={{ background: `linear-gradient(135deg,${C.purple},${C.pink})`,
-            WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
-            ton run.
-          </span>
-        </h2>
-        <button onClick={() => navigate('/register')} style={{
-          padding: '.9rem 2.25rem', borderRadius: 50, border: 'none', cursor: 'pointer',
-          background: `linear-gradient(135deg,${C.purple},${C.pink})`, color: '#fff',
-          fontSize: '1rem', fontWeight: 800, boxShadow: '0 8px 32px rgba(232,35,122,.4)',
-        }}>
-          Rejoindre The Ultimate Academy →
-        </button>
-      </section>
 
       <SiteFooter />
     </div>

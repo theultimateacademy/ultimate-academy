@@ -3,6 +3,7 @@ import { useNavigate, Link } from 'react-router-dom'
 import Nav from '../../components/Nav'
 import SiteFooter from '../../components/SiteFooter'
 import PageHero, { gradText } from '../../components/PageHero'
+import PricingCTA from '../../components/PricingCTA'
 import { kmhToPace, DIST_PRESETS, VMA_ZONES } from '../../lib/runCalc'
 import { TESTIMONIALS_VMA } from '../../lib/toolsContent'
 import TestimonialsCarousel from '../../components/TestimonialsCarousel'
@@ -325,20 +326,10 @@ export default function VMACalculator() {
         <TestimonialsCarousel testimonials={TESTIMONIALS_VMA} />
       </section>
 
-      {/* CTA */}
-      <section style={{ padding:'6rem 1.5rem', background:'#0C0A18', textAlign:'center', position:'relative', overflow:'hidden' }}>
-        <div style={{ position:'absolute', top:'10%', left:'-5%', width:'40vw', height:'40vw', maxWidth:420, maxHeight:420, borderRadius:'50%', background:'radial-gradient(circle,rgba(139,47,201,.22) 0%,transparent 70%)', pointerEvents:'none' }}/>
-        <div style={{ position:'absolute', bottom:'10%', right:'-5%', width:'35vw', height:'35vw', maxWidth:360, maxHeight:360, borderRadius:'50%', background:'radial-gradient(circle,rgba(232,35,122,.16) 0%,transparent 70%)', pointerEvents:'none' }}/>
-        <Inner max={620} style={{ position:'relative', zIndex:1 }}>
-          <div style={{ background:'rgba(255,255,255,.03)', border:'1px solid rgba(255,255,255,.08)', borderRadius:24, padding:'3.5rem 2.5rem' }}>
-            <p style={{ fontSize:'.75rem', letterSpacing:'.18em', textTransform:'uppercase', color:'rgba(192,132,252,.8)', marginBottom:'.75rem', fontWeight:600 }}>Coaching personnalisé</p>
-            <h2 style={{ fontSize:'clamp(1.8rem,4vw,2.8rem)', fontWeight:900, color:'#fff', lineHeight:1.1, marginBottom:'1rem' }}>Transforme ta VMA en performances</h2>
-            <p style={{ color:'rgba(255,255,255,.55)', fontSize:'1.05rem', marginBottom:'2.5rem', lineHeight:1.6 }}>Reçois un plan personnalisé basé sur ta VMA et ton objectif, que je construis et ajuste chaque semaine.</p>
-            <button onClick={handleCTA} style={{ padding:'1.1rem 2.75rem', borderRadius:50, border:'none', background:`linear-gradient(135deg,${C.purple},${C.pink})`, color:'#fff', fontSize:'1.1rem', fontWeight:800, cursor:'pointer', boxShadow:'0 8px 32px rgba(232,35,122,.5)', marginBottom:'1rem' }}>Je rejoins The Ultimate Academy</button>
-            <p style={{ color:'rgba(255,255,255,.3)', fontSize:'.82rem', margin:0 }}>30€/mois · Sans engagement · Résiliation en 1 clic</p>
-          </div>
-        </Inner>
-      </section>
+      <PricingCTA
+        title={<>Transforme ta VMA en <span style={{ background:'linear-gradient(135deg,#8B2FC9,#E8237A)', WebkitBackgroundClip:'text', WebkitTextFillColor:'transparent', backgroundClip:'text', display:'inline' }}>performances</span></>}
+        subtitle="Reçois un plan basé sur ta VMA que je construis et ajuste chaque semaine."
+      />
 
       {/* FAQ */}
       <section style={{ background:'#fff', padding:'5rem 1.5rem' }}>
@@ -356,11 +347,6 @@ export default function VMACalculator() {
         </Inner>
       </section>
 
-      {/* FOOTER CTA */}
-      <section style={{ background:'#0C0A18', padding:'3.5rem 1.5rem', textAlign:'center' }}>
-        <p style={{ color:'rgba(255,255,255,.5)', fontSize:'1.05rem', marginBottom:'1.25rem', fontStyle:'italic' }}>Ton objectif, ton plan, ton run.</p>
-        <button onClick={handleCTA} style={{ padding:'.85rem 2.25rem', borderRadius:50, border:'none', background:`linear-gradient(135deg,${C.purple},${C.pink})`, color:'#fff', fontSize:'1rem', fontWeight:700, cursor:'pointer', boxShadow:'0 6px 24px rgba(232,35,122,.4)' }}>Démarrer mon coaching</button>
-      </section>
 
       <SiteFooter />
     </div>
