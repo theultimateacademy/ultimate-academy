@@ -27,8 +27,8 @@ export default function PricingCTA({
     <section style={{ padding: '6rem 1.5rem', background: '#000', borderTop: '1px solid rgba(255,255,255,.06)' }}>
       <style>{`
         @keyframes pricePulse {
-          0%, 100% { box-shadow: 0 8px 40px rgba(0,0,0,.4), 0 0 0 1px rgba(139,47,201,.3), 0 0 60px rgba(139,47,201,.15), inset 0 1px 0 rgba(255,255,255,.22) }
-          50%       { box-shadow: 0 8px 40px rgba(0,0,0,.4), 0 0 0 1px rgba(139,47,201,.5), 0 0 100px rgba(139,47,201,.3), inset 0 1px 0 rgba(255,255,255,.22) }
+          0%, 100% { box-shadow: 0 0 30px rgba(139,47,201,.35), 0 0 60px rgba(232,35,122,.15), 0 24px 48px rgba(0,0,0,.5) }
+          50%       { box-shadow: 0 0 55px rgba(139,47,201,.6),  0 0 100px rgba(232,35,122,.3), 0 24px 48px rgba(0,0,0,.5) }
         }
         @keyframes shimmer {
           0%   { background-position: -200% center }
