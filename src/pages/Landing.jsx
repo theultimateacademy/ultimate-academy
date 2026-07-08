@@ -214,9 +214,9 @@ export default function Landing() {
         minHeight: '100dvh', display: 'flex', flexDirection: 'column',
         alignItems: 'center', justifyContent: 'center', textAlign: 'center',
         padding: '7rem 1.5rem 4rem', position: 'relative', overflow: 'hidden',
-        background: 'linear-gradient(-45deg, #0a0a0a, #1a0a2e, #2d0a4e, #8B2FC9, #E8237A, #1a0a2e, #0a0a0a)',
+        background: 'linear-gradient(-45deg, #0a0a0a, #1a0a2e, #2d0a4e, #8B2FC9, #5a1fa0, #1a0a2e, #0a0a0a)',
         backgroundSize: '400% 400%',
-        animation: 'gradientShift 8s ease infinite',
+        animation: 'gradientShift 8s ease 1 forwards',
       }}>
         {/* Particules */}
         {PARTICLES.map(p => (
@@ -351,30 +351,23 @@ export default function Landing() {
             <p style={{ color: 'rgba(255,255,255,.4)', fontSize: '1rem' }}>Un accompagnement complet pour progresser intelligemment</p>
           </div>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '.75rem' }}>
-            {FEATURES.map((f, i) => {
-              const vis = visibleFeatures.has(i)
-              return (
-                <div key={f.title} style={{
-                  display: 'flex', alignItems: 'flex-start', gap: '1rem', padding: '1.1rem 1.25rem',
-                  borderRadius: 18, background: 'rgba(255,255,255,.04)',
-                  border: '1px solid rgba(255,255,255,.08)',
-                  backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)',
-                  transition: 'border-color .25s, transform .25s, box-shadow .25s, opacity 0.6s ease, transform 0.6s ease',
-                  opacity: vis ? 1 : 0,
-                  transform: vis ? 'translateY(0)' : 'translateY(28px)',
-                  transitionDelay: `${i * 80}ms`,
-                  willChange: 'transform, opacity',
-                }}
-                  onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-4px)'; e.currentTarget.style.borderColor = 'rgba(139,47,201,.45)'; e.currentTarget.style.boxShadow = '0 8px 32px rgba(139,47,201,.2)' }}
-                  onMouseLeave={e => { e.currentTarget.style.transform = vis ? 'translateY(0)' : 'translateY(28px)'; e.currentTarget.style.borderColor = 'rgba(255,255,255,.08)'; e.currentTarget.style.boxShadow = '' }}>
-                  <div style={{ fontSize: '1.6rem', flexShrink: 0, marginTop: '.1rem' }}>{f.icon}</div>
-                  <div>
-                    <div style={{ fontWeight: 700, fontSize: '.95rem', color: '#fff', marginBottom: '.25rem' }}>{f.title}</div>
-                    <div style={{ fontSize: '.82rem', color: 'rgba(255,255,255,.45)', lineHeight: 1.6 }}>{f.desc}</div>
-                  </div>
+            {FEATURES.map((f) => (
+              <div key={f.title} style={{
+                display: 'flex', alignItems: 'flex-start', gap: '1rem', padding: '1.1rem 1.25rem',
+                borderRadius: 18, background: 'rgba(255,255,255,.04)',
+                border: '1px solid rgba(255,255,255,.08)',
+                backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)',
+                transition: 'border-color .25s, transform .25s, box-shadow .25s',
+              }}
+                onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-4px)'; e.currentTarget.style.borderColor = 'rgba(139,47,201,.45)'; e.currentTarget.style.boxShadow = '0 8px 32px rgba(139,47,201,.2)' }}
+                onMouseLeave={e => { e.currentTarget.style.transform = ''; e.currentTarget.style.borderColor = 'rgba(255,255,255,.08)'; e.currentTarget.style.boxShadow = '' }}>
+                <div style={{ fontSize: '1.6rem', flexShrink: 0, marginTop: '.1rem' }}>{f.icon}</div>
+                <div>
+                  <div style={{ fontWeight: 700, fontSize: '.95rem', color: '#fff', marginBottom: '.25rem' }}>{f.title}</div>
+                  <div style={{ fontSize: '.82rem', color: 'rgba(255,255,255,.45)', lineHeight: 1.6 }}>{f.desc}</div>
                 </div>
-              )
-            })}
+              </div>
+            ))}
           </div>
         </div>
       </section>
@@ -516,81 +509,27 @@ export default function Landing() {
         </div>
       </section>
 
-      {/* ── TESTIMONIALS CAROUSEL ────────────────────────────── */}
-      <section id="resultats" style={{ padding: '5rem 1.5rem', background: '#0A0A0A', overflow: 'hidden', borderTop: '1px solid rgba(255,255,255,.06)' }}>
-        <div style={{ textAlign: 'center', marginBottom: '2.5rem' }}>
+      {/* ── TESTIMONIALS ─────────────────────────────────────── */}
+      <section id="resultats" style={{ padding: '5rem 0', background: '#0A0A0A', overflow: 'hidden', borderTop: '1px solid rgba(255,255,255,.06)' }}>
+        <div style={{ textAlign: 'center', marginBottom: '2.5rem', padding: '0 1.5rem' }}>
           <h2 style={{ fontSize: 'clamp(1.8rem,4vw,2.8rem)', fontWeight: 800, letterSpacing: '-0.02em', marginBottom: '.5rem' }}>
             Ils l'ont <span style={gd()}>fait</span>
           </h2>
           <p style={{ color: 'rgba(255,255,255,.4)', fontSize: '1rem' }}>Des vrais résultats, de vraies personnes</p>
         </div>
-
-        <div style={{ maxWidth: 1100, margin: '0 auto', position: 'relative' }}
-          onMouseEnter={() => setCarouselPaused(true)}
-          onMouseLeave={() => setCarouselPaused(false)}>
-
-          {/* Flèches */}
-          {[[-1,'←'],[1,'→']].map(([dir, arrow]) => (
-            <button key={dir} onClick={() => setCarouselIdx(i => (i + dir + CAROUSEL_PAGES.length) % CAROUSEL_PAGES.length)}
-              style={{
-                position: 'absolute', top: '50%', transform: 'translateY(-50%)',
-                [dir === -1 ? 'left' : 'right']: -20,
-                zIndex: 10, width: 40, height: 40, borderRadius: '50%', border: 'none', cursor: 'pointer',
-                background: 'rgba(255,255,255,.08)', color: 'rgba(255,255,255,.6)',
-                fontSize: '1.1rem', display: 'flex', alignItems: 'center', justifyContent: 'center',
-                transition: 'background .2s',
-                backdropFilter: 'blur(8px)',
-              }}
-              onMouseEnter={e => e.currentTarget.style.background = 'rgba(139,47,201,.35)'}
-              onMouseLeave={e => e.currentTarget.style.background = 'rgba(255,255,255,.08)'}>
-              {arrow}
-            </button>
-          ))}
-
-          {/* Track */}
-          <div style={{ overflow: 'hidden', borderRadius: 16 }}>
-            <div style={{
-              display: 'flex',
-              transform: `translateX(-${carouselIdx * 100}%)`,
-              transition: 'transform 0.6s cubic-bezier(0.25,0.46,0.45,0.94)',
-              willChange: 'transform',
-            }}>
-              {CAROUSEL_PAGES.map((page, pi) => (
-                <div key={pi} style={{
-                  minWidth: '100%', display: 'grid',
-                  gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '1rem',
-                }}>
-                  {page.map((t, ti) => (
-                    <div key={ti} style={{
-                      background: 'rgba(255,255,255,.04)', border: '1px solid rgba(255,255,255,.08)',
-                      borderRadius: 20, padding: '1.75rem', display: 'flex', flexDirection: 'column',
-                      backdropFilter: 'blur(12px)',
-                    }}>
-                      <div style={{ fontSize: '2rem', marginBottom: '.75rem' }}>{t.emoji}</div>
-                      <p style={{ fontSize: '.9375rem', lineHeight: 1.75, color: 'rgba(255,255,255,.65)', fontStyle: 'italic', marginBottom: '1rem', flex: 1 }}>
-                        "{t.quote}"
-                      </p>
-                      <div>
-                        <div style={{ fontWeight: 700, color: '#fff', fontSize: '.9375rem' }}>{t.name}{t.age ? `, ${t.age} ans` : ''}</div>
-                        <div style={{ fontSize: '.78rem', marginTop: '.2rem', fontWeight: 600, ...gd() }}>{t.role}</div>
-                      </div>
-                    </div>
-                  ))}
+        <div className="testimonials-viewport">
+          <div className="testimonials-track">
+            {[...TESTIMONIALS, ...TESTIMONIALS].map((t, i) => (
+              <div key={i} className="testimonial-card">
+                <div style={{ fontSize: '2rem', marginBottom: '.75rem' }}>{t.emoji}</div>
+                <p style={{ fontSize: '.9375rem', lineHeight: 1.75, color: 'rgba(255,255,255,.65)', fontStyle: 'italic', marginBottom: '1rem', flex: 1 }}>
+                  "{t.quote}"
+                </p>
+                <div>
+                  <div style={{ fontWeight: 700, color: '#fff', fontSize: '.9375rem' }}>{t.name}{t.age ? `, ${t.age} ans` : ''}</div>
+                  <div style={{ fontSize: '.78rem', marginTop: '.2rem', fontWeight: 600, ...gd() }}>{t.role}</div>
                 </div>
-              ))}
-            </div>
-          </div>
-
-          {/* Dots */}
-          <div style={{ display: 'flex', justifyContent: 'center', gap: '.5rem', marginTop: '1.5rem' }}>
-            {CAROUSEL_PAGES.map((_, di) => (
-              <button key={di} onClick={() => setCarouselIdx(di)}
-                style={{
-                  width: carouselIdx === di ? 24 : 8, height: 8, borderRadius: 4, border: 'none', cursor: 'pointer',
-                  background: carouselIdx === di ? grad : 'rgba(255,255,255,.2)',
-                  transition: 'width .3s ease, background .3s ease',
-                  padding: 0,
-                }} />
+              </div>
             ))}
           </div>
         </div>
