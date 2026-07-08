@@ -28,6 +28,7 @@ import VMACalculator  from './pages/calculators/VMA'
 import AlluresCalculator from './pages/calculators/Allures'
 import PredictorCalculator from './pages/calculators/Predictor'
 import VO2maxCalculator    from './pages/calculators/VO2max'
+import TriathlonCalculator from './pages/calculators/Triathlon'
 
 import AthleteHome         from './pages/athlete/Home'
 import AthletePlan         from './pages/athlete/Plan'
@@ -101,6 +102,7 @@ function AppRoutes() {
       <Route path="/calculateur/allures"            element={<AlluresCalculator />} />
       <Route path="/calculateur/predicteur"         element={<PredictorCalculator />} />
       <Route path="/calculateur/vo2max"             element={<VO2maxCalculator />} />
+      <Route path="/calculateur/triathlon"          element={<TriathlonCalculator />} />
 
       <Route path="/app" element={<RequireActive><AthleteLayout /></RequireActive>}>
         <Route index element={<Navigate to="/app/home" replace />} />

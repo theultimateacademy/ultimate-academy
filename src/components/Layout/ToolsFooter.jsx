@@ -1,11 +1,12 @@
 import { Link } from 'react-router-dom'
 
 const TOOLS = [
-  { label: 'Calculateur temps de passage',  path: '/calculateur' },
+  { label: 'Temps de passage course',       path: '/calculateur/passage' },
   { label: 'Calculateur de VMA',            path: '/calculateur/vma' },
   { label: 'Test de Cooper & VO2max',       path: '/calculateur/vo2max' },
   { label: 'Allures running & zones FC',    path: '/calculateur/allures' },
   { label: 'Prédicteur de chrono running',  path: '/calculateur/predicteur' },
+  { label: 'Allures triathlon',             path: '/calculateur/triathlon' },
 ]
 
 const colHead = {

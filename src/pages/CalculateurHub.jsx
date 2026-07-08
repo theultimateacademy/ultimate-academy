@@ -43,6 +43,14 @@ const CALCULATEURS = [
     label: 'Tester mon VO2max',
     tag: 'VO2max',
   },
+  {
+    icon: '🏊',
+    title: 'Calcule tes allures triathlon',
+    desc: 'Renseigne tes distances et temps cibles pour la nage, le vélo et la course. Obtiens ton allure natation (min/100m), ta vitesse vélo (km/h), ton allure course (min/km) et ton temps total hors transitions.',
+    path: '/calculateur/triathlon',
+    label: 'Calculer mes allures triathlon',
+    tag: 'Triathlon',
+  },
 ]
 
 const grad = 'linear-gradient(135deg,#8B2FC9,#E8237A)'
@@ -97,10 +105,10 @@ export default function CalculateurHub() {
 
                 <div style={{
                   marginTop: 'auto',
-                  display: 'inline-flex', alignItems: 'center', gap: '.4rem',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '.4rem',
                   background: grad, borderRadius: 50,
                   padding: '.55rem 1.25rem', fontSize: '.85rem', fontWeight: 700, color: '#fff',
-                  width: 'fit-content',
+                  width: '100%', textAlign: 'center',
                 }}>
                   {c.label} →
                 </div>
