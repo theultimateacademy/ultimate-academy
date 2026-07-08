@@ -27,11 +27,11 @@ const EBOOK_DETAILS = {
     full_description: 'Un plan complet de 8 semaines pour préparer ta prochaine course de 10 km. Chaque séance est calculée depuis ta VMA réelle : tu cours aux bonnes allures, au bon moment, sans jamais avoir à convertir des pourcentages.',
     toc: [
       'Tableau d\'allures personnalisé depuis ta VMA (EF, Seuil, VMA, Allure 10km)',
-      'Semaines 1-2 · Adaptation: mise en route progressive, EF et premières séances de qualité',
-      'Semaines 3-4 · Développement: montée en charge aérobie, fractionnés courts',
-      'Semaines 5-6 · Intensification: pic de charge, séances au seuil et VMA',
-      'Semaine 7 · Consolidation: stabilisation de la forme avant course',
-      'Semaine 8 · Semaine de course: activation, stratégie de course et gestion du jour J',
+      'Semaines 1-2 : Adaptation (mise en route progressive, EF et premières séances de qualité)',
+      'Semaines 3-4 : Développement (montée en charge aérobie, fractionnés courts)',
+      'Semaines 5-6 : Intensification (pic de charge, séances au seuil et VMA)',
+      'Semaine 7 : Consolidation (stabilisation de la forme avant course)',
+      'Semaine 8 : Semaine de course (activation, stratégie et gestion du jour J)',
     ],
     for_who: [
       { check: true,  text: 'Tu peux courir 30 minutes sans t\'arrêter' },
@@ -47,13 +47,13 @@ const EBOOK_DETAILS = {
     full_description: 'La version longue et progressive pour préparer un 10km en 12 semaines. Plus de temps pour construire ta base aérobie, développer ta VMA et arriver en pleine forme le jour J.',
     toc: [
       'Tableau d\'allures personnalisé depuis ta VMA (EF, Seuil, VMA, Allure 10km)',
-      'Semaines 1-2 · Adaptation: reprise progressive et mise en route',
-      'Semaines 3-4 · Développement aérobie: construction de la base endurance',
-      'Semaines 5-6 · Développement VMA: fractionnés courts, montée en intensité',
-      'Semaines 7-8 · Intensification: pic de charge, séances mixtes seuil et VMA',
-      'Semaines 9-10 · Spécificité 10km: allure objectif et répétitions longues',
-      'Semaine 11 · Consolidation: stabilisation avant affûtage',
-      'Semaine 12 · Semaine de course: activation, stratégie et gestion du jour J',
+      'Semaines 1-2 : Adaptation (reprise progressive et mise en route)',
+      'Semaines 3-4 : Développement aérobie (construction de la base endurance)',
+      'Semaines 5-6 : Développement VMA (fractionnés courts, montée en intensité)',
+      'Semaines 7-8 : Intensification (pic de charge, séances mixtes seuil et VMA)',
+      'Semaines 9-10 : Spécificité 10km (allure objectif et répétitions longues)',
+      'Semaine 11 : Consolidation (stabilisation avant affûtage)',
+      'Semaine 12 : Semaine de course (activation, stratégie et gestion du jour J)',
     ],
     for_who: [
       { check: true, text: 'Tu peux courir 30 minutes sans t\'arrêter' },
@@ -67,13 +67,13 @@ const EBOOK_DETAILS = {
     full_description: 'Prépare ton semi-marathon en 12 semaines avec un plan structuré alliant volume kilométrique progressif, séances de qualité et allures personnalisées selon ta VMA.',
     toc: [
       'Tableau d\'allures personnalisé depuis ta VMA (EF, Seuil, VMA, Allure semi)',
-      'Semaines 1-2 · Adaptation: mise en route, EF et premières séances de qualité',
-      'Semaines 3-4 · Développement aérobie: construction de l\'endurance de base',
-      'Semaines 5-6 · Volume: sorties longues progressives, montée du kilométrage',
-      'Semaines 7-8 · Intensification: seuil lactique et fractionnés, pic de charge',
-      'Semaines 9-10 · Spécificité semi: allure objectif et long run race-pace',
-      'Semaine 11 · Consolidation: affûtage progressif',
-      'Semaine 12 · Semaine de course: activation, stratégie de course et nutrition',
+      'Semaines 1-2 : Adaptation (mise en route, EF et premières séances de qualité)',
+      'Semaines 3-4 : Développement aérobie (construction de l\'endurance de base)',
+      'Semaines 5-6 : Volume (sorties longues progressives, montée du kilométrage)',
+      'Semaines 7-8 : Intensification (seuil lactique et fractionnés, pic de charge)',
+      'Semaines 9-10 : Spécificité semi (allure objectif et long run race-pace)',
+      'Semaine 11 : Consolidation (affûtage progressif)',
+      'Semaine 12 : Semaine de course (activation, stratégie de course et nutrition)',
     ],
     for_who: [
       { check: true, text: 'Tu as déjà couru un 10km ou tu cours régulièrement depuis 6 mois' },
@@ -88,13 +88,13 @@ const EBOOK_DETAILS = {
     full_description: 'Un plan complet de 12 semaines pour préparer ton marathon. Chaque séance est calculée depuis ta VMA réelle, adaptée à ton palier (débutant, intermédiaire ou avancé). Tu cours aux bonnes allures, au bon moment, sans jamais avoir à convertir des pourcentages.',
     toc: [
       'Tableau d\'allures personnalisé depuis ta VMA (EF, Seuil, Tempo, Allure marathon)',
-      'Semaines 1-2 · Adaptation: mise en route, EF et premières séances au seuil',
-      'Semaines 3-4 · Développement aérobie: construction de l\'endurance de base',
-      'Semaines 5-6 · Volume marathon: sorties longues jusqu\'à 2h10, montée du kilométrage',
-      'Semaines 7-8 · Intensification: pic de charge, long run jusqu\'à 2h30',
-      'Semaines 9-10 · Spécificité marathon: allure objectif intégrée aux séances',
-      'Semaine 11 · Consolidation: affûtage progressif',
-      'Semaine 12 · Semaine de course: activation, stratégie et gestion des ravitaillements',
+      'Semaines 1-2 : Adaptation (mise en route, EF et premières séances au seuil)',
+      'Semaines 3-4 : Développement aérobie (construction de l\'endurance de base)',
+      'Semaines 5-6 : Volume marathon (sorties longues jusqu\'à 2h10, montée du kilométrage)',
+      'Semaines 7-8 : Intensification (pic de charge, long run jusqu\'à 2h30)',
+      'Semaines 9-10 : Spécificité marathon (allure objectif intégrée aux séances)',
+      'Semaine 11 : Consolidation (affûtage progressif)',
+      'Semaine 12 : Semaine de course (activation, stratégie et gestion des ravitaillements)',
     ],
     for_who: [
       { check: true, text: 'Tu as déjà couru un semi-marathon ou tu cours régulièrement depuis 6 mois' },
@@ -109,12 +109,12 @@ const EBOOK_DETAILS = {
     full_description: 'Le plan marathon complet. 16 semaines pour construire progressivement ton endurance, développer ta résistance et arriver au départ en pleine confiance.',
     toc: [
       'Tableau d\'allures personnalisé depuis ta VMA (EF, Seuil, Tempo, Allure marathon)',
-      'Semaines 1-4 · Fondamentaux: endurance fondamentale, côtes, mise en place des bases',
-      'Semaines 5-8 · Développement: volume croissant, sorties longues progressives (jusqu\'à 2h10)',
-      'Semaines 9-12 · Spécificité marathon: allure objectif et seuil intégrés, long runs jusqu\'à 2h30',
-      'Semaines 13-14 · Pic de charge: séances tempo et long run avant l\'affûtage',
-      'Semaine 15 · Consolidation: affûtage progressif, gestion de la fatigue',
-      'Semaine 16 · Semaine de course: activation, stratégie de course et ravitaillements',
+      'Semaines 1-4 : Fondamentaux (endurance fondamentale, côtes, mise en place des bases)',
+      'Semaines 5-8 : Développement (volume croissant, sorties longues progressives jusqu\'à 2h10)',
+      'Semaines 9-12 : Spécificité marathon (allure objectif et seuil intégrés, long runs jusqu\'à 2h30)',
+      'Semaines 13-14 : Pic de charge (séances tempo et long run avant l\'affûtage)',
+      'Semaine 15 : Consolidation (affûtage progressif, gestion de la fatigue)',
+      'Semaine 16 : Semaine de course (activation, stratégie de course et ravitaillements)',
     ],
     for_who: [
       { check: true, text: 'Tu veux préparer ton premier marathon ou battre ton record personnel' },
@@ -127,7 +127,7 @@ const EBOOK_DETAILS = {
     icon: '🩺', weeks: null, distance: null, level: 'Tous niveaux',
     full_description: 'Le guide indispensable pour courir plus longtemps sans se blesser. Prévention, renforcement musculaire, soins et protocoles de reprise.',
     toc: [
-      'Les blessures courantes du runner: causes et mécanismes',
+      'Les blessures courantes du runner (causes et mécanismes)',
       'Programme de renforcement musculaire complet (8 exercices)',
       'Routine d\'étirements et mobilité articulaire',
       'Signes d\'alerte : quand s\'arrêter, quand continuer',
@@ -278,18 +278,18 @@ function IllustrationGeneric({ icon, title }) {
 // ─── Aperçu flouté ────────────────────────────────────────────────────────────
 const PREVIEW_DATA = {
   '10km-8sem': {
-    header: '10 KM · 8 SEMAINES', allureeLabel: 'Allure objectif 10km : XX:XX min/km',
-    weekLabel: 'Semaine 6 / 8 · 6 séances', phase: 'INTENSIFICATION',
+    header: '10 KM: 8 SEMAINES', allureeLabel: 'Allure objectif 10km : XX:XX min/km',
+    weekLabel: 'Semaine 6 / 8: 6 séances', phase: 'INTENSIFICATION',
     phaseDesc: 'Dernière semaine de charge maximale. Tu atteins le pic de ta préparation.',
     sessions: [
       { day: 'LUN', type: 'Footing EF', color: '#22C55E', dur: '40 min',
         lines: ['40 min très faciles. Sortie légère avant les deux séances clés.', 'RPE 3/10'] },
       { day: 'MAR', type: '3 × 10 min au seuil', color: '#F97316', dur: '70 min',
-        lines: ['Échauffement 25 min EF progressif.', '3 × 10 min à allure seuil, 3 min récup entre chaque.', 'RPE 8-9/10 · 30 min totales au seuil.'] },
+        lines: ['Échauffement 25 min EF progressif.', '3 × 10 min à allure seuil, 3 min récup entre chaque.', 'RPE 8-9/10: 30 min totales au seuil.'] },
       { day: 'MER', type: 'Footing EF', color: '#22C55E', dur: '30 min',
         lines: ['30 min très faciles. Sortie de récupération volontairement courte.', 'RPE 3/10'] },
       { day: 'JEU', type: '4 × 2 km à allure objectif', color: '#8B2FC9', dur: '70 min',
-        lines: ['Échauffement 25 min EF.', '4 × 2 km à ton allure objectif 10km. Récupération 90 sec.', 'RPE 8/10 · La séance la plus course-spécifique du plan.'] },
+        lines: ['Échauffement 25 min EF.', '4 × 2 km à ton allure objectif 10km. Récupération 90 sec.', 'RPE 8/10: La séance la plus course-spécifique du plan.'] },
       { day: 'SAM', type: 'Footing de récupération', color: '#22C55E', dur: '45 min',
         lines: ['45 min très faciles. Aussi important que les séances intenses.', 'RPE 3/10'] },
       { day: 'DIM', type: 'Sortie longue', color: '#06B6D4', dur: '85 min',
@@ -297,8 +297,8 @@ const PREVIEW_DATA = {
     ],
   },
   '10km-12sem': {
-    header: '10 KM · 12 SEMAINES', allureeLabel: 'Allure objectif 10km : XX:XX min/km',
-    weekLabel: 'Semaine 8 / 12 · 5 séances', phase: 'DÉVELOPPEMENT VMA',
+    header: '10 KM: 12 SEMAINES', allureeLabel: 'Allure objectif 10km : XX:XX min/km',
+    weekLabel: 'Semaine 8 / 12: 5 séances', phase: 'DÉVELOPPEMENT VMA',
     phaseDesc: 'Montée en puissance. Le volume atteint son pic et la VMA est sollicitée.',
     sessions: [
       { day: 'MAR', type: 'Footing EF', color: '#22C55E', dur: '45 min',
@@ -306,7 +306,7 @@ const PREVIEW_DATA = {
       { day: 'MER', type: '5 × 1000 m au seuil', color: '#F97316', dur: '65 min',
         lines: ['Échauffement 25 min EF.', '5 × 1000m à ton allure seuil. Récupération 2 min au trot.', 'RPE 7-8/10'] },
       { day: 'VEN', type: '12 × 400 m VMA', color: '#EF4444', dur: '65 min',
-        lines: ['Échauffement 25 min progressif.', '12 × 400m à allure VMA. Récupération 90 sec au trot.', 'RPE 9/10 · La séance qui fait le plus progresser.'] },
+        lines: ['Échauffement 25 min progressif.', '12 × 400m à allure VMA. Récupération 90 sec au trot.', 'RPE 9/10: La séance qui fait le plus progresser.'] },
       { day: 'SAM', type: 'Footing de récupération', color: '#22C55E', dur: '40 min',
         lines: ['40 min très faciles. Active la circulation avant la sortie longue.', 'RPE 3/10'] },
       { day: 'DIM', type: 'Sortie longue', color: '#06B6D4', dur: '90 min',
@@ -314,8 +314,8 @@ const PREVIEW_DATA = {
     ],
   },
   'semi-12sem': {
-    header: '21,1 KM · 12 SEMAINES', allureeLabel: 'Allure objectif semi : XX:XX min/km',
-    weekLabel: 'Semaine 9 / 12 · 5 séances', phase: 'SPÉCIFICITÉ SEMI',
+    header: '21,1 KM: 12 SEMAINES', allureeLabel: 'Allure objectif semi : XX:XX min/km',
+    weekLabel: 'Semaine 9 / 12: 5 séances', phase: 'SPÉCIFICITÉ SEMI',
     phaseDesc: 'Les séances s\'alignent sur ton allure de course. Le jour J se rapproche.',
     sessions: [
       { day: 'LUN', type: 'Footing EF', color: '#22C55E', dur: '45 min',
@@ -323,16 +323,16 @@ const PREVIEW_DATA = {
       { day: 'MAR', type: '2 × 15 min au seuil lactique', color: '#F97316', dur: '70 min',
         lines: ['Échauffement 25 min progressif.', '2 × 15 min à ton allure seuil, 3 min de récupération.', 'RPE 8/10'] },
       { day: 'JEU', type: '4 × 2 km à allure semi', color: '#8B2FC9', dur: '75 min',
-        lines: ['Échauffement 25 min EF.', '4 × 2 km à ton allure objectif semi-marathon. Récup 90 sec.', 'RPE 7-8/10 · La séance la plus spécifique du plan.'] },
+        lines: ['Échauffement 25 min EF.', '4 × 2 km à ton allure objectif semi-marathon. Récup 90 sec.', 'RPE 7-8/10: La séance la plus spécifique du plan.'] },
       { day: 'SAM', type: 'Footing EF', color: '#22C55E', dur: '35 min',
         lines: ['35 min très faciles. Prépare la sortie longue du lendemain.', 'RPE 3/10'] },
       { day: 'DIM', type: 'Sortie longue 22 km', color: '#06B6D4', dur: '120 min',
-        lines: ['22 km à allure endurance fondamentale. Le long run le plus important du plan.', 'RPE 6/10 · Ravitaille-toi à mi-course.'] },
+        lines: ['22 km à allure endurance fondamentale. Le long run le plus important du plan.', 'RPE 6/10: Ravitaille-toi à mi-course.'] },
     ],
   },
   'marathon-12sem': {
-    header: '42,195 KM · 12 SEMAINES', allureeLabel: 'Allure objectif marathon : XX:XX min/km',
-    weekLabel: 'Semaine 9 / 12 · 5 séances', phase: 'ALLURE MARATHON',
+    header: '42,195 KM: 12 SEMAINES', allureeLabel: 'Allure objectif marathon : XX:XX min/km',
+    weekLabel: 'Semaine 9 / 12: 5 séances', phase: 'ALLURE MARATHON',
     phaseDesc: 'L\'allure objectif est au cœur de chaque séance. Les long runs atteignent leur pic.',
     sessions: [
       { day: 'LUN', type: 'Footing EF', color: '#22C55E', dur: '50 min',
@@ -340,28 +340,28 @@ const PREVIEW_DATA = {
       { day: 'MER', type: '3 × 12 min au seuil', color: '#F97316', dur: '75 min',
         lines: ['Échauffement 25 min progressif.', '3 × 12 min à ton allure seuil, 3 min de récupération.', 'RPE 8-9/10'] },
       { day: 'VEN', type: '5 × 2 km à allure marathon', color: '#8B2FC9', dur: '85 min',
-        lines: ['Échauffement 25 min EF.', '5 × 2 km exactement à ton allure objectif marathon. Récup 90 sec.', 'RPE 8/10 · Mémorise cette sensation, c\'est celle du jour J.'] },
+        lines: ['Échauffement 25 min EF.', '5 × 2 km exactement à ton allure objectif marathon. Récup 90 sec.', 'RPE 8/10: Mémorise cette sensation, c\'est celle du jour J.'] },
       { day: 'SAM', type: 'Footing de récupération', color: '#22C55E', dur: '40 min',
         lines: ['40 min faciles. Récupération active avant le long run du dimanche.', 'RPE 3/10'] },
       { day: 'DIM', type: 'Sortie longue 30 km', color: '#06B6D4', dur: '160 min',
-        lines: ['28 km à allure EF, puis 2 km à ton allure objectif marathon.', 'RPE 6/10 · Le long run le plus long du plan.'] },
+        lines: ['28 km à allure EF, puis 2 km à ton allure objectif marathon.', 'RPE 6/10: Le long run le plus long du plan.'] },
     ],
   },
   'marathon-16sem': {
-    header: '42,195 KM · 16 SEMAINES', allureeLabel: 'Allure objectif marathon : XX:XX min/km',
-    weekLabel: 'Semaine 11 / 16 · 5 séances', phase: 'DÉVELOPPEMENT MARATHON',
+    header: '42,195 KM: 16 SEMAINES', allureeLabel: 'Allure objectif marathon : XX:XX min/km',
+    weekLabel: 'Semaine 11 / 16: 5 séances', phase: 'DÉVELOPPEMENT MARATHON',
     phaseDesc: 'Le volume atteint son pic. Les sorties longues dépassent les 30 km.',
     sessions: [
       { day: 'LUN', type: 'Footing EF', color: '#22C55E', dur: '50 min',
         lines: ['50 min à allure fondamentale. Base aérobie de la semaine.', 'RPE 4/10'] },
       { day: 'MAR', type: '2 × 20 min au seuil', color: '#F97316', dur: '80 min',
-        lines: ['Échauffement 25 min.', '2 × 20 min à ton allure seuil, 4 min de récupération.', 'RPE 8/10 · 40 min totales au seuil, ta charge la plus élevée.'] },
+        lines: ['Échauffement 25 min.', '2 × 20 min à ton allure seuil, 4 min de récupération.', 'RPE 8/10: 40 min totales au seuil, ta charge la plus élevée.'] },
       { day: 'JEU', type: '5 × 1500 m à allure marathon', color: '#8B2FC9', dur: '80 min',
         lines: ['Échauffement 25 min EF.', '5 × 1500m à ton allure objectif marathon. Récupération 2 min.', 'RPE 7-8/10'] },
       { day: 'SAM', type: 'Footing EF', color: '#22C55E', dur: '45 min',
         lines: ['45 min faciles. Prépare le long run du lendemain.', 'RPE 3/10'] },
       { day: 'DIM', type: 'Sortie longue 32 km', color: '#06B6D4', dur: '175 min',
-        lines: ['30 km à allure EF, puis 2 km à ton allure objectif marathon.', 'RPE 6/10 · Ravitaille-toi toutes les 45 min.'] },
+        lines: ['30 km à allure EF, puis 2 km à ton allure objectif marathon.', 'RPE 6/10: Ravitaille-toi toutes les 45 min.'] },
     ],
   },
 }
@@ -647,7 +647,7 @@ export default function EbookDetail() {
                   {((displayPriceCents || minCents || ebook.price_cents) / 100).toFixed(2).replace('.', ',')}€
                 </div>
                 <div style={{ fontSize: '.78rem', color: 'rgba(255,255,255,.38)', marginTop: '.2rem' }}>
-                  Paiement unique · accès à vie
+                  Paiement unique: accès à vie
                 </div>
               </div>
 
