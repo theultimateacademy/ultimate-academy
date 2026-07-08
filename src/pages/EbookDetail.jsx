@@ -26,14 +26,12 @@ const EBOOK_DETAILS = {
     icon: '🏃', weeks: 8, distance: '10 km', level: 'Tous niveaux',
     full_description: 'Un plan complet de 8 semaines pour préparer ta prochaine course de 10 km. Chaque séance est calculée depuis ta VMA réelle : tu cours aux bonnes allures, au bon moment, sans jamais avoir à convertir des pourcentages.',
     toc: [
-      'Allures personnalisées en min/km',
-      'Semaines 1-2 · Adaptation',
-      'Semaines 3-4 · Développement',
-      'Semaines 5-6 · Intensification',
-      'Semaine 7 · Consolidation',
-      'Semaine 8 · Semaine de course',
-      'Stratégie de course',
-      'Nutrition',
+      'Tableau d\'allures personnalisé depuis ta VMA (EF, Seuil, VMA, Allure 10km)',
+      'Semaines 1-2 · Adaptation — mise en route progressive, EF et premières séances de qualité',
+      'Semaines 3-4 · Développement — montée en charge aérobie, fractionnés courts',
+      'Semaines 5-6 · Intensification — pic de charge, séances au seuil et VMA',
+      'Semaine 7 · Consolidation — stabilisation de la forme avant course',
+      'Semaine 8 · Semaine de course — activation, stratégie de course et gestion du jour J',
     ],
     for_who: [
       { check: true,  text: 'Tu peux courir 30 minutes sans t\'arrêter' },
@@ -48,15 +46,14 @@ const EBOOK_DETAILS = {
     icon: '🏃', weeks: 12, distance: '10 km', level: 'Tous niveaux',
     full_description: 'La version longue et progressive pour préparer un 10km en 12 semaines. Plus de temps pour construire ta base aérobie, développer ta VMA et arriver en pleine forme le jour J.',
     toc: [
-      'Allures personnalisées en min/km',
-      'Semaines 1-2 · Adaptation',
-      'Semaines 3-4 · Développement aérobie',
-      'Semaines 5-6 · Développement VMA',
-      'Semaines 7-8 · Intensification',
-      'Semaines 9-10 · Spécificité',
-      'Semaine 11 · Consolidation',
-      'Semaine 12 · Semaine de course',
-      'Stratégie de course et nutrition',
+      'Tableau d\'allures personnalisé depuis ta VMA (EF, Seuil, VMA, Allure 10km)',
+      'Semaines 1-2 · Adaptation — reprise progressive et mise en route',
+      'Semaines 3-4 · Développement aérobie — construction de la base endurance',
+      'Semaines 5-6 · Développement VMA — fractionnés courts, montée en intensité',
+      'Semaines 7-8 · Intensification — pic de charge, séances mixtes seuil et VMA',
+      'Semaines 9-10 · Spécificité 10km — allure objectif et répétitions longues',
+      'Semaine 11 · Consolidation — stabilisation avant affûtage',
+      'Semaine 12 · Semaine de course — activation, stratégie et gestion du jour J',
     ],
     for_who: [
       { check: true, text: 'Tu peux courir 30 minutes sans t\'arrêter' },
@@ -69,15 +66,14 @@ const EBOOK_DETAILS = {
     icon: '🏅', weeks: 12, distance: 'Semi-marathon', level: 'Tous niveaux',
     full_description: 'Prépare ton semi-marathon en 12 semaines avec un plan structuré alliant volume kilométrique progressif, séances de qualité et allures personnalisées selon ta VMA.',
     toc: [
-      'Allures personnalisées en min/km',
-      'Semaines 1-2 · Adaptation',
-      'Semaines 3-4 · Développement aérobie',
-      'Semaines 5-6 · Volume',
-      'Semaines 7-8 · Intensification',
-      'Semaines 9-10 · Spécificité semi',
-      'Semaine 11 · Consolidation',
-      'Semaine 12 · Semaine de course',
-      'Stratégie de course et nutrition',
+      'Tableau d\'allures personnalisé depuis ta VMA (EF, Seuil, VMA, Allure semi)',
+      'Semaines 1-2 · Adaptation — mise en route, EF et premières séances de qualité',
+      'Semaines 3-4 · Développement aérobie — construction de l\'endurance de base',
+      'Semaines 5-6 · Volume — sorties longues progressives, montée du kilométrage',
+      'Semaines 7-8 · Intensification — seuil lactique et fractionnés, pic de charge',
+      'Semaines 9-10 · Spécificité semi — allure objectif et long run race-pace',
+      'Semaine 11 · Consolidation — affûtage progressif',
+      'Semaine 12 · Semaine de course — activation, stratégie de course et nutrition',
     ],
     for_who: [
       { check: true, text: 'Tu as déjà couru un 10km ou tu cours régulièrement depuis 6 mois' },
@@ -91,14 +87,14 @@ const EBOOK_DETAILS = {
     icon: '🏆', weeks: 12, distance: 'Marathon', level: 'Tous niveaux',
     full_description: 'Un plan complet de 12 semaines pour préparer ton marathon. Chaque séance est calculée depuis ta VMA réelle, adaptée à ton palier (débutant, intermédiaire ou avancé). Tu cours aux bonnes allures, au bon moment, sans jamais avoir à convertir des pourcentages.',
     toc: [
-      'Allures personnalisées en min/km selon ta VMA',
-      'Semaines 1-2 · Adaptation et mise en route',
-      'Semaines 3-5 · Développement aérobie et première allures marathon',
-      'Semaines 6-8 · Volume maximum et pic de charge',
-      'Semaines 9-10 · Spécificité marathon — blocs à allure objectif',
-      'Semaine 11 · Consolidation et préparation finale',
-      'Semaine 12 · Semaine de course et stratégie',
-      'Nutrition, ravitaillement et gestion des gels',
+      'Tableau d\'allures personnalisé depuis ta VMA (EF, Seuil, Tempo, Allure marathon)',
+      'Semaines 1-2 · Adaptation — mise en route, EF et premières séances au seuil',
+      'Semaines 3-4 · Développement aérobie — construction de l\'endurance de base',
+      'Semaines 5-6 · Volume marathon — sorties longues jusqu\'à 2h10, montée du kilométrage',
+      'Semaines 7-8 · Intensification — pic de charge, long run jusqu\'à 2h30',
+      'Semaines 9-10 · Spécificité marathon — allure objectif intégrée aux séances',
+      'Semaine 11 · Consolidation — affûtage progressif',
+      'Semaine 12 · Semaine de course — activation, stratégie et gestion des ravitaillements',
     ],
     for_who: [
       { check: true, text: 'Tu as déjà couru un semi-marathon ou tu cours régulièrement depuis 6 mois' },
@@ -112,13 +108,13 @@ const EBOOK_DETAILS = {
     icon: '🏆', weeks: 16, distance: 'Marathon', level: 'Tous niveaux',
     full_description: 'Le plan marathon complet. 16 semaines pour construire progressivement ton endurance, développer ta résistance et arriver au départ en pleine confiance.',
     toc: [
-      'Semaines 1-4 : Fondation — endurance fondamentale, côtes',
-      'Semaines 5-8 : Développement volume — long runs croissants',
-      'Semaines 9-12 : Spécificité marathon — allures et seuil',
-      'Semaines 13-14 : Intensification finale',
-      'Semaines 15-16 : Consolidation et course',
-      'Plans A / B / C selon l\'objectif',
-      'Guide complet nutrition et hydratation',
+      'Tableau d\'allures personnalisé depuis ta VMA (EF, Seuil, Tempo, Allure marathon)',
+      'Semaines 1-4 · Fondamentaux — endurance fondamentale, côtes, mise en place des bases',
+      'Semaines 5-8 · Développement — volume croissant, sorties longues progressives (jusqu\'à 2h10)',
+      'Semaines 9-12 · Spécificité marathon — allure objectif et seuil intégrés, long runs jusqu\'à 2h30',
+      'Semaines 13-14 · Pic de charge — séances tempo et long run avant l\'affûtage',
+      'Semaine 15 · Consolidation — affûtage progressif, gestion de la fatigue',
+      'Semaine 16 · Semaine de course — activation, stratégie de course et ravitaillements',
     ],
     for_who: [
       { check: true, text: 'Tu veux préparer ton premier marathon ou battre ton record personnel' },
@@ -198,8 +194,8 @@ function IllustrationRunning({ dist, kmText, kmInline, weeksLabel, price }) {
 
       {price && (
         <>
-          <rect x="496" y="12" width="132" height="24" rx="12" fill="url(#il-g)" opacity="0.88" />
-          <text x="562" y="28" fontFamily="Poppins,sans-serif" fontSize="10.5" fontWeight="800"
+          <rect x="448" y="8" width="184" height="40" rx="20" fill="url(#il-g)" opacity="0.93" />
+          <text x="540" y="33" fontFamily="Poppins,sans-serif" fontSize="14.5" fontWeight="800"
             fill="white" textAnchor="middle">{price}</text>
         </>
       )}
@@ -252,8 +248,8 @@ function IllustrationAntiBlessure({ price }) {
         fill="rgba(255,255,255,.32)" letterSpacing="3" textAnchor="middle">COURIR DURABLEMENT</text>
       {price && (
         <>
-          <rect x="496" y="12" width="132" height="24" rx="12" fill="url(#il-g)" opacity="0.88" />
-          <text x="562" y="28" fontFamily="Poppins,sans-serif" fontSize="10.5" fontWeight="800"
+          <rect x="448" y="8" width="184" height="40" rx="20" fill="url(#il-g)" opacity="0.93" />
+          <text x="540" y="33" fontFamily="Poppins,sans-serif" fontSize="14.5" fontWeight="800"
             fill="white" textAnchor="middle">{price}</text>
         </>
       )}
