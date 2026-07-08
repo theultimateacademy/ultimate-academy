@@ -1,5 +1,15 @@
 const GRAD = 'linear-gradient(135deg, #8B2FC9, #E8237A)'
 
+const PARTICLES = Array.from({ length: 20 }, (_, i) => ({
+  id: i,
+  x: 5 + (i * 4.7) % 90,
+  y: 5 + (i * 7.3) % 85,
+  size: 2 + (i % 3),
+  opacity: 0.2 + (i % 5) * 0.07,
+  duration: 8 + (i % 8),
+  delay: -(i % 6),
+}))
+
 export const gradText = {
   background: GRAD,
   WebkitBackgroundClip: 'text',
@@ -24,6 +34,26 @@ export default function PageHero({ title, subtitle, badge }) {
       position: 'relative',
       overflow: 'hidden',
     }}>
+      <style>{`
+        @keyframes floatParticle {
+          0%   { transform: translateY(0px) translateX(0px) }
+          33%  { transform: translateY(-28px) translateX(18px) }
+          66%  { transform: translateY(-8px) translateX(-14px) }
+          100% { transform: translateY(0px) translateX(0px) }
+        }
+      `}</style>
+
+      {/* Particules */}
+      {PARTICLES.map(p => (
+        <div key={p.id} style={{
+          position: 'absolute', left: `${p.x}%`, top: `${p.y}%`,
+          width: p.size, height: p.size, borderRadius: '50%',
+          background: '#fff', opacity: p.opacity, pointerEvents: 'none',
+          willChange: 'transform',
+          animation: `floatParticle ${p.duration}s ${p.delay}s ease-in-out infinite`,
+        }} />
+      ))}
+
       {/* Glow violet haut gauche */}
       <div style={{
         position: 'absolute', top: '-20%', left: '-10%',
