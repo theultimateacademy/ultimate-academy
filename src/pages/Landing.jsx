@@ -280,14 +280,6 @@ export default function Landing() {
         </div>
 
         {/* Ligne de course */}
-        <div style={{ position: 'absolute', bottom: '5.5rem', left: 0, right: 0, height: 1, background: 'rgba(255,255,255,.08)' }}>
-          <div style={{
-            position: 'absolute', top: -3, width: 7, height: 7, borderRadius: '50%',
-            background: grad, boxShadow: '0 0 10px rgba(232,35,122,.8)',
-            animation: 'runnerDot 3s linear infinite',
-            willChange: 'left',
-          }} />
-        </div>
 
         {/* Scroll indicator */}
         {!scrolled && (
