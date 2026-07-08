@@ -103,8 +103,13 @@ export default function Nav() {
       <nav className="landing-nav">
 
         {/* Logo — always scrolls to top */}
-        <Link to="/" onClick={handleLogoClick} style={{ lineHeight: 0, flexShrink: 0 }}>
-          <img src="/Logo.png" alt="The Ultimate Academy" className="nav-logo" />
+        <Link to="/" onClick={handleLogoClick} style={{ display: 'flex', alignItems: 'center', gap: '.55rem', textDecoration: 'none', flexShrink: 0 }}>
+          <img src="/LogoSymbol.png" alt="The Ultimate Academy" style={{ height: 44, width: 'auto', display: 'block' }} />
+          <span style={{ display: 'flex', flexDirection: 'column', lineHeight: 1.1 }}>
+            <span style={{ fontSize: '.72rem', fontWeight: 700, letterSpacing: '.18em', textTransform: 'uppercase', color: 'rgba(255,255,255,.45)' }}>The</span>
+            <span style={{ fontSize: '1rem', fontWeight: 800, letterSpacing: '.04em', textTransform: 'uppercase', background: 'linear-gradient(135deg,#8B2FC9,#E8237A)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text' }}>Ultimate</span>
+            <span style={{ fontSize: '.72rem', fontWeight: 700, letterSpacing: '.18em', textTransform: 'uppercase', color: 'rgba(255,255,255,.45)' }}>Academy</span>
+          </span>
         </Link>
 
         {/* Desktop centre links — in scroll order */}

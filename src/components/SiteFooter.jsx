@@ -25,7 +25,7 @@ export default function SiteFooter() {
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px,1fr))', gap: '2.5rem', marginBottom: '2rem' }}>
 
           <div>
-            <img src="/Logo.png" alt="The Ultimate Academy" style={{ height: 60, width: 'auto', objectFit: 'contain', opacity: .8, marginBottom: '.85rem' }} />
+            <img src="/LogoSymbol.png" alt="The Ultimate Academy" style={{ height: 52, width: 'auto', objectFit: 'contain', marginBottom: '.85rem' }} />
             <p style={{ color: 'rgba(255,255,255,.2)', fontSize: '.78rem', margin: 0 }}>
               © 2026 The Ultimate Academy<br />Tous droits réservés.
             </p>
