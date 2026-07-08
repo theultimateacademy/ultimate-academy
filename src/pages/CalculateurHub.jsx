@@ -8,7 +8,7 @@ const CALCULATEURS = [
     title: 'Calcule tes temps de passage',
     desc: 'Génère ton tableau complet avec tes temps de passage à chaque kilomètre selon ton allure cible. Idéal pour préparer ta stratégie de course et éviter de partir trop vite.',
     path: '/calculateur/passage',
-    label: 'Calculer mes temps de passage',
+    label: 'Mes temps de passage',
     tag: 'Course à pied',
   },
   {
@@ -48,7 +48,7 @@ const CALCULATEURS = [
     title: 'Calcule tes allures triathlon',
     desc: 'Renseigne tes distances et temps cibles pour la nage, le vélo et la course. Obtiens ton allure natation (min/100m), ta vitesse vélo (km/h), ton allure course (min/km) et ton temps total hors transitions.',
     path: '/calculateur/triathlon',
-    label: 'Calculer mes allures triathlon',
+    label: 'Mes allures triathlon',
     tag: 'Triathlon',
   },
 ]
