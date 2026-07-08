@@ -12,8 +12,13 @@ export default function PageHero({ title, subtitle, badge }) {
   return (
     <div style={{
       background: BG,
-      padding: '5rem 1.5rem 3.5rem',
+      minHeight: '100vh',
+      display: 'flex',
+      flexDirection: 'column',
+      justifyContent: 'center',
+      alignItems: 'center',
       textAlign: 'center',
+      padding: '8rem 1.5rem 4rem',
       borderBottom: '1px solid rgba(255,255,255,.08)',
       position: 'relative',
       overflow: 'hidden',
