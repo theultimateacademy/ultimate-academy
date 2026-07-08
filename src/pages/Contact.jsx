@@ -3,7 +3,7 @@ import Nav from '../components/Nav'
 import PageHero, { gradText } from '../components/PageHero'
 
 const grad = 'linear-gradient(135deg,#8B2FC9,#E8237A)'
-const WEB3FORMS_KEY = import.meta.env.VITE_WEB3FORMS_KEY || ''
+const WEB3FORMS_KEY = 'f9d9f98e-987b-495c-817a-4793c37ad351'
 
 const inputSt = {
   width: '100%', background: 'rgba(255,255,255,.05)',
