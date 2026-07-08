@@ -20,6 +20,7 @@ import Privacy        from './pages/legal/Privacy'
 import Terms          from './pages/legal/Terms'
 import Cookies        from './pages/legal/Cookies'
 import Calculator     from './pages/Calculator'
+import Contact        from './pages/Contact'
 import CalculateurHub from './pages/CalculateurHub'
 import Ebooks         from './pages/Ebooks'
 import EbookDetail    from './pages/EbookDetail'
@@ -90,6 +91,7 @@ function AppRoutes() {
       <Route path="/dev-login" element={<DevLogin />} />
       <Route path="/welcome"  element={<RequireAuth><CheckoutSuccess /></RequireAuth>} />
       <Route path="/onboarding" element={<RequireAuth><ProfileWizard /></RequireAuth>} />
+      <Route path="/contact"       element={<Contact />} />
       <Route path="/privacy"      element={<Privacy />} />
       <Route path="/terms"        element={<Terms />} />
       <Route path="/cookies"      element={<Cookies />} />
