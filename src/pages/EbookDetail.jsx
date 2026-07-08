@@ -622,7 +622,7 @@ export default function EbookDetail() {
                       <span style={{ width: 22, height: 22, borderRadius: '50%', background: grad,
                         display: 'flex', alignItems: 'center', justifyContent: 'center',
                         fontSize: '.62rem', fontWeight: 800, flexShrink: 0, marginTop: '.1rem' }}>{i + 1}</span>
-                      <span style={{ fontSize: '.875rem', color: 'rgba(255,255,255,.8)', lineHeight: 1.55, textAlign: 'justify' }}>{item}</span>
+                      <div style={{ fontSize: '.875rem', color: 'rgba(255,255,255,.8)', lineHeight: 1.55, textAlign: 'justify' }}>{item}</div>
                     </div>
                   ))}
                 </div>
