@@ -27,11 +27,11 @@ const EBOOK_DETAILS = {
     full_description: 'Un plan complet de 8 semaines pour préparer ta prochaine course de 10 km. Chaque séance est calculée depuis ta VMA réelle : tu cours aux bonnes allures, au bon moment, sans jamais avoir à convertir des pourcentages.',
     toc: [
       'Tableau d\'allures personnalisé depuis ta VMA (EF, Seuil, VMA, Allure 10km)',
-      'Semaines 1-2 · Adaptation — mise en route progressive, EF et premières séances de qualité',
-      'Semaines 3-4 · Développement — montée en charge aérobie, fractionnés courts',
-      'Semaines 5-6 · Intensification — pic de charge, séances au seuil et VMA',
-      'Semaine 7 · Consolidation — stabilisation de la forme avant course',
-      'Semaine 8 · Semaine de course — activation, stratégie de course et gestion du jour J',
+      'Semaines 1-2 · Adaptation: mise en route progressive, EF et premières séances de qualité',
+      'Semaines 3-4 · Développement: montée en charge aérobie, fractionnés courts',
+      'Semaines 5-6 · Intensification: pic de charge, séances au seuil et VMA',
+      'Semaine 7 · Consolidation: stabilisation de la forme avant course',
+      'Semaine 8 · Semaine de course: activation, stratégie de course et gestion du jour J',
     ],
     for_who: [
       { check: true,  text: 'Tu peux courir 30 minutes sans t\'arrêter' },
@@ -47,13 +47,13 @@ const EBOOK_DETAILS = {
     full_description: 'La version longue et progressive pour préparer un 10km en 12 semaines. Plus de temps pour construire ta base aérobie, développer ta VMA et arriver en pleine forme le jour J.',
     toc: [
       'Tableau d\'allures personnalisé depuis ta VMA (EF, Seuil, VMA, Allure 10km)',
-      'Semaines 1-2 · Adaptation — reprise progressive et mise en route',
-      'Semaines 3-4 · Développement aérobie — construction de la base endurance',
-      'Semaines 5-6 · Développement VMA — fractionnés courts, montée en intensité',
-      'Semaines 7-8 · Intensification — pic de charge, séances mixtes seuil et VMA',
-      'Semaines 9-10 · Spécificité 10km — allure objectif et répétitions longues',
-      'Semaine 11 · Consolidation — stabilisation avant affûtage',
-      'Semaine 12 · Semaine de course — activation, stratégie et gestion du jour J',
+      'Semaines 1-2 · Adaptation: reprise progressive et mise en route',
+      'Semaines 3-4 · Développement aérobie: construction de la base endurance',
+      'Semaines 5-6 · Développement VMA: fractionnés courts, montée en intensité',
+      'Semaines 7-8 · Intensification: pic de charge, séances mixtes seuil et VMA',
+      'Semaines 9-10 · Spécificité 10km: allure objectif et répétitions longues',
+      'Semaine 11 · Consolidation: stabilisation avant affûtage',
+      'Semaine 12 · Semaine de course: activation, stratégie et gestion du jour J',
     ],
     for_who: [
       { check: true, text: 'Tu peux courir 30 minutes sans t\'arrêter' },
@@ -67,13 +67,13 @@ const EBOOK_DETAILS = {
     full_description: 'Prépare ton semi-marathon en 12 semaines avec un plan structuré alliant volume kilométrique progressif, séances de qualité et allures personnalisées selon ta VMA.',
     toc: [
       'Tableau d\'allures personnalisé depuis ta VMA (EF, Seuil, VMA, Allure semi)',
-      'Semaines 1-2 · Adaptation — mise en route, EF et premières séances de qualité',
-      'Semaines 3-4 · Développement aérobie — construction de l\'endurance de base',
-      'Semaines 5-6 · Volume — sorties longues progressives, montée du kilométrage',
-      'Semaines 7-8 · Intensification — seuil lactique et fractionnés, pic de charge',
-      'Semaines 9-10 · Spécificité semi — allure objectif et long run race-pace',
-      'Semaine 11 · Consolidation — affûtage progressif',
-      'Semaine 12 · Semaine de course — activation, stratégie de course et nutrition',
+      'Semaines 1-2 · Adaptation: mise en route, EF et premières séances de qualité',
+      'Semaines 3-4 · Développement aérobie: construction de l\'endurance de base',
+      'Semaines 5-6 · Volume: sorties longues progressives, montée du kilométrage',
+      'Semaines 7-8 · Intensification: seuil lactique et fractionnés, pic de charge',
+      'Semaines 9-10 · Spécificité semi: allure objectif et long run race-pace',
+      'Semaine 11 · Consolidation: affûtage progressif',
+      'Semaine 12 · Semaine de course: activation, stratégie de course et nutrition',
     ],
     for_who: [
       { check: true, text: 'Tu as déjà couru un 10km ou tu cours régulièrement depuis 6 mois' },
@@ -88,13 +88,13 @@ const EBOOK_DETAILS = {
     full_description: 'Un plan complet de 12 semaines pour préparer ton marathon. Chaque séance est calculée depuis ta VMA réelle, adaptée à ton palier (débutant, intermédiaire ou avancé). Tu cours aux bonnes allures, au bon moment, sans jamais avoir à convertir des pourcentages.',
     toc: [
       'Tableau d\'allures personnalisé depuis ta VMA (EF, Seuil, Tempo, Allure marathon)',
-      'Semaines 1-2 · Adaptation — mise en route, EF et premières séances au seuil',
-      'Semaines 3-4 · Développement aérobie — construction de l\'endurance de base',
-      'Semaines 5-6 · Volume marathon — sorties longues jusqu\'à 2h10, montée du kilométrage',
-      'Semaines 7-8 · Intensification — pic de charge, long run jusqu\'à 2h30',
-      'Semaines 9-10 · Spécificité marathon — allure objectif intégrée aux séances',
-      'Semaine 11 · Consolidation — affûtage progressif',
-      'Semaine 12 · Semaine de course — activation, stratégie et gestion des ravitaillements',
+      'Semaines 1-2 · Adaptation: mise en route, EF et premières séances au seuil',
+      'Semaines 3-4 · Développement aérobie: construction de l\'endurance de base',
+      'Semaines 5-6 · Volume marathon: sorties longues jusqu\'à 2h10, montée du kilométrage',
+      'Semaines 7-8 · Intensification: pic de charge, long run jusqu\'à 2h30',
+      'Semaines 9-10 · Spécificité marathon: allure objectif intégrée aux séances',
+      'Semaine 11 · Consolidation: affûtage progressif',
+      'Semaine 12 · Semaine de course: activation, stratégie et gestion des ravitaillements',
     ],
     for_who: [
       { check: true, text: 'Tu as déjà couru un semi-marathon ou tu cours régulièrement depuis 6 mois' },
@@ -109,12 +109,12 @@ const EBOOK_DETAILS = {
     full_description: 'Le plan marathon complet. 16 semaines pour construire progressivement ton endurance, développer ta résistance et arriver au départ en pleine confiance.',
     toc: [
       'Tableau d\'allures personnalisé depuis ta VMA (EF, Seuil, Tempo, Allure marathon)',
-      'Semaines 1-4 · Fondamentaux — endurance fondamentale, côtes, mise en place des bases',
-      'Semaines 5-8 · Développement — volume croissant, sorties longues progressives (jusqu\'à 2h10)',
-      'Semaines 9-12 · Spécificité marathon — allure objectif et seuil intégrés, long runs jusqu\'à 2h30',
-      'Semaines 13-14 · Pic de charge — séances tempo et long run avant l\'affûtage',
-      'Semaine 15 · Consolidation — affûtage progressif, gestion de la fatigue',
-      'Semaine 16 · Semaine de course — activation, stratégie de course et ravitaillements',
+      'Semaines 1-4 · Fondamentaux: endurance fondamentale, côtes, mise en place des bases',
+      'Semaines 5-8 · Développement: volume croissant, sorties longues progressives (jusqu\'à 2h10)',
+      'Semaines 9-12 · Spécificité marathon: allure objectif et seuil intégrés, long runs jusqu\'à 2h30',
+      'Semaines 13-14 · Pic de charge: séances tempo et long run avant l\'affûtage',
+      'Semaine 15 · Consolidation: affûtage progressif, gestion de la fatigue',
+      'Semaine 16 · Semaine de course: activation, stratégie de course et ravitaillements',
     ],
     for_who: [
       { check: true, text: 'Tu veux préparer ton premier marathon ou battre ton record personnel' },
@@ -127,7 +127,7 @@ const EBOOK_DETAILS = {
     icon: '🩺', weeks: null, distance: null, level: 'Tous niveaux',
     full_description: 'Le guide indispensable pour courir plus longtemps sans se blesser. Prévention, renforcement musculaire, soins et protocoles de reprise.',
     toc: [
-      'Les blessures courantes du runner — causes et mécanismes',
+      'Les blessures courantes du runner: causes et mécanismes',
       'Programme de renforcement musculaire complet (8 exercices)',
       'Routine d\'étirements et mobilité articulaire',
       'Signes d\'alerte : quand s\'arrêter, quand continuer',
@@ -631,7 +631,7 @@ export default function EbookDetail() {
 
           </div>
 
-          {/* ── Colonne droite — achat (sticky) ── */}
+          {/* ── Colonne droite: achat (sticky) ── */}
           <div style={{ position: 'sticky', top: '1.5rem' }}>
             <div id="buy-form" style={{ background: 'rgba(255,255,255,.05)', border: '1px solid rgba(255,255,255,.1)',
               borderRadius: 24, padding: '1.75rem' }}>
