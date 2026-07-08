@@ -24,16 +24,18 @@ export default function Contact() {
     if (!email || !subject || !message) return
     setStatus('sending')
     try {
+      const fd = new FormData()
+      fd.append('email', email)
+      fd.append('_subject', subject)
+      fd.append('message', message)
+      fd.append('_captcha', 'false')
+      fd.append('_template', 'table')
+      fd.append('_next', window.location.href)
+
       const res = await fetch(`https://formsubmit.co/ajax/${TARGET}`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
-        body: JSON.stringify({
-          _subject: subject,
-          email,
-          message,
-          _captcha: 'false',
-          _template: 'table',
-        }),
+        headers: { Accept: 'application/json' },
+        body: fd,
       })
       const data = await res.json()
       if (data.success === 'true' || data.success === true) {
