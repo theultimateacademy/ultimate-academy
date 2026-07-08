@@ -6,33 +6,34 @@ const mobileStyle = `
   .nav-hamburger {
     display: none;
     background: none; border: none; cursor: pointer;
-    padding: .4rem; color: rgba(255,255,255,.85); flex-shrink: 0;
+    padding: .4rem; color: rgba(12,10,24,.75); flex-shrink: 0;
   }
   @media (max-width: 680px) {
     .nav-hamburger { display: flex; align-items: center; justify-content: center; }
     .nav-mobile-menu {
       position: fixed; top: 72px; left: 0; right: 0;
-      background: rgba(0,0,0,.96); backdrop-filter: blur(24px);
-      border-bottom: 1px solid rgba(255,255,255,.1);
+      background: rgba(255,255,255,.98); backdrop-filter: blur(24px);
+      border-bottom: 1px solid rgba(0,0,0,.08);
       padding: 1rem 1.5rem 1.5rem; z-index: 199;
       display: flex; flex-direction: column; gap: 0;
+      box-shadow: 0 8px 24px rgba(0,0,0,.08);
     }
     .nav-mobile-link {
       display: block; padding: .75rem .5rem;
       font-size: 1rem; font-weight: 500;
-      color: rgba(255,255,255,.75);
+      color: rgba(12,10,24,.75);
       border: none; background: none; text-align: left;
       cursor: pointer; font-family: inherit;
-      border-bottom: 1px solid rgba(255,255,255,.06);
+      border-bottom: 1px solid rgba(0,0,0,.07);
       text-decoration: none; min-height: 44px; width: 100%;
     }
     .nav-mobile-link:last-child { border-bottom: none; }
-    .nav-mobile-link.accent { color: #C084FC; font-weight: 600; }
+    .nav-mobile-link.accent { color: #8B2FC9; font-weight: 600; }
     .nav-mobile-sub { padding-left: 1rem; display: flex; flex-direction: column; }
     .nav-mobile-sub a {
       display: flex; align-items: center;
       padding: .6rem .5rem; font-size: .9rem;
-      color: rgba(255,255,255,.55); text-decoration: none; min-height: 44px;
+      color: rgba(12,10,24,.55); text-decoration: none; min-height: 44px;
     }
   }
 `
@@ -150,16 +151,16 @@ export default function Nav() {
             </button>
             {openTools && (
               <div style={{ position: 'absolute', top: 'calc(100% + .85rem)', right: '-1rem', minWidth: 230,
-                background: '#16132A', border: '1px solid rgba(139,47,201,.35)', borderRadius: 12,
-                padding: '.4rem', zIndex: 300, boxShadow: '0 16px 48px rgba(0,0,0,.65)' }}>
+                background: '#fff', border: '1px solid rgba(139,47,201,.2)', borderRadius: 12,
+                padding: '.4rem', zIndex: 300, boxShadow: '0 8px 32px rgba(0,0,0,.1)' }}>
                 {TOOLS.map(t => (
                   <Link key={t.path} to={t.path} onClick={() => setOpenTools(false)} style={{
                     display: 'block', padding: '.55rem .85rem', borderRadius: 8, textDecoration: 'none',
-                    fontSize: '.85rem', color: location.pathname === t.path ? '#C084FC' : 'rgba(255,255,255,.75)',
-                    background: location.pathname === t.path ? 'rgba(139,47,201,.15)' : 'transparent',
+                    fontSize: '.85rem', color: location.pathname === t.path ? '#8B2FC9' : 'rgba(12,10,24,.7)',
+                    background: location.pathname === t.path ? 'rgba(139,47,201,.1)' : 'transparent',
                     transition: 'background .12s',
                   }}
-                  onMouseEnter={e => { if (location.pathname !== t.path) e.currentTarget.style.background = 'rgba(255,255,255,.05)' }}
+                  onMouseEnter={e => { if (location.pathname !== t.path) e.currentTarget.style.background = 'rgba(0,0,0,.04)' }}
                   onMouseLeave={e => { if (location.pathname !== t.path) e.currentTarget.style.background = 'transparent' }}>
                     {t.label}
                   </Link>
@@ -173,7 +174,7 @@ export default function Nav() {
         <div style={{ display: 'flex', gap: '.6rem', alignItems: 'center', flexShrink: 0 }}>
           <div className="landing-nav-auth-desktop" style={{ display: 'flex', gap: '.6rem', alignItems: 'center' }}>
             <Link to="/login" className="btn btn-sm"
-              style={{ background: 'transparent', color: 'rgba(255,255,255,.7)', border: '1px solid rgba(255,255,255,.18)' }}>
+              style={{ background: 'transparent', color: 'rgba(12,10,24,.7)', border: '1px solid rgba(0,0,0,.18)' }}>
               Connexion
             </Link>
             <Link to="/register" className="btn btn-sm"
@@ -214,10 +215,10 @@ export default function Nav() {
               ))}
             </div>
           )}
-          <div style={{ display: 'flex', gap: '.75rem', padding: '.75rem .5rem .25rem', borderTop: '1px solid rgba(255,255,255,.08)', marginTop: '.25rem' }}>
+          <div style={{ display: 'flex', gap: '.75rem', padding: '.75rem .5rem .25rem', borderTop: '1px solid rgba(0,0,0,.08)', marginTop: '.25rem' }}>
             <Link to="/login" onClick={() => setMobileMenu(false)}
               style={{ flex: 1, padding: '.75rem', borderRadius: 10, textAlign: 'center', fontWeight: 600, fontSize: '.9rem',
-                background: 'rgba(255,255,255,.07)', border: '1px solid rgba(255,255,255,.15)', color: 'rgba(255,255,255,.8)', textDecoration: 'none' }}>
+                background: 'rgba(0,0,0,.05)', border: '1px solid rgba(0,0,0,.12)', color: 'rgba(12,10,24,.75)', textDecoration: 'none' }}>
               Connexion
             </Link>
             <Link to="/register" onClick={() => setMobileMenu(false)}
