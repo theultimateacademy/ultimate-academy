@@ -8,6 +8,14 @@ import PageHero, { gradText } from '../components/PageHero'
 const C = { purple: '#8B2FC9', pink: '#E8237A', bg: '#0C0A18' }
 const grad = 'linear-gradient(135deg,#8B2FC9,#E8237A)'
 
+const scrollBtnStyle = {
+  display: 'inline-flex', alignItems: 'center', gap: '.5rem',
+  padding: '.75rem 1.75rem', borderRadius: 50, border: '1.5px solid rgba(255,255,255,.2)',
+  background: 'rgba(255,255,255,.07)', backdropFilter: 'blur(12px)',
+  color: '#fff', fontSize: '.9rem', fontWeight: 600, cursor: 'pointer',
+  transition: 'background .2s, border-color .2s',
+}
+
 // Ebooks à variantes : prix qui dépend du nombre de séances/semaine choisi à l'achat.
 const VARIANT_PRICE_TIERS = {
   '10km-8sem': { 3: 1499, 4: 1799, 5: 1999, 6: 2299 },
@@ -57,10 +65,14 @@ export default function EbooksPage() {
         badge="Plans d'entraînement PDF"
         title={<>Ebooks <span style={gradText}>Running</span></>}
         subtitle="Des plans complets selon ta VMA — À partir de 14,99 € — Paiement unique"
-      />
+      >
+        <button onClick={() => document.getElementById('grille-ebooks')?.scrollIntoView({ behavior: 'smooth' })} style={scrollBtnStyle}>
+          Voir les plans ↓
+        </button>
+      </PageHero>
 
       {/* ── GRILLE ── */}
-      <div style={{ maxWidth: 1100, margin: '0 auto', padding: '3.5rem 1.5rem 4rem' }}>
+      <div id="grille-ebooks" style={{ maxWidth: 1100, margin: '0 auto', padding: '3.5rem 1.5rem 4rem' }}>
         {loading ? (
           <div style={{ textAlign: 'center', padding: '4rem', color: 'rgba(255,255,255,.4)' }}>Chargement…</div>
         ) : (

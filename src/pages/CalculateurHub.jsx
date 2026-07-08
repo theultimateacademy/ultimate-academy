@@ -57,6 +57,14 @@ const CALCULATEURS = [
 
 const grad = 'linear-gradient(135deg,#8B2FC9,#E8237A)'
 
+const scrollBtnStyle = {
+  display: 'inline-flex', alignItems: 'center', gap: '.5rem',
+  padding: '.75rem 1.75rem', borderRadius: 50, border: '1.5px solid rgba(255,255,255,.2)',
+  background: 'rgba(255,255,255,.07)', backdropFilter: 'blur(12px)',
+  color: '#fff', fontSize: '.9rem', fontWeight: 600, cursor: 'pointer',
+  transition: 'background .2s, border-color .2s',
+}
+
 export default function CalculateurHub() {
   return (
     <div style={{ background: '#000', minHeight: '100vh', color: '#fff' }}>
@@ -66,9 +74,13 @@ export default function CalculateurHub() {
         badge="Outils gratuits"
         title={<>Calculateurs <span style={gradText}>Running</span></>}
         subtitle="Tous les outils pour optimiser ton entraînement et préparer tes courses."
-      />
+      >
+        <button onClick={() => document.getElementById('grille-calculateurs')?.scrollIntoView({ behavior: 'smooth' })} style={scrollBtnStyle}>
+          Voir les calculateurs ↓
+        </button>
+      </PageHero>
 
-      <main style={{ maxWidth: 1100, margin: '0 auto', padding: '4rem 1.5rem 6rem' }}>
+      <main id="grille-calculateurs" style={{ maxWidth: 1100, margin: '0 auto', padding: '4rem 1.5rem 6rem' }}>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(310px, 1fr))', gap: '1.5rem' }}>
           {CALCULATEURS.map(c => (
             <Link key={c.path} to={c.path} style={{ textDecoration: 'none' }}>

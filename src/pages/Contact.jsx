@@ -4,6 +4,14 @@ import SiteFooter from '../components/SiteFooter'
 import PageHero, { gradText } from '../components/PageHero'
 
 const grad = 'linear-gradient(135deg,#8B2FC9,#E8237A)'
+
+const scrollBtnStyle = {
+  display: 'inline-flex', alignItems: 'center', gap: '.5rem',
+  padding: '.75rem 1.75rem', borderRadius: 50, border: '1.5px solid rgba(255,255,255,.2)',
+  background: 'rgba(255,255,255,.07)', backdropFilter: 'blur(12px)',
+  color: '#fff', fontSize: '.9rem', fontWeight: 600, cursor: 'pointer',
+  transition: 'background .2s, border-color .2s',
+}
 const WEB3FORMS_KEY = 'f9d9f98e-987b-495c-817a-4793c37ad351'
 
 const inputSt = {
@@ -56,9 +64,13 @@ export default function Contact() {
         badge="Nous contacter"
         title={<>Une question ? <span style={gradText}>Écris-moi.</span></>}
         subtitle="Je réponds personnellement à chaque message sous 48h."
-      />
+      >
+        <button onClick={() => document.getElementById('formulaire')?.scrollIntoView({ behavior: 'smooth' })} style={scrollBtnStyle}>
+          Écrire un message ↓
+        </button>
+      </PageHero>
 
-      <main style={{ maxWidth: 640, margin: '0 auto', padding: '4rem 1.5rem 6rem' }}>
+      <main id="formulaire" style={{ maxWidth: 640, margin: '0 auto', padding: '4rem 1.5rem 6rem' }}>
 
         {status === 'success' ? (
           <div style={{

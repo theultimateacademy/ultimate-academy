@@ -6,6 +6,14 @@ import SiteFooter from '../components/SiteFooter'
 
 import PageHero, { gradText } from '../components/PageHero'
 
+const scrollBtnStyle = {
+  display: 'inline-flex', alignItems: 'center', gap: '.5rem',
+  padding: '.75rem 1.75rem', borderRadius: 50, border: '1.5px solid rgba(255,255,255,.2)',
+  background: 'rgba(255,255,255,.07)', backdropFilter: 'blur(12px)',
+  color: '#fff', fontSize: '.9rem', fontWeight: 600, cursor: 'pointer',
+  transition: 'background .2s, border-color .2s',
+}
+
 function formatDate(iso) {
   return new Date(iso).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })
 }
@@ -58,9 +66,13 @@ export default function Blog() {
         badge="Blog Running"
         title={<>Conseils & <span style={gradText}>Programmes</span></>}
         subtitle="Articles et plans d'entraînement pour progresser en course à pied."
-      />
+      >
+        <button onClick={() => document.getElementById('contenu')?.scrollIntoView({ behavior: 'smooth' })} style={scrollBtnStyle}>
+          Voir les articles ↓
+        </button>
+      </PageHero>
 
-      <main style={{ maxWidth: 1140, margin: '0 auto', padding: '3.5rem 1.25rem 6rem' }}>
+      <main id="contenu" style={{ maxWidth: 1140, margin: '0 auto', padding: '3.5rem 1.25rem 6rem' }}>
 
         {/* Search bar */}
         <div style={{ maxWidth: 560, margin: '0 auto 3.5rem', position: 'relative' }}>
