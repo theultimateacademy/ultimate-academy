@@ -142,7 +142,7 @@ export default function Nav() {
               style={{ display: 'flex', alignItems: 'center', gap: '.3rem',
                 color: TOOLS.some(t => t.path === location.pathname) ? '#C084FC' : undefined,
                 fontWeight: TOOLS.some(t => t.path === location.pathname) ? 600 : undefined }}>
-              Outils gratuits
+              Calculateur
               <svg width="10" height="10" viewBox="0 0 10 10" fill="currentColor"
                 style={{ transition: 'transform .2s', transform: openTools ? 'rotate(180deg)' : 'none', opacity: .7 }}>
                 <path d="M1 3l4 4 4-4" stroke="currentColor" strokeWidth="1.5" fill="none" strokeLinecap="round"/>
@@ -205,7 +205,7 @@ export default function Nav() {
           <Link to="/ebooks" className="nav-mobile-link accent" onClick={() => setMobileMenu(false)}>Ebooks 📚</Link>
           <button className="nav-mobile-link accent"
             onClick={e => { e.stopPropagation(); setMobileTools(v => !v) }}>
-            Outils gratuits {mobileTools ? '▴' : '▾'}
+            Calculateur {mobileTools ? '▴' : '▾'}
           </button>
           {mobileTools && (
             <div className="nav-mobile-sub" onClick={e => e.stopPropagation()}>
