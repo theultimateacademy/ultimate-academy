@@ -5,6 +5,7 @@ import AthleteLayout from './components/Layout/AthleteLayout'
 import AdminLayout   from './components/Layout/AdminLayout'
 import CookieBanner  from './components/UI/CookieBanner'
 import ScrollToTop   from './components/ScrollToTop'
+import CanonicalTag  from './components/CanonicalTag'
 
 // Pages
 import Landing        from './pages/Landing'
@@ -131,6 +132,7 @@ export default function App() {
   return (
     <BrowserRouter>
       <ScrollToTop />
+      <CanonicalTag />
       <AuthProvider>
         <AppRoutes />
         <CookieBanner />
