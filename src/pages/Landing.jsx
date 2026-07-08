@@ -1,97 +1,212 @@
 import { Link, useNavigate } from 'react-router-dom'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useAuth } from '../contexts/AuthContext'
 import Nav from '../components/Nav'
 
 const TOOLS = [
-  { label: 'Temps de passage',     path: '/calculateur' },
-  { label: 'Calculateur de VMA',   path: '/calculateur/vma' },
+  { label: 'Temps de passage',        path: '/calculateur' },
+  { label: 'Calculateur de VMA',      path: '/calculateur/vma' },
   { label: 'Test de Cooper & VO2max', path: '/calculateur/vo2max' },
-  { label: 'Allures & zones FC',   path: '/calculateur/allures' },
-  { label: 'Estime ton chrono', path: '/calculateur/predicteur' },
+  { label: 'Allures & zones FC',      path: '/calculateur/allures' },
+  { label: 'Estime ton chrono',       path: '/calculateur/predicteur' },
 ]
 
 const FEATURES = [
-  { icon: '🎯', title: 'Plan sur-mesure',          desc: 'Conçu selon ton niveau, tes objectifs et tes disponibilités' },
-  { icon: '⚡', title: 'Adapté en continu',         desc: 'Ton plan évolue chaque semaine selon tes retours et ta progression' },
-  { icon: '💬', title: 'Coaching direct',           desc: 'Tu peux me contacter à tout moment, réponse sous 24h' },
-  { icon: '⌚', title: 'Synchro montre',            desc: 'Tes séances arrivent directement sur Garmin, Coros ou Suunto' },
-  { icon: '💪', title: 'Renforcement musculaire',   desc: 'Une séance de renfo adaptée chaque semaine pour courir plus fort' },
-  { icon: '🥗', title: 'Nutrition du sportif',      desc: 'Conseils et recettes adaptés à l\'endurance' },
-  { icon: '📊', title: 'Suivi de progression',      desc: 'Visualise tes progrès semaine après semaine' },
-  { icon: '🌸', title: 'Suivi cycle féminin',       desc: 'Adaptation automatique du plan selon ton cycle' },
+  { icon: '\U0001f3af', title: 'Plan sur-mesure',        desc: 'Conçu selon ton niveau, tes objectifs et tes disponibilités' },
+  { icon: '⚡',     title: 'Adapté en continu',       desc: 'Ton plan évolue chaque semaine selon tes retours et ta progression' },
+  { icon: '\U0001f4ac', title: 'Coaching direct',         desc: 'Tu peux me contacter à tout moment, réponse sous 24h' },
+  { icon: '⌚',     title: 'Synchro montre',          desc: 'Tes séances arrivent directement sur Garmin, Coros ou Suunto' },
+  { icon: '\U0001f4aa', title: 'Renforcement musculaire', desc: 'Une séance de renfo adaptée chaque semaine pour courir plus fort' },
+  { icon: '\U0001f957', title: 'Nutrition du sportif',    desc: "Conseils et recettes adaptés à l'endurance" },
+  { icon: '\U0001f4ca', title: 'Suivi de progression',   desc: 'Visualise tes progrès semaine après semaine' },
+  { icon: '\U0001f338', title: 'Suivi cycle féminin',    desc: 'Adaptation automatique du plan selon ton cycle' },
 ]
 
 const TESTIMONIALS = [
-  { name: 'Marin',    age: 22, role: 'Finisher Ironman · Prépa triathlon',             emoji: '🏊',  quote: "J'ai fini mon Ironman avec la prépa d'Alexis. Le plan était vraiment adapté à ma charge globale triathlon, je n'avais jamais couru aussi bien sans me blesser." },
-  { name: 'Amandine', age: 25, role: 'Finisher Ironman 70.3 · 10km en 49min',          emoji: '🏃‍♀️', quote: "En quelques mois, j'ai passé mon 10km sous les 50min et fini mon premier 70.3. Alexis a su cerner exactement ce dont j'avais besoin dès le départ." },
-  { name: 'Baptiste', age: 27, role: 'Semi en 1h24 · 10km en 37min',                   emoji: '⚡',  quote: "1h24 au semi et 37min sur 10km, des chronos que je n'aurais jamais crus possibles seul. Le suivi semaine par semaine fait vraiment la différence." },
-  { name: 'Anouk',    age: 25, role: 'Finisher Ironman 70.3 · 10km en 48min',          emoji: '🥇',  quote: "Mon 70.3 finisher et mon 10km en 48min, je les dois à Alexis. Il sait exactement comment doser la charge sans jamais te griller avant le jour J." },
-  { name: 'Dimitry',  age: 30, role: 'Finisher 50K Grand Raid Ventoux · Marathon',     emoji: '🏔️', quote: "Finisher du 50K Grand Raid Ventoux et d'un marathon dans la même saison. Je ne pensais vraiment pas que c'était à ma portée. Alexis m'a prouvé le contraire." },
-  { name: 'Lucas',    age: 19, role: 'Étudiant · Premier 10km finisher',               emoji: '🎓',  quote: "Je m'étais jamais vu finir un 10km entier. Quatre mois plus tard, j'ai franchi la ligne d'arrivée. Une fierté que j'avais pas du tout anticipée." },
-  { name: 'Céline',   age: 38, role: 'Reprise post-grossesse · Objectif semi',         emoji: '🌸',  quote: "Reprendre le sport après une grossesse c'est aussi mental que physique. Alexis n'a jamais forcé le rythme. Je prépare mon premier semi sereinement." },
-  { name: 'Romain',   age: 45, role: 'Cadre · Marathon en 3h45',                       emoji: '💼',  quote: "Boulot, famille, deux séances par semaine c'est tout ce que j'avais. Alexis en a fait quelque chose de solide. 3h45 au marathon, je l'avais vraiment pas vu venir." },
-  { name: 'Sofia',    age: 31, role: 'Crossfit → Trail · Première course montagne',    emoji: '⛰️', quote: "Du crossfit au trail, j'avais la condition mais pas les fondamentaux de course. Alexis a tout remis en ordre. Ma première course montagne s'est super bien passée." },
+  { name: 'Marin',    age: 22, role: 'Finisher Ironman · Prépa triathlon',          emoji: '\U0001f3ca', quote: "J'ai fini mon Ironman avec la prépa d'Alexis. Le plan était vraiment adapté à ma charge globale triathlon, je n'avais jamais couru aussi bien sans me blesser." },
+  { name: 'Amandine', age: 25, role: 'Finisher Ironman 70.3 · 10km en 49min',       emoji: '\U0001f3c3‍♀️', quote: "En quelques mois, j'ai passé mon 10km sous les 50min et fini mon premier 70.3. Alexis a su cerner exactement ce dont j'avais besoin dès le départ." },
+  { name: 'Baptiste', age: 27, role: 'Semi en 1h24 · 10km en 37min',                emoji: '⚡',  quote: "1h24 au semi et 37min sur 10km, des chronos que je n'aurais jamais crus possibles seul. Le suivi semaine par semaine fait vraiment la différence." },
+  { name: 'Anouk',    age: 25, role: 'Finisher Ironman 70.3 · 10km en 48min',       emoji: '\U0001f947', quote: "Mon 70.3 finisher et mon 10km en 48min, je les dois à Alexis. Il sait exactement comment doser la charge sans jamais te griller avant le jour J." },
+  { name: 'Dimitry',  age: 30, role: 'Finisher 50K Grand Raid Ventoux · Marathon',  emoji: '\U0001f3d4️', quote: "Finisher du 50K Grand Raid Ventoux et d'un marathon dans la même saison. Je ne pensais vraiment pas que c'était à ma portée. Alexis m'a prouvé le contraire." },
+  { name: 'Lucas',    age: 19, role: 'Étudiant · Premier 10km finisher',            emoji: '\U0001f393', quote: "Je m'étais jamais vu finir un 10km entier. Quatre mois plus tard, j'ai franchi la ligne d'arrivée. Une fierté que j'avais pas du tout anticipée." },
+  { name: 'Céline',   age: 38, role: 'Reprise post-grossesse · Objectif semi',      emoji: '\U0001f338', quote: "Reprendre le sport après une grossesse c'est aussi mental que physique. Alexis n'a jamais forcé le rythme. Je prépare mon premier semi sereinement." },
+  { name: 'Romain',   age: 45, role: 'Cadre · Marathon en 3h45',                    emoji: '\U0001f4bc', quote: "Boulot, famille, deux séances par semaine c'est tout ce que j'avais. Alexis en a fait quelque chose de solide. 3h45 au marathon, je l'avais vraiment pas vu venir." },
+  { name: 'Sofia',    age: 31, role: 'Crossfit → Trail · Première course montagne', emoji: '⛰️', quote: "Du crossfit au trail, j'avais la condition mais pas les fondamentaux de course. Alexis a tout remis en ordre. Ma première course montagne s'est super bien passée." },
 ]
-const TESTIMONIALS_LOOP = [...TESTIMONIALS, ...TESTIMONIALS]
 
 const FAQ = [
-  {
-    q: "Pour quel niveau de coureur est ce coaching ?",
-    a: "Tous les niveaux sont les bienvenus, du grand débutant qui n'a jamais couru 5 km jusqu'au coureur confirmé qui vise un ultra. Ce qui compte, c'est ton engagement et ton objectif : le plan s'adapte à toi, pas l'inverse.",
-  },
-  {
-    q: "Comment se passe le suivi au quotidien ?",
-    a: "Chaque semaine, j'analyse tes séances, ta charge et tes retours. Je t'envoie un bilan personnalisé avec mes observations et j'ajuste le programme si nécessaire. Tu peux aussi m'écrire directement via la messagerie à tout moment.",
-  },
-  {
-    q: "En combien de temps vais-je voir des résultats ?",
-    a: "Les premières sensations changent souvent dès 3 à 4 semaines. Des progrès mesurables (chrono, distance, facilité perçue) arrivent généralement entre 6 et 10 semaines selon le point de départ. La régularité est le seul vrai levier.",
-  },
-  {
-    q: "Puis-je annuler mon abonnement à tout moment ?",
-    a: "Oui, sans préavis ni justification. Tu annules depuis ton espace, l'abonnement reste actif jusqu'à la fin de la période en cours, puis s'arrête. Aucun frais caché, aucune fidélisation forcée.",
-  },
-  {
-    q: "Que se passe-t-il si je me blesse ou dois m'arrêter ?",
-    a: "On adapte immédiatement. Une blessure n'est pas une raison d'abandonner le suivi : on travaille ensemble sur la récupération, le maintien de la condition et la reprise progressive. Tu n'es pas livré à toi-même.",
-  },
-  {
-    q: "Combien de temps d'entraînement faut-il prévoir par semaine ?",
-    a: "De 2 à 6 séances selon tes disponibilités et ton objectif. Je construis le plan autour de ton emploi du temps réel, pas d'un idéal théorique. 3 séances bien faites valent mieux que 6 séances bâclées.",
-  },
-  {
-    q: "La connexion Strava est-elle obligatoire ?",
-    a: "Non, elle n'est pas obligatoire. Si tu n'utilises pas Strava, tu peux simplement me partager tes données manuellement via la messagerie. L'important c'est l'information, pas l'outil.",
-  },
+  { q: "Pour quel niveau de coureur est ce coaching ?",      a: "Tous les niveaux sont les bienvenus, du grand débutant qui n'a jamais couru 5 km jusqu'au coureur confirmé qui vise un ultra. Ce qui compte, c'est ton engagement et ton objectif : le plan s'adapte à toi, pas l'inverse." },
+  { q: "Comment se passe le suivi au quotidien ?",           a: "Chaque semaine, j'analyse tes séances, ta charge et tes retours. Je t'envoie un bilan personnalisé avec mes observations et j'ajuste le programme si nécessaire. Tu peux aussi m'écrire directement via la messagerie à tout moment." },
+  { q: "En combien de temps vais-je voir des résultats ?",   a: "Les premières sensations changent souvent dès 3 à 4 semaines. Des progrès mesurables (chrono, distance, facilité perçue) arrivent généralement entre 6 et 10 semaines selon le point de départ. La régularité est le seul vrai levier." },
+  { q: "Puis-je annuler mon abonnement à tout moment ?",     a: "Oui, sans préavis ni justification. Tu annules depuis ton espace, l'abonnement reste actif jusqu'à la fin de la période en cours, puis s'arrête. Aucun frais caché, aucune fidélisation forcée." },
+  { q: "Que se passe-t-il si je me blesse ou dois m'arrêter ?", a: "On adapte immédiatement. Une blessure n'est pas une raison d'abandonner le suivi : on travaille ensemble sur la récupération, le maintien de la condition et la reprise progressive. Tu n'es pas livré à toi-même." },
+  { q: "Combien de temps d'entraînement faut-il prévoir par semaine ?", a: "De 2 à 6 séances selon tes disponibilités et ton objectif. Je construis le plan autour de ton emploi du temps réel, pas d'un idéal théorique. 3 séances bien faites valent mieux que 6 séances bâclées." },
+  { q: "La connexion Strava est-elle obligatoire ?",         a: "Non, elle n'est pas obligatoire. Si tu n'utilises pas Strava, tu peux simplement me partager tes données manuellement via la messagerie. L'important c'est l'information, pas l'outil." },
 ]
 
+const CAROUSEL_PAGES = [TESTIMONIALS.slice(0,3), TESTIMONIALS.slice(3,6), TESTIMONIALS.slice(6,9)]
 
-const gd = (text) => ({
+const PARTICLES = Array.from({ length: 20 }, (_, i) => ({
+  id: i,
+  x: 5 + (i * 4.7) % 90,
+  y: 5 + (i * 7.3) % 85,
+  size: 2 + (i % 3),
+  opacity: 0.2 + (i % 5) * 0.07,
+  duration: 8 + (i % 8),
+  delay: -(i % 6),
+}))
+
+const gd = () => ({
   background: 'linear-gradient(135deg, #8B2FC9 0%, #E8237A 100%)',
   WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text',
   display: 'inline',
 })
+const grad = 'linear-gradient(135deg,#8B2FC9,#E8237A)'
+
+const ANIMATIONS = `
+@keyframes gradientShift {
+  0%   { background-position: 0% 50% }
+  50%  { background-position: 100% 50% }
+  100% { background-position: 0% 50% }
+}
+@keyframes floatParticle {
+  0%   { transform: translateY(0px) translateX(0px) }
+  33%  { transform: translateY(-28px) translateX(18px) }
+  66%  { transform: translateY(-8px) translateX(-14px) }
+  100% { transform: translateY(0px) translateX(0px) }
+}
+@keyframes runnerDot {
+  0%   { left: -1% }
+  100% { left: 101% }
+}
+@keyframes slideUpFade {
+  from { opacity: 0; transform: translateY(32px) }
+  to   { opacity: 1; transform: translateY(0) }
+}
+@keyframes bounceScroll {
+  0%, 100% { transform: translateX(-50%) translateY(0) }
+  50%       { transform: translateX(-50%) translateY(10px) }
+}
+@keyframes shimmer {
+  0%   { background-position: -200% center }
+  100% { background-position:  200% center }
+}
+@keyframes pricePulse {
+  0%, 100% { box-shadow: 0 0 30px rgba(139,47,201,.35), 0 0 60px rgba(232,35,122,.15), 0 24px 48px rgba(0,0,0,.5) }
+  50%       { box-shadow: 0 0 55px rgba(139,47,201,.6),  0 0 100px rgba(232,35,122,.3), 0 24px 48px rgba(0,0,0,.5) }
+}
+@keyframes badgePop {
+  from { opacity: 0; transform: scale(0.75) }
+  to   { opacity: 1; transform: scale(1) }
+}
+@keyframes trialBlink {
+  0%, 100% { opacity: 1 }
+  50%       { opacity: 0.65 }
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+`
+
+function useOnScreen(ref, threshold = 0.2) {
+  const [visible, setVisible] = useState(false)
+  useEffect(() => {
+    const el = ref.current
+    if (!el) return
+    const obs = new IntersectionObserver(([e]) => { if (e.isIntersecting) { setVisible(true); obs.disconnect() } }, { threshold })
+    obs.observe(el)
+    return () => obs.disconnect()
+  }, [])
+  return visible
+}
+
+function animateCounter(from, to, duration, onUpdate) {
+  const start = performance.now()
+  const tick = (now) => {
+    const t = Math.min((now - start) / duration, 1)
+    const eased = 1 - Math.pow(1 - t, 3)
+    onUpdate(from + (to - from) * eased)
+    if (t < 1) requestAnimationFrame(tick)
+  }
+  requestAnimationFrame(tick)
+}
 
 export default function Landing() {
   const { user, isCoach } = useAuth()
   const navigate = useNavigate()
   const [openFaq, setOpenFaq] = useState(null)
+  const [heroIn, setHeroIn] = useState(false)
+  const [scrolled, setScrolled] = useState(false)
+  const [counts, setCounts] = useState({ a: 0, r: 0, s: 0, w: 0 })
+  const [statsStarted, setStatsStarted] = useState(false)
+  const [carouselIdx, setCarouselIdx] = useState(0)
+  const [carouselPaused, setCarouselPaused] = useState(false)
+  const [visibleFeatures, setVisibleFeatures] = useState(new Set())
+  const [coachIn, setCoachIn] = useState(false)
+
+  const statsRef  = useRef(null)
+  const featRef   = useRef(null)
+  const coachRef  = useRef(null)
+  const timerRef  = useRef(null)
+
+  const statsVisible = useOnScreen(statsRef)
+  const featVisible  = useOnScreen(featRef, 0.1)
+  const coachVisible = useOnScreen(coachRef, 0.15)
+
+  useEffect(() => { setTimeout(() => setHeroIn(true), 80) }, [])
 
   useEffect(() => {
-    const hash = window.location.hash.replace('#', '')
-    if (hash) setTimeout(() => document.getElementById(hash)?.scrollIntoView({ behavior: 'smooth' }), 120)
+    const onScroll = () => setScrolled(window.scrollY > 60)
+    window.addEventListener('scroll', onScroll, { passive: true })
+    return () => window.removeEventListener('scroll', onScroll)
   }, [])
+
+  useEffect(() => {
+    if (!statsVisible || statsStarted) return
+    setStatsStarted(true)
+    animateCounter(0, 70,  2000, v => setCounts(c => ({ ...c, a: v })))
+    animateCounter(0, 4.9, 2000, v => setCounts(c => ({ ...c, r: v })))
+    animateCounter(0, 93,  2000, v => setCounts(c => ({ ...c, s: v })))
+    animateCounter(0, 12,  2000, v => setCounts(c => ({ ...c, w: v })))
+  }, [statsVisible, statsStarted])
+
+  useEffect(() => {
+    if (!featVisible) return
+    FEATURES.forEach((_, i) => {
+      setTimeout(() => setVisibleFeatures(prev => new Set([...prev, i])), i * 100)
+    })
+  }, [featVisible])
+
+  useEffect(() => { if (coachVisible) setCoachIn(true) }, [coachVisible])
+
+  useEffect(() => {
+    if (carouselPaused) { clearInterval(timerRef.current); return }
+    timerRef.current = setInterval(() => {
+      setCarouselIdx(i => (i + 1) % CAROUSEL_PAGES.length)
+    }, 4000)
+    return () => clearInterval(timerRef.current)
+  }, [carouselPaused])
 
   const handleCTA = () => {
     if (!user) { navigate('/register'); return }
     navigate(isCoach ? '/admin' : '/app/home')
   }
-
   const scrollTo = (id) => document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' })
+
+  const statItems = [
+    { val: Math.floor(counts.a),                               suffix: '+',     label: 'Athlètes accompagnés', pct: 70 },
+    { val: counts.r.toFixed(counts.r >= 4.9 ? 1 : 1),         suffix: '/5',    label: 'Satisfaction',         pct: 98 },
+    { val: Math.floor(counts.s),                               suffix: '%',     label: 'Objectifs atteints',   pct: 93 },
+    { val: Math.floor(counts.w),                               suffix: ' sem.', label: 'Durée moyenne',        pct: 80 },
+  ]
 
   return (
     <div style={{ background: '#000', color: '#fff', overflowX: 'hidden' }}>
+      <style>{ANIMATIONS}</style>
       <Nav />
 
       {/* ── HERO ─────────────────────────────────────────────── */}
@@ -99,38 +214,73 @@ export default function Landing() {
         minHeight: '100dvh', display: 'flex', flexDirection: 'column',
         alignItems: 'center', justifyContent: 'center', textAlign: 'center',
         padding: '7rem 1.5rem 4rem', position: 'relative', overflow: 'hidden',
-        background: 'radial-gradient(ellipse at 50% 45%, rgba(139,47,201,.18) 0%, rgba(232,35,122,.10) 42%, transparent 68%), #0C0A18',
+        background: 'linear-gradient(-45deg, #0a0a0a, #1a0a2e, #2d0a4e, #8B2FC9, #E8237A, #1a0a2e, #0a0a0a)',
+        backgroundSize: '400% 400%',
+        animation: 'gradientShift 8s ease infinite',
       }}>
-        {/* Glow accent secondaire */}
+        {/* Particules */}
+        {PARTICLES.map(p => (
+          <div key={p.id} style={{
+            position: 'absolute', left: `${p.x}%`, top: `${p.y}%`,
+            width: p.size, height: p.size, borderRadius: '50%',
+            background: '#fff', opacity: p.opacity, pointerEvents: 'none',
+            willChange: 'transform',
+            animation: `floatParticle ${p.duration}s ${p.delay}s ease-in-out infinite`,
+          }} />
+        ))}
+
+        {/* Glow rose */}
         <div style={{
           position: 'absolute', top: '60%', left: '65%', transform: 'translate(-50%,-50%)',
           width: 600, height: 500, pointerEvents: 'none',
-          background: 'radial-gradient(ellipse, rgba(232,35,122,.07) 0%, transparent 65%)',
-        }} />
-        <div style={{
-          position: 'absolute', bottom: 0, left: 0, right: 0, height: 1,
-          background: 'linear-gradient(90deg, transparent, #8B2FC9, #E8237A, transparent)',
+          background: 'radial-gradient(ellipse, rgba(232,35,122,.09) 0%, transparent 65%)',
         }} />
 
+        {/* Contenu hero */}
         <div style={{ position: 'relative', zIndex: 1, maxWidth: 900 }}>
-          <h1 style={{
-            fontSize: 'clamp(3.5rem, 10vw, 7rem)', fontWeight: 800,
-            letterSpacing: '-0.04em', lineHeight: 1.05, marginBottom: '1.75rem',
-          }}>
-            Cours plus vite,<br />
-            <span style={gd()}>va plus loin.</span>
+          <h1 style={{ fontSize: 'clamp(3.5rem, 10vw, 7rem)', fontWeight: 800, letterSpacing: '-0.04em', lineHeight: 1.05, marginBottom: '1.75rem' }}>
+            <span style={{
+              display: 'block',
+              opacity: heroIn ? 1 : 0,
+              transform: heroIn ? 'translateY(0)' : 'translateY(32px)',
+              transition: 'opacity 0.8s ease, transform 0.8s ease',
+            }}>Cours plus vite,</span>
+            <span style={{
+              display: 'block',
+              opacity: heroIn ? 1 : 0,
+              transform: heroIn ? 'translateY(0)' : 'translateY(32px)',
+              transition: 'opacity 0.8s 0.3s ease, transform 0.8s 0.3s ease',
+              ...gd(),
+            }}>va plus loin.</span>
           </h1>
 
           <p style={{
             color: 'rgba(255,255,255,.6)', fontSize: 'clamp(1.05rem, 2.5vw, 1.3rem)',
             maxWidth: 560, margin: '0 auto 2.75rem', lineHeight: 1.8,
+            opacity: heroIn ? 1 : 0, transform: heroIn ? 'translateY(0)' : 'translateY(24px)',
+            transition: 'opacity 0.8s 0.6s ease, transform 0.8s 0.6s ease',
           }}>
             Je conçois ton plan sur-mesure, suis ta progression semaine après semaine
             et t'accompagne jusqu'à ton objectif, du 5 km au marathon.
           </p>
 
-          <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center', flexWrap: 'wrap' }}>
-            <button onClick={handleCTA} className="btn-liquid-primary">
+          <div style={{
+            display: 'flex', gap: '1rem', justifyContent: 'center', flexWrap: 'wrap',
+            opacity: heroIn ? 1 : 0, transform: heroIn ? 'translateY(0)' : 'translateY(20px)',
+            transition: 'opacity 0.8s 0.9s ease, transform 0.8s 0.9s ease',
+          }}>
+            <button onClick={handleCTA} style={{
+              padding: '.85rem 2rem', borderRadius: 99, border: 'none', cursor: 'pointer',
+              fontWeight: 800, fontSize: '1rem', fontFamily: 'inherit', color: '#fff',
+              background: `linear-gradient(90deg, #8B2FC9, #E8237A, #8B2FC9)`,
+              backgroundSize: '200% auto',
+              animation: 'shimmer 3s linear infinite',
+              boxShadow: '0 8px 28px rgba(232,35,122,.4)',
+              transition: 'transform .2s, box-shadow .2s',
+              willChange: 'transform',
+            }}
+              onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-3px)'; e.currentTarget.style.boxShadow = '0 14px 36px rgba(232,35,122,.55)' }}
+              onMouseLeave={e => { e.currentTarget.style.transform = ''; e.currentTarget.style.boxShadow = '0 8px 28px rgba(232,35,122,.4)' }}>
               Je veux progresser →
             </button>
             <button onClick={() => scrollTo('coach')} className="btn-liquid-ghost">
@@ -139,30 +289,60 @@ export default function Landing() {
           </div>
         </div>
 
-        <div style={{
-          position: 'absolute', bottom: '2rem', left: '50%', transform: 'translateX(-50%)',
-          color: 'rgba(255,255,255,.3)', fontSize: '1.4rem',
-          animation: 'floatDown 2s ease-in-out infinite',
-        }}>↓</div>
+        {/* Ligne de course */}
+        <div style={{ position: 'absolute', bottom: '5.5rem', left: 0, right: 0, height: 1, background: 'rgba(255,255,255,.08)' }}>
+          <div style={{
+            position: 'absolute', top: -3, width: 7, height: 7, borderRadius: '50%',
+            background: grad, boxShadow: '0 0 10px rgba(232,35,122,.8)',
+            animation: 'runnerDot 3s linear infinite',
+            willChange: 'left',
+          }} />
+        </div>
+
+        {/* Scroll indicator */}
+        {!scrolled && (
+          <div style={{
+            position: 'absolute', bottom: '2rem', left: '50%',
+            animation: 'bounceScroll 2s ease-in-out infinite',
+            cursor: 'pointer', zIndex: 2,
+          }} onClick={() => scrollTo('stats')}>
+            <div style={{
+              width: 36, height: 36, borderRadius: '50%',
+              border: '1.5px solid rgba(139,47,201,.5)',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              color: 'rgba(255,255,255,.45)', fontSize: '1rem',
+              backdropFilter: 'blur(4px)',
+            }}>↓</div>
+          </div>
+        )}
       </header>
 
       {/* ── STATS ────────────────────────────────────────────── */}
-      <section style={{
-        background: '#0A0A0A', padding: '2.5rem 1.5rem',
+      <section id="stats" ref={statsRef} style={{
+        background: '#0A0A0A', padding: '3rem 1.5rem',
         borderTop: '1px solid rgba(255,255,255,.06)', borderBottom: '1px solid rgba(255,255,255,.06)',
       }}>
         <div style={{ maxWidth: 900, margin: '0 auto', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))', gap: '1.5rem', textAlign: 'center' }}>
-          {[['70+','Athlètes accompagnés'],['4.9/5','Satisfaction'],['93%','Objectifs atteints'],['12 sem.','Durée moyenne']].map(([val,lbl]) => (
-            <div key={lbl}>
-              <div style={{ fontSize: 'clamp(1.8rem,4vw,2.5rem)', fontWeight: 800, letterSpacing: '-0.02em', ...gd() }}>{val}</div>
-              <div style={{ color: 'rgba(255,255,255,.45)', fontSize: '.85rem', marginTop: '.3rem' }}>{lbl}</div>
+          {statItems.map(({ val, suffix, label, pct }) => (
+            <div key={label}>
+              <div style={{ fontSize: 'clamp(1.8rem,4vw,2.5rem)', fontWeight: 800, letterSpacing: '-0.02em', ...gd() }}>
+                {val}{suffix}
+              </div>
+              <div style={{ color: 'rgba(255,255,255,.45)', fontSize: '.85rem', marginTop: '.3rem', marginBottom: '.65rem' }}>{label}</div>
+              <div style={{ height: 3, borderRadius: 2, background: 'rgba(255,255,255,.08)', overflow: 'hidden' }}>
+                <div style={{
+                  height: '100%', borderRadius: 2, background: grad,
+                  width: statsStarted ? `${pct}%` : '0%',
+                  transition: 'width 2s cubic-bezier(0.25,0.46,0.45,0.94)',
+                }} />
+              </div>
             </div>
           ))}
         </div>
       </section>
 
-      {/* ── FEATURES BENTO ───────────────────────────────────── */}
-      <section id="features" style={{ padding: '6rem 1.5rem', background: '#000', borderTop: '1px solid rgba(255,255,255,.06)' }}>
+      {/* ── FEATURES ─────────────────────────────────────────── */}
+      <section id="features" ref={featRef} style={{ padding: '6rem 1.5rem', background: '#000', borderTop: '1px solid rgba(255,255,255,.06)' }}>
         <div className="container">
           <div style={{ textAlign: 'center', marginBottom: '3.5rem' }}>
             <h2 style={{ fontSize: 'clamp(2rem,5vw,3rem)', fontWeight: 800, letterSpacing: '-0.02em', marginBottom: '.75rem' }}>
@@ -171,35 +351,52 @@ export default function Landing() {
             <p style={{ color: 'rgba(255,255,255,.4)', fontSize: '1rem' }}>Un accompagnement complet pour progresser intelligemment</p>
           </div>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '.75rem' }}>
-            {FEATURES.map(f => (
-              <div key={f.title} style={{
-                display: 'flex', alignItems: 'flex-start', gap: '1rem', padding: '1.1rem 1.25rem',
-                borderRadius: 18, background: 'rgba(255,255,255,.04)',
-                border: '1px solid rgba(255,255,255,.08)',
-                backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)',
-                transition: 'border-color .2s',
-              }}>
-                <div style={{ fontSize: '1.6rem', flexShrink: 0, marginTop: '.1rem' }}>{f.icon}</div>
-                <div>
-                  <div style={{ fontWeight: 700, fontSize: '.95rem', color: '#fff', marginBottom: '.25rem' }}>{f.title}</div>
-                  <div style={{ fontSize: '.82rem', color: 'rgba(255,255,255,.45)', lineHeight: 1.6 }}>{f.desc}</div>
+            {FEATURES.map((f, i) => {
+              const vis = visibleFeatures.has(i)
+              return (
+                <div key={f.title} style={{
+                  display: 'flex', alignItems: 'flex-start', gap: '1rem', padding: '1.1rem 1.25rem',
+                  borderRadius: 18, background: 'rgba(255,255,255,.04)',
+                  border: '1px solid rgba(255,255,255,.08)',
+                  backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)',
+                  transition: 'border-color .25s, transform .25s, box-shadow .25s, opacity 0.6s ease, transform 0.6s ease',
+                  opacity: vis ? 1 : 0,
+                  transform: vis ? 'translateY(0)' : 'translateY(28px)',
+                  transitionDelay: `${i * 80}ms`,
+                  willChange: 'transform, opacity',
+                }}
+                  onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-4px)'; e.currentTarget.style.borderColor = 'rgba(139,47,201,.45)'; e.currentTarget.style.boxShadow = '0 8px 32px rgba(139,47,201,.2)' }}
+                  onMouseLeave={e => { e.currentTarget.style.transform = vis ? 'translateY(0)' : 'translateY(28px)'; e.currentTarget.style.borderColor = 'rgba(255,255,255,.08)'; e.currentTarget.style.boxShadow = '' }}>
+                  <div style={{ fontSize: '1.6rem', flexShrink: 0, marginTop: '.1rem' }}>{f.icon}</div>
+                  <div>
+                    <div style={{ fontWeight: 700, fontSize: '.95rem', color: '#fff', marginBottom: '.25rem' }}>{f.title}</div>
+                    <div style={{ fontSize: '.82rem', color: 'rgba(255,255,255,.45)', lineHeight: 1.6 }}>{f.desc}</div>
+                  </div>
                 </div>
-              </div>
-            ))}
+              )
+            })}
           </div>
         </div>
       </section>
 
       {/* ── COACH ────────────────────────────────────────────── */}
-      <section id="coach" style={{ padding: '6rem 1.5rem', background: '#0A0A0A', borderTop: '1px solid rgba(255,255,255,.06)' }}>
+      <section id="coach" ref={coachRef} style={{ padding: '6rem 1.5rem', background: '#0A0A0A', borderTop: '1px solid rgba(255,255,255,.06)' }}>
         <div className="container" style={{ maxWidth: 960 }}>
           <div style={{ display: 'flex', gap: '4rem', alignItems: 'center', flexWrap: 'wrap' }}>
-            <div style={{ flexShrink: 0, width: 'min(100%, 300px)' }}>
-              <div style={{ borderRadius: 28, overflow: 'hidden', position: 'relative',
+            <div style={{
+              flexShrink: 0, width: 'min(100%, 300px)',
+              opacity: coachIn ? 1 : 0,
+              transform: coachIn ? 'translateX(0)' : 'translateX(-40px)',
+              transition: 'opacity 0.8s ease, transform 0.8s ease',
+              willChange: 'transform, opacity',
+            }}>
+              <div style={{
+                borderRadius: 28, overflow: 'hidden', position: 'relative',
                 boxShadow: '0 0 60px rgba(232,35,122,.25), 0 32px 64px rgba(0,0,0,.5)',
-                border: '1px solid rgba(255,255,255,.12)' }}>
+                border: '1px solid rgba(255,255,255,.12)',
+              }}>
                 <img src="/Coach.JPG" alt="Alexis" style={{ width: '100%', display: 'block', objectFit: 'cover', aspectRatio: '3/4' }} />
-                <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: 3, background: 'linear-gradient(90deg,#8B2FC9,#E8237A)' }} />
+                <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: 3, background: grad }} />
               </div>
             </div>
             <div style={{ flex: 1, minWidth: 260 }}>
@@ -219,11 +416,22 @@ export default function Landing() {
                 ))}
               </div>
               <div style={{ display: 'flex', flexWrap: 'wrap', gap: '.6rem', marginTop: '2rem' }}>
-                {[['🏃','10km en 34min'],['🥈','Semi en 1h19'],['🏔️','126km / 6500m D+'],['🎿','Moniteur de ski'],['🎓','Éducateur sportif · STAPS']].map(([icon,label]) => (
-                  <div key={label} style={{ display: 'flex', alignItems: 'center', gap: '.4rem',
+                {[
+                  ['\U0001f3c3','10km en 34min'],
+                  ['\U0001f948','Semi en 1h19'],
+                  ['\U0001f3d4️','126km / 6500m D+'],
+                  ['\U0001f3bf','Moniteur de ski'],
+                  ['\U0001f393','Éducateur sportif · STAPS'],
+                ].map(([icon, label], idx) => (
+                  <div key={label} style={{
+                    display: 'flex', alignItems: 'center', gap: '.4rem',
                     padding: '.4rem .9rem', borderRadius: 99,
                     background: 'rgba(255,255,255,.06)', border: '1px solid rgba(255,255,255,.1)',
-                    fontSize: '.8rem', fontWeight: 500, color: 'rgba(255,255,255,.8)' }}>
+                    fontSize: '.8rem', fontWeight: 500, color: 'rgba(255,255,255,.8)',
+                    opacity: coachIn ? 1 : 0,
+                    transform: coachIn ? 'scale(1)' : 'scale(0.8)',
+                    transition: `opacity 0.5s ${300 + idx * 100}ms ease, transform 0.5s ${300 + idx * 100}ms ease`,
+                  }}>
                     <span>{icon}</span> {label}
                   </div>
                 ))}
@@ -246,31 +454,42 @@ export default function Landing() {
             <p style={{ color: 'rgba(255,255,255,.4)', fontSize: '1rem' }}>Tout ce qu'il faut pour progresser. Rien de superflu.</p>
           </div>
 
-          <div className="pricing-card pricing-card--featured" style={{ padding: '3rem 2.5rem' }}>
-            <div style={{ position: 'absolute', top: '-1px', left: '50%', transform: 'translateX(-50%)',
-              background: 'linear-gradient(135deg,#8B2FC9,#E8237A)', color: '#fff',
+          <div className="pricing-card pricing-card--featured" style={{
+            padding: '3rem 2.5rem',
+            animation: 'pricePulse 3s ease-in-out infinite',
+          }}>
+            <div style={{
+              position: 'absolute', top: '-1px', left: '50%', transform: 'translateX(-50%)',
+              background: grad, color: '#fff',
               fontSize: '.72rem', fontWeight: 700, padding: '.35rem 1.6rem', borderRadius: '0 0 14px 14px',
-              letterSpacing: '.07em', textTransform: 'uppercase', whiteSpace: 'nowrap' }}>
+              letterSpacing: '.07em', textTransform: 'uppercase', whiteSpace: 'nowrap',
+              animation: 'trialBlink 2.5s ease-in-out infinite',
+            }}>
               14 jours d'essai gratuit
             </div>
 
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(260px,100%),1fr))', gap: '3rem', alignItems: 'center', marginTop: '.5rem' }}>
-
               <div style={{ textAlign: 'center' }}>
-                <div style={{ fontSize: '.78rem', fontWeight: 700, color: 'rgba(255,255,255,.55)', letterSpacing: '.12em', textTransform: 'uppercase', marginBottom: '1rem', textAlign: 'center', width: '100%' }}>
+                <div style={{ fontSize: '.78rem', fontWeight: 700, color: 'rgba(255,255,255,.55)', letterSpacing: '.12em', textTransform: 'uppercase', marginBottom: '1rem' }}>
                   Coaching Personnalisé
                 </div>
                 <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'center', gap: '.4rem', marginBottom: '.3rem' }}>
                   <span className="price-amount">30€</span>
                   <span className="price-period">/mois</span>
                 </div>
-                <p style={{ color: 'rgba(255,255,255,.65)', fontSize: '.85rem', marginBottom: '.4rem', lineHeight: 1.6 }}>
-                  après 14 jours offerts
-                </p>
-                <p style={{ color: 'rgba(255,255,255,.5)', fontSize: '.78rem', marginBottom: '2rem', lineHeight: 1.5 }}>
-                  Sans engagement. Annule à tout moment.
-                </p>
-                <button onClick={handleCTA} className="btn-liquid-primary" style={{ width: '100%', fontSize: '1rem', padding: '1rem 1.5rem' }}>
+                <p style={{ color: 'rgba(255,255,255,.65)', fontSize: '.85rem', marginBottom: '.4rem', lineHeight: 1.6 }}>après 14 jours offerts</p>
+                <p style={{ color: 'rgba(255,255,255,.5)', fontSize: '.78rem', marginBottom: '2rem', lineHeight: 1.5 }}>Sans engagement. Annule à tout moment.</p>
+                <button onClick={handleCTA} style={{
+                  width: '100%', padding: '1rem 1.5rem', borderRadius: 99, border: 'none', cursor: 'pointer',
+                  fontWeight: 800, fontSize: '1rem', fontFamily: 'inherit', color: '#fff',
+                  background: 'linear-gradient(90deg, #8B2FC9, #E8237A, #8B2FC9)',
+                  backgroundSize: '200% auto',
+                  animation: 'shimmer 2.5s linear infinite',
+                  boxShadow: '0 8px 28px rgba(232,35,122,.4)',
+                  transition: 'transform .2s',
+                }}
+                  onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-2px)' }}
+                  onMouseLeave={e => { e.currentTarget.style.transform = '' }}>
                   Commencer gratuitement →
                 </button>
                 <p style={{ color: 'rgba(255,255,255,.45)', fontSize: '.72rem', marginTop: '.75rem' }}>
@@ -292,34 +511,86 @@ export default function Landing() {
                   </div>
                 ))}
               </div>
-
             </div>
           </div>
-
         </div>
       </section>
 
-      {/* ── TESTIMONIALS ─────────────────────────────────────── */}
-      <section id="resultats" style={{ padding: '5rem 0', background: '#0A0A0A', overflow: 'hidden', borderTop: '1px solid rgba(255,255,255,.06)' }}>
-        <div style={{ textAlign: 'center', marginBottom: '2.5rem', padding: '0 1.5rem' }}>
+      {/* ── TESTIMONIALS CAROUSEL ────────────────────────────── */}
+      <section id="resultats" style={{ padding: '5rem 1.5rem', background: '#0A0A0A', overflow: 'hidden', borderTop: '1px solid rgba(255,255,255,.06)' }}>
+        <div style={{ textAlign: 'center', marginBottom: '2.5rem' }}>
           <h2 style={{ fontSize: 'clamp(1.8rem,4vw,2.8rem)', fontWeight: 800, letterSpacing: '-0.02em', marginBottom: '.5rem' }}>
             Ils l'ont <span style={gd()}>fait</span>
           </h2>
           <p style={{ color: 'rgba(255,255,255,.4)', fontSize: '1rem' }}>Des vrais résultats, de vraies personnes</p>
         </div>
-        <div className="testimonials-viewport">
-          <div className="testimonials-track">
-            {TESTIMONIALS_LOOP.map((t, i) => (
-              <div key={i} className="testimonial-card">
-                <div style={{ fontSize: '2rem', marginBottom: '.75rem' }}>{t.emoji}</div>
-                <p style={{ fontSize: '.9375rem', lineHeight: 1.75, color: 'rgba(255,255,255,.65)', fontStyle: 'italic', marginBottom: '1rem', flex: 1 }}>
-                  "{t.quote}"
-                </p>
-                <div>
-                  <div style={{ fontWeight: 700, color: '#fff', fontSize: '.9375rem' }}>{t.name}{t.age ? `, ${t.age} ans` : ''}</div>
-                  <div style={{ fontSize: '.78rem', marginTop: '.2rem', fontWeight: 600, ...gd() }}>{t.role}</div>
+
+        <div style={{ maxWidth: 1100, margin: '0 auto', position: 'relative' }}
+          onMouseEnter={() => setCarouselPaused(true)}
+          onMouseLeave={() => setCarouselPaused(false)}>
+
+          {/* Flèches */}
+          {[[-1,'←'],[1,'→']].map(([dir, arrow]) => (
+            <button key={dir} onClick={() => setCarouselIdx(i => (i + dir + CAROUSEL_PAGES.length) % CAROUSEL_PAGES.length)}
+              style={{
+                position: 'absolute', top: '50%', transform: 'translateY(-50%)',
+                [dir === -1 ? 'left' : 'right']: -20,
+                zIndex: 10, width: 40, height: 40, borderRadius: '50%', border: 'none', cursor: 'pointer',
+                background: 'rgba(255,255,255,.08)', color: 'rgba(255,255,255,.6)',
+                fontSize: '1.1rem', display: 'flex', alignItems: 'center', justifyContent: 'center',
+                transition: 'background .2s',
+                backdropFilter: 'blur(8px)',
+              }}
+              onMouseEnter={e => e.currentTarget.style.background = 'rgba(139,47,201,.35)'}
+              onMouseLeave={e => e.currentTarget.style.background = 'rgba(255,255,255,.08)'}>
+              {arrow}
+            </button>
+          ))}
+
+          {/* Track */}
+          <div style={{ overflow: 'hidden', borderRadius: 16 }}>
+            <div style={{
+              display: 'flex',
+              transform: `translateX(-${carouselIdx * 100}%)`,
+              transition: 'transform 0.6s cubic-bezier(0.25,0.46,0.45,0.94)',
+              willChange: 'transform',
+            }}>
+              {CAROUSEL_PAGES.map((page, pi) => (
+                <div key={pi} style={{
+                  minWidth: '100%', display: 'grid',
+                  gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '1rem',
+                }}>
+                  {page.map((t, ti) => (
+                    <div key={ti} style={{
+                      background: 'rgba(255,255,255,.04)', border: '1px solid rgba(255,255,255,.08)',
+                      borderRadius: 20, padding: '1.75rem', display: 'flex', flexDirection: 'column',
+                      backdropFilter: 'blur(12px)',
+                    }}>
+                      <div style={{ fontSize: '2rem', marginBottom: '.75rem' }}>{t.emoji}</div>
+                      <p style={{ fontSize: '.9375rem', lineHeight: 1.75, color: 'rgba(255,255,255,.65)', fontStyle: 'italic', marginBottom: '1rem', flex: 1 }}>
+                        "{t.quote}"
+                      </p>
+                      <div>
+                        <div style={{ fontWeight: 700, color: '#fff', fontSize: '.9375rem' }}>{t.name}{t.age ? `, ${t.age} ans` : ''}</div>
+                        <div style={{ fontSize: '.78rem', marginTop: '.2rem', fontWeight: 600, ...gd() }}>{t.role}</div>
+                      </div>
+                    </div>
+                  ))}
                 </div>
-              </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Dots */}
+          <div style={{ display: 'flex', justifyContent: 'center', gap: '.5rem', marginTop: '1.5rem' }}>
+            {CAROUSEL_PAGES.map((_, di) => (
+              <button key={di} onClick={() => setCarouselIdx(di)}
+                style={{
+                  width: carouselIdx === di ? 24 : 8, height: 8, borderRadius: 4, border: 'none', cursor: 'pointer',
+                  background: carouselIdx === di ? grad : 'rgba(255,255,255,.2)',
+                  transition: 'width .3s ease, background .3s ease',
+                  padding: 0,
+                }} />
             ))}
           </div>
         </div>
@@ -352,7 +623,7 @@ export default function Landing() {
                     </span>
                     <span style={{
                       flexShrink: 0, width: 28, height: 28, borderRadius: '50%',
-                      background: open ? 'linear-gradient(135deg,#8B2FC9,#E8237A)' : 'rgba(255,255,255,.08)',
+                      background: open ? grad : 'rgba(255,255,255,.08)',
                       display: 'flex', alignItems: 'center', justifyContent: 'center',
                       fontSize: '.9rem', fontWeight: 700, color: '#fff',
                       transition: 'background .2s, transform .25s',
@@ -398,10 +669,9 @@ export default function Landing() {
             </div>
             <div>
               <p style={{ fontSize: '.72rem', fontWeight: 700, letterSpacing: '.12em', textTransform: 'uppercase', color: 'rgba(255,255,255,.25)', marginBottom: '.85rem' }}>Blog</p>
-              <Link to="/blog" style={{ display: 'block', color: 'rgba(255,255,255,.38)', fontSize: '.82rem', textDecoration: 'none', marginBottom: '.5rem' }}>Tous les articles</Link>
-              <Link to="/blog" style={{ display: 'block', color: 'rgba(255,255,255,.38)', fontSize: '.82rem', textDecoration: 'none', marginBottom: '.5rem' }}>Plans d'entraînement</Link>
-              <Link to="/blog" style={{ display: 'block', color: 'rgba(255,255,255,.38)', fontSize: '.82rem', textDecoration: 'none', marginBottom: '.5rem' }}>Nutrition</Link>
-              <Link to="/blog" style={{ display: 'block', color: 'rgba(255,255,255,.38)', fontSize: '.82rem', textDecoration: 'none', marginBottom: '.5rem' }}>Trail & Marathon</Link>
+              {['Tous les articles','Plans d\'entraînement','Nutrition','Trail & Marathon'].map(l => (
+                <Link key={l} to="/blog" style={{ display: 'block', color: 'rgba(255,255,255,.38)', fontSize: '.82rem', textDecoration: 'none', marginBottom: '.5rem' }}>{l}</Link>
+              ))}
             </div>
             <div>
               <p style={{ fontSize: '.72rem', fontWeight: 700, letterSpacing: '.12em', textTransform: 'uppercase', color: 'rgba(255,255,255,.25)', marginBottom: '.85rem' }}>Légal</p>
@@ -412,7 +682,6 @@ export default function Landing() {
           </div>
         </div>
       </footer>
-
     </div>
   )
 }
