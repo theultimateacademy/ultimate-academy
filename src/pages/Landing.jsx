@@ -12,27 +12,28 @@ const TOOLS = [
 ]
 
 const FEATURES = [
-  { icon: '\U0001f3af', title: 'Plan sur-mesure',        desc: 'Conçu selon ton niveau, tes objectifs et tes disponibilités' },
-  { icon: '⚡',     title: 'Adapté en continu',       desc: 'Ton plan évolue chaque semaine selon tes retours et ta progression' },
-  { icon: '\U0001f4ac', title: 'Coaching direct',         desc: 'Tu peux me contacter à tout moment, réponse sous 24h' },
-  { icon: '⌚',     title: 'Synchro montre',          desc: 'Tes séances arrivent directement sur Garmin, Coros ou Suunto' },
-  { icon: '\U0001f4aa', title: 'Renforcement musculaire', desc: 'Une séance de renfo adaptée chaque semaine pour courir plus fort' },
-  { icon: '\U0001f957', title: 'Nutrition du sportif',    desc: "Conseils et recettes adaptés à l'endurance" },
-  { icon: '\U0001f4ca', title: 'Suivi de progression',   desc: 'Visualise tes progrès semaine après semaine' },
-  { icon: '\U0001f338', title: 'Suivi cycle féminin',    desc: 'Adaptation automatique du plan selon ton cycle' },
+  { icon: '🎯', title: 'Plan sur-mesure',          desc: 'Conçu selon ton niveau, tes objectifs et tes disponibilités' },
+  { icon: '⚡', title: 'Adapté en continu',         desc: 'Ton plan évolue chaque semaine selon tes retours et ta progression' },
+  { icon: '💬', title: 'Coaching direct',           desc: 'Tu peux me contacter à tout moment, réponse sous 24h' },
+  { icon: '⌚', title: 'Synchro montre',            desc: 'Tes séances arrivent directement sur Garmin, Coros ou Suunto' },
+  { icon: '💪', title: 'Renforcement musculaire',   desc: 'Une séance de renfo adaptée chaque semaine pour courir plus fort' },
+  { icon: '🥗', title: 'Nutrition du sportif',      desc: "Conseils et recettes adaptés à l'endurance" },
+  { icon: '📊', title: 'Suivi de progression',      desc: 'Visualise tes progrès semaine après semaine' },
+  { icon: '🌸', title: 'Suivi cycle féminin',       desc: 'Adaptation automatique du plan selon ton cycle' },
 ]
 
 const TESTIMONIALS = [
-  { name: 'Marin',    age: 22, role: 'Finisher Ironman · Prépa triathlon',          emoji: '\U0001f3ca', quote: "J'ai fini mon Ironman avec la prépa d'Alexis. Le plan était vraiment adapté à ma charge globale triathlon, je n'avais jamais couru aussi bien sans me blesser." },
-  { name: 'Amandine', age: 25, role: 'Finisher Ironman 70.3 · 10km en 49min',       emoji: '\U0001f3c3‍♀️', quote: "En quelques mois, j'ai passé mon 10km sous les 50min et fini mon premier 70.3. Alexis a su cerner exactement ce dont j'avais besoin dès le départ." },
-  { name: 'Baptiste', age: 27, role: 'Semi en 1h24 · 10km en 37min',                emoji: '⚡',  quote: "1h24 au semi et 37min sur 10km, des chronos que je n'aurais jamais crus possibles seul. Le suivi semaine par semaine fait vraiment la différence." },
-  { name: 'Anouk',    age: 25, role: 'Finisher Ironman 70.3 · 10km en 48min',       emoji: '\U0001f947', quote: "Mon 70.3 finisher et mon 10km en 48min, je les dois à Alexis. Il sait exactement comment doser la charge sans jamais te griller avant le jour J." },
-  { name: 'Dimitry',  age: 30, role: 'Finisher 50K Grand Raid Ventoux · Marathon',  emoji: '\U0001f3d4️', quote: "Finisher du 50K Grand Raid Ventoux et d'un marathon dans la même saison. Je ne pensais vraiment pas que c'était à ma portée. Alexis m'a prouvé le contraire." },
-  { name: 'Lucas',    age: 19, role: 'Étudiant · Premier 10km finisher',            emoji: '\U0001f393', quote: "Je m'étais jamais vu finir un 10km entier. Quatre mois plus tard, j'ai franchi la ligne d'arrivée. Une fierté que j'avais pas du tout anticipée." },
-  { name: 'Céline',   age: 38, role: 'Reprise post-grossesse · Objectif semi',      emoji: '\U0001f338', quote: "Reprendre le sport après une grossesse c'est aussi mental que physique. Alexis n'a jamais forcé le rythme. Je prépare mon premier semi sereinement." },
-  { name: 'Romain',   age: 45, role: 'Cadre · Marathon en 3h45',                    emoji: '\U0001f4bc', quote: "Boulot, famille, deux séances par semaine c'est tout ce que j'avais. Alexis en a fait quelque chose de solide. 3h45 au marathon, je l'avais vraiment pas vu venir." },
-  { name: 'Sofia',    age: 31, role: 'Crossfit → Trail · Première course montagne', emoji: '⛰️', quote: "Du crossfit au trail, j'avais la condition mais pas les fondamentaux de course. Alexis a tout remis en ordre. Ma première course montagne s'est super bien passée." },
+  { name: 'Marin',    age: 22, role: 'Finisher Ironman · Prépa triathlon',             emoji: '🏊',  quote: "J'ai fini mon Ironman avec la prépa d'Alexis. Le plan était vraiment adapté à ma charge globale triathlon, je n'avais jamais couru aussi bien sans me blesser." },
+  { name: 'Amandine', age: 25, role: 'Finisher Ironman 70.3 · 10km en 49min',          emoji: '🏃‍♀️', quote: "En quelques mois, j'ai passé mon 10km sous les 50min et fini mon premier 70.3. Alexis a su cerner exactement ce dont j'avais besoin dès le départ." },
+  { name: 'Baptiste', age: 27, role: 'Semi en 1h24 · 10km en 37min',                   emoji: '⚡',  quote: "1h24 au semi et 37min sur 10km, des chronos que je n'aurais jamais crus possibles seul. Le suivi semaine par semaine fait vraiment la différence." },
+  { name: 'Anouk',    age: 25, role: 'Finisher Ironman 70.3 · 10km en 48min',          emoji: '🥇',  quote: "Mon 70.3 finisher et mon 10km en 48min, je les dois à Alexis. Il sait exactement comment doser la charge sans jamais te griller avant le jour J." },
+  { name: 'Dimitry',  age: 30, role: 'Finisher 50K Grand Raid Ventoux · Marathon',     emoji: '🏔️', quote: "Finisher du 50K Grand Raid Ventoux et d'un marathon dans la même saison. Je ne pensais vraiment pas que c'était à ma portée. Alexis m'a prouvé le contraire." },
+  { name: 'Lucas',    age: 19, role: 'Étudiant · Premier 10km finisher',               emoji: '🎓',  quote: "Je m'étais jamais vu finir un 10km entier. Quatre mois plus tard, j'ai franchi la ligne d'arrivée. Une fierté que j'avais pas du tout anticipée." },
+  { name: 'Céline',   age: 38, role: 'Reprise post-grossesse · Objectif semi',         emoji: '🌸',  quote: "Reprendre le sport après une grossesse c'est aussi mental que physique. Alexis n'a jamais forcé le rythme. Je prépare mon premier semi sereinement." },
+  { name: 'Romain',   age: 45, role: 'Cadre · Marathon en 3h45',                       emoji: '💼',  quote: "Boulot, famille, deux séances par semaine c'est tout ce que j'avais. Alexis en a fait quelque chose de solide. 3h45 au marathon, je l'avais vraiment pas vu venir." },
+  { name: 'Sofia',    age: 31, role: 'Crossfit → Trail · Première course montagne',    emoji: '⛰️', quote: "Du crossfit au trail, j'avais la condition mais pas les fondamentaux de course. Alexis a tout remis en ordre. Ma première course montagne s'est super bien passée." },
 ]
+const TESTIMONIALS_LOOP = [...TESTIMONIALS, ...TESTIMONIALS]
 
 const FAQ = [
   { q: "Pour quel niveau de coureur est ce coaching ?",      a: "Tous les niveaux sont les bienvenus, du grand débutant qui n'a jamais couru 5 km jusqu'au coureur confirmé qui vise un ultra. Ce qui compte, c'est ton engagement et ton objectif : le plan s'adapte à toi, pas l'inverse." },
@@ -44,7 +45,6 @@ const FAQ = [
   { q: "La connexion Strava est-elle obligatoire ?",         a: "Non, elle n'est pas obligatoire. Si tu n'utilises pas Strava, tu peux simplement me partager tes données manuellement via la messagerie. L'important c'est l'information, pas l'outil." },
 ]
 
-const CAROUSEL_PAGES = [TESTIMONIALS.slice(0,3), TESTIMONIALS.slice(3,6), TESTIMONIALS.slice(6,9)]
 
 const PARTICLES = Array.from({ length: 20 }, (_, i) => ({
   id: i,
@@ -143,15 +143,12 @@ export default function Landing() {
   const [scrolled, setScrolled] = useState(false)
   const [counts, setCounts] = useState({ a: 0, r: 0, s: 0, w: 0 })
   const [statsStarted, setStatsStarted] = useState(false)
-  const [carouselIdx, setCarouselIdx] = useState(0)
-  const [carouselPaused, setCarouselPaused] = useState(false)
   const [visibleFeatures, setVisibleFeatures] = useState(new Set())
   const [coachIn, setCoachIn] = useState(false)
 
   const statsRef  = useRef(null)
   const featRef   = useRef(null)
   const coachRef  = useRef(null)
-  const timerRef  = useRef(null)
 
   const statsVisible = useOnScreen(statsRef)
   const featVisible  = useOnScreen(featRef, 0.1)
@@ -183,13 +180,6 @@ export default function Landing() {
 
   useEffect(() => { if (coachVisible) setCoachIn(true) }, [coachVisible])
 
-  useEffect(() => {
-    if (carouselPaused) { clearInterval(timerRef.current); return }
-    timerRef.current = setInterval(() => {
-      setCarouselIdx(i => (i + 1) % CAROUSEL_PAGES.length)
-    }, 4000)
-    return () => clearInterval(timerRef.current)
-  }, [carouselPaused])
 
   const handleCTA = () => {
     if (!user) { navigate('/register'); return }
@@ -351,16 +341,14 @@ export default function Landing() {
             <p style={{ color: 'rgba(255,255,255,.4)', fontSize: '1rem' }}>Un accompagnement complet pour progresser intelligemment</p>
           </div>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '.75rem' }}>
-            {FEATURES.map((f) => (
+            {FEATURES.map(f => (
               <div key={f.title} style={{
                 display: 'flex', alignItems: 'flex-start', gap: '1rem', padding: '1.1rem 1.25rem',
                 borderRadius: 18, background: 'rgba(255,255,255,.04)',
                 border: '1px solid rgba(255,255,255,.08)',
                 backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)',
-                transition: 'border-color .25s, transform .25s, box-shadow .25s',
-              }}
-                onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-4px)'; e.currentTarget.style.borderColor = 'rgba(139,47,201,.45)'; e.currentTarget.style.boxShadow = '0 8px 32px rgba(139,47,201,.2)' }}
-                onMouseLeave={e => { e.currentTarget.style.transform = ''; e.currentTarget.style.borderColor = 'rgba(255,255,255,.08)'; e.currentTarget.style.boxShadow = '' }}>
+                transition: 'border-color .2s',
+              }}>
                 <div style={{ fontSize: '1.6rem', flexShrink: 0, marginTop: '.1rem' }}>{f.icon}</div>
                 <div>
                   <div style={{ fontWeight: 700, fontSize: '.95rem', color: '#fff', marginBottom: '.25rem' }}>{f.title}</div>
@@ -519,7 +507,7 @@ export default function Landing() {
         </div>
         <div className="testimonials-viewport">
           <div className="testimonials-track">
-            {[...TESTIMONIALS, ...TESTIMONIALS].map((t, i) => (
+            {TESTIMONIALS_LOOP.map((t, i) => (
               <div key={i} className="testimonial-card">
                 <div style={{ fontSize: '2rem', marginBottom: '.75rem' }}>{t.emoji}</div>
                 <p style={{ fontSize: '.9375rem', lineHeight: 1.75, color: 'rgba(255,255,255,.65)', fontStyle: 'italic', marginBottom: '1rem', flex: 1 }}>
