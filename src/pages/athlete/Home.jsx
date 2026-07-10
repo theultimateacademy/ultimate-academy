@@ -636,8 +636,9 @@ export default function AthleteHome() {
         const mood = d.mood || 'good'
         const MOOD = { fire: { icon: '🔥', color: '#F97316' }, good: { icon: '💪', color: '#10B981' }, ok: { icon: '👌', color: '#3B82F6' }, attention: { icon: '⚠️', color: '#F59E0B' } }
         const m    = MOOD[mood] || MOOD.good
-        const sessions = d.sessions_comments || []
-        const done = sessions.filter(s => s.done !== false).length
+        const sessions   = d.sessions || d.sessions_comments || []
+        const doneReal   = sessions.filter(s => s.done).length
+        const totalCount = sessions.length
         return (
           <div style={{ marginBottom: '1.5rem' }}>
             <button
@@ -657,10 +658,10 @@ export default function AthleteHome() {
                 <div style={{ fontSize: '1.6rem', lineHeight: 1, flexShrink: 0 }}>{m.icon}</div>
                 <div style={{ flex: 1, minWidth: 0 }}>
                   <div style={{ fontWeight: 800, fontSize: '.88rem', color: '#fff', marginBottom: '.15rem' }}>
-                    Analyse S{analysis.week_number} disponible
+                    Semaine {analysis.week_number} · Retour d'Alexis
                   </div>
                   <div style={{ fontSize: '.75rem', color: 'rgba(255,255,255,.4)' }}>
-                    {done} séance{done > 1 ? 's' : ''} commentée{done > 1 ? 's' : ''} · Retour d'Alexis
+                    {doneReal}/{totalCount} séances effectuées
                   </div>
                 </div>
                 {d.rpe_moyen && (
