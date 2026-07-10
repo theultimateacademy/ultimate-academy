@@ -426,7 +426,7 @@ function SessionDetailPage({ session, weekNum, sessionIdx, planId, vma, onClose,
           <span style={{ fontSize:'.82rem', color:'var(--text-muted)' }}>
             📅 {session._dateLabel || session.jour}
           </span>
-          {onReschedule && (
+          {onReschedule && !isDone && (
             <button onClick={() => setShowDayPicker(v => !v)} style={{
               background: showDayPicker ? typeColor+'30' : typeColor+'15',
               border: `1px solid ${typeColor}40`,
@@ -1434,14 +1434,16 @@ export default function AthletePlan() {
                                 {session.duree_min > 0 ? `${session.duree_min} min` : '🏁'}{done ? ' · ✅' : ''}
                               </div>
                             </div>
-                            <button
-                              onClick={e => { e.stopPropagation(); setRescheduleIdx(v => v && v.weekNum === currentWeekData.numero && v.sessionIdx === idx ? null : { weekNum: currentWeekData.numero, sessionIdx: idx }) }}
-                              style={{ flexShrink:0, background:'none', border:'none',
-                                borderTop:'1px solid rgba(255,255,255,.08)',
-                                padding:'.2rem', fontSize:'.58rem', color:'rgba(255,255,255,.35)', cursor:'pointer',
-                                fontFamily:'inherit', width:'100%' }}>
-                              📅 Déplacer
-                            </button>
+                            {!done && (
+                              <button
+                                onClick={e => { e.stopPropagation(); setRescheduleIdx(v => v && v.weekNum === currentWeekData.numero && v.sessionIdx === idx ? null : { weekNum: currentWeekData.numero, sessionIdx: idx }) }}
+                                style={{ flexShrink:0, background:'none', border:'none',
+                                  borderTop:'1px solid rgba(255,255,255,.08)',
+                                  padding:'.2rem', fontSize:'.58rem', color:'rgba(255,255,255,.35)', cursor:'pointer',
+                                  fontFamily:'inherit', width:'100%' }}>
+                                📅 Déplacer
+                              </button>
+                            )}
                             {isRescheduling && (
                               <div onClick={e => e.stopPropagation()} style={{
                                 position:'absolute', top:'calc(100% + .25rem)', left:0, right:0, zIndex:50,

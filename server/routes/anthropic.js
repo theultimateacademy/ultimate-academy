@@ -1314,6 +1314,10 @@ router.post('/plans/adjust-heat', async (req, res) => {
       const type = (s.type || '').toLowerCase();
       if (type.includes('renforcement')) return s;
       if (s.type === 'Récupération active') return s;
+      // Ne jamais modifier les séances de course/compétition
+      if (s.est_course) return s;
+      if (s.id_seance === 'RACE' || s.id_seance === 'RACE_INT') return s;
+      if (type.includes('course') || type.includes('compétition')) return s;
 
       const newDuration = roundTo5(Math.round((s.duree_min || 45) * 0.80));
 
@@ -1919,6 +1923,26 @@ router.post('/analyses/run-weekly', async (req, res) => {
           : 'RPE dans la zone cible'
         : 'RPE non renseigné';
 
+      // Build session-by-session breakdown for analysis_data
+      const sessionsDetail = (weekData.seances || []).map((s, idx) => {
+        const comp = (completions || []).find(c => c.session_index === idx);
+        return {
+          idx,
+          jour:      s.jour,
+          type:      s.type,
+          titre:     s.titre,
+          duree_min: s.duree_min,
+          done:      !!comp,
+          rpe:       comp?.rpe || null,
+          comment:   comp?.comment || null,
+          completed_at: comp?.completed_at || null,
+        };
+      });
+
+      const sessionsDetailStr = sessionsDetail.map(s =>
+        `  - ${s.jour} : ${s.titre} (${s.type}) ${s.done ? `✅ RPE ${s.rpe || '?'} ${s.comment ? '| ' + s.comment : ''}` : '❌ non effectuée'}`
+      ).join('\n');
+
       const analysisPrompt = `Tu es le coach Alexis de The Ultimate Academy. Analyse la semaine ${weeksElapsed} de ${athlete.first_name}.
 Retourne UNIQUEMENT du JSON valide.
 
@@ -1927,7 +1951,8 @@ Données semaine ${weeksElapsed} (${weekData.phase} - ${weekData.charge}) :
 - Séances réalisées : ${doneCount}
 - RPE moyen : ${avgRpe}/10
 - Signal : ${loadSignal}
-- Commentaires : ${comments}
+- Détail séance par séance :
+${sessionsDetailStr}
 
 RÈGLES IMPÉRATIVES pour message_coach :
 - Commence par "Hello ${athlete.first_name} !" ou "Salut ${athlete.first_name} !"
@@ -1967,21 +1992,10 @@ Format JSON :
           user_id:       athlete.id,
           week_number:   weeksElapsed,
           plan_id:       plan.id,
-          analysis_data: analysisData,
+          analysis_data: { ...analysisData, sessions: sessionsDetail },
           coach_message: analysisData.message_coach,
-          status:        'sent',
-          sent_at:       new Date().toISOString()
+          status:        'pending',
         });
-
-        // Send message_coach directly as a chat message to the athlete
-        if (analysisData.message_coach) {
-          await supabase.from('messages').insert({
-            user_id: athlete.id,
-            sender:  'coach',
-            content: analysisData.message_coach,
-            read:    false,
-          });
-        }
 
         // Adjust next week automatically
         adjustNextWeek(plan.id, weeksElapsed, analysisData, athlete);
@@ -2723,6 +2737,19 @@ router.post('/plans/reschedule-session', async (req, res) => {
     return res.status(400).json({ error: 'Missing params' });
 
   try {
+    // Refuse if this session is already completed
+    const { data: existingComp } = await supabase
+      .from('session_completions')
+      .select('id')
+      .eq('user_id', userId)
+      .eq('plan_id', planId)
+      .eq('week_number', weekNum)
+      .eq('session_index', sessionIdx)
+      .maybeSingle();
+    if (existingComp) {
+      return res.status(400).json({ error: 'Cette séance a déjà été effectuée et ne peut pas être déplacée.' });
+    }
+
     const { data: plan, error: fetchErr } = await supabase
       .from('training_plans').select('plan_data').eq('id', planId).eq('user_id', userId).single();
     if (fetchErr || !plan) return res.status(404).json({ error: 'Plan not found' });

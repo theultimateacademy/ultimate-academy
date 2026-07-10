@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { supabase } from '../../lib/supabase'
 import LoadingSpinner from '../../components/UI/LoadingSpinner'
+import { SESSION_TYPE_COLORS } from '../../lib/utils'
 
 const MOOD_OPTIONS = [
   { v: 'fire',      icon: '🔥', label: 'En feu !',      color: '#F97316' },
@@ -14,14 +15,39 @@ const rpeColor = r => !r ? 'rgba(255,255,255,.4)' : r >= 8 ? '#EF4444' : r >= 6 
 function AnalysisModal({ analysis, athlete, onClose, onSend }) {
   const data0 = analysis.analysis_data || {}
 
-  const [intro,    setIntro]    = useState(analysis.coach_message || data0.intro || '')
-  const [conseil,  setConseil]  = useState(data0.conseil || data0.ajustement_semaine_suivante || '')
-  const [mood,     setMood]     = useState(data0.mood || 'good')
-  const [sessions, setSessions] = useState(data0.sessions_comments || [])
-  const [saving,   setSaving]   = useState(false)
-  const [sending,  setSending]  = useState(false)
+  const [intro,           setIntro]           = useState(analysis.coach_message || data0.intro || data0.message_coach || '')
+  const [conseil,         setConseil]         = useState(data0.conseil || data0.ajustement_semaine_suivante || '')
+  const [mood,            setMood]            = useState(data0.mood || 'good')
+  const [sessions,        setSessions]        = useState(data0.sessions_comments || [])
+  const [saving,          setSaving]          = useState(false)
+  const [sending,         setSending]         = useState(false)
+  const [weekSessions,    setWeekSessions]    = useState([]) // sessions planifiées
+  const [weekCompletions, setWeekCompletions] = useState([]) // sessions effectuées
+  const [loadingData,     setLoadingData]     = useState(true)
 
   const isSent = analysis.status === 'sent'
+
+  useEffect(() => {
+    async function loadWeekData() {
+      setLoadingData(true)
+      try {
+        const [{ data: plan }, { data: comps }] = await Promise.all([
+          supabase.from('training_plans').select('plan_data').eq('id', analysis.plan_id).single(),
+          supabase.from('session_completions').select('*')
+            .eq('user_id', analysis.user_id)
+            .eq('plan_id', analysis.plan_id)
+            .eq('week_number', analysis.week_number),
+        ])
+        const weekData = plan?.plan_data?.semaines?.find(w => w.numero === analysis.week_number)
+        setWeekSessions(weekData?.seances || [])
+        setWeekCompletions(comps || [])
+      } finally {
+        setLoadingData(false)
+      }
+    }
+    if (analysis.plan_id) loadWeekData()
+    else setLoadingData(false)
+  }, [analysis.plan_id, analysis.user_id, analysis.week_number])
 
   async function save() {
     setSaving(true)
@@ -106,6 +132,67 @@ function AnalysisModal({ analysis, athlete, onClose, onSend }) {
             <div style={{ fontSize: '.7rem', color: 'rgba(255,255,255,.25)', marginTop: '.3rem' }}>
               Parle-lui comme à un pote. C'est ce texte qui s'affichera en grand sur son tableau de bord.
             </div>
+          </div>
+
+          {/* Séances réelles de la semaine */}
+          <div>
+            <div style={{ fontSize: '.72rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '.08em', color: 'rgba(255,255,255,.4)', marginBottom: '.5rem' }}>
+              Séances de la semaine — réel
+            </div>
+            {loadingData ? (
+              <div style={{ fontSize: '.8rem', color: 'rgba(255,255,255,.3)', padding: '.5rem 0' }}>Chargement…</div>
+            ) : weekSessions.length === 0 ? (
+              <div style={{ fontSize: '.8rem', color: 'rgba(255,255,255,.25)', fontStyle: 'italic' }}>Aucune séance trouvée dans le plan.</div>
+            ) : (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '.4rem' }}>
+                {weekSessions.map((s, idx) => {
+                  const comp  = weekCompletions.find(c => c.session_index === idx)
+                  const color = SESSION_TYPE_COLORS[s.type] || '#10B981'
+                  const done  = !!comp
+                  return (
+                    <div key={idx} style={{
+                      display: 'flex', alignItems: 'flex-start', gap: '.75rem',
+                      background: done ? 'rgba(16,185,129,.07)' : 'rgba(255,255,255,.03)',
+                      border: `1px solid ${done ? 'rgba(16,185,129,.2)' : 'rgba(255,255,255,.08)'}`,
+                      borderLeft: `3px solid ${done ? '#10B981' : color}`,
+                      borderRadius: 10, padding: '.625rem .875rem',
+                    }}>
+                      <div style={{ width: 20, flexShrink: 0, paddingTop: '.15rem', textAlign: 'center', fontSize: '.9rem' }}>
+                        {done ? '✅' : '—'}
+                      </div>
+                      <div style={{ flex: 1, minWidth: 0 }}>
+                        <div style={{ display: 'flex', gap: '.4rem', alignItems: 'center', flexWrap: 'wrap', marginBottom: '.2rem' }}>
+                          <span style={{ fontSize: '.7rem', fontWeight: 700, color, textTransform: 'uppercase', letterSpacing: '.04em' }}>{s.type}</span>
+                          <span style={{ fontSize: '.72rem', color: 'rgba(255,255,255,.35)' }}>· {s.jour}</span>
+                          {comp?.rpe && (
+                            <span style={{ fontSize: '.7rem', background: 'rgba(255,255,255,.08)', borderRadius: 99, padding: '.1rem .45rem', color: 'rgba(255,255,255,.6)', fontWeight: 700 }}>
+                              RPE {comp.rpe}
+                            </span>
+                          )}
+                        </div>
+                        <div style={{ fontSize: '.82rem', fontWeight: 600 }}>{s.titre}</div>
+                        {comp?.comment && (
+                          <div style={{ fontSize: '.75rem', color: 'rgba(255,255,255,.45)', marginTop: '.2rem', fontStyle: 'italic' }}>
+                            {comp.comment}
+                          </div>
+                        )}
+                        {!done && (
+                          <div style={{ fontSize: '.72rem', color: 'rgba(255,255,255,.28)', marginTop: '.15rem' }}>Non effectuée</div>
+                        )}
+                      </div>
+                      {comp?.avg_hr && (
+                        <div style={{ flexShrink: 0, fontSize: '.72rem', color: 'rgba(255,255,255,.4)', textAlign: 'right' }}>
+                          ❤️ {comp.avg_hr} bpm
+                        </div>
+                      )}
+                    </div>
+                  )
+                })}
+                <div style={{ fontSize: '.7rem', color: 'rgba(255,255,255,.3)', marginTop: '.25rem' }}>
+                  {weekCompletions.length} / {weekSessions.length} séances effectuées
+                </div>
+              </div>
+            )}
           </div>
 
           {/* Session comments */}
