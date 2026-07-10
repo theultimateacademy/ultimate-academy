@@ -1993,7 +1993,7 @@ Format JSON :
           week_number:   weeksElapsed,
           plan_id:       plan.id,
           analysis_data: { ...analysisData, sessions: sessionsDetail },
-          coach_message: analysisData.message_coach,
+          coach_message: null,
           status:        'pending',
         });
 

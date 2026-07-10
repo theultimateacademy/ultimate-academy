@@ -15,7 +15,7 @@ const rpeColor = r => !r ? 'rgba(255,255,255,.4)' : r >= 8 ? '#EF4444' : r >= 6 
 function AnalysisModal({ analysis, athlete, onClose, onSend }) {
   const data0 = analysis.analysis_data || {}
 
-  const [intro,           setIntro]           = useState(analysis.coach_message || data0.intro || data0.message_coach || '')
+  const [intro,           setIntro]           = useState(analysis.coach_message || '')
   const [conseil,         setConseil]         = useState(data0.conseil || data0.ajustement_semaine_suivante || '')
   const [mood,            setMood]            = useState(data0.mood || 'good')
   const [sessions,        setSessions]        = useState(data0.sessions_comments || [])
@@ -281,7 +281,7 @@ function AnalysisModal({ analysis, athlete, onClose, onSend }) {
             {saving ? 'Sauvegarde…' : '💾 Brouillon'}
           </button>
           {!isSent && (
-            <button onClick={send} disabled={sending || !intro.trim()} style={{ padding: '.5rem 1.25rem', borderRadius: 8, border: 'none', background: 'var(--gradient)', color: '#fff', cursor: 'pointer', fontFamily: 'inherit', fontSize: '.85rem', fontWeight: 700, opacity: (!intro.trim()) ? .5 : 1 }}>
+            <button onClick={send} disabled={sending} style={{ padding: '.5rem 1.25rem', borderRadius: 8, border: 'none', background: 'var(--gradient)', color: '#fff', cursor: 'pointer', fontFamily: 'inherit', fontSize: '.85rem', fontWeight: 700 }}>
               {sending ? 'Envoi…' : '📤 Envoyer à l\'athlète'}
             </button>
           )}

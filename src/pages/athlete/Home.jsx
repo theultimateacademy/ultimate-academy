@@ -131,8 +131,8 @@ function SportLegend({ sessions }) {
 // Modale analyse — pleine page
 function WeeklyAnalysisModal({ analysis, onClose }) {
   const d = analysis.analysis_data || {}
-  const intro    = analysis.coach_message || d.intro || ''
-  const sessions = d.sessions_comments || []
+  const intro    = analysis.coach_message || ''
+  const sessions = d.sessions || d.sessions_comments || []
   const conseil  = d.conseil || d.ajustement_semaine_suivante || ''
   const rpe      = d.rpe_moyen
   const mood     = d.mood || 'good'
@@ -235,9 +235,9 @@ function WeeklyAnalysisModal({ analysis, onClose }) {
                           <RpeBar rpe={s.rpe} />
                         </div>
                       </div>
-                      {s.note && (
+                      {(s.comment || s.note) && (
                         <p style={{ fontSize: '.855rem', lineHeight: 1.65, color: 'rgba(255,255,255,.72)', margin: 0 }}>
-                          {renderRich(s.note)}
+                          {renderRich(s.comment || s.note)}
                         </p>
                       )}
                     </div>
