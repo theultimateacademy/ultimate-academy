@@ -235,8 +235,14 @@ function WeeklyAnalysisModal({ analysis, onClose }) {
                           <RpeBar rpe={s.rpe} />
                         </div>
                       </div>
+                      {s.coach_comment && (
+                        <div style={{ background: 'linear-gradient(135deg, rgba(139,47,201,.08), rgba(232,35,122,.04))', border: '1px solid rgba(139,47,201,.18)', borderRadius: 10, padding: '.6rem .875rem', marginBottom: (s.comment || s.note) ? '.5rem' : 0 }}>
+                          <div style={{ fontSize: '.6rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '.08em', color: '#C084FC', marginBottom: '.3rem' }}>Alexis</div>
+                          <p style={{ fontSize: '.845rem', lineHeight: 1.65, color: 'rgba(255,255,255,.88)', margin: 0 }}>{renderRich(s.coach_comment)}</p>
+                        </div>
+                      )}
                       {(s.comment || s.note) && (
-                        <p style={{ fontSize: '.855rem', lineHeight: 1.65, color: 'rgba(255,255,255,.72)', margin: 0 }}>
+                        <p style={{ fontSize: '.8rem', lineHeight: 1.6, color: 'rgba(255,255,255,.5)', margin: 0, fontStyle: 'italic' }}>
                           {renderRich(s.comment || s.note)}
                         </p>
                       )}

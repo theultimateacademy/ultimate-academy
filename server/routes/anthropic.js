@@ -1939,48 +1939,57 @@ router.post('/analyses/run-weekly', async (req, res) => {
         };
       });
 
-      const sessionsDetailStr = sessionsDetail.map(s =>
-        `  - ${s.jour} : ${s.titre} (${s.type}) ${s.done ? `✅ RPE ${s.rpe || '?'} ${s.comment ? '| ' + s.comment : ''}` : '❌ non effectuée'}`
+      // Count done from sessionsDetail (not raw completions, which may have ghost entries)
+      const realDoneCount = sessionsDetail.filter(s => s.done).length;
+
+      const sessionsDetailStr = sessionsDetail.map((s, i) =>
+        `  [${i}] ${s.jour} : ${s.titre} (${s.type}, ${s.duree_min || '?'} min) ${s.done ? `✅ RPE ${s.rpe || '?'}${s.comment ? ' | Ressenti athlète: ' + s.comment : ''}` : '❌ non effectuée'}`
       ).join('\n');
 
-      const analysisPrompt = `Tu es le coach Alexis de The Ultimate Academy. Analyse la semaine ${weeksElapsed} de ${athlete.first_name}.
-Retourne UNIQUEMENT du JSON valide.
+      const sessionsJsonTemplate = sessionsDetail.map(s =>
+        `    {"idx": ${s.idx}, "coach_comment": "${s.done ? 'Commentaire coach spécifique sur cette séance, 1-2 phrases' : 'Séance non effectuée — mot d\'encouragement court'}"}`
+      ).join(',\n');
 
-Données semaine ${weeksElapsed} (${weekData.phase} - ${weekData.charge}) :
+      const analysisPrompt = `Tu es le coach Alexis de The Ultimate Academy. Analyse la semaine ${weeksElapsed} de ${athlete.first_name}.
+Retourne UNIQUEMENT du JSON valide, SANS markdown, SANS backticks.
+
+Contexte semaine ${weeksElapsed} (${weekData.phase} — charge ${weekData.charge}) :
 - Séances planifiées : ${plannedCount}
-- Séances réalisées : ${doneCount}
+- Séances réalisées : ${realDoneCount}/${plannedCount}
 - RPE moyen : ${avgRpe}/10
-- Signal : ${loadSignal}
-- Détail séance par séance :
+- Signal de charge : ${loadSignal}
+
+Séances en détail :
 ${sessionsDetailStr}
 
-RÈGLES IMPÉRATIVES pour message_coach :
-- Commence par "Hello ${athlete.first_name} !" ou "Salut ${athlete.first_name} !"
-- Toujours positif et bienveillant, même si peu de séances ont été faites
-- Tire quelque chose de bien de la semaine dans tous les cas
-- 4 à 6 phrases, style SMS naturel entre potes, chaleureux
-- 1 à 2 emojis maximum
-- Termine par un encouragement du style "bonne semaine !", "bon courage pour la suite !", "passe une bonne soirée !"
-- JAMAIS le caractère tiret long (—)
-- JAMAIS de signature, JAMAIS de formule formelle
+RÈGLES pour les coach_comment (TRÈS IMPORTANT) :
+- Écris un commentaire COACH pour CHAQUE séance, même un footing EF basique
+- Mentionne le type de séance, ce que ça apporte à l'entraînement
+- Appuie-toi sur le RPE et le ressenti de l'athlète
+- Si RPE haut sur un footing EF → signale qu'il faut rester léger
+- Si RPE bas sur une séance difficile → félicite la maîtrise
+- Style coach expert mais chaleureux, tutoiement
+- 1 à 2 phrases maximum par séance
+- JAMAIS de tiret long (—)
 
-Format JSON :
+Format JSON strict :
 {
-  "resume": "2-3 phrases",
-  "points_positifs": ["point1"],
-  "points_attention": [],
-  "ajustement_semaine_suivante": "recommandation concrète",
-  "seances_realisees": ${doneCount},
+  "resume": "2-3 phrases sur la semaine globale",
+  "points_positifs": ["point1", "point2"],
+  "points_attention": ["point si nécessaire"],
+  "ajustement_semaine_suivante": "recommandation concrète sur la semaine suivante",
+  "seances_realisees": ${realDoneCount},
   "seances_planifiees": ${plannedCount},
-  "rpe_moyen": "${avgRpe}",
-  "commentaires": "${comments.replace(/"/g, "'")}",
-  "message_coach": "Message chaleureux et personnel pour ${athlete.first_name}, voir règles ci-dessus"
+  "rpe_moyen": ${isNaN(parseFloat(avgRpe)) ? 'null' : avgRpe},
+  "sessions": [
+${sessionsJsonTemplate}
+  ]
 }`;
 
       try {
         const msg = await client.messages.create({
           model:      'claude-sonnet-4-6',
-          max_tokens: 800,
+          max_tokens: 1200,
           messages:   [{ role: 'user', content: analysisPrompt }]
         });
 
@@ -1988,11 +1997,18 @@ Format JSON :
         const jsonText     = raw.replace(/^```json\s*/i, '').replace(/^```\s*/i, '').replace(/\s*```$/i, '');
         const analysisData = JSON.parse(jsonText);
 
+        // Merge AI coach_comments into sessionsDetail
+        const aiSessions = analysisData.sessions || [];
+        const finalSessions = sessionsDetail.map(s => ({
+          ...s,
+          coach_comment: aiSessions.find(ai => ai.idx === s.idx)?.coach_comment || null,
+        }));
+
         await supabase.from('weekly_analyses').insert({
           user_id:       athlete.id,
           week_number:   weeksElapsed,
           plan_id:       plan.id,
-          analysis_data: { ...analysisData, sessions: sessionsDetail },
+          analysis_data: { ...analysisData, sessions: finalSessions },
           coach_message: null,
           status:        'pending',
         });
