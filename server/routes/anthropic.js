@@ -1732,34 +1732,39 @@ async function adjustNextWeek(planId, weekNumber, analysisData, athleteProfile) 
       ? 'minimum 2 EF par semaine'
       : 'minimum 1 EF par semaine';
 
+    const chargeSignal = analysisData.charge_signal || 'maintain';
+    const chargeRule   = chargeSignal === 'reduce'
+      ? 'RÉDUIRE la charge : -10 à -20% volume/intensité sur les séances dures, remplacer une séance intense par EF si nécessaire'
+      : chargeSignal === 'increase'
+      ? 'AUGMENTER légèrement : +1-2 reps ou +5% intensité sur les séances clés'
+      : 'MAINTENIR : garder le plan tel quel sauf anomalie de RPE';
+
     const adjustPrompt = `Tu es le moteur d'ajustement de plans d'entraînement de The Ultimate Academy.
 Retourne UNIQUEMENT du JSON valide, sans texte autour.
 
 Analyse de la semaine ${weekNumber} :
 - RPE moyen : ${analysisData.rpe_moyen || 'N/A'}/10
 - Séances réalisées : ${analysisData.seances_realisees || '?'}/${analysisData.seances_planifiees || '?'}
-- Ajustement recommandé : ${analysisData.ajustement_semaine_suivante}
-- Commentaires athlète : ${analysisData.commentaires || 'Aucun'}
+- Signal de charge : ${chargeSignal.toUpperCase()} — ${chargeRule}
+- Focus coach : ${analysisData.ajustement_semaine_suivante || 'maintenir'}
 
 Séances prévues pour la semaine ${nextWeekNum} (${nextWeek.phase}, ${nextWeek.charge}) :
 ${JSON.stringify(nextWeek.seances, null, 2)}
 
-Allures (VMA ${vma} km/h) :
+Allures de référence (VMA ${vma} km/h) :
   EF (65-70%) : ${calcPace(vma, 0.65)}/km – ${calcPace(vma, 0.70)}/km
   Seuil (82-88%) : ${calcPace(vma, 0.82)}/km – ${calcPace(vma, 0.88)}/km
   Fractionné court (95-105%) : ${calcPace(vma, 0.95)}/km – ${calcPace(vma, 1.05)}/km
   Récup (60-65%) : ${calcPace(vma, 0.60)}/km – ${calcPace(vma, 0.65)}/km
 
-Règles d'ajustement :
-- RPE moyen ≥ 8 : réduire intensité des séances dures de ~10% (moins de répétitions ou allure plus lente)
-- RPE moyen < 5 : augmenter légèrement volume ou intensité (+1-2 reps ou +5%)
-- Séances non réalisées sans mention de fatigue : garder le volume (l'athlète peut encore progresser)
-- Séances non réalisées AVEC fatigue signalée : réduire d'une séance intense, la remplacer par EF
-- ${efMin} (JAMAIS en dessous de ce minimum)
-- Ne jamais supprimer toutes les séances intenses d'un coup
+Règles impératives :
+- Respecter le signal de charge indiqué ci-dessus en priorité
+- ${efMin} (JAMAIS en dessous)
+- Ne jamais supprimer TOUTES les séances intenses d'un coup
+- Séances non réalisées sans fatigue signalée : garder le volume
 
 Retourne UNIQUEMENT :
-{"seances": [ /* séances ajustées ou identiques si aucun changement nécessaire */ ]}`;
+{"seances": [ /* séances ajustées ou identiques */ ]}`;
 
     const message = await client.messages.create({
       model:      'claude-sonnet-4-6',
@@ -1910,12 +1915,10 @@ router.post('/analyses/run-weekly', async (req, res) => {
         .eq('week_number', weeksElapsed);
 
       const plannedCount = weekData.seances?.length || 0;
-      const doneCount    = completions?.length || 0;
       const rpeList      = (completions || []).filter(c => c.rpe).map(c => c.rpe);
       const avgRpe       = rpeList.length
         ? (rpeList.reduce((a, b) => a + b, 0) / rpeList.length).toFixed(1)
         : 'N/A';
-      const comments     = (completions || []).filter(c => c.comment).map(c => c.comment).join(' | ') || 'Aucun';
       const rpeNum       = parseFloat(avgRpe);
       const loadSignal   = !isNaN(rpeNum)
         ? rpeNum > 8 ? 'RPE élevé — réduire la charge'
@@ -1923,24 +1926,38 @@ router.post('/analyses/run-weekly', async (req, res) => {
           : 'RPE dans la zone cible'
         : 'RPE non renseigné';
 
-      // Build session-by-session breakdown for analysis_data
-      const sessionsDetail = (weekData.seances || []).map((s, idx) => {
-        const comp = (completions || []).find(c => c.session_index === idx);
-        return {
-          idx,
-          jour:      s.jour,
-          type:      s.type,
-          titre:     s.titre,
-          duree_min: s.duree_min,
-          done:      !!comp,
-          rpe:       comp?.rpe || null,
-          comment:   comp?.comment || null,
-          completed_at: comp?.completed_at || null,
-        };
-      });
+      // Day-of-week sort order
+      const DAY_ORDER = { Lundi:1, Mardi:2, Mercredi:3, Jeudi:4, Vendredi:5, Samedi:6, Dimanche:7 };
+
+      // Build session-by-session breakdown sorted chronologically
+      const sessionsDetail = (weekData.seances || [])
+        .map((s, idx) => {
+          const comp = (completions || []).find(c => c.session_index === idx);
+          return {
+            idx,
+            jour:      s.jour,
+            type:      s.type,
+            titre:     s.titre,
+            duree_min: s.duree_min,
+            done:      !!comp,
+            rpe:       comp?.rpe || null,
+            comment:   comp?.comment || null,
+            completed_at: comp?.completed_at || null,
+          };
+        })
+        .sort((a, b) => (DAY_ORDER[a.jour] || 8) - (DAY_ORDER[b.jour] || 8));
 
       // Count done from sessionsDetail (not raw completions, which may have ghost entries)
       const realDoneCount = sessionsDetail.filter(s => s.done).length;
+
+      // Next week context for the focus
+      const nextWeekData = plan.plan_data?.semaines?.find(s => s.numero === weeksElapsed + 1);
+      const nextWeekStr  = nextWeekData
+        ? (nextWeekData.seances || [])
+            .slice().sort((a, b) => (DAY_ORDER[a.jour] || 8) - (DAY_ORDER[b.jour] || 8))
+            .map(s => `  - ${s.jour} : ${s.titre} (${s.type}, ${s.duree_min || '?'} min)`)
+            .join('\n')
+        : '  (Dernière semaine du plan — pas de semaine suivante)';
 
       const sessionsDetailStr = sessionsDetail.map((s, i) =>
         `  [${i}] ${s.jour} : ${s.titre} (${s.type}, ${s.duree_min || '?'} min) ${s.done ? `✅ RPE ${s.rpe || '?'}${s.comment ? ' | Ressenti athlète: ' + s.comment : ''}` : '❌ non effectuée'}`
@@ -1959,25 +1976,35 @@ Contexte semaine ${weeksElapsed} (${weekData.phase} — charge ${weekData.charge
 - RPE moyen : ${avgRpe}/10
 - Signal de charge : ${loadSignal}
 
-Séances en détail :
+Séances de la semaine écoulée (ordre chronologique) :
 ${sessionsDetailStr}
 
-RÈGLES pour les coach_comment (TRÈS IMPORTANT) :
+Séances PRÉVUES pour la semaine ${weeksElapsed + 1} (plan actuel, avant ajustement automatique) :
+${nextWeekStr}
+
+RÈGLES pour les coach_comment :
 - Écris un commentaire COACH pour CHAQUE séance, même un footing EF basique
 - Mentionne le type de séance, ce que ça apporte à l'entraînement
-- Appuie-toi sur le RPE et le ressenti de l'athlète
-- Si RPE haut sur un footing EF → signale qu'il faut rester léger
-- Si RPE bas sur une séance difficile → félicite la maîtrise
-- Style coach expert mais chaleureux, tutoiement
-- 1 à 2 phrases maximum par séance
+- Appuie-toi sur le RPE et le ressenti si disponible
+- Si RPE haut sur EF → signale qu'il faut rester léger la prochaine fois
+- Style coach expert mais chaleureux, tutoiement, 1 à 2 phrases max
 - JAMAIS de tiret long (—)
+
+RÈGLES pour ajustement_semaine_suivante :
+- Rédige le focus en te basant sur les séances RÉELLES prévues la semaine prochaine
+- Mentionne des séances concrètes ("ta sortie longue de jeudi", "les fracs de mardi")
+- Si RPE moyen ≥ 8 ou fatigue signalée : précise qu'on réduit la charge (le plan sera ajusté automatiquement)
+- Si RPE < 5 : précise qu'on peut pousser davantage
+- Sinon : focus sur ce qui compte dans la semaine à venir
+- 2 à 3 phrases, tutoiement, ton coach
 
 Format JSON strict :
 {
   "resume": "2-3 phrases sur la semaine globale",
   "points_positifs": ["point1", "point2"],
-  "points_attention": ["point si nécessaire"],
-  "ajustement_semaine_suivante": "recommandation concrète sur la semaine suivante",
+  "points_attention": ["point si nécessaire, sinon tableau vide"],
+  "ajustement_semaine_suivante": "focus basé sur les séances réelles de la semaine prochaine",
+  "charge_signal": "reduce" ou "maintain" ou "increase",
   "seances_realisees": ${realDoneCount},
   "seances_planifiees": ${plannedCount},
   "rpe_moyen": ${isNaN(parseFloat(avgRpe)) ? 'null' : avgRpe},
