@@ -13,14 +13,14 @@ const TOOLS = [
 ]
 
 const FEATURES = [
-  { icon: '🎯', title: 'Plan sur-mesure',          desc: 'Conçu selon ton niveau, tes objectifs et tes disponibilités' },
-  { icon: '⚡', title: 'Adapté en continu',         desc: 'Ton plan évolue chaque semaine selon tes retours et ta progression' },
-  { icon: '💬', title: 'Coaching direct',           desc: 'Tu peux me contacter à tout moment, réponse sous 24h' },
-  { icon: '⌚', title: 'Synchro montre',            desc: 'Tes séances arrivent directement sur Garmin, Coros ou Suunto' },
-  { icon: '💪', title: 'Renforcement musculaire',   desc: 'Une séance de renfo adaptée chaque semaine pour courir plus fort' },
-  { icon: '🥗', title: 'Nutrition du sportif',      desc: "Conseils et recettes adaptés à l'endurance" },
-  { icon: '📊', title: 'Suivi de progression',      desc: 'Visualise tes progrès semaine après semaine' },
-  { icon: '🌸', title: 'Suivi cycle féminin',       desc: 'Adaptation automatique du plan selon ton cycle' },
+  { icon: '🎯', title: 'Plan sur-mesure',              desc: 'Conçu selon ton niveau, tes objectifs et tes disponibilités' },
+  { icon: '⚡', title: 'Adapté en continu',             desc: 'Ton plan évolue chaque semaine selon tes retours et ta progression' },
+  { icon: '💬', title: 'Coaching direct',               desc: 'Tu peux me contacter à tout moment, réponse sous 24h' },
+  { icon: '🌡️', title: 'Adaptation fatigue & canicule', desc: 'Ton plan s\'ajuste selon ta fatigue et les conditions météo extrêmes' },
+  { icon: '💪', title: 'Renforcement musculaire',       desc: 'Une séance de renfo adaptée chaque semaine pour courir plus fort' },
+  { icon: '🥗', title: 'Nutrition du sportif',          desc: "Conseils et recettes adaptés à l'endurance" },
+  { icon: '📊', title: 'Suivi de progression',          desc: 'Visualise tes progrès semaine après semaine' },
+  { icon: '🌸', title: 'Suivi cycle féminin',           desc: 'Adaptation automatique du plan selon ton cycle' },
 ]
 
 const TESTIMONIALS = [
@@ -252,7 +252,7 @@ export default function Landing() {
             transition: 'opacity 0.8s 0.6s ease, transform 0.8s 0.6s ease',
           }}>
             Je conçois ton plan sur-mesure, suis ta progression semaine après semaine
-            et t'accompagne jusqu'à ton objectif, du 5 km au marathon.
+            et t'accompagne jusqu'à ton objectif — course, trail ou triathlon.
           </p>
 
           <div style={{
@@ -410,6 +410,28 @@ export default function Landing() {
                   </div>
                 ))}
               </div>
+              {/* Logos / certifications */}
+              <div style={{ marginTop: '2rem', paddingTop: '1.5rem', borderTop: '1px solid rgba(255,255,255,.08)' }}>
+                <div style={{ fontSize: '.72rem', fontWeight: 600, color: 'rgba(255,255,255,.3)', letterSpacing: '.1em', textTransform: 'uppercase', marginBottom: '1rem' }}>
+                  Certifications & affiliations
+                </div>
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '.75rem', alignItems: 'center' }}>
+                  {[
+                    { label: 'FFA', sub: 'Fédération Française d\'Athlétisme' },
+                    { label: 'France Triathlon', sub: 'Fédération Française de Triathlon' },
+                    { label: 'STAPS', sub: 'En formation' },
+                    { label: 'Éducateur Sportif', sub: 'Brevet professionnel' },
+                  ].map(({ label, sub }) => (
+                    <div key={label} title={sub} style={{
+                      padding: '.45rem 1rem', borderRadius: 10,
+                      background: 'rgba(255,255,255,.05)', border: '1px solid rgba(255,255,255,.1)',
+                      fontSize: '.8rem', fontWeight: 700, color: 'rgba(255,255,255,.7)',
+                      letterSpacing: '.03em', cursor: 'default',
+                    }}>{label}</div>
+                  ))}
+                </div>
+              </div>
+
               <button onClick={handleCTA} className="btn-liquid-primary" style={{ marginTop: '2rem' }}>
                 Travailler avec moi →
               </button>
@@ -420,30 +442,32 @@ export default function Landing() {
 
       {/* ── PRICING ──────────────────────────────────────────── */}
       <section id="tarifs" style={{ padding: '6rem 1.5rem', background: '#000', borderTop: '1px solid rgba(255,255,255,.06)' }}>
-        <div className="container" style={{ maxWidth: 820 }}>
+        <div className="container" style={{ maxWidth: 1060 }}>
           <div style={{ textAlign: 'center', marginBottom: '3rem' }}>
             <h2 style={{ fontSize: 'clamp(2rem,5vw,3rem)', fontWeight: 800, letterSpacing: '-0.02em', marginBottom: '.6rem' }}>
-              Une seule offre, <span style={gd()}>sans compromis</span>
+              Choisis ton <span style={gd()}>niveau d'accompagnement</span>
             </h2>
-            <p style={{ color: 'rgba(255,255,255,.4)', fontSize: '1rem' }}>Tout ce qu'il faut pour progresser. Rien de superflu.</p>
+            <p style={{ color: 'rgba(255,255,255,.4)', fontSize: '1rem' }}>Coaching complet ou ressources pour progresser à ton rythme.</p>
           </div>
 
-          <div className="pricing-card pricing-card--featured" style={{
-            padding: '3rem 2.5rem',
-            animation: 'pricePulse 3s ease-in-out infinite',
-          }}>
-            <div style={{
-              position: 'absolute', top: '-1px', left: '50%', transform: 'translateX(-50%)',
-              background: grad, color: '#fff',
-              fontSize: '.72rem', fontWeight: 700, padding: '.35rem 1.6rem', borderRadius: '0 0 14px 14px',
-              letterSpacing: '.07em', textTransform: 'uppercase', whiteSpace: 'nowrap',
-              animation: 'trialBlink 2.5s ease-in-out infinite',
-            }}>
-              14 jours d'essai gratuit
-            </div>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(340px,100%),1fr))', gap: '1.5rem', alignItems: 'start' }}>
 
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(260px,100%),1fr))', gap: '3rem', alignItems: 'center', marginTop: '.5rem' }}>
-              <div style={{ textAlign: 'center' }}>
+            {/* ── Coaching card ── */}
+            <div className="pricing-card pricing-card--featured" style={{
+              padding: '3rem 2.5rem',
+              animation: 'pricePulse 3s ease-in-out infinite',
+            }}>
+              <div style={{
+                position: 'absolute', top: '-1px', left: '50%', transform: 'translateX(-50%)',
+                background: grad, color: '#fff',
+                fontSize: '.72rem', fontWeight: 700, padding: '.35rem 1.6rem', borderRadius: '0 0 14px 14px',
+                letterSpacing: '.07em', textTransform: 'uppercase', whiteSpace: 'nowrap',
+                animation: 'trialBlink 2.5s ease-in-out infinite',
+              }}>
+                14 jours d'essai gratuit
+              </div>
+
+              <div style={{ textAlign: 'center', marginTop: '.5rem', marginBottom: '2rem' }}>
                 <div style={{ fontSize: '.78rem', fontWeight: 700, color: 'rgba(255,255,255,.55)', letterSpacing: '.12em', textTransform: 'uppercase', marginBottom: '1rem' }}>
                   Coaching Personnalisé
                 </div>
@@ -486,6 +510,60 @@ export default function Landing() {
                 ))}
               </div>
             </div>
+
+            {/* ── Ebook card ── */}
+            <div style={{
+              position: 'relative', borderRadius: 28, padding: '2.5rem',
+              background: 'rgba(255,255,255,.04)', border: '1px solid rgba(255,255,255,.12)',
+              backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)',
+              display: 'flex', flexDirection: 'column', gap: '1.5rem',
+            }}>
+              <div style={{ display: 'inline-flex', alignItems: 'center', gap: '.4rem', padding: '.3rem .9rem',
+                borderRadius: 99, background: 'rgba(232,35,122,.15)', border: '1px solid rgba(232,35,122,.3)',
+                fontSize: '.75rem', fontWeight: 700, color: '#F472B6', width: 'fit-content' }}>
+                📖 Ebooks
+              </div>
+
+              <div>
+                <h3 style={{ fontSize: '1.6rem', fontWeight: 800, letterSpacing: '-0.02em', marginBottom: '.75rem', lineHeight: 1.2 }}>
+                  Progresse à ton<br /><span style={gd()}>propre rythme</span>
+                </h3>
+                <p style={{ color: 'rgba(255,255,255,.5)', fontSize: '.9rem', lineHeight: 1.75 }}>
+                  Guides pratiques pour comprendre l'entraînement, la nutrition et la préparation mentale — conçus par Alexis pour t'aider à progresser intelligemment, même sans coaching.
+                </p>
+              </div>
+
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '.7rem' }}>
+                {[
+                  'Méthodes d\'entraînement expliquées',
+                  'Stratégies de course et de récupération',
+                  'Nutrition adaptée à ton sport',
+                  'Achat unique · accès illimité',
+                ].map(f => (
+                  <div key={f} style={{ display: 'flex', gap: '.75rem', alignItems: 'center', fontSize: '.875rem', color: 'rgba(255,255,255,.65)' }}>
+                    <span style={{ color: '#F472B6', fontWeight: 700, flexShrink: 0 }}>✓</span> {f}
+                  </div>
+                ))}
+              </div>
+
+              <div style={{ marginTop: 'auto' }}>
+                <Link to="/ebooks" style={{
+                  display: 'block', width: '100%', padding: '1rem 1.5rem', borderRadius: 99,
+                  border: '1.5px solid rgba(232,35,122,.5)', textAlign: 'center',
+                  fontWeight: 800, fontSize: '1rem', color: '#fff', textDecoration: 'none',
+                  background: 'rgba(232,35,122,.12)',
+                  transition: 'background .2s, border-color .2s, transform .2s',
+                }}
+                  onMouseEnter={e => { e.currentTarget.style.background = 'rgba(232,35,122,.25)'; e.currentTarget.style.transform = 'translateY(-2px)' }}
+                  onMouseLeave={e => { e.currentTarget.style.background = 'rgba(232,35,122,.12)'; e.currentTarget.style.transform = '' }}>
+                  Voir les ebooks →
+                </Link>
+                <p style={{ color: 'rgba(255,255,255,.3)', fontSize: '.72rem', marginTop: '.65rem', textAlign: 'center' }}>
+                  À partir de 9,90€ · téléchargement immédiat
+                </p>
+              </div>
+            </div>
+
           </div>
         </div>
       </section>
