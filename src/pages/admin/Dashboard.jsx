@@ -436,7 +436,7 @@ export default function AdminDashboard() {
         cancelling:   cancelling   || 0,
         newThisMonth: newThisMonth || 0,
         feedbacks:    feedbacks    || 0,
-        mrr:          (paying || 0) * PRICE,
+        mrr:          0,
       })
       setRecentAthletes(recent || [])
     } finally {

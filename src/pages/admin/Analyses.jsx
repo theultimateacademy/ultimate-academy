@@ -300,6 +300,12 @@ export default function AdminAnalyses() {
 
   useEffect(() => { loadAnalyses() }, [])
 
+  async function deleteAnalysis(id) {
+    if (!window.confirm('Supprimer cette analyse ?')) return
+    await supabase.from('weekly_analyses').delete().eq('id', id)
+    setAnalyses(prev => prev.filter(a => a.id !== id))
+  }
+
   async function loadAnalyses() {
     setLoading(true)
     try {
@@ -401,6 +407,17 @@ export default function AdminAnalyses() {
                         color: isSent ? '#34D399' : '#C084FC',
                       }}>
                       {isSent ? '👁 Voir' : '✏️ Rédiger'}
+                    </button>
+                    <button
+                      onClick={() => deleteAnalysis(analysis.id)}
+                      title="Supprimer l'analyse"
+                      style={{
+                        width: 30, height: 30, borderRadius: 8, border: '1px solid rgba(239,68,68,.25)',
+                        background: 'rgba(239,68,68,.08)', color: '#F87171',
+                        cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center',
+                        fontSize: '.85rem', flexShrink: 0,
+                      }}>
+                      🗑
                     </button>
                   </div>
                 </div>

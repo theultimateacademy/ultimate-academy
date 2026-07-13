@@ -92,14 +92,26 @@ function PlanModal({ plan, athlete, onClose, onActivate }) {
 
         {/* Week tabs */}
         <div style={{ display:'flex', gap:'.3rem', overflowX:'auto', paddingBottom:'.5rem', marginBottom:'.75rem' }}>
-          {weeks.map((w,i) => (
-            <button key={i} onClick={() => setActiveWeek(i)} style={{
-              flexShrink:0, padding:'.35rem .65rem', borderRadius:99, border:'none', whiteSpace:'nowrap',
-              background: activeWeek===i ? 'var(--gradient)' : 'var(--surface-2)',
-              color: activeWeek===i ? '#fff' : 'var(--text-muted)',
-              fontWeight:600, fontSize:'.78rem', cursor:'pointer', fontFamily:'inherit',
-            }}>S{w.numero} — {(w.charge||'').split(/[—–(]/)[0].trim()}</button>
-          ))}
+          {weeks.map((w,i) => {
+            const activatedAt = plan.activated_at ? new Date(plan.activated_at) : null
+            let weekRange = ''
+            if (activatedAt) {
+              const start = new Date(activatedAt)
+              start.setUTCDate(start.getUTCDate() + (w.numero - 1) * 7)
+              const end = new Date(start)
+              end.setUTCDate(end.getUTCDate() + 6)
+              const fmt = d => d.toLocaleDateString('fr-FR', { day: 'numeric', month: 'short', timeZone: 'UTC' })
+              weekRange = ` · ${fmt(start)} – ${fmt(end)}`
+            }
+            return (
+              <button key={i} onClick={() => setActiveWeek(i)} style={{
+                flexShrink:0, padding:'.35rem .65rem', borderRadius:99, border:'none', whiteSpace:'nowrap',
+                background: activeWeek===i ? 'var(--gradient)' : 'var(--surface-2)',
+                color: activeWeek===i ? '#fff' : 'var(--text-muted)',
+                fontWeight:600, fontSize:'.78rem', cursor:'pointer', fontFamily:'inherit',
+              }}>S{w.numero}{weekRange}</button>
+            )
+          })}
         </div>
 
         {currentWeek && (() => {
