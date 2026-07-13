@@ -138,7 +138,7 @@ export default function AthleteMessages() {
           style={{ flex: 1, resize: 'none', border: '1.5px solid var(--border)',
             borderRadius: 20, padding: '.65rem 1rem', fontSize: '.9375rem',
             fontFamily: 'inherit', background: 'var(--bg)', outline: 'none',
-            maxHeight: 120, overflowY: 'auto' }}
+            color: 'var(--text)', maxHeight: 120, overflowY: 'auto' }}
           onInput={e => {
             e.target.style.height = 'auto'
             e.target.style.height = Math.min(e.target.scrollHeight, 120) + 'px'

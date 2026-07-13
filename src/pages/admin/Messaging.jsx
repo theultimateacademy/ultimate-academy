@@ -145,7 +145,7 @@ function Conversation({ athlete, onBack }) {
             style={{ flex: 1, resize: 'none', border: '1.5px solid var(--border)',
               borderRadius: 12, padding: '.75rem 1rem', fontSize: '.9375rem',
               fontFamily: 'inherit', outline: 'none', background: 'var(--bg)',
-              maxHeight: 150, overflowY: 'auto' }}
+              color: 'var(--text)', maxHeight: 150, overflowY: 'auto' }}
           />
           <button type="submit" className="btn btn-primary" disabled={!input.trim() || sending}>
             {sending ? '…' : 'Envoyer'}
