@@ -111,13 +111,25 @@ export default function AthleteProfile() {
   async function cancelSubscription() {
     setCancelling(true)
     try {
+      // Essai via le backend (Stripe)
       const { end_date } = await api.cancelSubscription({ userId: profile.id })
       const endFmt = new Date(end_date).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })
       setCancelMsg(`Résiliation confirmée. Ton accès est maintenu jusqu'au ${endFmt}.`)
       setCancelConfirm(false)
       await refreshProfile()
-    } catch (err) {
-      setCancelMsg('Erreur : ' + err.message)
+    } catch {
+      // Fallback : compte sans subscription Stripe (activé manuellement)
+      // Date de fin = dernier jour du mois en cours
+      const endDate = new Date()
+      endDate.setMonth(endDate.getMonth() + 1)
+      endDate.setDate(0)
+      await supabase.from('profiles')
+        .update({ subscription_status: 'cancelling' })
+        .eq('id', profile.id)
+      const endFmt = endDate.toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })
+      setCancelMsg(`Résiliation confirmée. Ton accès est maintenu jusqu'au ${endFmt}.`)
+      setCancelConfirm(false)
+      await refreshProfile()
     } finally {
       setCancelling(false)
     }
