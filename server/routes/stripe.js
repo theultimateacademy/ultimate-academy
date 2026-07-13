@@ -215,14 +215,19 @@ router.post('/cancel-subscription', async (req, res) => {
       limit: 1
     });
 
-    if (!subscriptions.data.length) {
-      return res.status(400).json({ error: 'Aucun abonnement actif trouvé.' });
+    let endDate;
+    if (subscriptions.data.length) {
+      const sub = subscriptions.data[0];
+      endDate = new Date(sub.current_period_end * 1000);
+      await stripe.subscriptions.update(sub.id, { cancel_at_period_end: true });
+    } else {
+      // Pas de subscription Stripe (compte activé manuellement) : résiliation directe côté DB
+      // Date de fin = fin du mois en cours
+      endDate = new Date();
+      endDate.setMonth(endDate.getMonth() + 1);
+      endDate.setDate(0); // dernier jour du mois courant
     }
 
-    const sub     = subscriptions.data[0];
-    const endDate = new Date(sub.current_period_end * 1000);
-
-    await stripe.subscriptions.update(sub.id, { cancel_at_period_end: true });
     await supabase.from('profiles')
       .update({ subscription_status: 'cancelling' })
       .eq('id', userId);
