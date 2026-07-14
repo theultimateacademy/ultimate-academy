@@ -41,6 +41,16 @@ function fmtPace(min, sec) {
   return `${min || '0'}'${String(sec || '0').padStart(2, '0')}"/km`
 }
 
+// Convert time on distance (sec) → pace display string "M'SS""
+function timeToPace(min, sec, distM) {
+  const total = (parseInt(min) || 0) * 60 + (parseInt(sec) || 0)
+  if (!total || !distM) return null
+  const paceSec = (total / distM) * 1000
+  const pMin = Math.floor(paceSec / 60)
+  const pSec = Math.round(paceSec % 60)
+  return `${pMin}'${String(pSec).padStart(2, '0')}"`
+}
+
 // Detect first interval line: "• N×M[unit]..." → {reps, label} or null
 function detectIntervals(corps) {
   if (!corps) return null
@@ -225,7 +235,9 @@ export default function PostSessionFlow({
   const [wuPaceSec,     setWuPaceSec]     = useState('')
   const [mainPaceMin,   setMainPaceMin]   = useState('')
   const [mainPaceSec,   setMainPaceSec]   = useState('')
-  const [repPaces,      setRepPaces]      = useState([]) // [{min:'', sec:''}]
+  const [repPaces,      setRepPaces]      = useState([]) // [{min:'', sec:''}] — allure mode
+  const [repTimes,      setRepTimes]      = useState([]) // [{min:'', sec:''}] — temps/distance mode
+  const [repMode,       setRepMode]       = useState('time') // 'time' | 'pace'
   const [cdPaceMin,     setCdPaceMin]     = useState('')
   const [cdPaceSec,     setCdPaceSec]     = useState('')
   const [avgHr,         setAvgHr]         = useState('')
@@ -240,11 +252,25 @@ export default function PostSessionFlow({
   const intervals = useMemo(() => !isNonRunning ? detectIntervals(session.corps) : null, [session.corps, isNonRunning])
   const numReps   = intervals?.reps || 0
 
+  // Extract distance in metres from intervals.label (e.g. "6×300m" → 300)
+  const distM = useMemo(() => {
+    if (!intervals?.label) return null
+    const m = intervals.label.match(/[×x]\s*(\d+(?:[.,]\d+)?)\s*(m|km)/i)
+    if (!m) return null
+    const val = parseFloat(m[1].replace(',', '.'))
+    return m[2].toLowerCase() === 'km' ? val * 1000 : val
+  }, [intervals?.label])
+
   // Effective rep paces (grows dynamically as user edits)
   const effectiveRepPaces = useMemo(() => {
     if (numReps === 0) return []
     return Array.from({ length: numReps }, (_, i) => repPaces[i] || { min: '', sec: '' })
   }, [numReps, repPaces])
+
+  const effectiveRepTimes = useMemo(() => {
+    if (numReps === 0) return []
+    return Array.from({ length: numReps }, (_, i) => repTimes[i] || { min: '', sec: '' })
+  }, [numReps, repTimes])
 
   const wuAllure   = getPhaseAllure(session.allures, 'warmup')
   const mainAllure = getPhaseAllure(session.allures, 'main')
@@ -290,12 +316,21 @@ export default function PostSessionFlow({
       if (wuPaceMin || wuPaceSec)
         parts.push(`[Ech: ${wuPaceMin||'0'}'${String(wuPaceSec||'0').padStart(2,'0')}"]`)
       if (numReps > 0) {
-        const usedReps = effectiveRepPaces.filter(p => p.min || p.sec)
-        if (usedReps.length) {
+        if (repMode === 'time' && distM) {
+          const repsStr = effectiveRepTimes
+            .map((t, i) => {
+              if (!t.min && !t.sec) return null
+              const timeStr = `${t.min||'0'}'${String(t.sec||'0').padStart(2,'0')}"`
+              const pace = timeToPace(t.min, t.sec, distM)
+              return pace ? `${i+1}:${timeStr}(${pace}/km)` : `${i+1}:${timeStr}`
+            })
+            .filter(Boolean).join(' | ')
+          if (repsStr) parts.push(`[Blocs: ${repsStr}]`)
+        } else {
           const repsStr = effectiveRepPaces
             .map((p, i) => (p.min || p.sec) ? `${i+1}:${p.min||'0'}'${String(p.sec||'0').padStart(2,'0')}"` : null)
             .filter(Boolean).join(' | ')
-          parts.push(`[Blocs: ${repsStr}]`)
+          if (repsStr) parts.push(`[Blocs: ${repsStr}]`)
         }
       } else if (mainPaceMin || mainPaceSec) {
         parts.push(`[Corps: ${mainPaceMin||'0'}'${String(mainPaceSec||'0').padStart(2,'0')}"/km]`)
@@ -508,7 +543,9 @@ export default function PostSessionFlow({
               </h3>
               <p style={{ fontSize: '.85rem', color: 'rgba(26,26,46,.5)', marginBottom: '1.25rem', lineHeight: 1.65 }}>
                 {numReps > 0
-                  ? `Entre l'allure (min:sec/km) pour chaque répétition.`
+                  ? distM
+                    ? `Entre le temps réalisé sur chaque ${distM}m.`
+                    : `Entre l'allure pour chaque répétition.`
                   : 'Quelle allure moyenne sur le corps de la séance ?'}
               </p>
 
@@ -521,47 +558,82 @@ export default function PostSessionFlow({
               </PrevuCard>
 
               {numReps > 0 ? (
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '.5rem' }}>
-                  {effectiveRepPaces.map((rp, i) => (
-                    <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '.75rem',
-                      background: 'rgba(139,47,201,.04)', borderRadius: 12,
-                      padding: '.6rem .875rem', border: '1px solid rgba(139,47,201,.1)' }}>
-                      <span style={{ fontSize: '.78rem', fontWeight: 800, color: C.purple,
-                        minWidth: 22, textAlign: 'center' }}>
-                        {i + 1}
-                      </span>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '.3rem', flex: 1 }}>
-                        <input
-                          type="number" min="0" max="99" placeholder="MM" value={rp.min || ''}
-                          onChange={e => setRepPaces(prev => {
-                            const next = Array.from({ length: numReps }, (_, j) => prev[j] || { min: '', sec: '' })
-                            next[i] = { ...next[i], min: e.target.value }
-                            return next
-                          })}
-                          style={{ width: 50, padding: '.4rem .3rem', borderRadius: 8, fontSize: '.95rem',
-                            fontWeight: 700, border: '2px solid rgba(139,47,201,.18)', background: '#fff',
-                            textAlign: 'center', outline: 'none', color: '#1a1a2e' }} />
-                        <span style={{ color: 'rgba(26,26,46,.25)', fontSize: '1rem' }}>:</span>
-                        <input
-                          type="number" min="0" max="59" placeholder="SS" value={rp.sec || ''}
-                          onChange={e => setRepPaces(prev => {
-                            const next = Array.from({ length: numReps }, (_, j) => prev[j] || { min: '', sec: '' })
-                            next[i] = { ...next[i], sec: e.target.value }
-                            return next
-                          })}
-                          style={{ width: 50, padding: '.4rem .3rem', borderRadius: 8, fontSize: '.95rem',
-                            fontWeight: 700, border: '2px solid rgba(139,47,201,.18)', background: '#fff',
-                            textAlign: 'center', outline: 'none', color: '#1a1a2e' }} />
-                        <span style={{ fontSize: '.75rem', color: 'rgba(26,26,46,.35)' }}>/km</span>
-                      </div>
-                      {(rp.min || rp.sec) && (
-                        <span style={{ fontSize: '.75rem', fontWeight: 800, color: C.purple, flexShrink: 0 }}>
-                          {rp.min || '0'}'{String(rp.sec || '0').padStart(2,'0')}"
-                        </span>
-                      )}
+                <>
+                  {/* Mode toggle — only show if distance is known */}
+                  {distM && (
+                    <div style={{ display: 'flex', gap: '.35rem', marginBottom: '.875rem',
+                      background: 'rgba(139,47,201,.06)', borderRadius: 12, padding: '.3rem' }}>
+                      {[
+                        { v: 'time', l: `⏱ Temps / ${distM}m` },
+                        { v: 'pace', l: '⚡ Allure /km' },
+                      ].map(m => (
+                        <button key={m.v} onClick={() => setRepMode(m.v)} style={{
+                          flex: 1, padding: '.4rem', borderRadius: 9, border: 'none', cursor: 'pointer',
+                          fontFamily: 'inherit', fontWeight: 700, fontSize: '.8rem',
+                          background: repMode === m.v ? C.purple : 'transparent',
+                          color: repMode === m.v ? '#fff' : 'rgba(26,26,46,.4)',
+                          transition: 'all .15s',
+                        }}>{m.l}</button>
+                      ))}
                     </div>
-                  ))}
-                </div>
+                  )}
+
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '.5rem' }}>
+                    {(repMode === 'time' && distM ? effectiveRepTimes : effectiveRepPaces).map((rp, i) => {
+                      const calcPace = repMode === 'time' && distM ? timeToPace(rp.min, rp.sec, distM) : null
+                      const setter  = repMode === 'time' && distM ? setRepTimes : setRepPaces
+                      return (
+                        <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '.75rem',
+                          background: 'rgba(139,47,201,.04)', borderRadius: 12,
+                          padding: '.6rem .875rem', border: '1px solid rgba(139,47,201,.1)' }}>
+                          <span style={{ fontSize: '.78rem', fontWeight: 800, color: C.purple,
+                            minWidth: 22, textAlign: 'center' }}>
+                            {i + 1}
+                          </span>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '.3rem', flex: 1 }}>
+                            <input
+                              type="number" min="0" max="99" placeholder="MM" value={rp.min || ''}
+                              onChange={e => setter(prev => {
+                                const next = Array.from({ length: numReps }, (_, j) => prev[j] || { min: '', sec: '' })
+                                next[i] = { ...next[i], min: e.target.value }
+                                return next
+                              })}
+                              style={{ width: 50, padding: '.4rem .3rem', borderRadius: 8, fontSize: '.95rem',
+                                fontWeight: 700, border: '2px solid rgba(139,47,201,.18)', background: '#fff',
+                                textAlign: 'center', outline: 'none', color: '#1a1a2e' }} />
+                            <span style={{ color: 'rgba(26,26,46,.25)', fontSize: '1rem' }}>:</span>
+                            <input
+                              type="number" min="0" max="59" placeholder="SS" value={rp.sec || ''}
+                              onChange={e => setter(prev => {
+                                const next = Array.from({ length: numReps }, (_, j) => prev[j] || { min: '', sec: '' })
+                                next[i] = { ...next[i], sec: e.target.value }
+                                return next
+                              })}
+                              style={{ width: 50, padding: '.4rem .3rem', borderRadius: 8, fontSize: '.95rem',
+                                fontWeight: 700, border: '2px solid rgba(139,47,201,.18)', background: '#fff',
+                                textAlign: 'center', outline: 'none', color: '#1a1a2e' }} />
+                            <span style={{ fontSize: '.75rem', color: 'rgba(26,26,46,.35)' }}>
+                              {repMode === 'time' && distM ? `sur ${distM}m` : '/km'}
+                            </span>
+                          </div>
+                          {/* Calculated pace shown live in time mode */}
+                          {calcPace && (
+                            <span style={{ fontSize: '.8rem', fontWeight: 800, color: C.purple,
+                              flexShrink: 0, whiteSpace: 'nowrap' }}>
+                              = {calcPace}<span style={{ fontSize: '.68rem', fontWeight: 400, opacity: .6 }}>/km</span>
+                            </span>
+                          )}
+                          {/* Pace display in pace mode */}
+                          {repMode !== 'time' && (rp.min || rp.sec) && (
+                            <span style={{ fontSize: '.75rem', fontWeight: 800, color: C.purple, flexShrink: 0 }}>
+                              {rp.min || '0'}'{String(rp.sec || '0').padStart(2,'0')}"
+                            </span>
+                          )}
+                        </div>
+                      )
+                    })}
+                  </div>
+                </>
               ) : (
                 <PaceInput
                   label="Allure moyenne corps de séance"

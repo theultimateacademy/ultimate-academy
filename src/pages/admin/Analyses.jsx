@@ -10,7 +10,255 @@ const MOOD_OPTIONS = [
   { v: 'attention', icon: '⚠️', label: 'À surveiller', color: '#F59E0B' },
 ]
 
-const rpeColor = r => !r ? 'rgba(255,255,255,.4)' : r >= 8 ? '#EF4444' : r >= 6 ? '#F59E0B' : '#10B981'
+const DAY_ORDER = { Lundi: 1, Mardi: 2, Mercredi: 3, Jeudi: 4, Vendredi: 5, Samedi: 6, Dimanche: 7 }
+const rpeColor  = r => !r ? 'rgba(255,255,255,.4)' : r >= 8 ? '#EF4444' : r >= 6 ? '#F59E0B' : '#10B981'
+
+// Parse structured comment tags into object
+function parseComment(comment) {
+  if (!comment) return {}
+  const r = {}
+  const ressentiM = comment.match(/\[Ressenti:\s*([^\]]+)\]/)
+  if (ressentiM) r.ressenti = ressentiM[1].trim()
+  const echM = comment.match(/\[Ech:\s*([^\]]+)\]/)
+  if (echM) r.ech = echM[1].trim()
+  const blocsM = comment.match(/\[Blocs:\s*([^\]]+)\]/)
+  if (blocsM) r.blocs = blocsM[1].split('|').map(b => b.trim()).filter(Boolean)
+  const corpsM = comment.match(/\[Corps:\s*([^\]]+)\]/)
+  if (corpsM) r.corps = corpsM[1].trim()
+  const racM = comment.match(/\[RAC:\s*([^\]]+)\]/)
+  if (racM) r.rac = racM[1].trim()
+  const fcMoyM = comment.match(/\[FC moy:\s*([^\]]+)\]/)
+  if (fcMoyM) r.fcMoy = fcMoyM[1].trim()
+  const fcMaxM = comment.match(/\[FC max:\s*([^\]]+)\]/)
+  if (fcMaxM) r.fcMax = fcMaxM[1].trim()
+  r.text = comment.replace(/\[[^\]]*\]/g, '').trim()
+  return r
+}
+
+// Corps text renderer adapted for dark admin theme
+function AdminCorpsDisplay({ corps, color }) {
+  if (!corps) return null
+  const c = color || '#10B981'
+  const nodes = []
+  corps.split('\n').forEach((line, i) => {
+    const t = line.trim()
+    if (!t) return
+    if (/^BLOC\b/i.test(t)) {
+      nodes.push(
+        <div key={i} style={{ fontSize: '.63rem', fontWeight: 800, color: c, textTransform: 'uppercase',
+          letterSpacing: '.07em', marginTop: nodes.length > 0 ? '.5rem' : 0, marginBottom: '.15rem', opacity: .85 }}>
+          {t}
+        </div>
+      )
+    } else if (t.startsWith('•')) {
+      const content = t.slice(1).trim()
+      const isRecov = /récup|recup|marche|trot|repos/i.test(content)
+      nodes.push(
+        <div key={i} style={{ fontSize: '.78rem', color: isRecov ? 'rgba(255,255,255,.32)' : 'rgba(255,255,255,.72)',
+          fontStyle: isRecov ? 'italic' : 'normal', lineHeight: 1.5 }}>
+          {isRecov ? '⏸ ' : '· '}{content}
+        </div>
+      )
+    } else {
+      nodes.push(<div key={i} style={{ fontSize: '.72rem', color: 'rgba(255,255,255,.38)', fontStyle: 'italic' }}>{t}</div>)
+    }
+  })
+  return <div style={{ display: 'flex', flexDirection: 'column', gap: '.1rem' }}>{nodes}</div>
+}
+
+// RPE mini progress bar
+function RPEBar({ rpe }) {
+  if (!rpe) return null
+  const c = rpeColor(rpe)
+  return (
+    <div style={{ display: 'flex', alignItems: 'center', gap: '.5rem', marginBottom: '.5rem' }}>
+      <span style={{ fontSize: '.68rem', color: 'rgba(255,255,255,.38)', flexShrink: 0 }}>RPE</span>
+      <div style={{ flex: 1, height: 5, background: 'rgba(255,255,255,.08)', borderRadius: 99, overflow: 'hidden' }}>
+        <div style={{ height: '100%', width: `${rpe * 10}%`, background: c, borderRadius: 99, transition: 'width .3s' }} />
+      </div>
+      <span style={{ fontSize: '.85rem', fontWeight: 800, color: c, flexShrink: 0, minWidth: 18 }}>{rpe}</span>
+    </div>
+  )
+}
+
+// Single expandable session card
+function SessionAccordion({ session, expanded, onToggle }) {
+  const { idx, jour, type, titre, corps, allures, echauffement, retour_au_calme, comp, aiComment } = session
+  const color  = SESSION_TYPE_COLORS[type] || '#10B981'
+  const done   = !!comp
+  const parsed = parseComment(comp?.comment)
+
+  return (
+    <div style={{ borderRadius: 12, border: `1px solid ${done ? 'rgba(16,185,129,.18)' : 'rgba(255,255,255,.07)'}`,
+      overflow: 'hidden', background: done ? 'rgba(16,185,129,.04)' : 'rgba(255,255,255,.02)' }}>
+
+      {/* Collapsed header — full row is clickable */}
+      <button onClick={onToggle} style={{
+        width: '100%', display: 'flex', alignItems: 'center', gap: 0,
+        background: 'none', border: 'none', cursor: 'pointer', fontFamily: 'inherit', padding: 0, textAlign: 'left',
+      }}>
+        <div style={{ width: 3, background: done ? '#10B981' : color, alignSelf: 'stretch', flexShrink: 0 }} />
+        <div style={{ flex: 1, padding: '.6rem .875rem', display: 'flex', alignItems: 'center', gap: '.5rem', minWidth: 0 }}>
+          {/* Day */}
+          <span style={{ fontSize: '.68rem', color: 'rgba(255,255,255,.38)', flexShrink: 0, minWidth: 28 }}>
+            {jour?.slice(0, 3)}
+          </span>
+          {/* Type badge */}
+          <span style={{ fontSize: '.62rem', fontWeight: 800, color, textTransform: 'uppercase',
+            letterSpacing: '.05em', flexShrink: 0, background: color + '18',
+            borderRadius: 99, padding: '.1rem .45rem', border: `1px solid ${color}28` }}>
+            {type?.split(' ')[0]}
+          </span>
+          {/* Title */}
+          <span style={{ fontSize: '.82rem', fontWeight: 600, color: '#fff', flex: 1, overflow: 'hidden',
+            textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+            {titre}
+          </span>
+          {/* Done / not done */}
+          {done ? (
+            <>
+              <span style={{ fontSize: '.78rem' }}>✅</span>
+              {comp.rpe && (
+                <span style={{ fontSize: '.68rem', fontWeight: 800, color: rpeColor(comp.rpe),
+                  background: rpeColor(comp.rpe) + '20', borderRadius: 99, padding: '.1rem .4rem',
+                  flexShrink: 0, border: `1px solid ${rpeColor(comp.rpe)}30` }}>
+                  RPE {comp.rpe}
+                </span>
+              )}
+            </>
+          ) : (
+            <span style={{ fontSize: '.7rem', color: 'rgba(255,255,255,.25)', fontStyle: 'italic', flexShrink: 0 }}>Non effectuée</span>
+          )}
+          {/* Chevron */}
+          <span style={{ fontSize: '.6rem', color: 'rgba(255,255,255,.22)', flexShrink: 0, marginLeft: '.25rem' }}>
+            {expanded ? '▲' : '▼'}
+          </span>
+        </div>
+      </button>
+
+      {/* Expanded detail */}
+      {expanded && (
+        <div style={{ borderTop: '1px solid rgba(255,255,255,.06)', padding: '1rem' }}>
+
+          {/* Prévu / Réalisé two-column grid */}
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+
+            {/* ── PRÉVU ── */}
+            <div>
+              <div style={{ fontSize: '.62rem', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '.1em',
+                color, marginBottom: '.5rem' }}>Prévu</div>
+              {echauffement && (
+                <div style={{ fontSize: '.72rem', color: 'rgba(255,255,255,.45)', marginBottom: '.35rem',
+                  padding: '.3rem .5rem', background: 'rgba(245,158,11,.06)', borderRadius: 8,
+                  border: '1px solid rgba(245,158,11,.15)' }}>
+                  🔥 <em>{echauffement}</em>
+                </div>
+              )}
+              <AdminCorpsDisplay corps={corps} color={color} />
+              {retour_au_calme && (
+                <div style={{ fontSize: '.72rem', color: 'rgba(255,255,255,.45)', marginTop: '.35rem',
+                  padding: '.3rem .5rem', background: 'rgba(59,130,246,.06)', borderRadius: 8,
+                  border: '1px solid rgba(59,130,246,.15)' }}>
+                  ❄️ <em>{retour_au_calme}</em>
+                </div>
+              )}
+              {/* Allures cibles */}
+              {(allures || []).filter(a => a?.allure_min_km).length > 0 && (
+                <div style={{ marginTop: '.5rem', display: 'flex', flexWrap: 'wrap', gap: '.3rem' }}>
+                  {(allures || []).filter(a => a?.allure_min_km).map((a, ai) => (
+                    <span key={ai} style={{ fontSize: '.7rem', fontWeight: 700, color,
+                      background: color + '15', borderRadius: 99, padding: '.15rem .5rem',
+                      border: `1px solid ${color}28` }}>
+                      🎯 {a.zone ? `${a.zone}: ` : ''}{a.allure_min_km}
+                    </span>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {/* ── RÉALISÉ ── */}
+            <div>
+              <div style={{ fontSize: '.62rem', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '.1em',
+                color: done ? '#10B981' : 'rgba(255,255,255,.25)', marginBottom: '.5rem' }}>Réalisé</div>
+              {done ? (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '.35rem' }}>
+                  <RPEBar rpe={comp.rpe} />
+                  {parsed.ressenti && (
+                    <div style={{ fontSize: '.75rem', color: 'rgba(255,255,255,.6)' }}>
+                      💬 {parsed.ressenti}
+                    </div>
+                  )}
+                  {parsed.ech && (
+                    <div style={{ fontSize: '.75rem', color: 'rgba(255,255,255,.55)' }}>
+                      🔥 Ech: <strong>{parsed.ech}</strong>/km
+                    </div>
+                  )}
+                  {parsed.blocs && parsed.blocs.length > 0 && (
+                    <div style={{ background: 'rgba(255,255,255,.04)', borderRadius: 8,
+                      padding: '.4rem .6rem', border: '1px solid rgba(255,255,255,.07)' }}>
+                      <div style={{ fontSize: '.62rem', fontWeight: 700, color: 'rgba(255,255,255,.3)',
+                        textTransform: 'uppercase', letterSpacing: '.08em', marginBottom: '.25rem' }}>
+                        Répétitions
+                      </div>
+                      {parsed.blocs.map((b, bi) => (
+                        <div key={bi} style={{ fontSize: '.78rem', color: '#C084FC',
+                          fontWeight: 700, lineHeight: 1.6 }}>
+                          ⚡ {b}
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                  {parsed.corps && (
+                    <div style={{ fontSize: '.75rem', color: 'rgba(255,255,255,.55)' }}>
+                      ⚡ Corps: <strong>{parsed.corps}</strong>
+                    </div>
+                  )}
+                  {parsed.rac && (
+                    <div style={{ fontSize: '.75rem', color: 'rgba(255,255,255,.55)' }}>
+                      ❄️ RAC: <strong>{parsed.rac}</strong>/km
+                    </div>
+                  )}
+                  {(comp.avg_hr || parsed.fcMoy) && (
+                    <div style={{ fontSize: '.75rem', color: '#F87171' }}>
+                      ❤️ FC moy: <strong>{comp.avg_hr || parsed.fcMoy}</strong> bpm
+                      {parsed.fcMax && <span> · max: <strong>{parsed.fcMax}</strong> bpm</span>}
+                    </div>
+                  )}
+                  {parsed.text && (
+                    <div style={{ fontSize: '.75rem', color: 'rgba(255,255,255,.5)',
+                      fontStyle: 'italic', borderTop: '1px solid rgba(255,255,255,.06)',
+                      paddingTop: '.3rem', marginTop: '.1rem' }}>
+                      "{parsed.text}"
+                    </div>
+                  )}
+                </div>
+              ) : (
+                <div style={{ fontSize: '.8rem', color: 'rgba(255,255,255,.25)', fontStyle: 'italic', paddingTop: '.25rem' }}>
+                  — Séance non effectuée
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* AI coach comment */}
+          {aiComment && (
+            <div style={{ marginTop: '.875rem', borderTop: '1px solid rgba(255,255,255,.06)',
+              paddingTop: '.75rem' }}>
+              <div style={{ fontSize: '.62rem', fontWeight: 800, textTransform: 'uppercase',
+                letterSpacing: '.1em', color: '#C084FC', marginBottom: '.35rem' }}>
+                Analyse coach
+              </div>
+              <p style={{ fontSize: '.82rem', color: 'rgba(255,255,255,.6)', lineHeight: 1.65, margin: 0,
+                fontStyle: 'italic' }}>
+                {aiComment}
+              </p>
+            </div>
+          )}
+        </div>
+      )}
+    </div>
+  )
+}
 
 function AnalysisModal({ analysis, athlete, onClose, onSend }) {
   const data0 = analysis.analysis_data || {}
@@ -18,12 +266,12 @@ function AnalysisModal({ analysis, athlete, onClose, onSend }) {
   const [intro,           setIntro]           = useState(analysis.coach_message || '')
   const [conseil,         setConseil]         = useState(data0.conseil || data0.ajustement_semaine_suivante || '')
   const [mood,            setMood]            = useState(data0.mood || 'good')
-  const [sessions,        setSessions]        = useState(data0.sessions_comments || [])
   const [saving,          setSaving]          = useState(false)
   const [sending,         setSending]         = useState(false)
-  const [weekSessions,    setWeekSessions]    = useState([]) // sessions planifiées
-  const [weekCompletions, setWeekCompletions] = useState([]) // sessions effectuées
+  const [weekSessions,    setWeekSessions]    = useState([])
+  const [weekCompletions, setWeekCompletions] = useState([])
   const [loadingData,     setLoadingData]     = useState(true)
+  const [expandedIdx,     setExpandedIdx]     = useState(null)
 
   const isSent = analysis.status === 'sent'
 
@@ -53,7 +301,7 @@ function AnalysisModal({ analysis, athlete, onClose, onSend }) {
     setSaving(true)
     const payload = {
       coach_message: intro,
-      analysis_data: { ...data0, intro, conseil, mood, sessions_comments: sessions },
+      analysis_data: { ...data0, intro, conseil, mood },
     }
     await supabase.from('weekly_analyses').update(payload).eq('id', analysis.id)
     setSaving(false)
@@ -64,7 +312,7 @@ function AnalysisModal({ analysis, athlete, onClose, onSend }) {
     try {
       const payload = {
         coach_message: intro,
-        analysis_data: { ...data0, intro, conseil, mood, sessions_comments: sessions },
+        analysis_data: { ...data0, intro, conseil, mood },
         status: 'sent',
         sent_at: new Date().toISOString(),
       }
@@ -75,16 +323,25 @@ function AnalysisModal({ analysis, athlete, onClose, onSend }) {
     }
   }
 
-  const addSession = () => setSessions(s => [...s, { titre: '', note: '' }])
-  const updateSession = (i, field, val) => setSessions(s => s.map((x, j) => j === i ? { ...x, [field]: val } : x))
-  const removeSession = (i) => setSessions(s => s.filter((_, j) => j !== i))
+  const aiSessions = data0.sessions || []
+
+  const sessionCards = weekSessions
+    .map((s, idx) => ({
+      idx,
+      ...s,
+      comp:      weekCompletions.find(c => c.session_index === idx),
+      aiComment: aiSessions.find(ai => ai.idx === idx)?.coach_comment || null,
+    }))
+    .sort((a, b) => (DAY_ORDER[a.jour] || 8) - (DAY_ORDER[b.jour] || 8))
+
+  const doneCount = sessionCards.filter(s => s.comp).length
 
   const inp = { width: '100%', padding: '.45rem .75rem', border: '1px solid rgba(255,255,255,.12)', borderRadius: 8, fontSize: '.875rem', fontFamily: 'inherit', background: 'rgba(255,255,255,.05)', color: '#fff', outline: 'none', boxSizing: 'border-box' }
 
   return (
     <div style={{ position: 'fixed', inset: 0, zIndex: 400, background: 'rgba(0,0,0,.75)', backdropFilter: 'blur(6px)', display: 'flex', alignItems: 'flex-start', justifyContent: 'center', padding: '1.5rem', overflowY: 'auto' }}
       onClick={e => e.target === e.currentTarget && onClose()}>
-      <div style={{ width: '100%', maxWidth: 680, background: 'var(--surface)', borderRadius: 20, border: '1px solid var(--border)', boxShadow: '0 24px 60px rgba(0,0,0,.6)', overflow: 'hidden', margin: 'auto' }}
+      <div style={{ width: '100%', maxWidth: 720, background: 'var(--surface)', borderRadius: 20, border: '1px solid var(--border)', boxShadow: '0 24px 60px rgba(0,0,0,.6)', overflow: 'hidden', margin: 'auto' }}
         onClick={e => e.stopPropagation()}>
 
         {/* Header */}
@@ -120,7 +377,37 @@ function AnalysisModal({ analysis, athlete, onClose, onSend }) {
             </div>
           </div>
 
-          {/* Intro pote */}
+          {/* Séances accordion */}
+          <div>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '.5rem' }}>
+              <label style={{ fontSize: '.72rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '.08em', color: 'rgba(255,255,255,.4)' }}>
+                Séances de la semaine
+              </label>
+              {!loadingData && sessionCards.length > 0 && (
+                <span style={{ fontSize: '.72rem', color: doneCount === sessionCards.length ? '#34D399' : 'rgba(255,255,255,.3)', fontWeight: 600 }}>
+                  {doneCount}/{sessionCards.length} effectuées
+                </span>
+              )}
+            </div>
+            {loadingData ? (
+              <div style={{ fontSize: '.8rem', color: 'rgba(255,255,255,.3)', padding: '.5rem 0' }}>Chargement…</div>
+            ) : sessionCards.length === 0 ? (
+              <div style={{ fontSize: '.8rem', color: 'rgba(255,255,255,.25)', fontStyle: 'italic' }}>Aucune séance trouvée dans le plan.</div>
+            ) : (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '.35rem' }}>
+                {sessionCards.map(s => (
+                  <SessionAccordion
+                    key={s.idx}
+                    session={s}
+                    expanded={expandedIdx === s.idx}
+                    onToggle={() => setExpandedIdx(expandedIdx === s.idx ? null : s.idx)}
+                  />
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* Message principal */}
           <div>
             <label style={{ fontSize: '.72rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '.08em', color: 'rgba(255,255,255,.4)', display: 'block', marginBottom: '.4rem' }}>
               Message principal — ton retour en mode pote
@@ -134,124 +421,7 @@ function AnalysisModal({ analysis, athlete, onClose, onSend }) {
             </div>
           </div>
 
-          {/* Séances réelles de la semaine */}
-          <div>
-            <div style={{ fontSize: '.72rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '.08em', color: 'rgba(255,255,255,.4)', marginBottom: '.5rem' }}>
-              Séances de la semaine — réel
-            </div>
-            {loadingData ? (
-              <div style={{ fontSize: '.8rem', color: 'rgba(255,255,255,.3)', padding: '.5rem 0' }}>Chargement…</div>
-            ) : weekSessions.length === 0 ? (
-              <div style={{ fontSize: '.8rem', color: 'rgba(255,255,255,.25)', fontStyle: 'italic' }}>Aucune séance trouvée dans le plan.</div>
-            ) : (
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '.4rem' }}>
-                {weekSessions.map((s, idx) => {
-                  const comp  = weekCompletions.find(c => c.session_index === idx)
-                  const color = SESSION_TYPE_COLORS[s.type] || '#10B981'
-                  const done  = !!comp
-                  return (
-                    <div key={idx} style={{
-                      display: 'flex', alignItems: 'flex-start', gap: '.75rem',
-                      background: done ? 'rgba(16,185,129,.07)' : 'rgba(255,255,255,.03)',
-                      border: `1px solid ${done ? 'rgba(16,185,129,.2)' : 'rgba(255,255,255,.08)'}`,
-                      borderLeft: `3px solid ${done ? '#10B981' : color}`,
-                      borderRadius: 10, padding: '.625rem .875rem',
-                    }}>
-                      <div style={{ width: 20, flexShrink: 0, paddingTop: '.15rem', textAlign: 'center', fontSize: '.9rem' }}>
-                        {done ? '✅' : '—'}
-                      </div>
-                      <div style={{ flex: 1, minWidth: 0 }}>
-                        <div style={{ display: 'flex', gap: '.4rem', alignItems: 'center', flexWrap: 'wrap', marginBottom: '.2rem' }}>
-                          <span style={{ fontSize: '.7rem', fontWeight: 700, color, textTransform: 'uppercase', letterSpacing: '.04em' }}>{s.type}</span>
-                          <span style={{ fontSize: '.72rem', color: 'rgba(255,255,255,.35)' }}>· {s.jour}</span>
-                          {comp?.rpe && (
-                            <span style={{ fontSize: '.7rem', background: 'rgba(255,255,255,.08)', borderRadius: 99, padding: '.1rem .45rem', color: 'rgba(255,255,255,.6)', fontWeight: 700 }}>
-                              RPE {comp.rpe}
-                            </span>
-                          )}
-                        </div>
-                        <div style={{ fontSize: '.82rem', fontWeight: 600 }}>{s.titre}</div>
-                        {comp?.comment && (
-                          <div style={{ fontSize: '.75rem', color: 'rgba(255,255,255,.45)', marginTop: '.2rem', fontStyle: 'italic' }}>
-                            {comp.comment}
-                          </div>
-                        )}
-                        {!done && (
-                          <div style={{ fontSize: '.72rem', color: 'rgba(255,255,255,.28)', marginTop: '.15rem' }}>Non effectuée</div>
-                        )}
-                      </div>
-                      {comp?.avg_hr && (
-                        <div style={{ flexShrink: 0, fontSize: '.72rem', color: 'rgba(255,255,255,.4)', textAlign: 'right' }}>
-                          ❤️ {comp.avg_hr} bpm
-                        </div>
-                      )}
-                    </div>
-                  )
-                })}
-                <div style={{ fontSize: '.7rem', color: 'rgba(255,255,255,.3)', marginTop: '.25rem' }}>
-                  {weekCompletions.length} / {weekSessions.length} séances effectuées
-                </div>
-              </div>
-            )}
-          </div>
-
-          {/* Session comments */}
-          <div>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '.5rem' }}>
-              <label style={{ fontSize: '.72rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '.08em', color: 'rgba(255,255,255,.4)' }}>
-                Retours séance par séance
-              </label>
-              <button onClick={addSession} style={{ fontSize: '.75rem', color: '#C084FC', background: 'rgba(139,47,201,.15)', border: '1px solid rgba(139,47,201,.3)', borderRadius: 6, padding: '.2rem .6rem', cursor: 'pointer', fontFamily: 'inherit' }}>
-                + Ajouter
-              </button>
-            </div>
-            {sessions.length === 0 && (
-              <div style={{ fontSize: '.8rem', color: 'rgba(255,255,255,.25)', fontStyle: 'italic', padding: '.5rem 0' }}>
-                Aucun commentaire de séance. Clique sur "+ Ajouter" pour commenter une séance spécifique.
-              </div>
-            )}
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '.65rem' }}>
-              {sessions.map((s, i) => (
-                <div key={i} style={{ background: 'rgba(255,255,255,.03)', border: '1px solid rgba(255,255,255,.08)', borderRadius: 10, padding: '.75rem' }}>
-                  {/* Titre + jour + type + RPE */}
-                  <div style={{ display: 'flex', gap: '.4rem', marginBottom: '.4rem', flexWrap: 'wrap' }}>
-                    <input value={s.titre || ''} onChange={e => updateSession(i, 'titre', e.target.value)}
-                      placeholder="Titre (ex : Côtes 8×80m)"
-                      style={{ ...inp, flex: 2, minWidth: 140, fontSize: '.82rem' }} />
-                    <select value={s.jour || ''} onChange={e => updateSession(i, 'jour', e.target.value)}
-                      style={{ ...inp, flex: '0 0 90px', fontSize: '.8rem', cursor: 'pointer' }}>
-                      <option value="">Jour</option>
-                      {['Lundi','Mardi','Mercredi','Jeudi','Vendredi','Samedi','Dimanche'].map(j => <option key={j} value={j}>{j.slice(0,3)}</option>)}
-                    </select>
-                    <select value={s.type || ''} onChange={e => updateSession(i, 'type', e.target.value)}
-                      style={{ ...inp, flex: '0 0 100px', fontSize: '.8rem', cursor: 'pointer' }}>
-                      <option value="">Sport</option>
-                      <option value="Cotes">Côtes</option>
-                      <option value="Endurance Fondamentale">EF</option>
-                      <option value="Fractionné Court">Frac Court</option>
-                      <option value="Fractionné Long">Frac Long</option>
-                      <option value="Sortie Longue">SL</option>
-                      <option value="Tempo / Seuil">Tempo</option>
-                      <option value="Natation">Natation</option>
-                      <option value="Velo">Vélo</option>
-                      <option value="Brique">Brique</option>
-                      <option value="Renforcement">Renfo</option>
-                    </select>
-                    <input value={s.rpe || ''} onChange={e => updateSession(i, 'rpe', +e.target.value || '')}
-                      type="number" min="1" max="10" placeholder="RPE"
-                      style={{ ...inp, flex: '0 0 60px', fontSize: '.82rem' }} />
-                    <button onClick={() => removeSession(i)} style={{ background: 'rgba(239,68,68,.12)', border: '1px solid rgba(239,68,68,.2)', borderRadius: 6, padding: '.2rem .5rem', color: '#F87171', cursor: 'pointer', fontFamily: 'inherit', fontSize: '.8rem' }}>✕</button>
-                  </div>
-                  <textarea value={s.note || ''} onChange={e => updateSession(i, 'note', e.target.value)}
-                    placeholder="Ton retour sur cette séance..."
-                    rows={2}
-                    style={{ ...inp, resize: 'vertical', fontSize: '.82rem', lineHeight: 1.5 }} />
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* Conseil semaine prochaine */}
+          {/* Focus semaine prochaine */}
           <div>
             <label style={{ fontSize: '.72rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '.08em', color: 'rgba(255,255,255,.4)', display: 'block', marginBottom: '.4rem' }}>
               Focus semaine prochaine
@@ -262,12 +432,12 @@ function AnalysisModal({ analysis, athlete, onClose, onSend }) {
               style={{ ...inp, resize: 'vertical', lineHeight: 1.6 }} />
           </div>
 
-          {/* RPE moyen auto */}
+          {/* RPE moyen */}
           {data0.rpe_moyen && (
             <div style={{ display: 'flex', alignItems: 'center', gap: '.75rem', background: 'rgba(255,255,255,.04)', borderRadius: 8, padding: '.6rem .875rem' }}>
-              <span style={{ fontSize: '.72rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '.08em', color: 'rgba(255,255,255,.4)' }}>RPE moyen calculé</span>
+              <span style={{ fontSize: '.72rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '.08em', color: 'rgba(255,255,255,.4)' }}>RPE moyen</span>
               <span style={{ fontSize: '1.1rem', fontWeight: 800, color: rpeColor(data0.rpe_moyen) }}>{data0.rpe_moyen}</span>
-              <span style={{ fontSize: '.72rem', color: 'rgba(255,255,255,.35)' }}>/10 — affiché automatiquement</span>
+              <span style={{ fontSize: '.72rem', color: 'rgba(255,255,255,.35)' }}>/10 — calculé automatiquement</span>
             </div>
           )}
         </div>
