@@ -252,7 +252,7 @@ export default function Landing() {
             transition: 'opacity 0.8s 0.6s ease, transform 0.8s 0.6s ease',
           }}>
             Je conçois ton plan sur-mesure, suis ta progression semaine après semaine
-            et t'accompagne jusqu'à ton objectif — course, trail ou triathlon.
+            et t'accompagne jusqu'à ton objectif, que ce soit une course sur route, un trail ou un triathlon.
           </p>
 
           <div style={{
@@ -382,54 +382,12 @@ export default function Landing() {
               <h2 style={{ fontSize: 'clamp(2.5rem,6vw,4rem)', fontWeight: 800, letterSpacing: '-0.03em', marginBottom: '1.75rem' }}>Alexis</h2>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
                 {[
-                  "Ancien militaire et moniteur de ski, je suis aujourd'hui éducateur sportif et actuellement en formation STAPS. Le sport structure ma vie depuis toujours, et cette diversité d'expériences m'a appris à m'adapter, à transmettre et à comprendre les besoins de chaque athlète.",
-                  "Sur route, je cours le 10km en 34 minutes et le semi en 1h19. En montagne, j'ai enchaîné plusieurs ultras dont un 126km avec 6500m de dénivelé positif.",
-                  "Je connais la discipline qu'exige un objectif ambitieux et la fierté de le franchir. C'est cette expérience que je mets entièrement au service de ton programme.",
+                  "Le sport structure ma vie depuis toujours. Ancien militaire, moniteur de ski et éducateur sportif, j'ai développé une approche exigeante et bienveillante de la performance. Je ne transmets que ce que j'ai testé sur le terrain, et je m'adapte entièrement à ton profil, ton niveau et ta vie.",
+                  "Sur route, je cours le 10km en 34 minutes et le semi en 1h19. En montagne, j'ai enchaîné plusieurs ultras dont un 126km avec 6500m de dénivelé positif. J'accompagne aussi des athlètes en triathlon, du sprint à l'Ironman. Ces disciplines, je les connais de l'intérieur, avec leurs exigences, leurs pièges et ce qu'elles demandent vraiment.",
+                  "Que tu vises ton premier trail, un ultra, un triathlon ou un chrono sur route, mon rôle est simple : te donner le plan qui te correspond, suivre ta progression semaine après semaine et t'amener sur la ligne de départ dans ta meilleure forme. Ensemble, on construit quelque chose de solide.",
                 ].map((t, i) => (
                   <p key={i} style={{ lineHeight: 1.8, color: 'rgba(255,255,255,.62)', fontSize: '.9875rem', textAlign: 'justify' }}>{t}</p>
                 ))}
-              </div>
-              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '.6rem', marginTop: '2rem' }}>
-                {[
-                  ['\U0001f3c3','10km en 34min'],
-                  ['\U0001f948','Semi en 1h19'],
-                  ['\U0001f3d4️','126km / 6500m D+'],
-                  ['\U0001f3bf','Moniteur de ski'],
-                  ['\U0001f393','Éducateur sportif · STAPS'],
-                ].map(([icon, label], idx) => (
-                  <div key={label} style={{
-                    display: 'flex', alignItems: 'center', gap: '.4rem',
-                    padding: '.4rem .9rem', borderRadius: 99,
-                    background: 'rgba(255,255,255,.06)', border: '1px solid rgba(255,255,255,.1)',
-                    fontSize: '.8rem', fontWeight: 500, color: 'rgba(255,255,255,.8)',
-                    opacity: coachIn ? 1 : 0,
-                    transform: coachIn ? 'scale(1)' : 'scale(0.8)',
-                    transition: `opacity 0.5s ${300 + idx * 100}ms ease, transform 0.5s ${300 + idx * 100}ms ease`,
-                  }}>
-                    <span>{icon}</span> {label}
-                  </div>
-                ))}
-              </div>
-              {/* Logos / certifications */}
-              <div style={{ marginTop: '2rem', paddingTop: '1.5rem', borderTop: '1px solid rgba(255,255,255,.08)' }}>
-                <div style={{ fontSize: '.72rem', fontWeight: 600, color: 'rgba(255,255,255,.3)', letterSpacing: '.1em', textTransform: 'uppercase', marginBottom: '1rem' }}>
-                  Certifications & affiliations
-                </div>
-                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '.75rem', alignItems: 'center' }}>
-                  {[
-                    { label: 'FFA', sub: 'Fédération Française d\'Athlétisme' },
-                    { label: 'France Triathlon', sub: 'Fédération Française de Triathlon' },
-                    { label: 'STAPS', sub: 'En formation' },
-                    { label: 'Éducateur Sportif', sub: 'Brevet professionnel' },
-                  ].map(({ label, sub }) => (
-                    <div key={label} title={sub} style={{
-                      padding: '.45rem 1rem', borderRadius: 10,
-                      background: 'rgba(255,255,255,.05)', border: '1px solid rgba(255,255,255,.1)',
-                      fontSize: '.8rem', fontWeight: 700, color: 'rgba(255,255,255,.7)',
-                      letterSpacing: '.03em', cursor: 'default',
-                    }}>{label}</div>
-                  ))}
-                </div>
               </div>
 
               <button onClick={handleCTA} className="btn-liquid-primary" style={{ marginTop: '2rem' }}>
