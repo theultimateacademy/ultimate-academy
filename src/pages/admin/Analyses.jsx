@@ -55,12 +55,12 @@ function AdminCorpsDisplay({ corps, color }) {
       const isRecov = /récup|recup|marche|trot|repos/i.test(content)
       nodes.push(
         <div key={i} style={{ fontSize: '.78rem', color: isRecov ? 'rgba(255,255,255,.32)' : 'rgba(255,255,255,.72)',
-          fontStyle: isRecov ? 'italic' : 'normal', lineHeight: 1.5 }}>
+          fontStyle: isRecov ? 'italic' : 'normal', lineHeight: 1.5, textAlign: 'justify' }}>
           {isRecov ? '⏸ ' : '· '}{content}
         </div>
       )
     } else {
-      nodes.push(<div key={i} style={{ fontSize: '.72rem', color: 'rgba(255,255,255,.38)', fontStyle: 'italic' }}>{t}</div>)
+      nodes.push(<div key={i} style={{ fontSize: '.72rem', color: 'rgba(255,255,255,.38)', fontStyle: 'italic', textAlign: 'justify' }}>{t}</div>)
     }
   })
   return <div style={{ display: 'flex', flexDirection: 'column', gap: '.1rem' }}>{nodes}</div>
@@ -150,7 +150,7 @@ function SessionAccordion({ session, expanded, onToggle }) {
               {echauffement && (
                 <div style={{ fontSize: '.72rem', color: 'rgba(255,255,255,.45)', marginBottom: '.35rem',
                   padding: '.3rem .5rem', background: 'rgba(245,158,11,.06)', borderRadius: 8,
-                  border: '1px solid rgba(245,158,11,.15)' }}>
+                  border: '1px solid rgba(245,158,11,.15)', textAlign: 'justify' }}>
                   🔥 <em>{echauffement}</em>
                 </div>
               )}
@@ -158,7 +158,7 @@ function SessionAccordion({ session, expanded, onToggle }) {
               {retour_au_calme && (
                 <div style={{ fontSize: '.72rem', color: 'rgba(255,255,255,.45)', marginTop: '.35rem',
                   padding: '.3rem .5rem', background: 'rgba(59,130,246,.06)', borderRadius: 8,
-                  border: '1px solid rgba(59,130,246,.15)' }}>
+                  border: '1px solid rgba(59,130,246,.15)', textAlign: 'justify' }}>
                   ❄️ <em>{retour_au_calme}</em>
                 </div>
               )}
@@ -184,7 +184,7 @@ function SessionAccordion({ session, expanded, onToggle }) {
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '.35rem' }}>
                   <RPEBar rpe={comp.rpe} />
                   {parsed.ressenti && (
-                    <div style={{ fontSize: '.75rem', color: 'rgba(255,255,255,.6)' }}>
+                    <div style={{ fontSize: '.75rem', color: 'rgba(255,255,255,.6)', textAlign: 'justify' }}>
                       💬 {parsed.ressenti}
                     </div>
                   )}
@@ -227,7 +227,7 @@ function SessionAccordion({ session, expanded, onToggle }) {
                   {parsed.text && (
                     <div style={{ fontSize: '.75rem', color: 'rgba(255,255,255,.5)',
                       fontStyle: 'italic', borderTop: '1px solid rgba(255,255,255,.06)',
-                      paddingTop: '.3rem', marginTop: '.1rem' }}>
+                      paddingTop: '.3rem', marginTop: '.1rem', textAlign: 'justify' }}>
                       "{parsed.text}"
                     </div>
                   )}
@@ -249,7 +249,7 @@ function SessionAccordion({ session, expanded, onToggle }) {
                 Analyse coach
               </div>
               <p style={{ fontSize: '.82rem', color: 'rgba(255,255,255,.6)', lineHeight: 1.65, margin: 0,
-                fontStyle: 'italic' }}>
+                fontStyle: 'italic', textAlign: 'justify' }}>
                 {aiComment}
               </p>
             </div>
@@ -263,7 +263,6 @@ function SessionAccordion({ session, expanded, onToggle }) {
 function AnalysisModal({ analysis, athlete, onClose, onSend }) {
   const data0 = analysis.analysis_data || {}
 
-  const [intro,           setIntro]           = useState(analysis.coach_message || '')
   const [conseil,         setConseil]         = useState(data0.conseil || data0.ajustement_semaine_suivante || '')
   const [mood,            setMood]            = useState(data0.mood || 'good')
   const [saving,          setSaving]          = useState(false)
@@ -299,24 +298,22 @@ function AnalysisModal({ analysis, athlete, onClose, onSend }) {
 
   async function save() {
     setSaving(true)
-    const payload = {
-      coach_message: intro,
-      analysis_data: { ...data0, intro, conseil, mood },
-    }
-    await supabase.from('weekly_analyses').update(payload).eq('id', analysis.id)
+    await supabase.from('weekly_analyses')
+      .update({ analysis_data: { ...data0, conseil, mood } })
+      .eq('id', analysis.id)
     setSaving(false)
   }
 
   async function send() {
     setSending(true)
     try {
-      const payload = {
-        coach_message: intro,
-        analysis_data: { ...data0, intro, conseil, mood },
-        status: 'sent',
-        sent_at: new Date().toISOString(),
-      }
-      await supabase.from('weekly_analyses').update(payload).eq('id', analysis.id)
+      await supabase.from('weekly_analyses')
+        .update({
+          analysis_data: { ...data0, conseil, mood },
+          status: 'sent',
+          sent_at: new Date().toISOString(),
+        })
+        .eq('id', analysis.id)
       onSend()
     } finally {
       setSending(false)
@@ -405,20 +402,6 @@ function AnalysisModal({ analysis, athlete, onClose, onSend }) {
                 ))}
               </div>
             )}
-          </div>
-
-          {/* Message principal */}
-          <div>
-            <label style={{ fontSize: '.72rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '.08em', color: 'rgba(255,255,255,.4)', display: 'block', marginBottom: '.4rem' }}>
-              Message principal — ton retour en mode pote
-            </label>
-            <textarea value={intro} onChange={e => setIntro(e.target.value)}
-              placeholder={`Coucou ${athlete?.first_name} ! Super semaine, t'as vraiment assuré sur...`}
-              rows={4}
-              style={{ ...inp, resize: 'vertical', lineHeight: 1.6 }} />
-            <div style={{ fontSize: '.7rem', color: 'rgba(255,255,255,.25)', marginTop: '.3rem' }}>
-              Parle-lui comme à un pote. C'est ce texte qui s'affichera en grand sur son tableau de bord.
-            </div>
           </div>
 
           {/* Focus semaine prochaine */}
