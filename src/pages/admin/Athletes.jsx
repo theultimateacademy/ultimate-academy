@@ -1624,26 +1624,27 @@ function AthleteDetailPanel({ athlete, onClose, onUpdated, onAlertDismissed }) {
                   {/* ── En-tête semaine sélectionnée ── */}
                   {sem && (
                     <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center',
-                      marginBottom:'.75rem', padding:'.5rem .875rem',
-                      background:'rgba(255,255,255,.03)', borderRadius:10,
+                      marginBottom:'1rem', padding:'.5rem .875rem',
+                      background: activeWk === currentWeekNum ? 'rgba(139,47,201,.08)' : 'rgba(255,255,255,.03)',
+                      borderRadius:10,
                       border:`1px solid ${activeWk === currentWeekNum ? 'rgba(139,47,201,.25)' : 'rgba(255,255,255,.07)'}` }}>
                       <div>
                         <span style={{ fontWeight:700, fontSize:'.85rem',
                           color: activeWk === currentWeekNum ? '#C084FC' : '#fff' }}>
                           Semaine {activeWk}{activeWk === currentWeekNum ? ' · EN COURS' : ''}
                         </span>
-                        <span style={{ fontSize:'.7rem', color:'rgba(255,255,255,.35)', marginLeft:'.5rem' }}>
+                        <span style={{ fontSize:'.7rem', color:'rgba(255,255,255,.38)', marginLeft:'.5rem' }}>
                           {getWeekRange(activeWk)}
                         </span>
                       </div>
                       <div style={{ display:'flex', alignItems:'center', gap:'.5rem' }}>
-                        <span style={{ fontSize:'.72rem', color:'rgba(255,255,255,.38)' }}>
+                        <span style={{ fontSize:'.72rem', fontWeight:600, color:'rgba(255,255,255,.5)' }}>
                           {weekComps.length}/{seances.length} effectuées
                         </span>
                         {weekRpe !== '—' && (
-                          <span style={{ fontSize:'.78rem', fontWeight:800, color:rpeColor(+weekRpe),
-                            background:rpeBg(+weekRpe), borderRadius:99, padding:'.15rem .5rem',
-                            border:`1px solid ${rpeColor(+weekRpe)}30` }}>
+                          <span style={{ fontSize:'.8rem', fontWeight:900, color:rpeColor(+weekRpe),
+                            background:rpeBg(+weekRpe), borderRadius:99, padding:'.18rem .6rem',
+                            border:`1px solid ${rpeColor(+weekRpe)}40` }}>
                             RPE {weekRpe}
                           </span>
                         )}
@@ -1651,74 +1652,102 @@ function AthleteDetailPanel({ athlete, onClose, onUpdated, onAlertDismissed }) {
                     </div>
                   )}
 
-                  {/* ── Liste des séances (simple, clic → détail) ── */}
+                  {/* ── Grille séances (style plan) ── */}
                   {seances.length === 0 ? (
                     <div style={{ textAlign:'center', padding:'2.5rem', color:'var(--text-muted)', fontStyle:'italic' }}>
                       {allWeeks.length === 0 ? 'Aucun retour de séance pour ce plan.' : 'Aucune séance planifiée cette semaine.'}
                     </div>
-                  ) : (
-                    <div style={{ display:'flex', flexDirection:'column', gap:'.35rem' }}>
-                      {seances.map(session => {
-                        const si    = session._si
-                        const comp  = weekComps.find(c => c.session_index === si)
-                        const color = getSessionColor(session.type)
-                        const done  = !!comp
-                        return (
-                          <div key={si}
-                            onClick={() => {
-                              if (!done) return
-                              const rawComment = comp.comment || ''
-                              setOpenRetour({ c: comp, session, color, rpe: comp.rpe, rpeColor: rpeColor(comp.rpe), rawComment })
-                            }}
-                            style={{
-                              display:'flex', alignItems:'center', gap:'.6rem',
-                              padding:'.65rem .875rem', borderRadius:12,
-                              cursor: done ? 'pointer' : 'default',
-                              background: done ? 'rgba(16,185,129,.05)' : 'rgba(255,255,255,.02)',
-                              border:`1px solid ${done ? 'rgba(16,185,129,.18)' : 'rgba(255,255,255,.05)'}`,
-                              borderLeft:`3px solid ${done ? '#10B981' : color}`,
-                              transition: done ? 'background .12s' : 'none',
-                            }}
-                            onMouseEnter={e => done && (e.currentTarget.style.background = 'rgba(16,185,129,.1)')}
-                            onMouseLeave={e => done && (e.currentTarget.style.background = 'rgba(16,185,129,.05)')}>
-                            {/* Jour */}
-                            <span style={{ fontSize:'.66rem', color:'rgba(255,255,255,.38)', flexShrink:0, minWidth:28 }}>
-                              {session.jour?.slice(0,3)}
-                            </span>
-                            {/* Type badge */}
-                            <span style={{ fontSize:'.62rem', fontWeight:800, color, textTransform:'uppercase',
-                              background:color+'18', borderRadius:99, padding:'.1rem .45rem',
-                              border:`1px solid ${color}28`, flexShrink:0 }}>
-                              {(session.type||'').split(' ')[0]}
-                            </span>
-                            {/* Titre */}
-                            <span style={{ flex:1, fontWeight:600, fontSize:'.84rem',
-                              overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>
-                              {session.titre}
-                            </span>
-                            {/* Statut */}
-                            {done ? (
-                              <div style={{ display:'flex', alignItems:'center', gap:'.4rem', flexShrink:0 }}>
-                                <span style={{ fontSize:'.75rem' }}>✅</span>
-                                {comp.rpe && (
-                                  <span style={{ fontSize:'.7rem', fontWeight:800, color:rpeColor(comp.rpe),
-                                    background:rpeBg(comp.rpe), borderRadius:99, padding:'.1rem .4rem',
-                                    border:`1px solid ${rpeColor(comp.rpe)}25` }}>
-                                    RPE {comp.rpe}
-                                  </span>
-                                )}
-                                <span style={{ color:'rgba(255,255,255,.22)', fontSize:'.8rem' }}>›</span>
-                              </div>
-                            ) : (
-                              <span style={{ fontSize:'.7rem', color:'rgba(255,255,255,.2)', fontStyle:'italic', flexShrink:0 }}>
-                                Non effectuée
-                              </span>
-                            )}
-                          </div>
-                        )
-                      })}
-                    </div>
-                  )}
+                  ) : (() => {
+                    const DAY_SHORT_R = ['Lun','Mar','Mer','Jeu','Ven','Sam','Dim']
+                    const DAY_NAMES_R = ['Lundi','Mardi','Mercredi','Jeudi','Vendredi','Samedi','Dimanche']
+                    const byDayR = {}
+                    DAY_NAMES_R.forEach(d => { byDayR[d] = [] })
+                    seances.forEach(s => { if (byDayR[s.jour]) byDayR[s.jour].push(s) })
+                    return (
+                      <div style={{ display:'grid', gridTemplateColumns:'repeat(7,1fr)', gap:'.45rem' }}>
+                        {/* En-têtes jours */}
+                        {DAY_SHORT_R.map(d => (
+                          <div key={d} style={{ textAlign:'center', fontSize:'.62rem', fontWeight:800,
+                            textTransform:'uppercase', letterSpacing:'.07em',
+                            color:'rgba(255,255,255,.35)', paddingBottom:'.4rem',
+                            borderBottom:'1px solid rgba(255,255,255,.06)', marginBottom:'.15rem' }}>{d}</div>
+                        ))}
+                        {/* Colonnes */}
+                        {DAY_NAMES_R.map(day => {
+                          const daySessions = byDayR[day]
+                          return (
+                            <div key={day} style={{ display:'flex', flexDirection:'column', gap:'.45rem' }}>
+                              {daySessions.length === 0 ? (
+                                <div style={{ minHeight:110, display:'flex', alignItems:'center', justifyContent:'center',
+                                  border:'1px dashed rgba(255,255,255,.05)', borderRadius:10,
+                                  fontSize:'.58rem', color:'rgba(255,255,255,.1)', fontStyle:'italic' }}>
+                                  —
+                                </div>
+                              ) : daySessions.map(session => {
+                                const comp  = weekComps.find(c => c.session_index === session._si)
+                                const done  = !!comp
+                                const clr   = getSessionColor(session.type)
+                                const rc    = done ? rpeColor(comp.rpe) : null
+                                return (
+                                  <div key={session._si}
+                                    onClick={() => {
+                                      if (!done) return
+                                      setOpenRetour({ c: comp, session, color: clr, rpe: comp.rpe, rpeColor: rc, rawComment: comp.comment || '' })
+                                    }}
+                                    style={{
+                                      minHeight:110, borderRadius:10, overflow:'hidden',
+                                      cursor: done ? 'pointer' : 'default',
+                                      background: done ? `${clr}1a` : 'rgba(255,255,255,.025)',
+                                      border: done ? `1px solid ${clr}50` : '1px solid rgba(255,255,255,.06)',
+                                      borderTop: `3px solid ${done ? clr : 'rgba(255,255,255,.07)'}`,
+                                      display:'flex', flexDirection:'column',
+                                      transition: done ? 'transform .1s, box-shadow .1s' : 'none',
+                                      opacity: done ? 1 : 0.4,
+                                    }}
+                                    onMouseEnter={e => { if (done) { e.currentTarget.style.transform='translateY(-2px)'; e.currentTarget.style.boxShadow=`0 6px 20px ${clr}25` } }}
+                                    onMouseLeave={e => { e.currentTarget.style.transform=''; e.currentTarget.style.boxShadow='' }}>
+                                    {/* Contenu */}
+                                    <div style={{ padding:'.5rem .55rem', flex:1, overflow:'hidden' }}>
+                                      <div style={{ fontSize:'.58rem', fontWeight:800, textTransform:'uppercase',
+                                        letterSpacing:'.04em', color: done ? clr : 'rgba(255,255,255,.25)',
+                                        marginBottom:'.15rem', overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>
+                                        {(session.type||'').split(' ')[0]}
+                                      </div>
+                                      <div style={{ fontSize:'.76rem', fontWeight:700, lineHeight:1.2,
+                                        color: done ? '#fff' : 'rgba(255,255,255,.28)',
+                                        overflow:'hidden', display:'-webkit-box',
+                                        WebkitLineClamp:2, WebkitBoxOrient:'vertical' }}>
+                                        {session.titre}
+                                      </div>
+                                    </div>
+                                    {/* Pied de carte */}
+                                    <div style={{ padding:'.3rem .55rem .45rem', display:'flex',
+                                      alignItems:'center', justifyContent:'space-between',
+                                      borderTop: done ? `1px solid ${clr}20` : '1px solid rgba(255,255,255,.04)' }}>
+                                      {done ? (
+                                        <>
+                                          <span style={{ fontSize:'.7rem' }}>✅</span>
+                                          {comp.rpe ? (
+                                            <span style={{ fontSize:'.68rem', fontWeight:900,
+                                              color: rc, background: rc ? `${rc}20` : 'transparent',
+                                              borderRadius:99, padding:'.08rem .38rem' }}>
+                                              {comp.rpe}/10
+                                            </span>
+                                          ) : <span />}
+                                        </>
+                                      ) : (
+                                        <span style={{ fontSize:'.58rem', color:'rgba(255,255,255,.18)', fontStyle:'italic', width:'100%', textAlign:'center' }}>Non effectuée</span>
+                                      )}
+                                    </div>
+                                  </div>
+                                )
+                              })}
+                            </div>
+                          )
+                        })}
+                      </div>
+                    )
+                  })()}
                 </div>
               )
             })()}
@@ -1767,137 +1796,175 @@ function AthleteDetailPanel({ athlete, onClose, onUpdated, onAlertDismissed }) {
 
       {/* ── Modal détail retour athlète ────────────────────── */}
       {openRetour && (() => {
-        const { c, session, color, rpe, rpeColor, rawComment } = openRetour
+        const { c, session, color, rpe, rawComment } = openRetour
         const parsed = parseRetourComment(rawComment)
         const RESSENTI_LABELS = { facile:'Facile 😊', tres_bien:'Très bien 😄', bien:'Bien 😊', moyen:'Moyen 😐', difficile:'Difficile 😐', trop_difficile:'Chargé 😓', pas_termine:"N'a pas terminé 😟" }
-        const hasAnyRealise = rpe || parsed.ressenti || parsed.ech || parsed.blocs?.length || parsed.corps || parsed.rac || parsed.fcMoy || parsed.fcMax || parsed.text
+        const rc = !rpe ? '#10B981' : rpe >= 8 ? '#EF4444' : rpe >= 6 ? '#F59E0B' : '#10B981'
 
-        const sectionTitle = (label) => (
-          <div style={{ fontSize:'.58rem', fontWeight:800, textTransform:'uppercase', letterSpacing:'.1em',
-            color:'rgba(255,255,255,.25)', marginBottom:'.625rem' }}>{label}</div>
-        )
-        const row = (label, value) => value ? (
-          <div style={{ marginBottom:'.45rem' }}>
-            <div style={{ fontSize:'.6rem', color:'rgba(255,255,255,.3)', textTransform:'uppercase', letterSpacing:'.06em', marginBottom:'.1rem' }}>{label}</div>
-            <div style={{ fontSize:'.82rem', lineHeight:1.55, color:'rgba(255,255,255,.85)' }}>{value}</div>
+        const PrevuRow = ({ label, value }) => value ? (
+          <div style={{ marginBottom:'.6rem' }}>
+            <div style={{ fontSize:'.58rem', fontWeight:800, textTransform:'uppercase', letterSpacing:'.08em',
+              color:`${color}bb`, marginBottom:'.18rem' }}>{label}</div>
+            <div style={{ fontSize:'.82rem', lineHeight:1.55, color:'#fff', fontWeight:500 }}>{value}</div>
           </div>
         ) : null
 
         return (
-          <div style={{ position:'fixed', inset:0, zIndex:400, background:'rgba(0,0,0,.72)', backdropFilter:'blur(6px)',
-            display:'flex', alignItems:'center', justifyContent:'center', padding:'1.5rem' }}
+          <div style={{ position:'fixed', inset:0, zIndex:400, background:'rgba(0,0,0,.78)', backdropFilter:'blur(8px)',
+            display:'flex', alignItems:'center', justifyContent:'center', padding:'1.25rem' }}
             onClick={() => setOpenRetour(null)}>
-            <div style={{ width:'100%', maxWidth:580, background:'var(--surface)', borderRadius:20,
-              border:'1px solid var(--border)', boxShadow:'0 24px 60px rgba(0,0,0,.6)',
-              overflow:'hidden', maxHeight:'90vh', overflowY:'auto' }}
+            <div style={{ width:'100%', maxWidth:620, background:'#12121E', borderRadius:22,
+              border:`1px solid ${color}35`, boxShadow:`0 30px 80px rgba(0,0,0,.7), 0 0 0 1px ${color}12`,
+              overflow:'hidden', maxHeight:'92vh', overflowY:'auto' }}
               onClick={e => e.stopPropagation()}>
 
-              {/* Header */}
-              <div style={{ background:`linear-gradient(135deg, ${color}20, ${color}08)`,
-                borderBottom:`1px solid ${color}30`, padding:'1.25rem 1.5rem',
-                position:'sticky', top:0, zIndex:2, backdropFilter:'blur(10px)' }}>
-                <div style={{ display:'flex', justifyContent:'space-between', alignItems:'flex-start' }}>
-                  <div>
-                    <span style={{ fontSize:'.62rem', fontWeight:800, textTransform:'uppercase',
-                      letterSpacing:'.08em', color, background:`${color}20`,
-                      border:`1px solid ${color}35`, borderRadius:99, padding:'.18rem .65rem' }}>
-                      {session?.type || 'Séance'}
-                    </span>
-                    <h3 style={{ marginTop:'.5rem', marginBottom:'.2rem', fontSize:'1rem', lineHeight:1.3 }}>
-                      {session?.titre || `Séance ${c.session_index + 1}`}
-                    </h3>
-                    <div style={{ fontSize:'.75rem', color:'var(--text-muted)' }}>
-                      {new Date(c.completed_at).toLocaleDateString('fr-FR', { weekday:'long', day:'numeric', month:'long', year:'numeric' })}
-                    </div>
+              {/* ── Header ── */}
+              <div style={{ background:`linear-gradient(135deg, ${color}28 0%, rgba(18,18,30,1) 65%)`,
+                borderBottom:`1px solid ${color}22`, padding:'1.25rem 1.5rem',
+                display:'flex', justifyContent:'space-between', alignItems:'flex-start' }}>
+                <div>
+                  <span style={{ fontSize:'.65rem', fontWeight:900, textTransform:'uppercase',
+                    letterSpacing:'.1em', color, background:`${color}22`,
+                    border:`1px solid ${color}45`, borderRadius:99, padding:'.2rem .75rem' }}>
+                    {session?.type || 'Séance'}
+                  </span>
+                  <h3 style={{ margin:'.5rem 0 .25rem', fontSize:'1.05rem', fontWeight:800, lineHeight:1.25, color:'#fff' }}>
+                    {session?.titre || `Séance ${c.session_index + 1}`}
+                  </h3>
+                  <div style={{ fontSize:'.72rem', color:'rgba(255,255,255,.42)', fontWeight:500 }}>
+                    {new Date(c.completed_at).toLocaleDateString('fr-FR', { weekday:'long', day:'numeric', month:'long', year:'numeric' })}
                   </div>
-                  <button onClick={() => setOpenRetour(null)}
-                    style={{ background:'none', border:'1px solid var(--border)', borderRadius:8,
-                      padding:'.3rem .6rem', cursor:'pointer', color:'var(--text-muted)', fontFamily:'inherit' }}>✕</button>
                 </div>
+                <button onClick={() => setOpenRetour(null)}
+                  style={{ background:`${color}18`, border:`1px solid ${color}35`, borderRadius:10,
+                    padding:'.35rem .7rem', cursor:'pointer', color:'rgba(255,255,255,.7)',
+                    fontFamily:'inherit', fontSize:'.8rem', fontWeight:700 }}>✕</button>
               </div>
 
-              {/* Deux colonnes Prévu / Réalisé */}
-              <div style={{ display:'flex', gap:0, borderBottom:'1px solid rgba(255,255,255,.06)' }}>
-                {/* ── Prévu ── */}
-                <div style={{ flex:1, padding:'1rem 1.25rem', borderRight:'1px solid rgba(255,255,255,.06)' }}>
-                  {sectionTitle('Prévu')}
-                  {session?.duree_min > 0 && row('Durée', `${session.duree_min} min`)}
-                  {session?.rpe_cible && row('RPE cible', `${session.rpe_cible}/10`)}
-                  {session?.echauffement && row('Échauffement', session.echauffement)}
-                  {session?.corps && row('Corps de séance', session.corps)}
-                  {session?.retour_au_calme && row('Retour au calme', session.retour_au_calme)}
+              {/* ── Deux panneaux côte à côte ── */}
+              <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', minHeight:200 }}>
+
+                {/* PRÉVU */}
+                <div style={{ padding:'1.125rem 1.25rem', background:`${color}0d`,
+                  borderRight:'1px solid rgba(255,255,255,.05)' }}>
+                  <div style={{ fontSize:'.62rem', fontWeight:900, textTransform:'uppercase',
+                    letterSpacing:'.12em', color, marginBottom:'1rem',
+                    display:'flex', alignItems:'center', gap:'.5rem' }}>
+                    <span>📋</span> Prévu
+                  </div>
+                  {session?.duree_min > 0 && <PrevuRow label="Durée" value={`${session.duree_min} min`} />}
+                  {session?.rpe_cible && <PrevuRow label="RPE cible" value={`${session.rpe_cible}/10`} />}
+                  {session?.corps && <PrevuRow label="Corps de séance" value={session.corps} />}
                   {(session?.allures || []).filter(a => a?.allure_min_km).length > 0 && (
-                    <div style={{ marginBottom:'.45rem' }}>
-                      <div style={{ fontSize:'.6rem', color:'rgba(255,255,255,.3)', textTransform:'uppercase', letterSpacing:'.06em', marginBottom:'.35rem' }}>Allures cibles</div>
+                    <div style={{ marginBottom:'.6rem' }}>
+                      <div style={{ fontSize:'.58rem', fontWeight:800, textTransform:'uppercase',
+                        letterSpacing:'.08em', color:`${color}bb`, marginBottom:'.35rem' }}>Allures cibles</div>
                       <div style={{ display:'flex', flexWrap:'wrap', gap:'.3rem' }}>
                         {session.allures.filter(a => a?.allure_min_km).map((a, i) => (
-                          <span key={i} style={{ fontSize:'.72rem', fontWeight:700, color, background:`${color}18`,
-                            border:`1px solid ${color}30`, borderRadius:99, padding:'.15rem .55rem' }}>
-                            {a.allure_min_km}
-                            {a.zone ? ` · ${a.zone}` : ''}
+                          <span key={i} style={{ fontSize:'.74rem', fontWeight:800, color,
+                            background:`${color}22`, border:`1px solid ${color}40`,
+                            borderRadius:99, padding:'.18rem .65rem' }}>
+                            {a.allure_min_km}{a.zone ? ` ${a.zone}` : ''}
                           </span>
                         ))}
                       </div>
                     </div>
                   )}
-                  {!session?.echauffement && !session?.corps && !session?.retour_au_calme && !(session?.duree_min > 0) && (
-                    <p style={{ fontSize:'.78rem', color:'rgba(255,255,255,.2)', fontStyle:'italic' }}>—</p>
+                  {!session?.corps && !(session?.duree_min > 0) && !(session?.allures?.filter(a=>a?.allure_min_km).length) && (
+                    <div style={{ fontSize:'.78rem', color:'rgba(255,255,255,.22)', fontStyle:'italic' }}>—</div>
                   )}
                 </div>
 
-                {/* ── Réalisé ── */}
-                <div style={{ flex:1, padding:'1rem 1.25rem' }}>
-                  {sectionTitle('Réalisé')}
+                {/* RÉALISÉ */}
+                <div style={{ padding:'1.125rem 1.25rem', background: rpe ? `${rc}0a` : 'transparent' }}>
+                  <div style={{ fontSize:'.62rem', fontWeight:900, textTransform:'uppercase',
+                    letterSpacing:'.12em', color:rc, marginBottom:'1rem',
+                    display:'flex', alignItems:'center', gap:'.5rem' }}>
+                    <span>✅</span> Réalisé
+                  </div>
+
+                  {/* RPE + Ressenti */}
                   {rpe && (
-                    <div style={{ marginBottom:'.625rem' }}>
-                      <div style={{ fontSize:'.6rem', color:'rgba(255,255,255,.3)', textTransform:'uppercase', letterSpacing:'.06em', marginBottom:'.25rem' }}>Effort perçu (RPE)</div>
-                      <div style={{ display:'flex', alignItems:'center', gap:'.5rem' }}>
-                        <span style={{ fontSize:'1.5rem', fontWeight:900, color:rpeColor, lineHeight:1 }}>{rpe}</span>
-                        <span style={{ fontSize:'.78rem', color:'rgba(255,255,255,.35)' }}>/10</span>
-                        <div style={{ flex:1, height:5, borderRadius:99, background:'rgba(255,255,255,.08)', overflow:'hidden' }}>
-                          <div style={{ height:'100%', width:`${rpe*10}%`, background:rpeColor, borderRadius:99 }} />
-                        </div>
+                    <div style={{ marginBottom:'1rem', background:`${rc}1a`,
+                      borderRadius:12, padding:'.75rem 1rem', border:`1px solid ${rc}35` }}>
+                      <div style={{ display:'flex', alignItems:'baseline', gap:'.3rem', marginBottom:'.4rem' }}>
+                        <span style={{ fontSize:'2.2rem', fontWeight:900, color:rc, lineHeight:1 }}>{rpe}</span>
+                        <span style={{ fontSize:'.88rem', color:'rgba(255,255,255,.45)', fontWeight:700 }}>/10</span>
+                        {parsed.ressenti && (
+                          <span style={{ marginLeft:'auto', fontSize:'.82rem', fontWeight:800, color:'#fff' }}>
+                            {RESSENTI_LABELS[parsed.ressenti] || parsed.ressenti}
+                          </span>
+                        )}
+                      </div>
+                      <div style={{ height:7, borderRadius:99, background:'rgba(255,255,255,.08)', overflow:'hidden' }}>
+                        <div style={{ height:'100%', width:`${rpe*10}%`,
+                          background:`linear-gradient(90deg, ${rc}99, ${rc})`, borderRadius:99 }} />
                       </div>
                     </div>
                   )}
-                  {parsed.ressenti && row('Ressenti', RESSENTI_LABELS[parsed.ressenti] || parsed.ressenti)}
-                  {parsed.ech && row('Échauffement', parsed.ech)}
+
+                  {/* Blocs fractionné */}
                   {parsed.blocs?.length > 0 && (
-                    <div style={{ marginBottom:'.45rem' }}>
-                      <div style={{ fontSize:'.6rem', color:'rgba(255,255,255,.3)', textTransform:'uppercase', letterSpacing:'.06em', marginBottom:'.3rem' }}>Blocs réalisés</div>
-                      <div style={{ display:'flex', flexDirection:'column', gap:'.2rem' }}>
+                    <div style={{ marginBottom:'.75rem' }}>
+                      <div style={{ fontSize:'.58rem', fontWeight:800, textTransform:'uppercase',
+                        letterSpacing:'.08em', color:`${rc}cc`, marginBottom:'.4rem' }}>Blocs réalisés</div>
+                      <div style={{ display:'flex', flexDirection:'column', gap:'.25rem' }}>
                         {parsed.blocs.map((b, i) => (
-                          <span key={i} style={{ fontSize:'.78rem', fontWeight:600, color:'rgba(255,255,255,.8)',
-                            background:'rgba(255,255,255,.04)', borderRadius:7, padding:'.2rem .5rem' }}>
+                          <div key={i} style={{ fontSize:'.8rem', fontWeight:700, color:'#fff',
+                            background:'rgba(255,255,255,.06)', borderRadius:8, padding:'.25rem .65rem',
+                            borderLeft:`2px solid ${rc}` }}>
                             {b}
-                          </span>
+                          </div>
                         ))}
                       </div>
                     </div>
                   )}
-                  {parsed.corps && row('Allure corps', parsed.corps)}
-                  {parsed.rac && row('Retour au calme', parsed.rac)}
-                  {(parsed.fcMoy || parsed.fcMax) && (
-                    <div style={{ marginBottom:'.45rem', display:'flex', gap:'.75rem' }}>
-                      {parsed.fcMoy && <div>
-                        <div style={{ fontSize:'.6rem', color:'rgba(255,255,255,.3)', textTransform:'uppercase', letterSpacing:'.06em', marginBottom:'.1rem' }}>FC moy</div>
-                        <div style={{ fontSize:'.82rem', fontWeight:700, color:'#F87171' }}>{parsed.fcMoy}</div>
-                      </div>}
-                      {parsed.fcMax && <div>
-                        <div style={{ fontSize:'.6rem', color:'rgba(255,255,255,.3)', textTransform:'uppercase', letterSpacing:'.06em', marginBottom:'.1rem' }}>FC max</div>
-                        <div style={{ fontSize:'.82rem', fontWeight:700, color:'#EF4444' }}>{parsed.fcMax}</div>
-                      </div>}
+
+                  {/* Allure corps EF/footing */}
+                  {parsed.corps && !parsed.blocs?.length && (
+                    <div style={{ marginBottom:'.6rem' }}>
+                      <div style={{ fontSize:'.58rem', fontWeight:800, textTransform:'uppercase',
+                        letterSpacing:'.08em', color:`${rc}cc`, marginBottom:'.18rem' }}>Allure corps</div>
+                      <div style={{ fontSize:'.9rem', fontWeight:900, color:'#fff' }}>{parsed.corps}</div>
                     </div>
                   )}
+
+                  {/* FC */}
+                  {(parsed.fcMoy || parsed.fcMax) && (
+                    <div style={{ display:'flex', gap:'.5rem', marginBottom:'.6rem' }}>
+                      {parsed.fcMoy && (
+                        <div style={{ flex:1, background:'rgba(248,113,113,.12)',
+                          border:'1px solid rgba(248,113,113,.28)', borderRadius:10,
+                          padding:'.5rem .75rem', textAlign:'center' }}>
+                          <div style={{ fontSize:'.55rem', fontWeight:800, textTransform:'uppercase',
+                            color:'#FCA5A5', letterSpacing:'.07em', marginBottom:'.1rem' }}>FC moy</div>
+                          <div style={{ fontSize:'1rem', fontWeight:900, color:'#FCA5A5' }}>{parsed.fcMoy}</div>
+                        </div>
+                      )}
+                      {parsed.fcMax && (
+                        <div style={{ flex:1, background:'rgba(239,68,68,.12)',
+                          border:'1px solid rgba(239,68,68,.28)', borderRadius:10,
+                          padding:'.5rem .75rem', textAlign:'center' }}>
+                          <div style={{ fontSize:'.55rem', fontWeight:800, textTransform:'uppercase',
+                            color:'#F87171', letterSpacing:'.07em', marginBottom:'.1rem' }}>FC max</div>
+                          <div style={{ fontSize:'1rem', fontWeight:900, color:'#F87171' }}>{parsed.fcMax}</div>
+                        </div>
+                      )}
+                    </div>
+                  )}
+
+                  {/* Commentaire libre */}
                   {parsed.text && (
-                    <div style={{ marginTop:'.5rem', paddingTop:'.5rem', borderTop:'1px solid rgba(255,255,255,.06)' }}>
-                      <p style={{ fontSize:'.8rem', lineHeight:1.6, fontStyle:'italic', color:'rgba(255,255,255,.55)', margin:0 }}>
+                    <div style={{ paddingTop:'.6rem', borderTop:'1px solid rgba(255,255,255,.07)' }}>
+                      <p style={{ fontSize:'.82rem', lineHeight:1.65, fontStyle:'italic',
+                        color:'rgba(255,255,255,.7)', margin:0 }}>
                         &ldquo;{parsed.text}&rdquo;
                       </p>
                     </div>
                   )}
-                  {!hasAnyRealise && (
-                    <p style={{ fontSize:'.78rem', color:'rgba(255,255,255,.2)', fontStyle:'italic' }}>—</p>
+
+                  {!rpe && !parsed.blocs?.length && !parsed.corps && !parsed.fcMoy && !parsed.fcMax && !parsed.text && (
+                    <div style={{ fontSize:'.78rem', color:'rgba(255,255,255,.22)', fontStyle:'italic' }}>—</div>
                   )}
                 </div>
               </div>
