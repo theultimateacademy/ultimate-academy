@@ -238,7 +238,7 @@ function WeeklyAnalysisModal({ analysis, onClose }) {
                       {s.coach_comment && (
                         <div style={{ background: 'linear-gradient(135deg, rgba(139,47,201,.08), rgba(232,35,122,.04))', border: '1px solid rgba(139,47,201,.18)', borderRadius: 10, padding: '.6rem .875rem', marginBottom: (s.comment || s.note) ? '.5rem' : 0 }}>
                           <div style={{ fontSize: '.6rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '.08em', color: '#C084FC', marginBottom: '.3rem' }}>Alexis</div>
-                          <p style={{ fontSize: '.845rem', lineHeight: 1.65, color: 'rgba(255,255,255,.88)', margin: 0 }}>{renderRich(s.coach_comment)}</p>
+                          <p style={{ fontSize: '.845rem', lineHeight: 1.65, color: 'rgba(255,255,255,.88)', margin: 0, textAlign: 'justify' }}>{renderRich(s.coach_comment)}</p>
                         </div>
                       )}
                       {(s.comment || s.note) && (
@@ -263,24 +263,6 @@ function WeeklyAnalysisModal({ analysis, onClose }) {
                 </div>
                 <p style={{ fontSize: '.82rem', color: 'rgba(255,255,255,.45)', lineHeight: 1.55, margin: 0 }}>
                   {rpe < 5 ? 'Semaine légère, bonne récupération active.' : rpe < 7 ? 'Charge modérée bien gérée. Endurance de fond qui progresse.' : rpe < 9 ? 'Semaine chargée. Assure-toi de bien dormir et bien manger.' : 'Semaine très intense. Récupération prioritaire.'}
-                </p>
-              </div>
-            </div>
-          )}
-
-          {/* Message coach */}
-          {intro && (
-            <div style={{ background: 'linear-gradient(135deg, rgba(139,47,201,.1), rgba(232,35,122,.04))', border: '1px solid rgba(139,47,201,.22)', borderRadius: 16 }}>
-              <div style={{ padding: '1.25rem 1.5rem' }}>
-                <div style={{ display: 'flex', gap: '.875rem', alignItems: 'center', marginBottom: '.875rem' }}>
-                  <img src="/Coach.JPG" alt="Alexis" style={{ width: 44, height: 44, borderRadius: '50%', objectFit: 'cover', flexShrink: 0, border: '2px solid rgba(139,47,201,.5)' }} />
-                  <div>
-                    <div style={{ fontWeight: 800, fontSize: '.8rem', color: '#C084FC' }}>Alexis · Coach</div>
-                    <div style={{ fontSize: '.65rem', color: 'rgba(255,255,255,.25)' }}>Retour semaine {analysis.week_number}</div>
-                  </div>
-                </div>
-                <p style={{ fontSize: '.9rem', lineHeight: 1.75, margin: 0, color: 'rgba(255,255,255,.9)', textAlign: 'justify' }}>
-                  {renderRich(intro)}
                 </p>
               </div>
             </div>
