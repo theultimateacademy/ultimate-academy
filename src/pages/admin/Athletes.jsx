@@ -1801,19 +1801,156 @@ function AthleteDetailPanel({ athlete, onClose, onUpdated, onAlertDismissed }) {
         const RESSENTI_LABELS = { facile:'Facile 😊', tres_bien:'Très bien 😄', bien:'Bien 😊', moyen:'Moyen 😐', difficile:'Difficile 😐', trop_difficile:'Chargé 😓', pas_termine:"N'a pas terminé 😟" }
         const rc = !rpe ? '#10B981' : rpe >= 8 ? '#EF4444' : rpe >= 6 ? '#F59E0B' : '#10B981'
 
-        const PrevuRow = ({ label, value }) => value ? (
-          <div style={{ marginBottom:'.6rem' }}>
-            <div style={{ fontSize:'.58rem', fontWeight:800, textTransform:'uppercase', letterSpacing:'.08em',
-              color:`${color}bb`, marginBottom:'.18rem' }}>{label}</div>
-            <div style={{ fontSize:'.82rem', lineHeight:1.55, color:'#fff', fontWeight:500 }}>{value}</div>
+        // ── helpers pour le visuel "Prévu" (copié de Plan.jsx) ──
+        const sType    = (session?.type || '').toLowerCase()
+        const isNonRun = sType.includes('natation') || sType.includes('vélo') || sType.includes('velo') || sType.includes('brique')
+        const alluresOk = (session?.allures || []).filter(a => a?.allure_min_km && typeof a.allure_min_km === 'string')
+        const efPace      = isNonRun ? null : (alluresOk[0] || null)
+        const coolPace    = isNonRun ? null : (alluresOk.find(a => /retour|calme|récup/i.test(a.zone||'')) || efPace)
+        const spePace     = alluresOk.length > 1
+          ? (alluresOk.find(a => /corps|principal/i.test(a.zone||'')) || alluresOk.reduce((b,a) => (a.pourcentage_vma||0) > (b.pourcentage_vma||0) ? a : b, alluresOk[0]))
+          : efPace
+
+        const PChip = ({ allure, chipColor }) => {
+          if (!allure?.allure_min_km) return null
+          const pace = allure.allure_min_km.replace(/"/g,'').replace(/\/km$/i,'')
+          return (
+            <span style={{ background: chipColor ? chipColor+'1a' : 'rgba(255,255,255,.08)',
+              border:`1px solid ${chipColor ? chipColor+'35' : 'rgba(255,255,255,.14)'}`,
+              borderRadius:99, padding:'.14rem .5rem', fontSize:'.68rem', fontWeight:700,
+              color: chipColor || 'rgba(255,255,255,.7)', whiteSpace:'nowrap', flexShrink:0 }}>
+              {pace}<span style={{ opacity:.55, fontWeight:400 }}>/km</span>
+            </span>
+          )
+        }
+        const PArrow = () => (
+          <div style={{ display:'flex', alignItems:'center', padding:'0 .75rem', height:20 }}>
+            <div style={{ width:1, height:'100%', background:'rgba(255,255,255,.1)', margin:'0 auto' }} />
           </div>
-        ) : null
+        )
+        const MiniCorps = () => {
+          const mainSet = session?.corps || ''
+          if (!mainSet) return null
+
+          // EF
+          if (sType.includes('endurance fondamentale') || sType === 'ef') {
+            const pMin = alluresOk.find(a => (a.pourcentage_vma||0) <= 66) || alluresOk[0]
+            const pMax = alluresOk.find(a => (a.pourcentage_vma||0) >= 70 && a !== pMin) || null
+            return (
+              <div style={{ textAlign:'center', padding:'.5rem 0' }}>
+                <div style={{ fontSize:'2.4rem', fontWeight:900, lineHeight:1, color:'#fff' }}>{session.duree_min}</div>
+                <div style={{ fontSize:'.72rem', color:'rgba(255,255,255,.35)', marginBottom:'1rem', marginTop:'.15rem' }}>minutes</div>
+                <div style={{ display:'inline-flex', alignItems:'center', gap:'.4rem',
+                  background:color+'14', borderRadius:99, padding:'.4rem .875rem', border:`1px solid ${color}30`, marginBottom:'.75rem' }}>
+                  {pMin && <span style={{ fontSize:'.9rem', fontWeight:700, color }}>{pMin.allure_min_km}</span>}
+                  {pMax && <><span style={{ color:'rgba(255,255,255,.3)', fontSize:'.72rem' }}>à</span>
+                    <span style={{ fontSize:'.9rem', fontWeight:700, color }}>{pMax.allure_min_km}</span></>}
+                  <span style={{ fontSize:'.65rem', color:'rgba(255,255,255,.35)' }}>/km</span>
+                </div>
+                <div style={{ fontSize:'.7rem', color:'rgba(255,255,255,.32)', fontStyle:'italic' }}>65 à 72% VMA · allure au ressenti</div>
+              </div>
+            )
+          }
+
+          // BLOC / bullet
+          const hasBloc = /^BLOC\b/im.test(mainSet)
+          const hasBullet = mainSet.includes('•')
+          if (hasBloc || hasBullet) {
+            const lines = mainSet.split('\n')
+            const nodes = []
+            for (let i = 0; i < lines.length; i++) {
+              const trimmed = lines[i].trim()
+              if (!trimmed) continue
+              if (/^BLOC\b/i.test(trimmed)) {
+                nodes.push(
+                  <div key={i} style={{ display:'flex', alignItems:'center', gap:'.5rem', margin: nodes.length > 0 ? '.75rem 0 0' : '0' }}>
+                    <div style={{ flex:1, height:1, background:`${color}35` }} />
+                    <span style={{ fontSize:'.62rem', fontWeight:800, letterSpacing:'.1em', flexShrink:0,
+                      color, textTransform:'uppercase', padding:'.18rem .65rem',
+                      background:`${color}18`, borderRadius:99, border:`1px solid ${color}35` }}>{trimmed}</span>
+                    <div style={{ flex:1, height:1, background:`${color}35` }} />
+                  </div>
+                )
+                continue
+              }
+              if (trimmed.startsWith('•')) {
+                const content = trimmed.slice(1).trim()
+                const isRecov = /r[eé]cup|marche|trot|repos|footing.*lent|lent.*footing/i.test(content)
+                if (isRecov) {
+                  nodes.push(
+                    <div key={i} style={{ display:'flex', alignItems:'center', justifyContent:'center', gap:'.4rem', padding:'.15rem 0' }}>
+                      <span style={{ fontSize:'.68rem', color:'#38BDF8' }}>⏸</span>
+                      <span style={{ fontSize:'.72rem', color:'rgba(255,255,255,.38)', fontStyle:'italic' }}>{content}</span>
+                    </div>
+                  )
+                } else {
+                  const mMatch = content.match(/^(\d+\s*[×x]\s*\d+(?:[.,]\d+)?\s*(?:m\b|km\b|min\b)|\d+(?:[.,]\d+)?\s*(?:m\b|km\b|min\b))\s+/i)
+                  const metric = mMatch ? mMatch[1].trim() : null
+                  const rest   = mMatch ? content.slice(mMatch[0].length) : content
+                  nodes.push(
+                    <div key={i} style={{ background:`${color}0D`, border:`1px solid ${color}2A`, borderRadius:12, padding:'.75rem .875rem' }}>
+                      {metric && <div style={{ fontSize:'1.3rem', fontWeight:900, color:'#fff', lineHeight:1, marginBottom:'.25rem' }}>{metric}</div>}
+                      <div style={{ fontSize:'.78rem', lineHeight:1.55, color:'rgba(255,255,255,.72)' }}>{metric ? rest : content}</div>
+                    </div>
+                  )
+                }
+                continue
+              }
+              nodes.push(
+                <div key={i} style={{ padding:'.5rem .75rem', marginTop:'.25rem',
+                  background:'rgba(14,165,233,.06)', border:'1px solid rgba(14,165,233,.14)', borderRadius:8 }}>
+                  <p style={{ fontSize:'.74rem', lineHeight:1.5, color:'rgba(255,255,255,.5)', margin:0, fontStyle:'italic' }}>{trimmed}</p>
+                </div>
+              )
+            }
+            return <div style={{ display:'flex', flexDirection:'column', gap:'.5rem' }}>{nodes}</div>
+          }
+
+          // Défaut : durée + allures
+          if (session?.duree_min > 0) {
+            const sorted = [...alluresOk.filter(a => !/retour|calme|échauff/i.test(a.zone||''))].sort((a,b) => (a.vitesse_kmh||0)-(b.vitesse_kmh||0))
+            const pMin2 = sorted[0] || null
+            const pMax2 = sorted.length > 1 ? sorted[sorted.length-1] : null
+            const isProgressif = sType.includes('progressif')
+            return (
+              <div style={{ textAlign:'center', padding:'.5rem 0' }}>
+                <div style={{ fontSize:'2.4rem', fontWeight:900, lineHeight:1, color:'#fff' }}>{session.duree_min}</div>
+                <div style={{ fontSize:'.72rem', color:'rgba(255,255,255,.35)', marginBottom:'1rem', marginTop:'.15rem' }}>minutes</div>
+                {(pMin2||pMax2) && (
+                  <div style={{ display:'inline-flex', alignItems:'center', gap:'.4rem',
+                    background:color+'14', borderRadius:99, padding:'.4rem .875rem',
+                    border:`1px solid ${color}30`, marginBottom:'.625rem' }}>
+                    {pMin2 && <span style={{ fontSize:'.9rem', fontWeight:700, color }}>{pMin2.allure_min_km}</span>}
+                    {pMax2 && <><span style={{ color:'rgba(255,255,255,.3)', fontSize:'.72rem' }}>à</span>
+                      <span style={{ fontSize:'.9rem', fontWeight:700, color }}>{pMax2.allure_min_km}</span></>}
+                    <span style={{ fontSize:'.65rem', color:'rgba(255,255,255,.35)' }}>/km</span>
+                  </div>
+                )}
+                {pMin2 && (
+                  <div style={{ fontSize:'.7rem', color:'rgba(255,255,255,.32)', fontStyle:'italic' }}>
+                    {isProgressif && pMax2
+                      ? `${pMin2.pourcentage_vma}% → ${pMax2.pourcentage_vma}% VMA`
+                      : pMax2 ? `${pMin2.pourcentage_vma}–${pMax2.pourcentage_vma}% VMA`
+                      : `${pMin2.pourcentage_vma}% VMA`}
+                  </div>
+                )}
+                {mainSet && mainSet.length > 40 && (
+                  <div style={{ marginTop:'.875rem', fontSize:'.78rem', lineHeight:1.7,
+                    color:'rgba(255,255,255,.65)', textAlign:'left', whiteSpace:'pre-line',
+                    borderTop:`1px solid ${color}20`, paddingTop:'.75rem' }}>{mainSet}</div>
+                )}
+              </div>
+            )
+          }
+
+          return <p style={{ fontSize:'.82rem', lineHeight:1.65, color:'rgba(255,255,255,.75)', whiteSpace:'pre-line' }}>{mainSet}</p>
+        }
 
         return (
           <div style={{ position:'fixed', inset:0, zIndex:400, background:'rgba(0,0,0,.78)', backdropFilter:'blur(8px)',
             display:'flex', alignItems:'center', justifyContent:'center', padding:'1.25rem' }}
             onClick={() => setOpenRetour(null)}>
-            <div style={{ width:'100%', maxWidth:620, background:'#12121E', borderRadius:22,
+            <div style={{ width:'100%', maxWidth:680, background:'#12121E', borderRadius:22,
               border:`1px solid ${color}35`, boxShadow:`0 30px 80px rgba(0,0,0,.7), 0 0 0 1px ${color}12`,
               overflow:'hidden', maxHeight:'92vh', overflowY:'auto' }}
               onClick={e => e.stopPropagation()}>
@@ -1844,35 +1981,76 @@ function AthleteDetailPanel({ athlete, onClose, onUpdated, onAlertDismissed }) {
               {/* ── Deux panneaux côte à côte ── */}
               <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', minHeight:200 }}>
 
-                {/* PRÉVU */}
-                <div style={{ padding:'1.125rem 1.25rem', background:`${color}0d`,
-                  borderRight:'1px solid rgba(255,255,255,.05)' }}>
-                  <div style={{ fontSize:'.62rem', fontWeight:900, textTransform:'uppercase',
-                    letterSpacing:'.12em', color, marginBottom:'1rem',
-                    display:'flex', alignItems:'center', gap:'.5rem' }}>
-                    <span>📋</span> Prévu
+                {/* PRÉVU — rendu identique à la vue athlète */}
+                <div style={{ borderRight:'1px solid rgba(255,255,255,.06)', overflowY:'auto' }}>
+                  <div style={{ fontSize:'.6rem', fontWeight:900, textTransform:'uppercase',
+                    letterSpacing:'.12em', color, padding:'1rem 1rem .5rem',
+                    display:'flex', alignItems:'center', gap:'.4rem' }}>
+                    📋 Prévu
                   </div>
-                  {session?.duree_min > 0 && <PrevuRow label="Durée" value={`${session.duree_min} min`} />}
-                  {session?.rpe_cible && <PrevuRow label="RPE cible" value={`${session.rpe_cible}/10`} />}
-                  {session?.corps && <PrevuRow label="Corps de séance" value={session.corps} />}
-                  {(session?.allures || []).filter(a => a?.allure_min_km).length > 0 && (
-                    <div style={{ marginBottom:'.6rem' }}>
-                      <div style={{ fontSize:'.58rem', fontWeight:800, textTransform:'uppercase',
-                        letterSpacing:'.08em', color:`${color}bb`, marginBottom:'.35rem' }}>Allures cibles</div>
-                      <div style={{ display:'flex', flexWrap:'wrap', gap:'.3rem' }}>
-                        {session.allures.filter(a => a?.allure_min_km).map((a, i) => (
-                          <span key={i} style={{ fontSize:'.74rem', fontWeight:800, color,
-                            background:`${color}22`, border:`1px solid ${color}40`,
-                            borderRadius:99, padding:'.18rem .65rem' }}>
-                            {a.allure_min_km}{a.zone ? ` ${a.zone}` : ''}
-                          </span>
-                        ))}
-                      </div>
+
+                  {/* Stats chips */}
+                  {(session?.duree_min > 0 || session?.rpe_cible || session?.distance_km) && (
+                    <div style={{ padding:'.375rem 1rem .625rem', display:'flex', gap:'.3rem', flexWrap:'wrap' }}>
+                      {session?.duree_min > 0 && (
+                        <span style={{ background:'rgba(255,255,255,.06)', border:'1px solid rgba(255,255,255,.1)',
+                          borderRadius:99, padding:'.2rem .6rem', fontSize:'.7rem', fontWeight:600 }}>⏱ {session.duree_min} min</span>
+                      )}
+                      {session?.distance_km && (
+                        <span style={{ background:'rgba(255,255,255,.06)', border:'1px solid rgba(255,255,255,.1)',
+                          borderRadius:99, padding:'.2rem .6rem', fontSize:'.7rem', fontWeight:600 }}>📍 {session.distance_km} km</span>
+                      )}
+                      {session?.rpe_cible && (
+                        <span style={{ background:'rgba(255,255,255,.06)', border:'1px solid rgba(255,255,255,.1)',
+                          borderRadius:99, padding:'.2rem .6rem', fontSize:'.7rem', fontWeight:600 }}>💪 RPE {session.rpe_cible}</span>
+                      )}
                     </div>
                   )}
-                  {!session?.corps && !(session?.duree_min > 0) && !(session?.allures?.filter(a=>a?.allure_min_km).length) && (
-                    <div style={{ fontSize:'.78rem', color:'rgba(255,255,255,.22)', fontStyle:'italic' }}>—</div>
-                  )}
+
+                  {/* Carte séance — même structure que l'athlète */}
+                  <div style={{ margin:'0 .75rem .75rem', background:'rgba(255,255,255,.03)',
+                    borderRadius:14, overflow:'hidden', border:'1px solid rgba(255,255,255,.07)' }}>
+
+                    {session?.echauffement && (
+                      <div style={{ borderLeft:'3px solid #F59E0B', padding:'.875rem .875rem .875rem .75rem' }}>
+                        <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:'.35rem' }}>
+                          <span style={{ fontWeight:700, fontSize:'.62rem', color:'#FCD34D', letterSpacing:'.1em', textTransform:'uppercase' }}>🔥 Échauffement</span>
+                          {!isNonRun && efPace && <PChip allure={efPace} />}
+                        </div>
+                        <p style={{ fontSize:'.78rem', lineHeight:1.6, color:'rgba(255,255,255,.72)', margin:0 }}>{session.echauffement}</p>
+                      </div>
+                    )}
+
+                    {session?.echauffement && session?.corps && <PArrow />}
+
+                    {session?.corps && (
+                      <div style={{ borderLeft:`3px solid ${color}`, padding:'.875rem .875rem .875rem .75rem', background:`${color}07` }}>
+                        {!(sType.includes('endurance fondamentale') || sType === 'ef' || sType.includes('sortie longue')) && (
+                          <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:'.625rem' }}>
+                            <span style={{ fontWeight:800, fontSize:'.62rem', color, letterSpacing:'.1em', textTransform:'uppercase' }}>⚡ Séance principale</span>
+                            {!isNonRun && spePace && <PChip allure={spePace} chipColor={color} />}
+                          </div>
+                        )}
+                        <MiniCorps />
+                      </div>
+                    )}
+
+                    {session?.corps && session?.retour_au_calme && <PArrow />}
+
+                    {session?.retour_au_calme && (
+                      <div style={{ borderLeft:'3px solid #3B82F6', padding:'.875rem .875rem .875rem .75rem' }}>
+                        <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:'.35rem' }}>
+                          <span style={{ fontWeight:700, fontSize:'.62rem', color:'#93C5FD', letterSpacing:'.1em', textTransform:'uppercase' }}>❄️ Retour au calme</span>
+                          {!isNonRun && coolPace && coolPace !== efPace && <PChip allure={coolPace} chipColor="#3B82F6" />}
+                        </div>
+                        <p style={{ fontSize:'.78rem', lineHeight:1.6, color:'rgba(255,255,255,.72)', margin:0 }}>{session.retour_au_calme}</p>
+                      </div>
+                    )}
+
+                    {!session?.echauffement && !session?.corps && !session?.retour_au_calme && (
+                      <div style={{ padding:'1.5rem', textAlign:'center', color:'rgba(255,255,255,.2)', fontStyle:'italic', fontSize:'.78rem' }}>—</div>
+                    )}
+                  </div>
                 </div>
 
                 {/* RÉALISÉ */}
