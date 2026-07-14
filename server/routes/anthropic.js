@@ -1314,13 +1314,61 @@ router.post('/plans/adjust-heat', async (req, res) => {
       const type = (s.type || '').toLowerCase();
       if (type.includes('renforcement')) return s;
       if (s.type === 'Récupération active') return s;
-      // Ne jamais modifier les séances de course/compétition
       if (s.est_course) return s;
       if (s.id_seance === 'RACE' || s.id_seance === 'RACE_INT') return s;
       if (type.includes('course') || type.includes('compétition')) return s;
 
       const newDuration = roundTo5(Math.round((s.duree_min || 45) * 0.80));
 
+      // ── Natation : garder la discipline (piscine = fraîche en été) ──────────
+      if (type.includes('natation')) {
+        return {
+          ...s,
+          titre:       (s.titre || s.type) + ' — Canicule 🌡️',
+          duree_min:   newDuration,
+          intensite:   'modérée',
+          corps:       s.corps
+            ? `${s.corps}\n\n(Volume réduit de 20% — canicule. La piscine reste fraîche, profites-en !)`
+            : `${newDuration} min de nage en endurance à allure confortable — séance allégée.`,
+          notes_coach: 'La piscine est un excellent refuge par la chaleur. Nage à ton rythme, pas de forçage.',
+          rpe_cible:   Math.max(3, (s.rpe_cible || 5) - 1),
+          est_seance_cle: false,
+        };
+      }
+
+      // ── Vélo : garder la discipline, réduire volume et intensité ─────────────
+      if (type.includes('vélo') || type.includes('velo')) {
+        return {
+          ...s,
+          titre:       (s.titre || s.type) + ' allégé 🌡️',
+          duree_min:   newDuration,
+          intensite:   'facile',
+          corps:       s.corps
+            ? `${s.corps}\n\n(Volume réduit de 20% — canicule. Sors tôt le matin ou utilise un home trainer.)`
+            : `${newDuration} min de vélo en endurance — séance allégée, allure confortable.`,
+          notes_coach: 'Sors tôt le matin ou utilise un home trainer par cette chaleur. Hydrate-toi bien avant, pendant et après.',
+          rpe_cible:   Math.max(3, (s.rpe_cible || 5) - 1),
+          est_seance_cle: false,
+        };
+      }
+
+      // ── Brique : garder mais alléger, conseil chaleur ─────────────────────────
+      if (type.includes('brique')) {
+        return {
+          ...s,
+          titre:       (s.titre || s.type) + ' allégée 🌡️',
+          duree_min:   newDuration,
+          intensite:   'facile',
+          corps:       s.corps
+            ? `${s.corps}\n\n(Séance allégée canicule : favorise la natation et le vélo, réduis la partie course.)`
+            : `${newDuration} min — brique allégée, allure confortable dans toutes les disciplines.`,
+          notes_coach: 'Par la chaleur, réduis surtout la partie course à pied. Natation et vélo sont plus supportables.',
+          rpe_cible:   4,
+          est_seance_cle: false,
+        };
+      }
+
+      // ── Course/running avec intensité : garder l'intensité, réduire volume/allure ──
       if (isIntensity(s)) {
         const mainMin      = Math.max(newDuration - 20, 10);
         const adaptedCorps = lightenCorps(s.corps);
@@ -1343,6 +1391,7 @@ router.post('/plans/adjust-heat', async (req, res) => {
         };
       }
 
+      // ── Course/running sans intensité : footing EF allégé ────────────────────
       return {
         ...s,
         type:            'Endurance fondamentale',
@@ -1405,9 +1454,54 @@ router.post('/plans/adapt-injury', async (req, res) => {
     }
 
     function adaptSessionForInjury(s) {
-      if ((s.type || '').toLowerCase().includes('renforcement')) return s;
+      const t = (s.type || '').toLowerCase();
+      if (t.includes('renforcement')) return s;
+      if (s.est_course) return s;
+
+      // ── Natation : parfait cross-training running injury, garder ──────────────
+      if (t.includes('natation')) {
+        return {
+          ...s,
+          titre:          (s.titre || s.type) + ' — Cross-training 🩹',
+          intensite:      'modérée',
+          corps:          s.corps
+            ? `${s.corps}\n\n(Excellent cross-training pendant ta blessure — pas d'impact, continue à nager !)`
+            : `${s.duree_min || 45} min de natation — idéal pour maintenir la forme sans contrainte articulaire.`,
+          notes_coach:    'La natation est parfaite pendant une blessure running : zéro impact, maintien de la condition. Continue !',
+          est_seance_cle: false,
+        };
+      }
+
+      // ── Vélo : bon cross-training aussi, garder ───────────────────────────────
+      if (t.includes('vélo') || t.includes('velo')) {
+        return {
+          ...s,
+          titre:          (s.titre || s.type) + ' — Cross-training 🩹',
+          intensite:      'modérée',
+          corps:          s.corps
+            ? `${s.corps}\n\n(Cross-training pendant ta blessure — sans impact, parfait pour maintenir ta forme !)`
+            : `${s.duree_min || 45} min de vélo — maintien de la condition sans impact.`,
+          notes_coach:    'Le vélo est parfait pendant une blessure running : maintient la condition cardio sans solliciter la zone blessée.',
+          est_seance_cle: false,
+        };
+      }
+
+      // ── Brique : supprimer la partie course, garder natation/vélo seulement ───
+      if (t.includes('brique')) {
+        return {
+          ...s,
+          type:           'Natation endurance',
+          titre:          'Natation seulement — Blessure 🩹',
+          intensite:      'modérée',
+          corps:          `${Math.min(s.duree_min || 45, 45)} min de natation — on supprime la partie course pendant ta blessure. Nage à allure confortable.`,
+          notes_coach:    'On garde uniquement la natation de ta brique pendant ta blessure. La course attendra ta guérison.',
+          rpe_cible:      4,
+          est_seance_cle: false,
+        };
+      }
+
+      // ── Course/running : adapter en footing très léger ────────────────────────
       const isIntensity = isIntensityType(s);
-      // Intensity → récupération active; EF/sortie longue → footing récup allégé
       const newDuration = isIntensity
         ? Math.max(25, Math.round((s.duree_min || 40) * 0.60))
         : Math.min(40, Math.round((s.duree_min || 45) * 0.70));
@@ -1481,16 +1575,68 @@ router.post('/plans/fatigue-adapt', async (req, res) => {
     currentWeek._adapted_for = 'fatigue';
     currentWeek.charge = 'Fatigue : Semaine allégée';
 
-    // Semaine fatigue = UNIQUEMENT des footings EF légers, aucune séance d'intensité
-    const footingDurations = [30, 35, 40, 45]; // durées EF selon la position dans la semaine
-    let footingIdx = 0;
+    // Semaine fatigue = séances légères dans chaque discipline, pas de conversion running forcée
+    const lightDurations = [30, 35, 40, 45];
+    let lightIdx = 0;
     currentWeek.seances = currentWeek.seances.map(s => {
       const t = (s.type || '').toLowerCase();
       // Repos, renforcement et courses restent intacts
       if (t.includes('renforcement') || t.includes('repos') || s.est_course) return s;
 
-      // Toutes les autres séances → footing EF léger
-      const dur = footingDurations[footingIdx++ % footingDurations.length];
+      const dur = lightDurations[lightIdx++ % lightDurations.length];
+
+      // ── Natation : garder la natation, juste alléger ──────────────────────────
+      if (t.includes('natation')) {
+        return {
+          ...s,
+          type:           'Natation endurance',
+          titre:          'Natation récupération 😴',
+          duree_min:      dur,
+          intensite:      'très facile',
+          corps:          `${dur} min de nage douce en endurance — allure très confortable, aucune intensité. Séance de récupération active.`,
+          notes_coach:    'Ton corps a besoin de souffler. Nage tranquillement, sens l\'eau, pas de forçage.',
+          rpe_cible:      2,
+          est_seance_cle: false,
+        };
+      }
+
+      // ── Vélo : garder le vélo, juste alléger ─────────────────────────────────
+      if (t.includes('vélo') || t.includes('velo')) {
+        return {
+          ...s,
+          type:           'Vélo endurance',
+          titre:          'Vélo récupération 😴',
+          duree_min:      dur,
+          intensite:      'très facile',
+          corps:          `${dur} min de vélo en endurance fondamentale — cadence souple, allure très facile, aucune accélération. Récupération active.`,
+          notes_coach:    'Ton corps a besoin de souffler. Pédale en douceur, sans forcer.',
+          rpe_cible:      2,
+          est_seance_cle: false,
+        };
+      }
+
+      // ── Brique : simplifier en footing léger (cumul trop chargé en fatigue) ──
+      if (t.includes('brique')) {
+        return {
+          ...s,
+          type:            'Endurance fondamentale',
+          titre:           'Footing récupération 😴',
+          duree_min:       30,
+          intensite:       'très facile',
+          echauffement:    '',
+          corps:           `30 min à 65-72% VMA (${calcPace(vma, 0.65)}/km à ${calcPace(vma, 0.72)}/km) — allure au ressenti. Séance de récupération active.`,
+          retour_au_calme: '',
+          allures: [
+            { zone: 'Min (65% VMA)', pourcentage_vma: 65, vitesse_kmh: parseFloat((vma * 0.65).toFixed(1)), allure_min_km: calcPace(vma, 0.65) + '/km' },
+            { zone: 'Max (72% VMA)', pourcentage_vma: 72, vitesse_kmh: parseFloat((vma * 0.72).toFixed(1)), allure_min_km: calcPace(vma, 0.72) + '/km' },
+          ],
+          notes_coach:    'Ton corps a besoin de récupérer — on simplifie avec un footing léger à la place de la brique.',
+          rpe_cible:      3,
+          est_seance_cle: false,
+        };
+      }
+
+      // ── Course/running : footing EF léger ─────────────────────────────────────
       return {
         ...s,
         type:            'Endurance fondamentale',
@@ -2637,8 +2783,55 @@ router.post('/plans/check-regen', async (req, res) => {
               const updatedPlan = JSON.parse(JSON.stringify(heatPlan.plan_data));
 
               updatedPlan.semaines[weekIdx].seances = updatedPlan.semaines[weekIdx].seances.map(s => {
-                if (s.type === 'Renforcement musculaire') return s;
+                const st = (s.type || '').toLowerCase();
+                if (st.includes('renforcement')) return s;
+                if (s.est_course) return s;
                 const newDuration = Math.min(50, Math.round((s.duree_min || 45) * 0.80));
+
+                // Natation : garder la discipline (piscine = fraîche)
+                if (st.includes('natation')) {
+                  return {
+                    ...s,
+                    titre:       (s.titre || s.type) + ' — Canicule 🌡️',
+                    duree_min:   newDuration,
+                    intensite:   'modérée',
+                    corps:       s.corps
+                      ? `${s.corps}\n\n(Volume réduit de 20% — canicule. La piscine reste fraîche, profites-en !)`
+                      : `${newDuration} min de nage en endurance — séance allégée.`,
+                    notes_coach: 'La piscine est un excellent refuge par la chaleur. Nage à ton rythme.',
+                    rpe_cible:   3, est_seance_cle: false,
+                  };
+                }
+
+                // Vélo : garder la discipline, réduire volume
+                if (st.includes('vélo') || st.includes('velo')) {
+                  return {
+                    ...s,
+                    titre:       (s.titre || s.type) + ' allégé 🌡️',
+                    duree_min:   newDuration,
+                    intensite:   'facile',
+                    corps:       s.corps
+                      ? `${s.corps}\n\n(Volume réduit de 20% — canicule. Sors tôt ou utilise un home trainer.)`
+                      : `${newDuration} min de vélo en endurance — séance allégée.`,
+                    notes_coach: 'Sors tôt le matin ou utilise un home trainer. Hydrate-toi bien.',
+                    rpe_cible:   3, est_seance_cle: false,
+                  };
+                }
+
+                // Brique : alléger
+                if (st.includes('brique')) {
+                  return {
+                    ...s,
+                    titre:       (s.titre || s.type) + ' allégée 🌡️',
+                    duree_min:   newDuration,
+                    intensite:   'facile',
+                    corps:       `${newDuration} min — brique allégée, favorise la natation et le vélo, réduis la partie course par cette chaleur.`,
+                    notes_coach: 'Par la chaleur, réduis surtout la partie course. La natation et le vélo restent supportables.',
+                    rpe_cible:   4, est_seance_cle: false,
+                  };
+                }
+
+                // Course/running : footing EF allégé
                 return {
                   ...s,
                   type:            'Endurance fondamentale',
@@ -2651,8 +2844,7 @@ router.post('/plans/check-regen', async (req, res) => {
                   allures: [{ zone: 'Endurance fondamentale', pourcentage_vma: 67, vitesse_kmh: parseFloat((vma * 0.67).toFixed(1)), allure_min_km: calcPace(vma, 0.67) + '/km' }],
                   recuperation:    null,
                   notes_coach:     'Cours tôt le matin ou en soirée. Hydrate-toi avant, pendant et après. Aucune intensité par cette chaleur.',
-                  rpe_cible:       3,
-                  est_seance_cle:  false,
+                  rpe_cible:       3, est_seance_cle: false,
                 };
               });
               updatedPlan.semaines[weekIdx].charge = 'Canicule — Allégé';
