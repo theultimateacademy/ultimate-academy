@@ -470,54 +470,56 @@ export default function Landing() {
             </div>
 
             {/* ── Ebook card ── */}
-            <div style={{
-              position: 'relative', borderRadius: 28, padding: '2.5rem',
-              background: 'rgba(255,255,255,.04)', border: '1px solid rgba(255,255,255,.12)',
-              backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)',
-              display: 'flex', flexDirection: 'column', gap: '1.5rem',
+            <div className="pricing-card pricing-card--featured" style={{
+              padding: '3rem 2.5rem',
+              animation: 'pricePulse 3s ease-in-out infinite',
             }}>
-              <div style={{ display: 'inline-flex', alignItems: 'center', gap: '.4rem', padding: '.3rem .9rem',
-                borderRadius: 99, background: 'rgba(232,35,122,.15)', border: '1px solid rgba(232,35,122,.3)',
-                fontSize: '.75rem', fontWeight: 700, color: '#F472B6', width: 'fit-content' }}>
-                📖 Ebooks
-              </div>
-
-              <div>
-                <h3 style={{ fontSize: '1.6rem', fontWeight: 800, letterSpacing: '-0.02em', marginBottom: '.75rem', lineHeight: 1.2 }}>
-                  Progresse à ton<br /><span style={gd()}>propre rythme</span>
+              <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
+                <div style={{ fontSize: '2.5rem', marginBottom: '.5rem' }}>📖</div>
+                <div style={{ fontSize: '.78rem', fontWeight: 700, color: 'rgba(255,255,255,.55)', letterSpacing: '.12em', textTransform: 'uppercase', marginBottom: '1rem' }}>
+                  Ebooks Running
+                </div>
+                <h3 style={{ fontSize: 'clamp(1.6rem,3.5vw,2.2rem)', fontWeight: 800, letterSpacing: '-0.02em', lineHeight: 1.15, marginBottom: '1rem' }}>
+                  Progresse à ton<br /><span style={gd()}>rythme</span>
                 </h3>
-                <p style={{ color: 'rgba(255,255,255,.5)', fontSize: '.9rem', lineHeight: 1.75 }}>
-                  Guides pratiques pour comprendre l'entraînement, la nutrition et la préparation mentale — conçus par Alexis pour t'aider à progresser intelligemment, même sans coaching.
-                </p>
+                <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'center', gap: '.4rem', marginBottom: '.3rem' }}>
+                  <span className="price-amount">14,99€</span>
+                  <span className="price-period">et +</span>
+                </div>
+                <p style={{ color: 'rgba(255,255,255,.65)', fontSize: '.85rem', marginBottom: '.4rem', lineHeight: 1.6 }}>selon le plan et les options</p>
+                <p style={{ color: 'rgba(255,255,255,.5)', fontSize: '.78rem', marginBottom: '1.5rem', lineHeight: 1.5 }}>Achat unique. Accès illimité au PDF.</p>
               </div>
 
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '.7rem' }}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '.85rem', textAlign: 'left', marginBottom: '2rem' }}>
                 {[
-                  'Méthodes d\'entraînement expliquées',
-                  'Stratégies de course et de récupération',
-                  'Nutrition adaptée à ton sport',
-                  'Achat unique · accès illimité',
+                  'Séances calculées selon ta VMA réelle',
+                  'Choix d\'objectif : 10 km, semi ou marathon',
+                  'Long runs progressifs jusqu\'à 32 km',
+                  'Prévention des blessures et renforcement',
+                  'Téléchargement immédiat · sans abonnement',
                 ].map(f => (
-                  <div key={f} style={{ display: 'flex', gap: '.75rem', alignItems: 'center', fontSize: '.875rem', color: 'rgba(255,255,255,.65)' }}>
-                    <span style={{ color: '#F472B6', fontWeight: 700, flexShrink: 0 }}>✓</span> {f}
+                  <div key={f} style={{ display: 'flex', gap: '.75rem', alignItems: 'center', fontSize: '.9rem', color: 'rgba(255,255,255,.78)' }}>
+                    <span style={{ ...gd(), fontWeight: 700, fontSize: '1rem', flexShrink: 0 }}>✓</span> {f}
                   </div>
                 ))}
               </div>
 
               <div style={{ marginTop: 'auto' }}>
                 <Link to="/ebooks" style={{
-                  display: 'block', width: '100%', padding: '1rem 1.5rem', borderRadius: 99,
-                  border: '1.5px solid rgba(232,35,122,.5)', textAlign: 'center',
-                  fontWeight: 800, fontSize: '1rem', color: '#fff', textDecoration: 'none',
-                  background: 'rgba(232,35,122,.12)',
-                  transition: 'background .2s, border-color .2s, transform .2s',
+                  display: 'block', width: '100%', padding: '1rem 1.5rem', borderRadius: 99, border: 'none',
+                  textAlign: 'center', fontWeight: 800, fontSize: '1rem', color: '#fff', textDecoration: 'none',
+                  background: 'linear-gradient(90deg, #8B2FC9, #E8237A, #8B2FC9)',
+                  backgroundSize: '200% auto',
+                  animation: 'shimmer 2.5s linear infinite',
+                  boxShadow: '0 8px 28px rgba(139,47,201,.4)',
+                  transition: 'transform .2s',
                 }}
-                  onMouseEnter={e => { e.currentTarget.style.background = 'rgba(232,35,122,.25)'; e.currentTarget.style.transform = 'translateY(-2px)' }}
-                  onMouseLeave={e => { e.currentTarget.style.background = 'rgba(232,35,122,.12)'; e.currentTarget.style.transform = '' }}>
+                  onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-2px)' }}
+                  onMouseLeave={e => { e.currentTarget.style.transform = '' }}>
                   Voir les ebooks →
                 </Link>
                 <p style={{ color: 'rgba(255,255,255,.3)', fontSize: '.72rem', marginTop: '.65rem', textAlign: 'center' }}>
-                  À partir de 9,90€ · téléchargement immédiat
+                  Téléchargement immédiat · sans abonnement
                 </p>
               </div>
             </div>
