@@ -869,6 +869,7 @@ function AthleteDetailPanel({ athlete, onClose, onUpdated, onAlertDismissed }) {
   const [openSession,   setOpenSession]   = useState(null)
   const [openRetour,    setOpenRetour]    = useState(null)
   const [coachWeekIdx, setCoachWeekIdx]  = useState(0)  // active week tab in plan view
+  const [retourWeek,   setRetourWeek]    = useState(null) // selected week in retours tab
 
   const currentWeekNum = getCurrentWeekNum(plan)
 
@@ -1538,190 +1539,158 @@ function AthleteDetailPanel({ athlete, onClose, onUpdated, onAlertDismissed }) {
 
             {/* ══════════ RETOURS ══════════ */}
             {tab === 'retours' && (() => {
-              // Group by week_number descending
-              const weekGroups = planComps.reduce((acc, c) => {
-                const k = c.week_number
-                if (!acc[k]) acc[k] = []
-                acc[k].push(c)
-                return acc
-              }, {})
-              const weekNums = Object.keys(weekGroups).map(Number).sort((a, b) => b - a)
-
+              const DAY_ORDER = { Lundi:1, Mardi:2, Mercredi:3, Jeudi:4, Vendredi:5, Samedi:6, Dimanche:7 }
               const rpeColor = (rpe) => !rpe ? 'var(--text-muted)' : rpe >= 8 ? '#EF4444' : rpe >= 6 ? '#F59E0B' : '#10B981'
               const rpeBg    = (rpe) => !rpe ? 'transparent' : rpe >= 8 ? 'rgba(239,68,68,.12)' : rpe >= 6 ? 'rgba(245,158,11,.12)' : 'rgba(16,185,129,.12)'
+
+              const allWeeks  = plan?.plan_data?.semaines || []
+              const activeWk  = retourWeek ?? currentWeekNum
+              const sem       = allWeeks.find(s => s.numero === activeWk)
+              const seances   = [...(sem?.seances || [])].map((s, si) => ({ ...s, _si: si }))
+                .sort((a, b) => (DAY_ORDER[a.jour] || 8) - (DAY_ORDER[b.jour] || 8))
+              const weekComps = planComps.filter(c => c.week_number === activeWk)
+              const weekRpe   = rpeAvg(weekComps)
 
               return (
                 <div className="coach-tab-pane" style={{ maxWidth:720, margin:'0 auto', padding:'1.5rem' }}>
 
-                  {/* ── Stat cards ─────────────────────────────────── */}
-                  <div style={{ display:'grid', gridTemplateColumns:'repeat(3,1fr)', gap:'.75rem', marginBottom:'1.75rem' }}>
-                    {/* Total plan */}
+                  {/* ── Stat cards ── */}
+                  <div style={{ display:'grid', gridTemplateColumns:'repeat(3,1fr)', gap:'.75rem', marginBottom:'1.5rem' }}>
                     <div className="stat-card stat-card--accent">
                       <div className="stat-value">{planComps.length}</div>
                       <div className="stat-label">Séances réalisées</div>
                     </div>
-                    {/* RPE mois */}
-                    <div className="stat-card stat-card--dark" style={{
-                      border: avgRpeMois !== '—' ? `1px solid ${rpeColor(+avgRpeMois)}44` : undefined,
-                    }}>
-                      <div className="stat-value" style={{ color: avgRpeMois !== '—' ? rpeColor(+avgRpeMois) : undefined }}>
-                        {avgRpeMois}
-                      </div>
+                    <div className="stat-card stat-card--dark" style={{ border: avgRpeMois !== '—' ? `1px solid ${rpeColor(+avgRpeMois)}44` : undefined }}>
+                      <div className="stat-value" style={{ color: avgRpeMois !== '—' ? rpeColor(+avgRpeMois) : undefined }}>{avgRpeMois}</div>
                       <div className="stat-label">RPE moyen — {moisLabel}</div>
                     </div>
-                    {/* RPE semaine */}
-                    <div className="stat-card" style={{
-                      border: avgRpeWeek !== '—' ? `1px solid ${rpeColor(+avgRpeWeek)}44` : '1px solid var(--border)',
-                      background: 'var(--surface-2)',
-                    }}>
-                      <div className="stat-value" style={avgRpeWeek !== '—'
-                        ? { color: rpeColor(+avgRpeWeek) }
-                        : { background:'var(--gradient)', WebkitBackgroundClip:'text', WebkitTextFillColor:'transparent' }}>
+                    <div className="stat-card" style={{ border: avgRpeWeek !== '—' ? `1px solid ${rpeColor(+avgRpeWeek)}44` : '1px solid var(--border)', background:'var(--surface-2)' }}>
+                      <div className="stat-value" style={avgRpeWeek !== '—' ? { color:rpeColor(+avgRpeWeek) } : { background:'var(--gradient)', WebkitBackgroundClip:'text', WebkitTextFillColor:'transparent' }}>
                         {avgRpeWeek}
                       </div>
                       <div className="stat-label">RPE semaine {currentWeekNum}</div>
                     </div>
                   </div>
 
-                  {/* ── Groupes par semaine ─────────────────────────── */}
-                  {planComps.length === 0 ? (
-                    <div style={{ textAlign:'center', padding:'3rem', color:'var(--text-muted)' }}>
-                      Aucun retour de séance pour ce plan.
+                  {/* ── Onglets semaine ── */}
+                  {allWeeks.length > 0 && (
+                    <div style={{ display:'flex', gap:'.35rem', flexWrap:'wrap', marginBottom:'1rem' }}>
+                      {allWeeks.map(w => {
+                        const wComps    = planComps.filter(c => c.week_number === w.numero)
+                        const hasDone   = wComps.length > 0
+                        const isActive  = activeWk === w.numero
+                        const isCurrent = w.numero === currentWeekNum
+                        return (
+                          <button key={w.numero} onClick={() => setRetourWeek(w.numero)} style={{
+                            padding:'.38rem .8rem', borderRadius:10, fontWeight:700, fontSize:'.8rem',
+                            cursor:'pointer', fontFamily:'inherit', whiteSpace:'nowrap',
+                            border:`1px solid ${isActive ? 'var(--primary)' : hasDone ? 'rgba(16,185,129,.25)' : 'rgba(255,255,255,.08)'}`,
+                            background: isActive ? 'rgba(139,47,201,.2)' : hasDone ? 'rgba(16,185,129,.06)' : 'transparent',
+                            color: isActive ? '#C084FC' : hasDone ? '#6EE7B7' : 'rgba(255,255,255,.32)',
+                          }}>
+                            S{w.numero}{isCurrent ? ' ●' : ''}{hasDone ? ` · ${wComps.length}` : ''}
+                          </button>
+                        )
+                      })}
+                    </div>
+                  )}
+
+                  {/* ── En-tête semaine sélectionnée ── */}
+                  {sem && (
+                    <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center',
+                      marginBottom:'.75rem', padding:'.5rem .875rem',
+                      background:'rgba(255,255,255,.03)', borderRadius:10,
+                      border:`1px solid ${activeWk === currentWeekNum ? 'rgba(139,47,201,.25)' : 'rgba(255,255,255,.07)'}` }}>
+                      <div>
+                        <span style={{ fontWeight:700, fontSize:'.85rem',
+                          color: activeWk === currentWeekNum ? '#C084FC' : '#fff' }}>
+                          Semaine {activeWk}{activeWk === currentWeekNum ? ' · EN COURS' : ''}
+                        </span>
+                        <span style={{ fontSize:'.7rem', color:'rgba(255,255,255,.35)', marginLeft:'.5rem' }}>
+                          {getWeekRange(activeWk)}
+                        </span>
+                      </div>
+                      <div style={{ display:'flex', alignItems:'center', gap:'.5rem' }}>
+                        <span style={{ fontSize:'.72rem', color:'rgba(255,255,255,.38)' }}>
+                          {weekComps.length}/{seances.length} effectuées
+                        </span>
+                        {weekRpe !== '—' && (
+                          <span style={{ fontSize:'.78rem', fontWeight:800, color:rpeColor(+weekRpe),
+                            background:rpeBg(+weekRpe), borderRadius:99, padding:'.15rem .5rem',
+                            border:`1px solid ${rpeColor(+weekRpe)}30` }}>
+                            RPE {weekRpe}
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* ── Liste des séances (simple, clic → détail) ── */}
+                  {seances.length === 0 ? (
+                    <div style={{ textAlign:'center', padding:'2.5rem', color:'var(--text-muted)', fontStyle:'italic' }}>
+                      {allWeeks.length === 0 ? 'Aucun retour de séance pour ce plan.' : 'Aucune séance planifiée cette semaine.'}
                     </div>
                   ) : (
-                    <div style={{ display:'flex', flexDirection:'column', gap:'1.5rem' }}>
-                      {weekNums.map(wn => {
-                        const weeksComps = weekGroups[wn]
-                        const sem = plan?.plan_data?.semaines?.find(s => s.numero === wn)
-                        const weekRpe = rpeAvg(weeksComps)
-                        const weekRpeNum = +weekRpe
-                        const isCurrentWeek = wn === currentWeekNum
-
+                    <div style={{ display:'flex', flexDirection:'column', gap:'.35rem' }}>
+                      {seances.map(session => {
+                        const si    = session._si
+                        const comp  = weekComps.find(c => c.session_index === si)
+                        const color = SESSION_TYPE_COLORS[session.type] || '#10B981'
+                        const done  = !!comp
                         return (
-                          <div key={wn}>
-                            {/* En-tête semaine */}
-                            <div style={{
-                              display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-                              padding: '.65rem 1rem',
-                              background: isCurrentWeek ? 'rgba(139,47,201,.1)' : 'rgba(255,255,255,.04)',
-                              border: `1px solid ${isCurrentWeek ? 'rgba(139,47,201,.35)' : 'rgba(255,255,255,.08)'}`,
-                              borderRadius: '10px 10px 0 0',
-                              borderBottom: 'none',
-                            }}>
-                              <div>
-                                <div style={{ display: 'flex', alignItems: 'center', gap: '.5rem' }}>
-                                  <span style={{
-                                    fontWeight: 800, fontSize: '.88rem',
-                                    color: isCurrentWeek ? '#C084FC' : '#fff',
-                                  }}>
-                                    Semaine {wn}
+                          <div key={si}
+                            onClick={() => {
+                              if (!done) return
+                              const tagPattern = /\[([^\]:]+):\s*([^\]]+)\]/g
+                              const tags = []; let rawComment = comp.comment || '', m2
+                              while ((m2 = tagPattern.exec(rawComment)) !== null) tags.push({ k: m2[1].trim(), v: m2[2].trim() })
+                              const freeText = rawComment.replace(/\[[^\]]+\]/g, '').trim()
+                              setOpenRetour({ c: comp, session, color, rpe: comp.rpe, rpeColor: rpeColor(comp.rpe), tags, freeText })
+                            }}
+                            style={{
+                              display:'flex', alignItems:'center', gap:'.6rem',
+                              padding:'.65rem .875rem', borderRadius:12,
+                              cursor: done ? 'pointer' : 'default',
+                              background: done ? 'rgba(16,185,129,.05)' : 'rgba(255,255,255,.02)',
+                              border:`1px solid ${done ? 'rgba(16,185,129,.18)' : 'rgba(255,255,255,.05)'}`,
+                              borderLeft:`3px solid ${done ? '#10B981' : color}`,
+                              transition: done ? 'background .12s' : 'none',
+                            }}
+                            onMouseEnter={e => done && (e.currentTarget.style.background = 'rgba(16,185,129,.1)')}
+                            onMouseLeave={e => done && (e.currentTarget.style.background = 'rgba(16,185,129,.05)')}>
+                            {/* Jour */}
+                            <span style={{ fontSize:'.66rem', color:'rgba(255,255,255,.38)', flexShrink:0, minWidth:28 }}>
+                              {session.jour?.slice(0,3)}
+                            </span>
+                            {/* Type badge */}
+                            <span style={{ fontSize:'.62rem', fontWeight:800, color, textTransform:'uppercase',
+                              background:color+'18', borderRadius:99, padding:'.1rem .45rem',
+                              border:`1px solid ${color}28`, flexShrink:0 }}>
+                              {(session.type||'').split(' ')[0]}
+                            </span>
+                            {/* Titre */}
+                            <span style={{ flex:1, fontWeight:600, fontSize:'.84rem',
+                              overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>
+                              {session.titre}
+                            </span>
+                            {/* Statut */}
+                            {done ? (
+                              <div style={{ display:'flex', alignItems:'center', gap:'.4rem', flexShrink:0 }}>
+                                <span style={{ fontSize:'.75rem' }}>✅</span>
+                                {comp.rpe && (
+                                  <span style={{ fontSize:'.7rem', fontWeight:800, color:rpeColor(comp.rpe),
+                                    background:rpeBg(comp.rpe), borderRadius:99, padding:'.1rem .4rem',
+                                    border:`1px solid ${rpeColor(comp.rpe)}25` }}>
+                                    RPE {comp.rpe}
                                   </span>
-                                  {isCurrentWeek && (
-                                    <span style={{
-                                      fontSize: '.65rem', fontWeight: 700, letterSpacing: '.06em',
-                                      background: 'rgba(139,47,201,.25)', color: '#C084FC',
-                                      border: '1px solid rgba(139,47,201,.4)', borderRadius: 99,
-                                      padding: '.1rem .5rem',
-                                    }}>EN COURS</span>
-                                  )}
-                                  {sem?.phase && (
-                                    <span style={{ fontSize: '.72rem', color: 'rgba(255,255,255,.4)' }}>
-                                      · {sem.phase}
-                                    </span>
-                                  )}
-                                </div>
-                                <div style={{ fontSize: '.7rem', color: 'rgba(255,255,255,.35)', marginTop: '.1rem' }}>
-                                  {getWeekRange(wn)} · {weeksComps.length} séance{weeksComps.length > 1 ? 's' : ''}
-                                </div>
+                                )}
+                                <span style={{ color:'rgba(255,255,255,.22)', fontSize:'.8rem' }}>›</span>
                               </div>
-                              {weekRpe !== '—' && (
-                                <div style={{
-                                  textAlign: 'center',
-                                  background: rpeBg(weekRpeNum),
-                                  border: `1px solid ${rpeColor(weekRpeNum)}33`,
-                                  borderRadius: 10, padding: '.35rem .75rem',
-                                }}>
-                                  <div style={{ fontSize: '1.1rem', fontWeight: 900, lineHeight: 1, color: rpeColor(weekRpeNum) }}>
-                                    {weekRpe}
-                                  </div>
-                                  <div style={{ fontSize: '.6rem', color: 'rgba(255,255,255,.35)', marginTop: '.1rem' }}>RPE moy.</div>
-                                </div>
-                              )}
-                            </div>
-
-                            {/* Cards de la semaine */}
-                            <div style={{
-                              border: `1px solid ${isCurrentWeek ? 'rgba(139,47,201,.25)' : 'rgba(255,255,255,.07)'}`,
-                              borderRadius: '0 0 10px 10px',
-                              overflow: 'hidden',
-                            }}>
-                              {weeksComps.map((c, ci) => {
-                                const sem2   = plan?.plan_data?.semaines?.find(s => s.numero === c.week_number)
-                                const session = sem2?.seances?.[c.session_index]
-                                const rpe    = c.rpe
-                                const color  = SESSION_TYPE_COLORS[session?.type] || '#10B981'
-                                const tagPattern = /\[([^\]:]+):\s*([^\]]+)\]/g
-                                const tags = []; let rawComment = c.comment || '', m2
-                                while ((m2 = tagPattern.exec(rawComment)) !== null) tags.push({ k: m2[1].trim(), v: m2[2].trim() })
-                                const freeText = rawComment.replace(/\[[^\]]+\]/g, '').trim()
-                                return (
-                                  <div key={c.id}
-                                    onClick={() => setOpenRetour({ c, session, color, rpe, rpeColor: rpeColor(rpe), tags, freeText })}
-                                    style={{
-                                      display: 'flex', gap: 0, cursor: 'pointer',
-                                      background: ci % 2 === 0 ? 'rgba(255,255,255,.025)' : 'rgba(255,255,255,.01)',
-                                      borderTop: ci === 0 ? 'none' : '1px solid rgba(255,255,255,.05)',
-                                      transition: 'background .12s',
-                                    }}
-                                    onMouseEnter={e => e.currentTarget.style.background = 'rgba(255,255,255,.06)'}
-                                    onMouseLeave={e => e.currentTarget.style.background = ci % 2 === 0 ? 'rgba(255,255,255,.025)' : 'rgba(255,255,255,.01)'}>
-                                    <div style={{ width: 3, background: color, flexShrink: 0 }} />
-                                    <div style={{ flex: 1, padding: '.65rem .875rem', minWidth: 0 }}>
-                                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '.5rem' }}>
-                                        <div style={{ minWidth: 0 }}>
-                                          <div style={{ fontWeight: 700, fontSize: '.84rem', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                                            {session?.titre || `Séance ${c.session_index + 1}`}
-                                          </div>
-                                          <div style={{ fontSize: '.68rem', color: 'rgba(255,255,255,.35)', marginTop: '.1rem' }}>
-                                            {new Date(c.completed_at).toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long' })}
-                                            {session?.type ? ` · ${session.type}` : ''}
-                                          </div>
-                                        </div>
-                                        <div style={{ flexShrink: 0, display: 'flex', alignItems: 'center', gap: '.5rem' }}>
-                                          {rpe && (
-                                            <div style={{
-                                              background: rpeBg(rpe), border: `1px solid ${rpeColor(rpe)}33`,
-                                              borderRadius: 8, padding: '.2rem .55rem', textAlign: 'center',
-                                            }}>
-                                              <span style={{ fontWeight: 800, fontSize: '.95rem', color: rpeColor(rpe) }}>{rpe}</span>
-                                              <span style={{ fontSize: '.65rem', color: 'rgba(255,255,255,.35)' }}>/10</span>
-                                            </div>
-                                          )}
-                                          <span style={{ color: 'rgba(255,255,255,.2)', fontSize: '.8rem' }}>›</span>
-                                        </div>
-                                      </div>
-                                      {tags.length > 0 && (
-                                        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '.2rem', marginTop: '.35rem' }}>
-                                          {tags.map((t, ti) => (
-                                            <span key={ti} style={{
-                                              fontSize: '.65rem', background: 'rgba(255,255,255,.06)',
-                                              border: '1px solid rgba(255,255,255,.1)', borderRadius: 99,
-                                              padding: '.1rem .45rem', color: 'rgba(255,255,255,.6)',
-                                            }}>{t.k} : <strong style={{ color: '#fff' }}>{t.v}</strong></span>
-                                          ))}
-                                        </div>
-                                      )}
-                                      {freeText && (
-                                        <div style={{
-                                          fontSize: '.75rem', fontStyle: 'italic', color: 'rgba(255,255,255,.55)',
-                                          marginTop: '.3rem', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
-                                        }}>&ldquo;{freeText}&rdquo;</div>
-                                      )}
-                                    </div>
-                                  </div>
-                                )
-                              })}
-                            </div>
+                            ) : (
+                              <span style={{ fontSize:'.7rem', color:'rgba(255,255,255,.2)', fontStyle:'italic', flexShrink:0 }}>
+                                Non effectuée
+                              </span>
+                            )}
                           </div>
                         )
                       })}
