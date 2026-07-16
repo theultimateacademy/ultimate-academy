@@ -41,23 +41,40 @@ function fmtPace(min, sec) {
   return `${min || '0'}'${String(sec || '0').padStart(2, '0')}"/km`
 }
 
-// Convert time on distance (sec) → pace display string "M'SS""
-function timeToPace(min, sec, distM) {
+// Convert time on distance → split display { time, unit }
+// per100=true for natation (calculates /100m instead of /km)
+function timeToSplit(min, sec, distM, per100 = false) {
   const total = (parseInt(min) || 0) * 60 + (parseInt(sec) || 0)
   if (!total || !distM) return null
-  const paceSec = (total / distM) * 1000
+  const unit = per100 ? 100 : 1000
+  const paceSec = (total / distM) * unit
   const pMin = Math.floor(paceSec / 60)
   const pSec = Math.round(paceSec % 60)
-  return `${pMin}'${String(pSec).padStart(2, '0')}"`
+  return { time: `${pMin}'${String(pSec).padStart(2, '0')}"`, unit: per100 ? '/100m' : '/km' }
+}
+function timeToPace(min, sec, distM) {
+  const s = timeToSplit(min, sec, distM, false)
+  return s ? s.time : null
 }
 
-// Detect first interval line: "• N×M[unit]..." → {reps, label} or null
+// Detect N×M intervals: checks bullet lines first, then BLOC headers
 function detectIntervals(corps) {
   if (!corps) return null
+  const RE = /(\d+)\s*[×x×]\s*(\d+(?:[.,]\d+)?)\s*(m\b|km\b|min\b)/i
   for (const line of corps.split('\n')) {
     const t = line.trim()
     if (!t.startsWith('•')) continue
-    const m = t.match(/(\d+)\s*[×x×]\s*(\d+(?:[.,]\d+)?)\s*(m\b|km\b|min\b)/i)
+    const m = t.match(RE)
+    if (m) {
+      const reps = parseInt(m[1])
+      if (reps >= 2 && reps <= 25) return { reps, label: `${m[1]}×${m[2]}${m[3]}` }
+    }
+  }
+  // Also detect from BLOC headers: "BLOC N×M unit — ..."
+  for (const line of corps.split('\n')) {
+    const t = line.trim()
+    if (!/^BLOC\b/i.test(t)) continue
+    const m = t.match(RE)
     if (m) {
       const reps = parseInt(m[1])
       if (reps >= 2 && reps <= 25) return { reps, label: `${m[1]}×${m[2]}${m[3]}` }
@@ -246,13 +263,17 @@ export default function PostSessionFlow({
 
   const typeColor      = SESSION_TYPE_COLORS[session.type] || '#10B981'
   const sessionTypeL   = (session.type || '').toLowerCase()
-  const isNonRunning   = sessionTypeL.includes('natation') || sessionTypeL.includes('vélo') ||
-    sessionTypeL.includes('velo') || sessionTypeL.includes('brique') || sessionTypeL.includes('renforcement')
+  const isNatation     = sessionTypeL.includes('natation')
+  const isVelo         = sessionTypeL.includes('vélo') || sessionTypeL.includes('velo')
+  const isNonRunning   = isNatation || isVelo ||
+    sessionTypeL.includes('brique') || sessionTypeL.includes('renforcement')
 
-  const intervals = useMemo(() => !isNonRunning ? detectIntervals(session.corps) : null, [session.corps, isNonRunning])
+  // Detect intervals/blocs for ALL session types
+  const intervals = useMemo(() => detectIntervals(session.corps), [session.corps])
   const numReps   = intervals?.reps || 0
+  const hasBlocs  = numReps > 0
 
-  // Extract distance in metres from intervals.label (e.g. "6×300m" → 300)
+  // Extract distance in metres from intervals.label (e.g. "6×300m" → 300, "3×20min" → null)
   const distM = useMemo(() => {
     if (!intervals?.label) return null
     const m = intervals.label.match(/[×x]\s*(\d+(?:[.,]\d+)?)\s*(m|km)/i)
@@ -278,7 +299,8 @@ export default function PostSessionFlow({
 
   const pasTermine  = ressenti === 'pas_termine'
   const hasWarmup   = !!session.echauffement && !isNonRunning
-  const hasMainSet  = !!session.corps && !isNonRunning
+  // mainset shown for running OR any session with detectable blocs
+  const hasMainSet  = !!session.corps && (!isNonRunning || hasBlocs)
   const hasCooldown = !!session.retour_au_calme && !isNonRunning
 
   function activeSteps() {
@@ -287,7 +309,9 @@ export default function PostSessionFlow({
       s.push('rpe')
       if (!isNonRunning) {
         if (hasWarmup)   s.push('warmup')
-        if (hasMainSet)  s.push('mainset')
+      }
+      if (hasMainSet)  s.push('mainset')
+      if (!isNonRunning) {
         if (hasCooldown) s.push('cooldown')
       }
       s.push('fc')
@@ -315,26 +339,27 @@ export default function PostSessionFlow({
     if (!isNonRunning) {
       if (wuPaceMin || wuPaceSec)
         parts.push(`[Ech: ${wuPaceMin||'0'}'${String(wuPaceSec||'0').padStart(2,'0')}"]`)
-      if (numReps > 0) {
-        if (repMode === 'time' && distM) {
-          const repsStr = effectiveRepTimes
-            .map((t, i) => {
-              if (!t.min && !t.sec) return null
-              const timeStr = `${t.min||'0'}'${String(t.sec||'0').padStart(2,'0')}"`
-              const pace = timeToPace(t.min, t.sec, distM)
-              return pace ? `${i+1}:${timeStr}(${pace}/km)` : `${i+1}:${timeStr}`
-            })
-            .filter(Boolean).join(' | ')
-          if (repsStr) parts.push(`[Blocs: ${repsStr}]`)
-        } else {
-          const repsStr = effectiveRepPaces
-            .map((p, i) => (p.min || p.sec) ? `${i+1}:${p.min||'0'}'${String(p.sec||'0').padStart(2,'0')}"` : null)
-            .filter(Boolean).join(' | ')
-          if (repsStr) parts.push(`[Blocs: ${repsStr}]`)
+    }
+    // Blocs data — for ALL session types with detectable intervals
+    if (hasBlocs) {
+      const useTimeMode = repMode === 'time' && distM
+      const useVeloMode = isVelo && !distM  // time entry per bloc, no pace
+      const arr = (useTimeMode || useVeloMode) ? effectiveRepTimes : effectiveRepPaces
+      const repsStr = arr.map((t, i) => {
+        if (!t.min && !t.sec) return null
+        const timeStr = `${t.min||'0'}'${String(t.sec||'0').padStart(2,'0')}"`
+        if (useTimeMode) {
+          const split = timeToSplit(t.min, t.sec, distM, isNatation)
+          return split ? `${i+1}:${timeStr}(${split.time}${split.unit})` : `${i+1}:${timeStr}`
         }
-      } else if (mainPaceMin || mainPaceSec) {
-        parts.push(`[Corps: ${mainPaceMin||'0'}'${String(mainPaceSec||'0').padStart(2,'0')}"/km]`)
-      }
+        if (useVeloMode) return `bloc${i+1}:${timeStr}`
+        return `${i+1}:${t.min||'0'}'${String(t.sec||'0').padStart(2,'0')}"/km`
+      }).filter(Boolean).join(' | ')
+      if (repsStr) parts.push(`[Blocs: ${repsStr}]`)
+    } else if (!isNonRunning && (mainPaceMin || mainPaceSec)) {
+      parts.push(`[Corps: ${mainPaceMin||'0'}'${String(mainPaceSec||'0').padStart(2,'0')}"/km]`)
+    }
+    if (!isNonRunning) {
       if (cdPaceMin || cdPaceSec)
         parts.push(`[RAC: ${cdPaceMin||'0'}'${String(cdPaceSec||'0').padStart(2,'0')}"]`)
     }
@@ -543,115 +568,135 @@ export default function PostSessionFlow({
             </>
           )}
 
-          {/* ── PAGE 4 : Corps de séance ── */}
-          {step === 'mainset' && (
-            <>
-              <h3 style={{ fontSize: '1.25rem', fontWeight: 900, lineHeight: 1.2, marginBottom: '.4rem' }}>
-                {numReps > 0 ? `⚡ Tes ${numReps} répétitions` : '⚡ Corps de séance'}
-              </h3>
-              <p style={{ fontSize: '.85rem', color: 'rgba(26,26,46,.5)', marginBottom: '1.25rem', lineHeight: 1.65 }}>
-                {numReps > 0
-                  ? distM
-                    ? `Entre le temps réalisé sur chaque ${distM}m.`
-                    : `Entre l'allure pour chaque répétition.`
-                  : 'Quelle allure moyenne sur le corps de la séance ?'}
-              </p>
+          {/* ── PAGE 4 : Corps de séance / Blocs ── */}
+          {step === 'mainset' && (() => {
+            // Determine entry mode for this session type
+            const isVeloBloc  = isVelo && hasBlocs && !distM   // vélo time-based blocs (no distance)
+            const isNatBloc   = isNatation && hasBlocs          // natation with distance blocs
+            const isRunBloc   = !isNonRunning && hasBlocs       // running with interval blocs
+            const useTimeMode = (repMode === 'time' && distM) || isVeloBloc
+            const setter      = useTimeMode ? setRepTimes : setRepPaces
+            const arr         = useTimeMode ? effectiveRepTimes : effectiveRepPaces
 
-              <PrevuCard color={typeColor} icon="⚡">
-                <div style={{ fontWeight: 700, fontSize: '.88rem', marginBottom: '.5rem', color: '#1a1a2e' }}>
-                  {session.titre}
-                </div>
-                <CorpsPreview corps={session.corps} typeColor={typeColor} />
-                {numReps === 0 && <AllureChip allure={mainAllure} color={typeColor} />}
-              </PrevuCard>
+            const blocEmoji = isNatation ? '🏊' : isVelo ? '🚴' : '⚡'
+            const blocLabel = hasBlocs
+              ? distM
+                ? `${blocEmoji} Tes ${numReps} répétitions`
+                : `${blocEmoji} Tes ${numReps} blocs`
+              : '⚡ Corps de séance'
+            const blocDesc = hasBlocs
+              ? isVeloBloc
+                ? `Entre le temps réalisé sur chaque bloc (prévu : ${intervals.label.split('×')[1]}).`
+                : distM
+                  ? `Entre le temps réalisé sur chaque ${distM >= 1000 ? `${distM/1000}km` : `${distM}m`}.`
+                  : `Entre l'allure pour chaque bloc.`
+              : 'Quelle allure moyenne sur le corps de la séance ?'
 
-              {numReps > 0 ? (
-                <>
-                  {/* Mode toggle — only show if distance is known */}
-                  {distM && (
-                    <div style={{ display: 'flex', gap: '.35rem', marginBottom: '.875rem',
-                      background: 'rgba(139,47,201,.06)', borderRadius: 12, padding: '.3rem' }}>
-                      {[
-                        { v: 'time', l: `⏱ Temps / ${distM}m` },
-                        { v: 'pace', l: '⚡ Allure /km' },
-                      ].map(m => (
-                        <button key={m.v} onClick={() => setRepMode(m.v)} style={{
-                          flex: 1, padding: '.4rem', borderRadius: 9, border: 'none', cursor: 'pointer',
-                          fontFamily: 'inherit', fontWeight: 700, fontSize: '.8rem',
-                          background: repMode === m.v ? C.purple : 'transparent',
-                          color: repMode === m.v ? '#fff' : 'rgba(26,26,46,.4)',
-                          transition: 'all .15s',
-                        }}>{m.l}</button>
-                      ))}
-                    </div>
-                  )}
+            return (
+              <>
+                <h3 style={{ fontSize: '1.25rem', fontWeight: 900, lineHeight: 1.2, marginBottom: '.4rem' }}>
+                  {blocLabel}
+                </h3>
+                <p style={{ fontSize: '.85rem', color: 'rgba(26,26,46,.5)', marginBottom: '1.25rem', lineHeight: 1.65 }}>
+                  {blocDesc}
+                </p>
 
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '.5rem' }}>
-                    {(repMode === 'time' && distM ? effectiveRepTimes : effectiveRepPaces).map((rp, i) => {
-                      const calcPace = repMode === 'time' && distM ? timeToPace(rp.min, rp.sec, distM) : null
-                      const setter  = repMode === 'time' && distM ? setRepTimes : setRepPaces
-                      return (
-                        <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '.75rem',
-                          background: 'rgba(139,47,201,.04)', borderRadius: 12,
-                          padding: '.6rem .875rem', border: '1px solid rgba(139,47,201,.1)' }}>
-                          <span style={{ fontSize: '.78rem', fontWeight: 800, color: C.purple,
-                            minWidth: 22, textAlign: 'center' }}>
-                            {i + 1}
-                          </span>
-                          <div style={{ display: 'flex', alignItems: 'center', gap: '.3rem', flex: 1 }}>
-                            <input
-                              type="number" min="0" max="99" placeholder="MM" value={rp.min || ''}
-                              onChange={e => setter(prev => {
-                                const next = Array.from({ length: numReps }, (_, j) => prev[j] || { min: '', sec: '' })
-                                next[i] = { ...next[i], min: e.target.value }
-                                return next
-                              })}
-                              style={{ width: 50, padding: '.4rem .3rem', borderRadius: 8, fontSize: '.95rem',
-                                fontWeight: 700, border: '2px solid rgba(139,47,201,.18)', background: '#fff',
-                                textAlign: 'center', outline: 'none', color: '#1a1a2e' }} />
-                            <span style={{ color: 'rgba(26,26,46,.25)', fontSize: '1rem' }}>:</span>
-                            <input
-                              type="number" min="0" max="59" placeholder="SS" value={rp.sec || ''}
-                              onChange={e => setter(prev => {
-                                const next = Array.from({ length: numReps }, (_, j) => prev[j] || { min: '', sec: '' })
-                                next[i] = { ...next[i], sec: e.target.value }
-                                return next
-                              })}
-                              style={{ width: 50, padding: '.4rem .3rem', borderRadius: 8, fontSize: '.95rem',
-                                fontWeight: 700, border: '2px solid rgba(139,47,201,.18)', background: '#fff',
-                                textAlign: 'center', outline: 'none', color: '#1a1a2e' }} />
-                            <span style={{ fontSize: '.75rem', color: 'rgba(26,26,46,.35)' }}>
-                              {repMode === 'time' && distM ? `sur ${distM}m` : '/km'}
-                            </span>
-                          </div>
-                          {/* Calculated pace shown live in time mode */}
-                          {calcPace && (
-                            <span style={{ fontSize: '.8rem', fontWeight: 800, color: C.purple,
-                              flexShrink: 0, whiteSpace: 'nowrap' }}>
-                              = {calcPace}<span style={{ fontSize: '.68rem', fontWeight: 400, opacity: .6 }}>/km</span>
-                            </span>
-                          )}
-                          {/* Pace display in pace mode */}
-                          {repMode !== 'time' && (rp.min || rp.sec) && (
-                            <span style={{ fontSize: '.75rem', fontWeight: 800, color: C.purple, flexShrink: 0 }}>
-                              {rp.min || '0'}'{String(rp.sec || '0').padStart(2,'0')}"
-                            </span>
-                          )}
-                        </div>
-                      )
-                    })}
+                <PrevuCard color={typeColor} icon={blocEmoji}>
+                  <div style={{ fontWeight: 700, fontSize: '.88rem', marginBottom: '.5rem', color: '#1a1a2e' }}>
+                    {session.titre}
                   </div>
-                </>
-              ) : (
-                <PaceInput
-                  label="Allure moyenne corps de séance"
-                  minVal={mainPaceMin} onMinChange={setMainPaceMin}
-                  secVal={mainPaceSec} onSecChange={setMainPaceSec}
-                />
-              )}
-              <SkipLink onSkip={skipToNext} />
-            </>
-          )}
+                  <CorpsPreview corps={session.corps} typeColor={typeColor} />
+                  {!hasBlocs && <AllureChip allure={mainAllure} color={typeColor} />}
+                </PrevuCard>
+
+                {hasBlocs ? (
+                  <>
+                    {/* Mode toggle — running with distance only; natation uses time mode only */}
+                    {distM && !isNonRunning && (
+                      <div style={{ display: 'flex', gap: '.35rem', marginBottom: '.875rem',
+                        background: 'rgba(139,47,201,.06)', borderRadius: 12, padding: '.3rem' }}>
+                        {[
+                          { v: 'time', l: `⏱ Temps / ${distM >= 1000 ? `${distM/1000}km` : `${distM}m`}` },
+                          { v: 'pace', l: '⚡ Allure /km' },
+                        ].map(m => (
+                          <button key={m.v} onClick={() => setRepMode(m.v)} style={{
+                            flex: 1, padding: '.4rem', borderRadius: 9, border: 'none', cursor: 'pointer',
+                            fontFamily: 'inherit', fontWeight: 700, fontSize: '.8rem',
+                            background: repMode === m.v ? C.purple : 'transparent',
+                            color: repMode === m.v ? '#fff' : 'rgba(26,26,46,.4)',
+                            transition: 'all .15s',
+                          }}>{m.l}</button>
+                        ))}
+                      </div>
+                    )}
+
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '.5rem' }}>
+                      {arr.map((rp, i) => {
+                        const split = (useTimeMode && distM)
+                          ? timeToSplit(rp.min, rp.sec, distM, isNatation)
+                          : null
+                        const unitLabel = isVeloBloc ? 'temps' : distM ? (isNatation ? `/100m` : '/km') : '/km'
+                        return (
+                          <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '.75rem',
+                            background: 'rgba(139,47,201,.04)', borderRadius: 12,
+                            padding: '.6rem .875rem', border: '1px solid rgba(139,47,201,.1)' }}>
+                            <span style={{ fontSize: '.78rem', fontWeight: 800, color: C.purple,
+                              minWidth: 22, textAlign: 'center' }}>
+                              {i + 1}
+                            </span>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '.3rem', flex: 1 }}>
+                              <input
+                                type="number" min="0" max="99" placeholder="MM" value={rp.min || ''}
+                                onChange={e => setter(prev => {
+                                  const next = Array.from({ length: numReps }, (_, j) => prev[j] || { min: '', sec: '' })
+                                  next[i] = { ...next[i], min: e.target.value }
+                                  return next
+                                })}
+                                style={{ width: 50, padding: '.4rem .3rem', borderRadius: 8, fontSize: '.95rem',
+                                  fontWeight: 700, border: '2px solid rgba(139,47,201,.18)', background: '#fff',
+                                  textAlign: 'center', outline: 'none', color: '#1a1a2e' }} />
+                              <span style={{ color: 'rgba(26,26,46,.25)', fontSize: '1rem' }}>:</span>
+                              <input
+                                type="number" min="0" max="59" placeholder="SS" value={rp.sec || ''}
+                                onChange={e => setter(prev => {
+                                  const next = Array.from({ length: numReps }, (_, j) => prev[j] || { min: '', sec: '' })
+                                  next[i] = { ...next[i], sec: e.target.value }
+                                  return next
+                                })}
+                                style={{ width: 50, padding: '.4rem .3rem', borderRadius: 8, fontSize: '.95rem',
+                                  fontWeight: 700, border: '2px solid rgba(139,47,201,.18)', background: '#fff',
+                                  textAlign: 'center', outline: 'none', color: '#1a1a2e' }} />
+                              {!split && <span style={{ fontSize: '.75rem', color: 'rgba(26,26,46,.35)' }}>{unitLabel}</span>}
+                            </div>
+                            {/* Calculated split shown live */}
+                            {split && (
+                              <span style={{ fontSize: '.8rem', fontWeight: 800, color: C.purple,
+                                flexShrink: 0, whiteSpace: 'nowrap' }}>
+                                = {split.time}<span style={{ fontSize: '.68rem', fontWeight: 400, opacity: .6 }}>{split.unit}</span>
+                              </span>
+                            )}
+                            {/* Pace display in pace mode */}
+                            {!useTimeMode && !isVeloBloc && (rp.min || rp.sec) && (
+                              <span style={{ fontSize: '.75rem', fontWeight: 800, color: C.purple, flexShrink: 0 }}>
+                                {rp.min || '0'}'{String(rp.sec || '0').padStart(2,'0')}"
+                              </span>
+                            )}
+                          </div>
+                        )
+                      })}
+                    </div>
+                  </>
+                ) : (
+                  <PaceInput
+                    label="Allure moyenne corps de séance"
+                    minVal={mainPaceMin} onMinChange={setMainPaceMin}
+                    secVal={mainPaceSec} onSecChange={setMainPaceSec}
+                  />
+                )}
+                <SkipLink onSkip={skipToNext} />
+              </>
+            )
+          })()}
 
           {/* ── PAGE 5 : Retour au calme ── */}
           {step === 'cooldown' && (
@@ -757,16 +802,22 @@ export default function PostSessionFlow({
                 ))}
               </div>
 
-              {/* Paces recap */}
-              {!isNonRunning && (() => {
+              {/* Paces/Blocs recap */}
+              {(() => {
                 const lines = []
-                if (wuPaceMin || wuPaceSec) lines.push({ icon: '🔥', label: 'Ech.', val: fmtPace(wuPaceMin, wuPaceSec) })
-                if (numReps > 0 && effectiveRepPaces.some(p => p.min || p.sec)) {
-                  lines.push({ icon: '⚡', label: `${effectiveRepPaces.filter(p => p.min || p.sec).length} reps`, val: 'enregistrées' })
-                } else if (mainPaceMin || mainPaceSec) {
-                  lines.push({ icon: '⚡', label: 'Corps', val: fmtPace(mainPaceMin, mainPaceSec) })
+                if (!isNonRunning) {
+                  if (wuPaceMin || wuPaceSec) lines.push({ icon: '🔥', label: 'Ech.', val: fmtPace(wuPaceMin, wuPaceSec) })
                 }
-                if (cdPaceMin || cdPaceSec) lines.push({ icon: '❄️', label: 'RAC', val: fmtPace(cdPaceMin, cdPaceSec) })
+                if (hasBlocs) {
+                  const arr = (repMode === 'time' && distM) || (isVelo && !distM) ? effectiveRepTimes : effectiveRepPaces
+                  const count = arr.filter(p => p.min || p.sec).length
+                  if (count > 0) lines.push({ icon: isNatation ? '🏊' : isVelo ? '🚴' : '⚡', label: `${count} blocs`, val: 'enregistrés' })
+                } else if (!isNonRunning) {
+                  if (mainPaceMin || mainPaceSec) lines.push({ icon: '⚡', label: 'Corps', val: fmtPace(mainPaceMin, mainPaceSec) })
+                }
+                if (!isNonRunning) {
+                  if (cdPaceMin || cdPaceSec) lines.push({ icon: '❄️', label: 'RAC', val: fmtPace(cdPaceMin, cdPaceSec) })
+                }
                 if (!lines.length) return null
                 return (
                   <div style={{ background: typeColor + '08', border: `1px solid ${typeColor}20`,
