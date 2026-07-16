@@ -386,9 +386,17 @@ export default function PostSessionFlow({
   const doneCount   = prevDone + 1
   const prevRpeSum  = weekCompletions.reduce((s, c) => s + (c.rpe || 0), 0)
   const avgRpeVal   = doneCount > 0 ? ((prevRpeSum + parseInt(rpe)) / doneCount).toFixed(1) : rpe
+  function sessionTotalMin(s) {
+    const parseMin = t => { const m = (t || '').match(/^(\d+)\s*min/i); return m ? parseInt(m[1], 10) : 0 }
+    const ech = parseMin(s.echauffement)
+    const rac = parseMin(s.retour_au_calme)
+    const base = s.duree_min || 0
+    // Add ech+rac only if duree_min seems to be corpus-only (< ech+rac+5 min corpus)
+    return (ech + rac > 0 && base < ech + rac + 5) ? base + ech + rac : base
+  }
   const weekMinutes = weekSessions.reduce((sum, s, i) => {
     const done = weekCompletions.some(c => c.session_index === i) || i === sessionIdx
-    return done ? sum + (s.duree_min || 0) : sum
+    return done ? sum + sessionTotalMin(s) : sum
   }, 0)
 
   function fmtDur(min) {

@@ -776,7 +776,7 @@ function CoachSessionModal({ session, weekNum, sessionIdx, completion, onClose, 
           {/* Stats chips */}
           <div style={{ display:'flex', gap:'.4rem', flexWrap:'wrap' }}>
             {[
-              session.duree_min > 0 ? { icon:'⏱', val:`${session.duree_min} min` } : null,
+              session.duree_min > 0 ? { icon:'⏱', val:`${(() => { const pm = t => { const m=(t||'').match(/^(\d+)\s*min/i); return m?parseInt(m[1],10):0 }; const e=pm(session.echauffement),r=pm(session.retour_au_calme),b=session.duree_min||0; return (e+r>0&&b<e+r+5)?b+e+r:b })()} min` } : null,
               session.distance_km > 0 ? { icon:'📍', val:`${session.distance_km} km` } : null,
               session.rpe_cible ? { icon:'💪', val:`RPE ${session.rpe_cible}` } : null,
               session.est_seance_cle ? { icon:'★', val:'Séance clé' } : null,

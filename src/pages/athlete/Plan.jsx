@@ -465,7 +465,7 @@ function SessionDetailPage({ session, weekNum, sessionIdx, planId, vma, onClose,
         {/* Stats chips */}
         <div style={{ display:'flex', gap:'.35rem', flexWrap:'wrap' }}>
           {[
-            { icon:'⏱', val:`${session.duree_min} min` },
+            { icon:'⏱', val:`${(() => { const pm = t => { const m = (t||'').match(/^(\d+)\s*min/i); return m ? parseInt(m[1],10) : 0 }; const e = pm(session.echauffement), r = pm(session.retour_au_calme), b = session.duree_min||0; return (e+r>0 && b<e+r+5) ? b+e+r : b })()} min` },
             session.distance_km ? { icon:'📍', val:`${session.distance_km} km` } : null,
             { icon:'💪', val:`RPE ${session.rpe_cible}` },
           ].filter(Boolean).map(({ icon, val }) => (
