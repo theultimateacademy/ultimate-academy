@@ -254,6 +254,7 @@ export default function PostSessionFlow({
   const [mainPaceSec,   setMainPaceSec]   = useState('')
   const [repPaces,      setRepPaces]      = useState([]) // [{min:'', sec:''}] — allure mode
   const [repTimes,      setRepTimes]      = useState([]) // [{min:'', sec:''}] — temps/distance mode
+  const [repWatts,      setRepWatts]      = useState([]) // [string] — watts par bloc vélo
   const [repMode,       setRepMode]       = useState('time') // 'time' | 'pace'
   const [cdPaceMin,     setCdPaceMin]     = useState('')
   const [cdPaceSec,     setCdPaceSec]     = useState('')
@@ -292,6 +293,11 @@ export default function PostSessionFlow({
     if (numReps === 0) return []
     return Array.from({ length: numReps }, (_, i) => repTimes[i] || { min: '', sec: '' })
   }, [numReps, repTimes])
+
+  const effectiveRepWatts = useMemo(() => {
+    if (numReps === 0) return []
+    return Array.from({ length: numReps }, (_, i) => repWatts[i] || '')
+  }, [numReps, repWatts])
 
   const wuAllure   = getPhaseAllure(session.allures, 'warmup')
   const mainAllure = getPhaseAllure(session.allures, 'main')
@@ -342,20 +348,23 @@ export default function PostSessionFlow({
     }
     // Blocs data — for ALL session types with detectable intervals
     if (hasBlocs) {
-      const useTimeMode = repMode === 'time' && distM
-      const useVeloMode = isVelo && !distM  // time entry per bloc, no pace
-      const arr = (useTimeMode || useVeloMode) ? effectiveRepTimes : effectiveRepPaces
-      const repsStr = arr.map((t, i) => {
-        if (!t.min && !t.sec) return null
-        const timeStr = `${t.min||'0'}'${String(t.sec||'0').padStart(2,'0')}"`
-        if (useTimeMode) {
-          const split = timeToSplit(t.min, t.sec, distM, isNatation)
-          return split ? `${i+1}:${timeStr}(${split.time}${split.unit})` : `${i+1}:${timeStr}`
-        }
-        if (useVeloMode) return `bloc${i+1}:${timeStr}`
-        return `${i+1}:${t.min||'0'}'${String(t.sec||'0').padStart(2,'0')}"/km`
-      }).filter(Boolean).join(' | ')
-      if (repsStr) parts.push(`[Blocs: ${repsStr}]`)
+      if (isVelo) {
+        const repsStr = effectiveRepWatts.map((w, i) => w ? `bloc${i+1}:${w}W` : null).filter(Boolean).join(' | ')
+        if (repsStr) parts.push(`[Blocs: ${repsStr}]`)
+      } else {
+        const useTimeMode = repMode === 'time' && distM
+        const arr = useTimeMode ? effectiveRepTimes : effectiveRepPaces
+        const repsStr = arr.map((t, i) => {
+          if (!t.min && !t.sec) return null
+          const timeStr = `${t.min||'0'}'${String(t.sec||'0').padStart(2,'0')}"`
+          if (useTimeMode) {
+            const split = timeToSplit(t.min, t.sec, distM, isNatation)
+            return split ? `${i+1}:${timeStr}(${split.time}${split.unit})` : `${i+1}:${timeStr}`
+          }
+          return `${i+1}:${timeStr}/km`
+        }).filter(Boolean).join(' | ')
+        if (repsStr) parts.push(`[Blocs: ${repsStr}]`)
+      }
     } else if (!isNonRunning && (mainPaceMin || mainPaceSec)) {
       parts.push(`[Corps: ${mainPaceMin||'0'}'${String(mainPaceSec||'0').padStart(2,'0')}"/km]`)
     }
@@ -571,10 +580,8 @@ export default function PostSessionFlow({
           {/* ── PAGE 4 : Corps de séance / Blocs ── */}
           {step === 'mainset' && (() => {
             // Determine entry mode for this session type
-            const isVeloBloc  = isVelo && hasBlocs && !distM   // vélo time-based blocs (no distance)
-            const isNatBloc   = isNatation && hasBlocs          // natation with distance blocs
-            const isRunBloc   = !isNonRunning && hasBlocs       // running with interval blocs
-            const useTimeMode = (repMode === 'time' && distM) || isVeloBloc
+            const isVeloBloc  = isVelo && hasBlocs
+            const useTimeMode = repMode === 'time' && distM
             const setter      = useTimeMode ? setRepTimes : setRepPaces
             const arr         = useTimeMode ? effectiveRepTimes : effectiveRepPaces
 
@@ -586,7 +593,7 @@ export default function PostSessionFlow({
               : '⚡ Corps de séance'
             const blocDesc = hasBlocs
               ? isVeloBloc
-                ? `Entre le temps réalisé sur chaque bloc (prévu : ${intervals.label.split('×')[1]}).`
+                ? `Entre la puissance développée (en watts) sur chaque bloc.`
                 : distM
                   ? `Entre le temps réalisé sur chaque ${distM >= 1000 ? `${distM/1000}km` : `${distM}m`}.`
                   : `Entre l'allure pour chaque bloc.`
@@ -611,7 +618,7 @@ export default function PostSessionFlow({
 
                 {hasBlocs ? (
                   <>
-                    {/* Mode toggle — running with distance only; natation uses time mode only */}
+                    {/* Mode toggle — running with distance only */}
                     {distM && !isNonRunning && (
                       <div style={{ display: 'flex', gap: '.35rem', marginBottom: '.875rem',
                         background: 'rgba(139,47,201,.06)', borderRadius: 12, padding: '.3rem' }}>
@@ -630,12 +637,40 @@ export default function PostSessionFlow({
                       </div>
                     )}
 
+                    {isVeloBloc ? (
+                      /* Vélo — watts input per bloc */
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '.5rem' }}>
+                        {effectiveRepWatts.map((w, i) => (
+                          <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '.75rem',
+                            background: 'rgba(139,47,201,.04)', borderRadius: 12,
+                            padding: '.6rem .875rem', border: '1px solid rgba(139,47,201,.1)' }}>
+                            <span style={{ fontSize: '.78rem', fontWeight: 800, color: C.purple,
+                              minWidth: 22, textAlign: 'center' }}>
+                              {i + 1}
+                            </span>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '.4rem', flex: 1 }}>
+                              <input
+                                type="number" min="0" max="9999" placeholder="Ex: 245" value={w}
+                                onChange={e => setRepWatts(prev => {
+                                  const next = Array.from({ length: numReps }, (_, j) => prev[j] || '')
+                                  next[i] = e.target.value
+                                  return next
+                                })}
+                                style={{ width: 90, padding: '.4rem .5rem', borderRadius: 8, fontSize: '.95rem',
+                                  fontWeight: 700, border: '2px solid rgba(139,47,201,.18)', background: '#fff',
+                                  textAlign: 'center', outline: 'none', color: '#1a1a2e' }} />
+                              <span style={{ fontSize: '.85rem', fontWeight: 700, color: 'rgba(26,26,46,.45)' }}>W</span>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    ) : (
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '.5rem' }}>
                       {arr.map((rp, i) => {
                         const split = (useTimeMode && distM)
                           ? timeToSplit(rp.min, rp.sec, distM, isNatation)
                           : null
-                        const unitLabel = isVeloBloc ? 'temps' : distM ? (isNatation ? `/100m` : '/km') : '/km'
+                        const unitLabel = distM ? (isNatation ? `/100m` : '/km') : '/km'
                         return (
                           <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '.75rem',
                             background: 'rgba(139,47,201,.04)', borderRadius: 12,
@@ -676,7 +711,7 @@ export default function PostSessionFlow({
                               </span>
                             )}
                             {/* Pace display in pace mode */}
-                            {!useTimeMode && !isVeloBloc && (rp.min || rp.sec) && (
+                            {!useTimeMode && (rp.min || rp.sec) && (
                               <span style={{ fontSize: '.75rem', fontWeight: 800, color: C.purple, flexShrink: 0 }}>
                                 {rp.min || '0'}'{String(rp.sec || '0').padStart(2,'0')}"
                               </span>
@@ -685,6 +720,7 @@ export default function PostSessionFlow({
                         )
                       })}
                     </div>
+                    )}
                   </>
                 ) : (
                   <PaceInput
@@ -809,9 +845,14 @@ export default function PostSessionFlow({
                   if (wuPaceMin || wuPaceSec) lines.push({ icon: '🔥', label: 'Ech.', val: fmtPace(wuPaceMin, wuPaceSec) })
                 }
                 if (hasBlocs) {
-                  const arr = (repMode === 'time' && distM) || (isVelo && !distM) ? effectiveRepTimes : effectiveRepPaces
-                  const count = arr.filter(p => p.min || p.sec).length
-                  if (count > 0) lines.push({ icon: isNatation ? '🏊' : isVelo ? '🚴' : '⚡', label: `${count} blocs`, val: 'enregistrés' })
+                  if (isVelo) {
+                    const count = effectiveRepWatts.filter(w => w).length
+                    if (count > 0) lines.push({ icon: '🚴', label: `${count} blocs`, val: 'watts enregistrés' })
+                  } else {
+                    const arr = (repMode === 'time' && distM) ? effectiveRepTimes : effectiveRepPaces
+                    const count = arr.filter(p => p.min || p.sec).length
+                    if (count > 0) lines.push({ icon: isNatation ? '🏊' : '⚡', label: `${count} blocs`, val: 'enregistrés' })
+                  }
                 } else if (!isNonRunning) {
                   if (mainPaceMin || mainPaceSec) lines.push({ icon: '⚡', label: 'Corps', val: fmtPace(mainPaceMin, mainPaceSec) })
                 }
