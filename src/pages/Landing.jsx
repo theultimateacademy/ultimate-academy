@@ -411,7 +411,7 @@ export default function Landing() {
           <div className="pricing-grid">
 
             {/* ── LEFT : Ebook card ── */}
-            <div className="pricing-card pricing-card--featured" style={{
+            <div className="pricing-card" style={{
               padding: '2.5rem 2rem',
               display: 'flex', flexDirection: 'column',
             }}>
@@ -526,7 +526,7 @@ export default function Landing() {
             </div>
 
             {/* ── RIGHT : Coaching Triathlon ── */}
-            <div className="pricing-card pricing-card--featured" style={{
+            <div className="pricing-card" style={{
               padding: '2.5rem 2rem',
               display: 'flex', flexDirection: 'column',
             }}>
