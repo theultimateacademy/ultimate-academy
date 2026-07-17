@@ -162,10 +162,10 @@ export default function VMACalculator() {
                 )}
               </div>
               <p style={{ fontWeight:700, color:C.dark, marginBottom:'1rem', fontSize:'.95rem' }}>Tes zones d'entraînement</p>
-              <div style={{ overflowX:'auto', borderRadius:12, border:'1px solid rgba(139,47,201,.12)' }}>
+              <div style={{ overflow:'hidden', overflowX:'auto', borderRadius:12, border:'1px solid rgba(139,47,201,.12)' }}>
                 <table style={{ width:'100%', borderCollapse:'collapse', fontSize:'.875rem' }}>
-                  <thead><tr style={{ background:'rgba(139,47,201,.06)' }}>
-                    {['Zone','Nom','% VMA','Vitesse','Allure'].map(h=><th key={h} style={{ padding:'.6rem .85rem', textAlign:'left', color:'rgba(26,18,48,.4)', fontWeight:500, fontSize:'.72rem', textTransform:'uppercase', letterSpacing:'.07em' }}>{h}</th>)}
+                  <thead><tr style={{ background:'#1a1230' }}>
+                    {['Zone','Nom','% VMA','Vitesse','Allure'].map(h=><th key={h} style={{ padding:'.6rem .85rem', textAlign:'left', color:'rgba(255,255,255,.75)', fontWeight:600, fontSize:'.72rem', textTransform:'uppercase', letterSpacing:'.07em' }}>{h}</th>)}
                   </tr></thead>
                   <tbody>
                     {VMA_ZONES.map(z=>{

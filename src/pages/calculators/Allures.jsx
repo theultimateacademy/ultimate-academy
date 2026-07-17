@@ -110,10 +110,10 @@ export default function AlluresCalculator() {
                   <Link to="/calculateur/vma" style={{ color:C.purple, fontSize:'.82rem', textDecoration:'none' }}>Je ne connais pas ma VMA →</Link>
                 </div>
                 {vmaVal>0 ? (
-                  <div style={{ overflowX:'auto', borderRadius:12, border:'1px solid rgba(139,47,201,.12)' }}>
+                  <div style={{ overflow:'hidden', overflowX:'auto', borderRadius:12, border:'1px solid rgba(139,47,201,.12)' }}>
                     <table style={{ width:'100%', borderCollapse:'collapse', fontSize:'.875rem' }}>
-                      <thead><tr style={{ background:'rgba(139,47,201,.06)' }}>
-                        {['Zone','Nom','% VMA','Vitesse','Allure','Objectif'].map(h=><th key={h} style={{ padding:'.6rem .75rem', textAlign:'left', color:'rgba(26,18,48,.4)', fontWeight:500, fontSize:'.72rem', textTransform:'uppercase', letterSpacing:'.07em' }}>{h}</th>)}
+                      <thead><tr style={{ background:'#1a1230' }}>
+                        {['Zone','Nom','% VMA','Vitesse','Allure','Objectif'].map(h=><th key={h} style={{ padding:'.6rem .75rem', textAlign:'left', color:'rgba(255,255,255,.75)', fontWeight:600, fontSize:'.72rem', textTransform:'uppercase', letterSpacing:'.07em' }}>{h}</th>)}
                       </tr></thead>
                       <tbody>
                         {VMA_ZONES.map(z=>{
@@ -145,10 +145,10 @@ export default function AlluresCalculator() {
                   <div><label style={labelSt}>Ou estimer par l'âge</label><div style={{ display:'flex', gap:'.5rem', alignItems:'center' }}><input type="number" min="15" max="80" placeholder="Âge" value={age} onChange={e=>{setAge(e.target.value);setUseAge(true)}} style={{ ...inputSt, width:90 }}/><span style={{ color:'rgba(26,18,48,.45)', fontSize:'.82rem' }}>ans → {useAge&&age?`FC max ~${fcEstimated} bpm`:''}</span></div></div>
                 </div>
                 {fcVal>0 ? (
-                  <div style={{ overflowX:'auto', borderRadius:12, border:'1px solid rgba(139,47,201,.12)' }}>
+                  <div style={{ overflow:'hidden', overflowX:'auto', borderRadius:12, border:'1px solid rgba(139,47,201,.12)' }}>
                     <table style={{ width:'100%', borderCollapse:'collapse', fontSize:'.875rem' }}>
-                      <thead><tr style={{ background:'rgba(139,47,201,.06)' }}>
-                        {['Zone','Nom','% FC max','FC (bpm)','Usage'].map(h=><th key={h} style={{ padding:'.6rem .85rem', textAlign:'left', color:'rgba(26,18,48,.4)', fontWeight:500, fontSize:'.72rem', textTransform:'uppercase', letterSpacing:'.07em' }}>{h}</th>)}
+                      <thead><tr style={{ background:'#1a1230' }}>
+                        {['Zone','Nom','% FC max','FC (bpm)','Usage'].map(h=><th key={h} style={{ padding:'.6rem .85rem', textAlign:'left', color:'rgba(255,255,255,.75)', fontWeight:600, fontSize:'.72rem', textTransform:'uppercase', letterSpacing:'.07em' }}>{h}</th>)}
                       </tr></thead>
                       <tbody>
                         {FC_ZONES.map(z=>{
@@ -177,8 +177,8 @@ export default function AlluresCalculator() {
           {vmaVal>0 && (
             <div style={{ marginTop:'2rem', background:'#fff', borderRadius:20, padding:'2rem', boxShadow:'0 4px 24px rgba(139,47,201,.08)', border:'1px solid rgba(139,47,201,.1)' }}>
               <p style={{ fontWeight:800, color:C.dark, marginBottom:'.4rem', fontSize:'1.05rem' }}>Tes temps exacts pour chaque distance</p>
-              <p style={{ color:'rgba(26,18,48,.5)', fontSize:'.85rem', marginBottom:'1.25rem' }}>Basé sur ta VMA de {vmaVal} km/h — temps en min'sec pour chaque % d'allure</p>
-              <div style={{ overflowX:'auto', borderRadius:12, border:'1px solid rgba(139,47,201,.1)' }}>
+              <p style={{ color:'rgba(26,18,48,.5)', fontSize:'.85rem', marginBottom:'1.25rem' }}>Basé sur ta VMA de {vmaVal} km/h — temps pour chaque distance en min/km selon l'intensité</p>
+              <div style={{ overflow:'hidden', overflowX:'auto', borderRadius:12, border:'1px solid rgba(139,47,201,.1)' }}>
                 <table style={{ width:'100%', borderCollapse:'collapse', fontSize:'.78rem', minWidth:720 }}>
                   <thead>
                     <tr style={{ background:'#1a1230' }}>
@@ -229,10 +229,10 @@ export default function AlluresCalculator() {
           <div style={{ marginTop:'2rem', background:'#fff', borderRadius:20, padding:'2rem', boxShadow:'0 4px 24px rgba(139,47,201,.08)', border:'1px solid rgba(139,47,201,.1)' }}>
             <p style={{ fontWeight:800, color:C.dark, marginBottom:'.4rem', fontSize:'1.05rem' }}>Quelle allure selon ton objectif chrono ?</p>
             <p style={{ color:'rgba(26,18,48,.5)', fontSize:'.85rem', marginBottom:'1.25rem' }}>Repères pour chaque objectif courant</p>
-            <div style={{ overflowX:'auto', borderRadius:12, border:'1px solid rgba(139,47,201,.1)' }}>
+            <div style={{ overflow:'hidden', overflowX:'auto', borderRadius:12, border:'1px solid rgba(139,47,201,.1)' }}>
               <table style={{ width:'100%', borderCollapse:'collapse', fontSize:'.875rem' }}>
-                <thead><tr style={{ background:'rgba(139,47,201,.06)' }}>
-                  {['Distance','Objectif','Allure à tenir','Niveau'].map(h=><th key={h} style={{ padding:'.6rem .85rem', textAlign:'left', color:'rgba(26,18,48,.4)', fontWeight:500, fontSize:'.72rem', textTransform:'uppercase', letterSpacing:'.07em' }}>{h}</th>)}
+                <thead><tr style={{ background:'#1a1230' }}>
+                  {['Distance','Objectif','Allure à tenir','Niveau'].map(h=><th key={h} style={{ padding:'.6rem .85rem', textAlign:'left', color:'rgba(255,255,255,.75)', fontWeight:600, fontSize:'.72rem', textTransform:'uppercase', letterSpacing:'.07em' }}>{h}</th>)}
                 </tr></thead>
                 <tbody>
                   {ALLURE_TABLE.map((row,i)=>(

@@ -468,7 +468,7 @@ export default function VO2maxCalculator() {
             ))}
           </div>
 
-          <div className="tbl-scroll" style={{ background: '#fff', borderRadius: 20, boxShadow: '0 8px 40px rgba(139,47,201,.1)', border: '1px solid rgba(139,47,201,.12)' }}>
+          <div className="tbl-scroll" style={{ background: '#fff', borderRadius: 20, boxShadow: '0 8px 40px rgba(139,47,201,.1)', border: '1px solid rgba(139,47,201,.12)', overflow: 'hidden' }}>
             <table style={{ width: '100%', minWidth: 480, borderCollapse: 'collapse', fontSize: '.875rem' }}>
               <thead>
                 <tr style={{ background: '#1a1230' }}>
@@ -602,7 +602,7 @@ export default function VO2maxCalculator() {
             <H2D>VO2max et VMA : quelle différence ?</H2D>
             <p style={{ color: 'rgba(255,255,255,.5)', maxWidth: 460, margin: '0 auto' }}>Deux indicateurs complémentaires, souvent confondus</p>
           </div>
-          <div className="tbl-scroll" style={{ background: 'rgba(255,255,255,.04)', borderRadius: 20, border: '1px solid rgba(255,255,255,.08)' }}>
+          <div className="tbl-scroll" style={{ background: 'rgba(255,255,255,.04)', borderRadius: 20, border: '1px solid rgba(255,255,255,.08)', overflow: 'hidden' }}>
             <table style={{ width: '100%', minWidth: 400, borderCollapse: 'collapse', fontSize: '.9rem' }}>
               <thead>
                 <tr style={{ background: 'rgba(139,47,201,.25)' }}>
