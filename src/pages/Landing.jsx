@@ -346,7 +346,7 @@ export default function Landing() {
                 <div style={{ fontSize: '1.75rem', flexShrink: 0, marginTop: '.1rem' }}>{f.icon}</div>
                 <div>
                   <div style={{ fontWeight: 700, fontSize: '.95rem', color: '#fff', marginBottom: '.5rem' }}>{f.title}</div>
-                  <div style={{ fontSize: '.84rem', color: 'rgba(255,255,255,.5)', lineHeight: 1.7 }}>{f.desc}</div>
+                  <div style={{ fontSize: '.84rem', color: 'rgba(255,255,255,.5)', lineHeight: 1.7, textAlign: 'justify' }}>{f.desc}</div>
                 </div>
               </div>
             ))}
@@ -409,12 +409,13 @@ export default function Landing() {
             <p style={{ color: 'rgba(255,255,255,.4)', fontSize: '1rem' }}>Coaching complet ou ressources pour progresser à ton rythme.</p>
           </div>
 
-          <div className="pricing-grid">
+          <div className="pricing-grid" style={{ alignItems: 'stretch' }}>
 
             {/* ── LEFT : Ebook card ── */}
             <div className="pricing-card" style={{
               padding: '2.5rem 2rem',
               display: 'flex', flexDirection: 'column',
+              alignSelf: 'stretch',
             }}>
               <div style={{ fontSize: '.78rem', fontWeight: 700, color: 'rgba(255,255,255,.55)', letterSpacing: '.12em', textTransform: 'uppercase', marginBottom: '1rem', textAlign: 'center' }}>
                 Ebooks Running
