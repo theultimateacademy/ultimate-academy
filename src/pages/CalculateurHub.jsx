@@ -53,6 +53,22 @@ const CALCULATEURS = [
     label: 'Mes allures triathlon',
     tag: 'Triathlon',
   },
+  {
+    icon: '🌊',
+    title: 'Calcule ta CSS natation',
+    desc: 'La Critical Swim Speed est l\'allure de seuil en natation, l\'équivalent du FTP en vélo. Deux tests suffisent (200m et 400m) pour obtenir tes zones d\'entraînement natation basées sur les travaux de Wakayoshi (1992).',
+    path: '/calculateur/css',
+    label: 'Calculer ma CSS',
+    tag: 'Natation',
+  },
+  {
+    icon: '⚡',
+    title: 'Calcule ta puissance critique (CP)',
+    desc: 'Basé sur le modèle de Monod & Scherrer, calcule ta CP et ta réserve anaérobie W\' à partir de tes tests d\'effort. Obtiens tes 7 zones de puissance en watts et W/kg pour structurer ton entraînement vélo.',
+    path: '/calculateur/puissance',
+    label: 'Calculer ma CP',
+    tag: 'Cyclisme',
+  },
 ]
 
 const grad = 'linear-gradient(135deg,#8B2FC9,#E8237A)'

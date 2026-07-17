@@ -199,6 +199,7 @@ export default function AlluresCalculator() {
                       {label:'600 m', km:0.6},
                       {label:'800 m', km:0.8},
                       {label:'1 km', km:1},
+                      {label:'1 200 m', km:1.2},
                       {label:'1,5 km', km:1.5},
                       {label:'2 km', km:2},
                       {label:'3 km', km:3},
