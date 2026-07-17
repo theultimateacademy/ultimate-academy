@@ -414,6 +414,7 @@ export default function Landing() {
             <div className="pricing-card" style={{
               padding: '2.5rem 2rem',
               display: 'flex', flexDirection: 'column',
+              boxSizing: 'border-box',
             }}>
               {/* label */}
               <div style={{ fontSize: '.78rem', fontWeight: 700, color: 'rgba(255,255,255,.55)', letterSpacing: '.12em', textTransform: 'uppercase', marginBottom: '1rem', textAlign: 'center' }}>
@@ -442,7 +443,7 @@ export default function Landing() {
                 ))}
               </div>
               {/* button */}
-              <div>
+              <div style={{ marginTop: 'auto' }}>
                 <Link to="/ebooks" style={{
                   display: 'block', width: '100%', padding: '1rem 1.5rem', borderRadius: 99,
                   textAlign: 'center', fontWeight: 800, fontSize: '1rem', color: '#fff', textDecoration: 'none',
@@ -467,6 +468,7 @@ export default function Landing() {
               padding: '2.5rem 2rem',
               animation: 'pricePulse 3s ease-in-out infinite',
               display: 'flex', flexDirection: 'column',
+              boxSizing: 'border-box',
             }}>
               <div style={{
                 position: 'absolute', top: '-1px', left: '50%', transform: 'translateX(-50%)',
@@ -505,7 +507,7 @@ export default function Landing() {
                 ))}
               </div>
               {/* button */}
-              <div>
+              <div style={{ marginTop: 'auto' }}>
                 <button onClick={handleCTA} style={{
                   width: '100%', padding: '1rem 1.5rem', borderRadius: 99, border: 'none', cursor: 'pointer',
                   fontWeight: 800, fontSize: '1rem', fontFamily: 'inherit', color: '#fff',
@@ -529,6 +531,7 @@ export default function Landing() {
             <div className="pricing-card" style={{
               padding: '2.5rem 2rem',
               display: 'flex', flexDirection: 'column',
+              boxSizing: 'border-box',
             }}>
               {/* label */}
               <div style={{ fontSize: '.78rem', fontWeight: 700, color: 'rgba(255,255,255,.55)', letterSpacing: '.12em', textTransform: 'uppercase', marginBottom: '1rem', textAlign: 'center' }}>
@@ -558,7 +561,7 @@ export default function Landing() {
                 ))}
               </div>
               {/* button */}
-              <div>
+              <div style={{ marginTop: 'auto' }}>
                 <button onClick={handleCTA} style={{
                   width: '100%', padding: '1rem 1.5rem', borderRadius: 99, border: 'none', cursor: 'pointer',
                   fontWeight: 800, fontSize: '1rem', fontFamily: 'inherit', color: '#fff',
