@@ -328,7 +328,7 @@ export default function Calculator() {
                   { n:'🎯', t:'Définis ton objectif', d:"Entre ta distance et ton chrono cible. Le calculateur convertit immédiatement en allure et en temps de passage kilomètre par kilomètre." },
                   { n:'📊', t:'Visualise ta course', d:"Obtiens un tableau complet de tes repères. Active le négatif split pour une stratégie scientifiquement prouvée : partir légèrement plus lent pour finir plus fort." },
                   { n:'🏃', t:'Exécute en confiance', d:"Le jour de course, coche chaque borne avec ton tableau de bord. Plus de décision à prendre à chaud : tu suis juste ton plan." },
-                ].map(p=><div key={p.n} style={{ display:'flex', gap:'.85rem', alignItems:'flex-start' }}><span style={{ fontSize:'1.5rem', flexShrink:0, marginTop:'.1rem' }}>{p.n}</span><div><p style={{ fontWeight:700, color:C.dark, marginBottom:'.25rem', fontSize:'.95rem' }}>{p.t}</p><p style={{ color:'rgba(26,18,48,.6)', fontSize:'.88rem', lineHeight:1.65, margin:0 }}>{p.d}</p></div></div>)}
+                ].map(p=><div key={p.n} style={{ display:'flex', gap:'.85rem', alignItems:'flex-start' }}><span style={{ fontSize:'1.5rem', flexShrink:0, marginTop:'.1rem' }}>{p.n}</span><div><p style={{ fontWeight:700, color:C.dark, marginBottom:'.25rem', fontSize:'.95rem' }}>{p.t}</p><p style={{ color:'rgba(26,18,48,.6)', fontSize:'.88rem', lineHeight:1.65, margin:0, textAlign:'justify' }}>{p.d}</p></div></div>)}
               </div>
               <button onClick={handleCTA} style={{ padding:'.85rem 2rem', borderRadius:50, border:'none', background:`linear-gradient(135deg,${C.purple},${C.pink})`, color:'#fff', fontWeight:700, cursor:'pointer', fontSize:'.95rem', boxShadow:'0 6px 24px rgba(232,35,122,.4)' }}>Je rejoins The Ultimate Academy</button>
             </div>
@@ -369,7 +369,7 @@ export default function Calculator() {
             <div style={{ flex:'1 1 300px' }}>
               <SectionTag>Comprendre les temps de passage</SectionTag>
               <H2Dark>Négatif split, stratégie et gestion de l'effort</H2Dark>
-              <div style={{ color:'rgba(255,255,255,.7)', fontSize:'.9rem', lineHeight:1.8, display:'flex', flexDirection:'column', gap:'1rem' }}>
+              <div style={{ color:'rgba(255,255,255,.7)', fontSize:'.9rem', lineHeight:1.8, display:'flex', flexDirection:'column', gap:'1rem', textAlign:'justify' }}>
                 <p>Un <strong style={{ color:'#fff' }}>temps de passage</strong> est ton chrono cumulé à chaque borne kilométrique. C'est l'outil de navigation de tout coureur qui vise un objectif précis, car les sensations en course sont souvent trompeuses.</p>
                 <p>Le <strong style={{ color:'#fff' }}>négatif split</strong> consiste à courir la seconde moitié de la course plus vite que la première. Cette stratégie, utilisée par Eliud Kipchoge et les meilleurs marathoniens, préserve le glycogène musculaire et évite le redoutable « mur » du marathon.</p>
                 <p>À l'inverse, le <strong style={{ color:'#fff' }}>positif split</strong> (partir trop vite) est la cause numéro 1 des contre-performances. L'adrénaline du départ fait paraître une allure excessive comme normale, jusqu'au retour de bâton au 30ème kilomètre.</p>
@@ -404,7 +404,7 @@ export default function Calculator() {
             ))}
           </div>
           <div style={{ background:`linear-gradient(135deg,rgba(139,47,201,.08),rgba(232,35,122,.06))`, borderRadius:16, padding:'1.5rem', border:'1px solid rgba(139,47,201,.15)' }}>
-            <p style={{ margin:0, fontSize:'.92rem', color:C.dark, lineHeight:1.7 }}>
+            <p style={{ margin:0, fontSize:'.92rem', color:C.dark, lineHeight:1.7, textAlign:'justify' }}>
               <strong style={{ color:C.purple }}>💬 Mon conseil coach :</strong> « {fuel.tip} »
             </p>
           </div>
@@ -440,7 +440,7 @@ export default function Calculator() {
                 {item.q}
                 <svg width="14" height="14" viewBox="0 0 12 12" fill="none" style={{ flexShrink:0, transition:'transform .2s', transform:openFaq===i?'rotate(180deg)':'none' }}><path d="M1 4l5 5 5-5" stroke={C.purple} strokeWidth="2" strokeLinecap="round"/></svg>
               </button>
-              {openFaq===i&&<p style={{ margin:'0 0 1.25rem', color:'rgba(26,18,48,.65)', fontSize:'.9rem', lineHeight:1.75 }}>{item.a}</p>}
+              {openFaq===i&&<p style={{ margin:'0 0 1.25rem', color:'rgba(26,18,48,.65)', fontSize:'.9rem', lineHeight:1.75, textAlign:'justify' }}>{item.a}</p>}
             </div>
           ))}
         </Inner>

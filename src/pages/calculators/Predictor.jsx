@@ -359,7 +359,7 @@ export default function PredictorCalculator() {
                   </div>
                   <div>
                     <p style={{ margin: '0 0 .2rem', fontWeight: 700, fontSize: '.95rem' }}>{title}</p>
-                    <p style={{ margin: 0, fontSize: '.875rem', color: 'rgba(26,26,46,.55)', lineHeight: 1.7 }}>{desc}</p>
+                    <p style={{ margin: 0, fontSize: '.875rem', color: 'rgba(26,26,46,.55)', lineHeight: 1.7, textAlign: 'justify' }}>{desc}</p>
                   </div>
                 </div>
               ))}
@@ -395,7 +395,7 @@ export default function PredictorCalculator() {
               ].map(([title, desc]) => (
                 <div key={title} style={{ paddingLeft: '1rem', borderLeft: `3px solid rgba(192,132,252,.3)` }}>
                   <p style={{ margin: '0 0 .3rem', fontWeight: 700, color: '#fff', fontSize: '.95rem' }}>{title}</p>
-                  <p style={{ margin: 0, fontSize: '.875rem', color: 'rgba(255,255,255,.5)', lineHeight: 1.7 }}>{desc}</p>
+                  <p style={{ margin: 0, fontSize: '.875rem', color: 'rgba(255,255,255,.5)', lineHeight: 1.7, textAlign: 'justify' }}>{desc}</p>
                 </div>
               ))}
             </div>
@@ -501,7 +501,7 @@ export default function PredictorCalculator() {
           <div style={{ background: `rgba(139,47,201,.06)`, borderRadius: 16, padding: '1.1rem 1.25rem',
             border: `1px solid rgba(139,47,201,.15)`, marginBottom: '1.75rem', display: 'flex', gap: '.75rem', alignItems: 'flex-start' }}>
             <span style={{ fontSize: '1.3rem', flexShrink: 0 }}>💡</span>
-            <p style={{ margin: 0, fontSize: '.88rem', color: 'rgba(26,26,46,.7)', lineHeight: 1.7 }}>
+            <p style={{ margin: 0, fontSize: '.88rem', color: 'rgba(26,26,46,.7)', lineHeight: 1.7, textAlign: 'justify' }}>
               <strong style={{ color: '#1a1a2e' }}>Mon conseil :</strong> {fuel.tip}
             </p>
           </div>
@@ -577,7 +577,7 @@ export default function PredictorCalculator() {
                 </svg>
               </button>
               {openFaq === i && (
-                <p style={{ margin: '0 0 1.1rem', fontSize: '.875rem', color: 'rgba(26,26,46,.6)', lineHeight: 1.8 }}>{item.a}</p>
+                <p style={{ margin: '0 0 1.1rem', fontSize: '.875rem', color: 'rgba(26,26,46,.6)', lineHeight: 1.8, textAlign: 'justify' }}>{item.a}</p>
               )}
             </div>
           ))}

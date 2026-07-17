@@ -453,7 +453,7 @@ export default function Triathlon() {
             <div style={{ fontSize: '1.5rem', flexShrink: 0 }}>⏱️</div>
             <div>
               <p style={{ fontWeight: 700, color: '#fff', marginBottom: '.35rem' }}>Les transitions : ne les oublie pas !</p>
-              <p style={{ fontSize: '.875rem', color: 'rgba(255,255,255,.5)', lineHeight: 1.7, margin: 0 }}>
+              <p style={{ fontSize: '.875rem', color: 'rgba(255,255,255,.5)', lineHeight: 1.7, margin: 0, textAlign: 'justify' }}>
                 Ce calculateur affiche la somme des trois temps de discipline <strong style={{ color: '#fff' }}>sans les transitions</strong>. En compétition, ajoute <strong style={{ color: '#fff' }}>T1</strong> (sortie eau → vélo) et <strong style={{ color: '#fff' }}>T2</strong> (vélo → course) à ton temps total. Comptez environ 2 à 5 minutes par transition pour un triathlète amateur.
               </p>
             </div>
@@ -475,7 +475,7 @@ export default function Triathlon() {
                   <span style={{ color: C.purple, fontSize: '1.2rem', flexShrink: 0, transform: openFaq === i ? 'rotate(45deg)' : 'none', transition: 'transform .2s' }}>+</span>
                 </button>
                 {openFaq === i && (
-                  <div style={{ padding: '0 1.4rem 1.25rem', color: 'rgba(255,255,255,.55)', fontSize: '.9rem', lineHeight: 1.7 }}>{f.a}</div>
+                  <div style={{ padding: '0 1.4rem 1.25rem', color: 'rgba(255,255,255,.55)', fontSize: '.9rem', lineHeight: 1.7, textAlign: 'justify' }}>{f.a}</div>
                 )}
               </div>
             ))}
