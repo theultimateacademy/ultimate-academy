@@ -415,35 +415,20 @@ export default function Landing() {
               padding: '2.5rem 2rem',
               display: 'flex', flexDirection: 'column',
             }}>
-              <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
-                <div style={{ fontSize: '.78rem', fontWeight: 700, color: 'rgba(255,255,255,.55)', letterSpacing: '.12em', textTransform: 'uppercase', marginBottom: '1rem' }}>
-                  Ebooks Running
-                </div>
-                <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'center', gap: '.4rem', marginBottom: '.3rem' }}>
-                  <span style={{ fontSize: '1rem', fontWeight: 700, color: 'rgba(255,255,255,.55)', alignSelf: 'center' }}>À partir de</span>
-                  <span className="price-amount">14,99€</span>
-                </div>
-                <p style={{ color: 'rgba(255,255,255,.65)', fontSize: '.85rem', marginBottom: '.4rem', lineHeight: 1.6 }}>selon le plan et les options</p>
-                <p style={{ color: 'rgba(255,255,255,.5)', fontSize: '.78rem', marginBottom: '1.5rem', lineHeight: 1.5 }}>Achat unique. Accès illimité au PDF.</p>
-                <Link to="/ebooks" style={{
-                  display: 'block', width: '100%', padding: '1rem 1.5rem', borderRadius: 99, border: 'none',
-                  textAlign: 'center', fontWeight: 800, fontSize: '1rem', color: '#fff', textDecoration: 'none',
-                  background: 'linear-gradient(90deg, #8B2FC9, #E8237A, #8B2FC9)',
-                  backgroundSize: '200% auto',
-                  animation: 'shimmer 2.5s linear infinite',
-                  boxShadow: '0 8px 28px rgba(139,47,201,.4)',
-                  transition: 'transform .2s',
-                }}
-                  onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-2px)' }}
-                  onMouseLeave={e => { e.currentTarget.style.transform = '' }}>
-                  Voir les ebooks →
-                </Link>
-                <p style={{ color: 'rgba(255,255,255,.3)', fontSize: '.72rem', marginTop: '.65rem' }}>
-                  Progresse à ton rythme · téléchargement immédiat
-                </p>
+              {/* label */}
+              <div style={{ fontSize: '.78rem', fontWeight: 700, color: 'rgba(255,255,255,.55)', letterSpacing: '.12em', textTransform: 'uppercase', marginBottom: '1rem', textAlign: 'center' }}>
+                Ebooks Running
               </div>
-
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '.85rem', textAlign: 'left', flex: 1 }}>
+              {/* price */}
+              <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'center', gap: '.35rem', marginBottom: '.3rem' }}>
+                <span style={{ fontSize: '.95rem', fontWeight: 600, color: 'rgba(255,255,255,.5)' }}>À partir de</span>
+                <span className="price-amount">14,99€</span>
+              </div>
+              {/* subtitles */}
+              <p style={{ color: 'rgba(255,255,255,.65)', fontSize: '.85rem', marginBottom: '.4rem', lineHeight: 1.6, textAlign: 'center' }}>selon le plan et les options</p>
+              <p style={{ color: 'rgba(255,255,255,.5)', fontSize: '.78rem', marginBottom: '2rem', lineHeight: 1.5, textAlign: 'center' }}>Achat unique. Accès illimité au PDF.</p>
+              {/* features */}
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '.85rem', textAlign: 'left', flex: 1, marginBottom: '2rem' }}>
                 {[
                   'Séances calculées selon ta VMA réelle',
                   "Choix d'objectif : 10 km, semi ou marathon",
@@ -455,6 +440,25 @@ export default function Landing() {
                     <span style={{ ...gd(), fontWeight: 700, fontSize: '1rem', flexShrink: 0 }}>✓</span> {f}
                   </div>
                 ))}
+              </div>
+              {/* button */}
+              <div>
+                <Link to="/ebooks" style={{
+                  display: 'block', width: '100%', padding: '1rem 1.5rem', borderRadius: 99,
+                  textAlign: 'center', fontWeight: 800, fontSize: '1rem', color: '#fff', textDecoration: 'none',
+                  background: 'linear-gradient(90deg, #8B2FC9, #E8237A, #8B2FC9)',
+                  backgroundSize: '200% auto',
+                  animation: 'shimmer 2.5s linear infinite',
+                  boxShadow: '0 8px 28px rgba(139,47,201,.4)',
+                  transition: 'transform .2s',
+                }}
+                  onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-2px)' }}
+                  onMouseLeave={e => { e.currentTarget.style.transform = '' }}>
+                  Voir les ebooks →
+                </Link>
+                <p style={{ color: 'rgba(255,255,255,.3)', fontSize: '.72rem', marginTop: '.65rem', textAlign: 'center' }}>
+                  Progresse à ton rythme · téléchargement immédiat
+                </p>
               </div>
             </div>
 
@@ -473,36 +477,20 @@ export default function Landing() {
               }}>
                 ⭐ Populaire
               </div>
-
-              <div style={{ textAlign: 'center', marginTop: '.5rem', marginBottom: '2rem' }}>
-                <div style={{ fontSize: '.78rem', fontWeight: 700, color: 'rgba(255,255,255,.55)', letterSpacing: '.12em', textTransform: 'uppercase', marginBottom: '1rem' }}>
-                  Course à pied · Trail
-                </div>
-                <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'center', gap: '.4rem', marginBottom: '.3rem' }}>
-                  <span className="price-amount">30€</span>
-                  <span className="price-period">/mois</span>
-                </div>
-                <p style={{ color: 'rgba(255,255,255,.65)', fontSize: '.85rem', marginBottom: '.4rem', lineHeight: 1.6 }}>après 14 jours offerts</p>
-                <p style={{ color: 'rgba(255,255,255,.5)', fontSize: '.78rem', marginBottom: '1.5rem', lineHeight: 1.5 }}>Sans engagement. Annule à tout moment.</p>
-                <button onClick={handleCTA} style={{
-                  width: '100%', padding: '1rem 1.5rem', borderRadius: 99, border: 'none', cursor: 'pointer',
-                  fontWeight: 800, fontSize: '1rem', fontFamily: 'inherit', color: '#fff',
-                  background: 'linear-gradient(90deg, #8B2FC9, #E8237A, #8B2FC9)',
-                  backgroundSize: '200% auto',
-                  animation: 'shimmer 2.5s linear infinite',
-                  boxShadow: '0 8px 28px rgba(232,35,122,.4)',
-                  transition: 'transform .2s',
-                }}
-                  onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-2px)' }}
-                  onMouseLeave={e => { e.currentTarget.style.transform = '' }}>
-                  Commencer gratuitement →
-                </button>
-                <p style={{ color: 'rgba(255,255,255,.45)', fontSize: '.72rem', marginTop: '.75rem' }}>
-                  Carte requise · aucun débit pendant 14 jours
-                </p>
+              {/* label */}
+              <div style={{ fontSize: '.78rem', fontWeight: 700, color: 'rgba(255,255,255,.55)', letterSpacing: '.12em', textTransform: 'uppercase', marginBottom: '1rem', textAlign: 'center' }}>
+                Course à pied · Trail
               </div>
-
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '.85rem', textAlign: 'left', flex: 1 }}>
+              {/* price */}
+              <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'center', gap: '.4rem', marginBottom: '.3rem' }}>
+                <span className="price-amount">30€</span>
+                <span className="price-period">/mois</span>
+              </div>
+              {/* subtitles */}
+              <p style={{ color: 'rgba(255,255,255,.65)', fontSize: '.85rem', marginBottom: '.4rem', lineHeight: 1.6, textAlign: 'center' }}>après 14 jours offerts</p>
+              <p style={{ color: 'rgba(255,255,255,.5)', fontSize: '.78rem', marginBottom: '2rem', lineHeight: 1.5, textAlign: 'center' }}>Sans engagement. Annule à tout moment.</p>
+              {/* features */}
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '.85rem', textAlign: 'left', flex: 1, marginBottom: '2rem' }}>
                 {[
                   "Plan d'entraînement 100% personnalisé",
                   'Adaptation hebdomadaire du programme',
@@ -516,6 +504,25 @@ export default function Landing() {
                   </div>
                 ))}
               </div>
+              {/* button */}
+              <div>
+                <button onClick={handleCTA} style={{
+                  width: '100%', padding: '1rem 1.5rem', borderRadius: 99, border: 'none', cursor: 'pointer',
+                  fontWeight: 800, fontSize: '1rem', fontFamily: 'inherit', color: '#fff',
+                  background: 'linear-gradient(90deg, #8B2FC9, #E8237A, #8B2FC9)',
+                  backgroundSize: '200% auto',
+                  animation: 'shimmer 2.5s linear infinite',
+                  boxShadow: '0 8px 28px rgba(232,35,122,.4)',
+                  transition: 'transform .2s',
+                }}
+                  onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-2px)' }}
+                  onMouseLeave={e => { e.currentTarget.style.transform = '' }}>
+                  Commencer gratuitement →
+                </button>
+                <p style={{ color: 'rgba(255,255,255,.45)', fontSize: '.72rem', marginTop: '.75rem', textAlign: 'center' }}>
+                  Carte requise · aucun débit pendant 14 jours
+                </p>
+              </div>
             </div>
 
             {/* ── RIGHT : Coaching Triathlon ── */}
@@ -523,16 +530,35 @@ export default function Landing() {
               padding: '2.5rem 2rem',
               display: 'flex', flexDirection: 'column',
             }}>
-              <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
-                <div style={{ fontSize: '.78rem', fontWeight: 700, color: 'rgba(255,255,255,.55)', letterSpacing: '.12em', textTransform: 'uppercase', marginBottom: '1rem' }}>
-                  Triathlon
-                </div>
-                <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'center', gap: '.4rem', marginBottom: '.3rem' }}>
-                  <span className="price-amount">50€</span>
-                  <span className="price-period">/mois</span>
-                </div>
-                <p style={{ color: 'rgba(255,255,255,.65)', fontSize: '.85rem', marginBottom: '.4rem', lineHeight: 1.6 }}>après 14 jours offerts</p>
-                <p style={{ color: 'rgba(255,255,255,.5)', fontSize: '.78rem', marginBottom: '1.5rem', lineHeight: 1.5 }}>Sans engagement. Annule à tout moment.</p>
+              {/* label */}
+              <div style={{ fontSize: '.78rem', fontWeight: 700, color: 'rgba(255,255,255,.55)', letterSpacing: '.12em', textTransform: 'uppercase', marginBottom: '1rem', textAlign: 'center' }}>
+                Triathlon
+              </div>
+              {/* price */}
+              <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'center', gap: '.4rem', marginBottom: '.3rem' }}>
+                <span className="price-amount">50€</span>
+                <span className="price-period">/mois</span>
+              </div>
+              {/* subtitles */}
+              <p style={{ color: 'rgba(255,255,255,.65)', fontSize: '.85rem', marginBottom: '.4rem', lineHeight: 1.6, textAlign: 'center' }}>après 14 jours offerts</p>
+              <p style={{ color: 'rgba(255,255,255,.5)', fontSize: '.78rem', marginBottom: '2rem', lineHeight: 1.5, textAlign: 'center' }}>Sans engagement. Annule à tout moment.</p>
+              {/* features */}
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '.85rem', textAlign: 'left', flex: 1, marginBottom: '2rem' }}>
+                {[
+                  'Plan triathlon 100% personnalisé (nage · vélo · course)',
+                  'Périodisation adaptée (sprint, olympique, longue distance)',
+                  'Connexion Strava intégrée',
+                  'Programme de renforcement musculaire',
+                  'Messagerie directe avec moi',
+                  'Analyse continue de ta progression',
+                ].map(f => (
+                  <div key={f} style={{ display: 'flex', gap: '.75rem', alignItems: 'center', fontSize: '.88rem', color: 'rgba(255,255,255,.78)' }}>
+                    <span style={{ ...gd(), fontWeight: 700, fontSize: '1rem', flexShrink: 0 }}>✓</span> {f}
+                  </div>
+                ))}
+              </div>
+              {/* button */}
+              <div>
                 <button onClick={handleCTA} style={{
                   width: '100%', padding: '1rem 1.5rem', borderRadius: 99, border: 'none', cursor: 'pointer',
                   fontWeight: 800, fontSize: '1rem', fontFamily: 'inherit', color: '#fff',
@@ -546,24 +572,9 @@ export default function Landing() {
                   onMouseLeave={e => { e.currentTarget.style.transform = '' }}>
                   Commencer gratuitement →
                 </button>
-                <p style={{ color: 'rgba(255,255,255,.45)', fontSize: '.72rem', marginTop: '.75rem' }}>
+                <p style={{ color: 'rgba(255,255,255,.45)', fontSize: '.72rem', marginTop: '.75rem', textAlign: 'center' }}>
                   Carte requise · aucun débit pendant 14 jours
                 </p>
-              </div>
-
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '.85rem', textAlign: 'left', flex: 1 }}>
-                {[
-                  'Plan triathlon 100% personnalisé (nage · vélo · course)',
-                  'Périodisation adaptée (sprint, olympique, longue distance)',
-                  'Connexion Strava intégrée',
-                  'Programme de renforcement musculaire',
-                  'Messagerie directe avec moi',
-                  'Analyse continue de ta progression',
-                ].map(f => (
-                  <div key={f} style={{ display: 'flex', gap: '.75rem', alignItems: 'center', fontSize: '.88rem', color: 'rgba(255,255,255,.78)' }}>
-                    <span style={{ ...gd(), fontWeight: 700, fontSize: '1rem', flexShrink: 0 }}>✓</span> {f}
-                  </div>
-                ))}
               </div>
             </div>
 
