@@ -429,7 +429,7 @@ export default function Landing() {
 
             {/* ── LEFT : Ebook card ── */}
             <div className="pricing-card" style={{
-              padding: '2.5rem 2rem',
+              padding: '2.5rem 2rem 9rem',
               display: 'flex', flexDirection: 'column',
             }}>
               <div style={{ fontSize: '.78rem', fontWeight: 700, color: 'rgba(255,255,255,.55)', letterSpacing: '.12em', textTransform: 'uppercase', marginBottom: '1rem', textAlign: 'center' }}>
@@ -454,30 +454,31 @@ export default function Landing() {
                   </div>
                 ))}
               </div>
-              <div style={{ flex: 1 }} />
-              <div style={{ marginTop: '2rem' }}>
-                <Link to="/ebooks" style={{
-                  display: 'block', width: '100%', padding: '1rem 1.5rem', borderRadius: 99,
-                  textAlign: 'center', fontWeight: 800, fontSize: '1rem', color: '#fff', textDecoration: 'none',
-                  background: 'linear-gradient(90deg, #8B2FC9, #E8237A, #8B2FC9)',
-                  backgroundSize: '200% auto',
-                  animation: 'shimmer 2.5s linear infinite',
-                  boxShadow: '0 8px 28px rgba(139,47,201,.4)',
-                  transition: 'transform .2s',
-                }}
-                  onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-2px)' }}
-                  onMouseLeave={e => { e.currentTarget.style.transform = '' }}>
-                  Voir les ebooks →
-                </Link>
-                <p style={{ color: 'rgba(255,255,255,.3)', fontSize: '.72rem', marginTop: '.65rem', textAlign: 'center' }}>
-                  Progresse à ton rythme · téléchargement immédiat
-                </p>
-              </div>
+              <Link to="/ebooks" style={{
+                position: 'absolute', bottom: '4.5rem', left: '2rem', right: '2rem',
+                display: 'block', padding: '1rem 1.5rem', borderRadius: 99, boxSizing: 'border-box',
+                textAlign: 'center', fontWeight: 800, fontSize: '1rem', color: '#fff', textDecoration: 'none',
+                background: 'linear-gradient(90deg, #8B2FC9, #E8237A, #8B2FC9)',
+                backgroundSize: '200% auto',
+                animation: 'shimmer 2.5s linear infinite',
+                boxShadow: '0 8px 28px rgba(139,47,201,.4)',
+                transition: 'transform .2s',
+              }}
+                onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-2px)' }}
+                onMouseLeave={e => { e.currentTarget.style.transform = '' }}>
+                Voir les ebooks →
+              </Link>
+              <p style={{
+                position: 'absolute', bottom: '1.5rem', left: '2rem', right: '2rem',
+                color: 'rgba(255,255,255,.3)', fontSize: '.72rem', textAlign: 'center', margin: 0,
+              }}>
+                Accès immédiat · sans abonnement
+              </p>
             </div>
 
             {/* ── MIDDLE : Coaching Course à pied · Trail (Populaire) ── */}
             <div className="pricing-card pricing-card--featured" style={{
-              padding: '2.5rem 2rem',
+              padding: '2.5rem 2rem 9rem',
               animation: 'pricePulse 3s ease-in-out infinite',
               display: 'flex', flexDirection: 'column',
             }}>
@@ -513,30 +514,31 @@ export default function Landing() {
                   </div>
                 ))}
               </div>
-              <div style={{ flex: 1 }} />
-              <div style={{ marginTop: '2rem' }}>
-                <button onClick={handleCTA} style={{
-                  width: '100%', padding: '1rem 1.5rem', borderRadius: 99, border: 'none', cursor: 'pointer',
-                  fontWeight: 800, fontSize: '1rem', fontFamily: 'inherit', color: '#fff',
-                  background: 'linear-gradient(90deg, #8B2FC9, #E8237A, #8B2FC9)',
-                  backgroundSize: '200% auto',
-                  animation: 'shimmer 2.5s linear infinite',
-                  boxShadow: '0 8px 28px rgba(232,35,122,.4)',
-                  transition: 'transform .2s',
-                }}
-                  onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-2px)' }}
-                  onMouseLeave={e => { e.currentTarget.style.transform = '' }}>
-                  Commencer gratuitement →
-                </button>
-                <p style={{ color: 'rgba(255,255,255,.45)', fontSize: '.72rem', marginTop: '.75rem', textAlign: 'center' }}>
-                  Carte requise · aucun débit pendant 14 jours
-                </p>
-              </div>
+              <button onClick={handleCTA} style={{
+                position: 'absolute', bottom: '4.5rem', left: '2rem', right: '2rem',
+                padding: '1rem 1.5rem', borderRadius: 99, border: 'none', cursor: 'pointer', boxSizing: 'border-box',
+                fontWeight: 800, fontSize: '1rem', fontFamily: 'inherit', color: '#fff',
+                background: 'linear-gradient(90deg, #8B2FC9, #E8237A, #8B2FC9)',
+                backgroundSize: '200% auto',
+                animation: 'shimmer 2.5s linear infinite',
+                boxShadow: '0 8px 28px rgba(232,35,122,.4)',
+                transition: 'transform .2s',
+              }}
+                onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-2px)' }}
+                onMouseLeave={e => { e.currentTarget.style.transform = '' }}>
+                Commencer gratuitement →
+              </button>
+              <p style={{
+                position: 'absolute', bottom: '1.5rem', left: '2rem', right: '2rem',
+                color: 'rgba(255,255,255,.45)', fontSize: '.72rem', textAlign: 'center', margin: 0,
+              }}>
+                Carte requise · aucun débit pendant 14 jours
+              </p>
             </div>
 
             {/* ── RIGHT : Coaching Triathlon ── */}
             <div className="pricing-card" style={{
-              padding: '2.5rem 2rem',
+              padding: '2.5rem 2rem 9rem',
               display: 'flex', flexDirection: 'column',
             }}>
               <div style={{ fontSize: '.78rem', fontWeight: 700, color: 'rgba(255,255,255,.55)', letterSpacing: '.12em', textTransform: 'uppercase', marginBottom: '1rem', textAlign: 'center' }}>
@@ -562,25 +564,26 @@ export default function Landing() {
                   </div>
                 ))}
               </div>
-              <div style={{ flex: 1 }} />
-              <div style={{ marginTop: '2rem' }}>
-                <button onClick={handleCTA} style={{
-                  width: '100%', padding: '1rem 1.5rem', borderRadius: 99, border: 'none', cursor: 'pointer',
-                  fontWeight: 800, fontSize: '1rem', fontFamily: 'inherit', color: '#fff',
-                  background: 'linear-gradient(90deg, #8B2FC9, #E8237A, #8B2FC9)',
-                  backgroundSize: '200% auto',
-                  animation: 'shimmer 2.5s linear infinite',
-                  boxShadow: '0 8px 28px rgba(139,47,201,.35)',
-                  transition: 'transform .2s',
-                }}
-                  onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-2px)' }}
-                  onMouseLeave={e => { e.currentTarget.style.transform = '' }}>
-                  Commencer gratuitement →
-                </button>
-                <p style={{ color: 'rgba(255,255,255,.45)', fontSize: '.72rem', marginTop: '.75rem', textAlign: 'center' }}>
-                  Carte requise · aucun débit pendant 14 jours
-                </p>
-              </div>
+              <button onClick={handleCTA} style={{
+                position: 'absolute', bottom: '4.5rem', left: '2rem', right: '2rem',
+                padding: '1rem 1.5rem', borderRadius: 99, border: 'none', cursor: 'pointer', boxSizing: 'border-box',
+                fontWeight: 800, fontSize: '1rem', fontFamily: 'inherit', color: '#fff',
+                background: 'linear-gradient(90deg, #8B2FC9, #E8237A, #8B2FC9)',
+                backgroundSize: '200% auto',
+                animation: 'shimmer 2.5s linear infinite',
+                boxShadow: '0 8px 28px rgba(139,47,201,.35)',
+                transition: 'transform .2s',
+              }}
+                onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-2px)' }}
+                onMouseLeave={e => { e.currentTarget.style.transform = '' }}>
+                Commencer gratuitement →
+              </button>
+              <p style={{
+                position: 'absolute', bottom: '1.5rem', left: '2rem', right: '2rem',
+                color: 'rgba(255,255,255,.45)', fontSize: '.72rem', textAlign: 'center', margin: 0,
+              }}>
+                Carte requise · aucun débit pendant 14 jours
+              </p>
             </div>
 
           </div>
