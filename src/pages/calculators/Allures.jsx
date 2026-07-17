@@ -173,6 +173,58 @@ export default function AlluresCalculator() {
             )}
           </div>
 
+          {/* Tableau temps VMA par distance */}
+          {vmaVal>0 && (
+            <div style={{ marginTop:'2rem', background:'#fff', borderRadius:20, padding:'2rem', boxShadow:'0 4px 24px rgba(139,47,201,.08)', border:'1px solid rgba(139,47,201,.1)' }}>
+              <p style={{ fontWeight:800, color:C.dark, marginBottom:'.4rem', fontSize:'1.05rem' }}>Tes temps exacts pour chaque distance</p>
+              <p style={{ color:'rgba(26,18,48,.5)', fontSize:'.85rem', marginBottom:'1.25rem' }}>Basé sur ta VMA de {vmaVal} km/h — temps en min'sec pour chaque % d'allure</p>
+              <div style={{ overflowX:'auto', borderRadius:12, border:'1px solid rgba(139,47,201,.1)' }}>
+                <table style={{ width:'100%', borderCollapse:'collapse', fontSize:'.78rem', minWidth:720 }}>
+                  <thead>
+                    <tr style={{ background:'#1a1230' }}>
+                      <th style={{ padding:'.55rem .75rem', textAlign:'left', color:'rgba(255,255,255,.8)', fontWeight:700, fontSize:'.72rem', whiteSpace:'nowrap', position:'sticky', left:0, background:'#1a1230', zIndex:1 }}>Distance</th>
+                      {[60,65,70,75,80,85,90,95,100,105,110].map(p=>(
+                        <th key={p} style={{ padding:'.55rem .5rem', textAlign:'center', color:'rgba(255,255,255,.8)', fontWeight:600, fontSize:'.72rem', whiteSpace:'nowrap' }}>{p}%</th>
+                      ))}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {[
+                      {label:'50 m', km:0.05},
+                      {label:'100 m', km:0.1},
+                      {label:'200 m', km:0.2},
+                      {label:'300 m', km:0.3},
+                      {label:'400 m', km:0.4},
+                      {label:'500 m', km:0.5},
+                      {label:'600 m', km:0.6},
+                      {label:'800 m', km:0.8},
+                      {label:'1 km', km:1},
+                      {label:'1,5 km', km:1.5},
+                      {label:'2 km', km:2},
+                      {label:'3 km', km:3},
+                      {label:'5 km', km:5},
+                      {label:'10 km', km:10},
+                    ].map((dist,i)=>(
+                      <tr key={dist.km} style={{ borderTop:'1px solid rgba(139,47,201,.07)', background:i%2===0?'transparent':'rgba(139,47,201,.025)' }}>
+                        <td style={{ padding:'.45rem .75rem', color:C.purple, fontWeight:700, whiteSpace:'nowrap', position:'sticky', left:0, background:i%2===0?'#fff':'#faf8ff', zIndex:1 }}>{dist.label}</td>
+                        {[60,65,70,75,80,85,90,95,100,105,110].map(p=>{
+                          const secs = Math.round(dist.km / (vmaVal * p / 100) * 3600)
+                          const hh = Math.floor(secs / 3600)
+                          const mm = Math.floor((secs % 3600) / 60)
+                          const ss = secs % 60
+                          const t = hh>0 ? `${hh}h${String(mm).padStart(2,'0')}'` : `${mm}'${String(ss).padStart(2,'0')}`
+                          const isVMA = p===100
+                          return <td key={p} style={{ padding:'.45rem .5rem', textAlign:'center', color:isVMA?C.purple:C.dark, fontWeight:isVMA?700:400, fontVariantNumeric:'tabular-nums', whiteSpace:'nowrap', background:isVMA?'rgba(139,47,201,.06)':'transparent' }}>{t}</td>
+                        })}
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+              <p style={{ color:'rgba(26,18,48,.35)', fontSize:'.75rem', marginTop:'.75rem', textAlign:'center' }}>La colonne 100% correspond à ton allure VMA · Les pourcentages inférieurs à 65% = endurance fondamentale</p>
+            </div>
+          )}
+
           {/* Allure selon objectif */}
           <div style={{ marginTop:'2rem', background:'#fff', borderRadius:20, padding:'2rem', boxShadow:'0 4px 24px rgba(139,47,201,.08)', border:'1px solid rgba(139,47,201,.1)' }}>
             <p style={{ fontWeight:800, color:C.dark, marginBottom:'.4rem', fontSize:'1.05rem' }}>Quelle allure selon ton objectif chrono ?</p>
@@ -236,9 +288,9 @@ export default function AlluresCalculator() {
               <SectionTag>S'entraîner intelligemment</SectionTag>
               <H2L>Pourquoi s'entraîner par zones ?</H2L>
               <div style={{ display:'flex', flexDirection:'column', gap:'1.25rem', marginBottom:'2rem', color:'rgba(26,18,48,.7)', fontSize:'.9rem', lineHeight:1.7 }}>
-                <p>L'erreur la plus courante chez les coureurs amateurs : courir <strong style={{ color:C.dark }}>trop vite en endurance et trop lentement en fractionné</strong>. Résultat : fatigue chronique, stagnation des chronos, risque de blessure accru.</p>
-                <p>La règle des <strong style={{ color:C.dark }}>80/20</strong> est prouvée par la science du sport : 80% du volume à basse intensité (zones 1-2), 20% à haute intensité (zones 4-5). C'est la répartition des meilleurs coureurs mondiaux, des récréatifs aux élites.</p>
-                <p>En connaissant précisément tes zones, tu <strong style={{ color:C.dark }}>optimises chaque séance</strong> : les sorties longues reconstituent les réserves, les séances de seuil repoussent tes limites, le fractionné développe ta puissance maximale.</p>
+                <p style={{ margin:0, textAlign:'justify' }}>L'erreur la plus courante chez les coureurs amateurs : courir <strong style={{ color:C.dark }}>trop vite en endurance et trop lentement en fractionné</strong>. Résultat : fatigue chronique, stagnation des chronos, risque de blessure accru.</p>
+                <p style={{ margin:0, textAlign:'justify' }}>La règle des <strong style={{ color:C.dark }}>80/20</strong> est prouvée par la science du sport : 80% du volume à basse intensité (zones 1-2), 20% à haute intensité (zones 4-5). C'est la répartition des meilleurs coureurs mondiaux, des récréatifs aux élites.</p>
+                <p style={{ margin:0, textAlign:'justify' }}>En connaissant précisément tes zones, tu <strong style={{ color:C.dark }}>optimises chaque séance</strong> : les sorties longues reconstituent les réserves, les séances de seuil repoussent tes limites, le fractionné développe ta puissance maximale.</p>
               </div>
               <button onClick={handleCTA} style={{ padding:'.85rem 2rem', borderRadius:50, border:'none', background:`linear-gradient(135deg,${C.purple},${C.pink})`, color:'#fff', fontWeight:700, cursor:'pointer', fontSize:'.95rem', boxShadow:'0 6px 24px rgba(232,35,122,.4)' }}>Je rejoins The Ultimate Academy</button>
             </div>
@@ -261,33 +313,33 @@ export default function AlluresCalculator() {
                 <rect width="440" height="300" fill="#12102a"/>
                 <text x="220" y="26" textAnchor="middle" fontSize="11" fill="rgba(255,255,255,.3)" fontFamily="system-ui,sans-serif">Modèle d'entraînement polarisé</text>
                 <text x="90" y="58" textAnchor="middle" fontSize="9.5" fill="#34D399" fontFamily="system-ui,sans-serif" fontWeight="600">Zones 1–2</text>
-                <text x="90" y="70" textAnchor="middle" fontSize="9" fill="rgba(255,255,255,.25)" fontFamily="system-ui,sans-serif">Facile</text>
+                <text x="90" y="70" textAnchor="middle" fontSize="9" fill="rgba(255,255,255,.65)" fontFamily="system-ui,sans-serif">Facile</text>
                 <rect x="55" y="78" width="70" height="155" rx="8" fill="#34D39930"/>
                 <rect x="55" y="78" width="70" height="155" rx="8" stroke="#34D39960" strokeWidth="1.5" fill="none"/>
                 <text x="90" y="160" textAnchor="middle" fontSize="20" fill="#34D399" fontWeight="900" fontFamily="system-ui,sans-serif">80%</text>
                 <text x="220" y="58" textAnchor="middle" fontSize="9.5" fill="#FBBF24" fontFamily="system-ui,sans-serif" fontWeight="600">Zone 3</text>
-                <text x="220" y="70" textAnchor="middle" fontSize="9" fill="rgba(255,255,255,.25)" fontFamily="system-ui,sans-serif">À éviter</text>
-                <rect x="185" y="188" width="70" height="45" rx="8" fill="rgba(251,191,36,.12)"/>
-                <rect x="185" y="188" width="70" height="45" rx="8" stroke="rgba(251,191,36,.3)" strokeWidth="1.5" fill="none"/>
+                <text x="220" y="70" textAnchor="middle" fontSize="9" fill="rgba(255,255,255,.65)" fontFamily="system-ui,sans-serif">À éviter</text>
+                <rect x="185" y="188" width="70" height="45" rx="8" fill="rgba(251,191,36,.18)"/>
+                <rect x="185" y="188" width="70" height="45" rx="8" stroke="rgba(251,191,36,.4)" strokeWidth="1.5" fill="none"/>
                 <text x="220" y="215" textAnchor="middle" fontSize="13" fill="#FBBF24" fontWeight="900" fontFamily="system-ui,sans-serif">~0%</text>
                 <line x1="185" y1="188" x2="255" y2="188" stroke="#FBBF2440" strokeWidth="1"/>
-                <text x="350" y="58" textAnchor="middle" fontSize="9.5" fill="url(#ag2)" fontFamily="system-ui,sans-serif" fontWeight="600">Zones 4–5</text>
-                <text x="350" y="70" textAnchor="middle" fontSize="9" fill="rgba(255,255,255,.25)" fontFamily="system-ui,sans-serif">Intense</text>
-                <rect x="315" y="138" width="70" height="95" rx="8" fill="url(#ag2)" opacity=".25"/>
-                <rect x="315" y="138" width="70" height="95" rx="8" stroke="url(#ag2)" strokeWidth="1.5" fill="none" opacity=".6"/>
+                <text x="350" y="58" textAnchor="middle" fontSize="9.5" fill="#C084FC" fontFamily="system-ui,sans-serif" fontWeight="600">Zones 4–5</text>
+                <text x="350" y="70" textAnchor="middle" fontSize="9" fill="rgba(255,255,255,.65)" fontFamily="system-ui,sans-serif">Intense</text>
+                <rect x="315" y="138" width="70" height="95" rx="8" fill="url(#ag2)" opacity=".35"/>
+                <rect x="315" y="138" width="70" height="95" rx="8" stroke="url(#ag2)" strokeWidth="1.5" fill="none" opacity=".8"/>
                 <text x="350" y="192" textAnchor="middle" fontSize="18" fill="#C084FC" fontWeight="900" fontFamily="system-ui,sans-serif">20%</text>
-                <line x1="40" y1="245" x2="400" y2="245" stroke="rgba(255,255,255,.06)" strokeWidth="1"/>
-                <text x="220" y="265" textAnchor="middle" fontSize="10.5" fill="rgba(255,255,255,.35)" fontFamily="system-ui,sans-serif" fontWeight="600">Entraîne vraiment lentement · Entraîne vraiment fort</text>
-                <text x="220" y="283" textAnchor="middle" fontSize="9.5" fill="rgba(255,255,255,.2)" fontFamily="system-ui,sans-serif">La clé de la progression durable</text>
+                <line x1="40" y1="245" x2="400" y2="245" stroke="rgba(255,255,255,.12)" strokeWidth="1"/>
+                <text x="220" y="265" textAnchor="middle" fontSize="10.5" fill="rgba(255,255,255,.7)" fontFamily="system-ui,sans-serif" fontWeight="600">Entraîne vraiment lentement · Entraîne vraiment fort</text>
+                <text x="220" y="283" textAnchor="middle" fontSize="9.5" fill="rgba(255,255,255,.5)" fontFamily="system-ui,sans-serif">La clé de la progression durable</text>
               </svg>
             </div>
             <div style={{ flex:'1 1 300px' }}>
               <SectionTag dark>Mon conseil</SectionTag>
               <H2D>La polarisation de l'entraînement</H2D>
               <div style={{ color:'rgba(255,255,255,.7)', fontSize:'.9rem', lineHeight:1.8, display:'flex', flexDirection:'column', gap:'1rem' }}>
-                <p>La <strong style={{ color:'#fff' }}>polarisation</strong> est l'approche adoptée par tous les grands entraîneurs : concentrer les efforts soit dans la zone 1-2 (facile), soit dans la zone 4-5 (dur), en évitant la zone 3 (modérée).</p>
-                <p>La zone 3, ni trop facile ni assez intense, est la <strong style={{ color:'#fff' }}>zone grise</strong> qui accumule la fatigue sans produire les adaptations des zones hautes. C'est là que stagnent la plupart des amateurs.</p>
-                <p>La solution : <strong style={{ color:'#fff' }}>courir vraiment lentement le plus souvent</strong>, et se donner à fond lors des séances intenses. Ce contraste est la clé de la progression durable.</p>
+                <p style={{ margin:0, textAlign:'justify' }}>La <strong style={{ color:'#fff' }}>polarisation</strong> est l'approche adoptée par tous les grands entraîneurs : concentrer les efforts soit dans la zone 1-2 (facile), soit dans la zone 4-5 (dur), en évitant la zone 3 (modérée).</p>
+                <p style={{ margin:0, textAlign:'justify' }}>La zone 3, ni trop facile ni assez intense, est la <strong style={{ color:'#fff' }}>zone grise</strong> qui accumule la fatigue sans produire les adaptations des zones hautes. C'est là que stagnent la plupart des amateurs.</p>
+                <p style={{ margin:0, textAlign:'justify' }}>La solution : <strong style={{ color:'#fff' }}>courir vraiment lentement le plus souvent</strong>, et se donner à fond lors des séances intenses. Ce contraste est la clé de la progression durable.</p>
               </div>
               <div style={{ marginTop:'1.5rem', display:'flex', gap:'1rem', flexWrap:'wrap' }}>
                 <Link to="/calculateur/vma" style={{ color:'#C084FC', fontSize:'.85rem', textDecoration:'none' }}>→ Calculer ma VMA</Link>
@@ -321,7 +373,7 @@ export default function AlluresCalculator() {
                 {item.q}
                 <svg width="14" height="14" viewBox="0 0 12 12" fill="none" style={{ flexShrink:0, transition:'transform .2s', transform:openFaq===i?'rotate(180deg)':'none' }}><path d="M1 4l5 5 5-5" stroke={C.purple} strokeWidth="2" strokeLinecap="round"/></svg>
               </button>
-              {openFaq===i&&<p style={{ margin:'0 0 1.25rem', color:'rgba(26,18,48,.65)', fontSize:'.9rem', lineHeight:1.75 }}>{item.a}</p>}
+              {openFaq===i&&<p style={{ margin:'0 0 1.25rem', color:'rgba(26,18,48,.65)', fontSize:'.9rem', lineHeight:1.75, textAlign:'justify' }}>{item.a}</p>}
             </div>
           ))}
         </Inner>

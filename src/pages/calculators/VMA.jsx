@@ -236,7 +236,7 @@ export default function VMACalculator() {
                   { n:'⚡', t:'Définition simple', d:"La VMA (Vitesse Maximale Aérobie) est la vitesse à laquelle ton corps consomme le maximum d'oxygène possible. C'est ton moteur : plus il est puissant, plus tu es rapide et endurant sur toutes les distances." },
                   { n:'📈', t:"L'indicateur de progression", d:"En connaissant ta VMA, tu peux calculer avec précision toutes tes allures d'entraînement et te fixer des objectifs réalistes. Chaque progression de 0,5 km/h de VMA se traduit par 3-5 minutes gagnées sur un marathon." },
                   { n:'🎯', t:'La base de chaque séance', d:"Endurance fondamentale, seuil, fractionné : tout se calcule en pourcentage de VMA. Courir dans les bonnes zones évite le surentraînement et maximise les adaptations physiologiques." },
-                ].map(p=><div key={p.n} style={{ display:'flex', gap:'.85rem', alignItems:'flex-start' }}><span style={{ fontSize:'1.5rem', flexShrink:0 }}>{p.n}</span><div><p style={{ fontWeight:700, color:C.dark, marginBottom:'.2rem', fontSize:'.95rem' }}>{p.t}</p><p style={{ color:'rgba(26,18,48,.6)', fontSize:'.88rem', lineHeight:1.65, margin:0 }}>{p.d}</p></div></div>)}
+                ].map(p=><div key={p.n} style={{ display:'flex', gap:'.85rem', alignItems:'flex-start' }}><span style={{ fontSize:'1.5rem', flexShrink:0 }}>{p.n}</span><div><p style={{ fontWeight:700, color:C.dark, marginBottom:'.2rem', fontSize:'.95rem' }}>{p.t}</p><p style={{ color:'rgba(26,18,48,.6)', fontSize:'.88rem', lineHeight:1.65, margin:0, textAlign:'justify' }}>{p.d}</p></div></div>)}
               </div>
               <button onClick={handleCTA} style={{ padding:'.85rem 2rem', borderRadius:50, border:'none', background:`linear-gradient(135deg,${C.purple},${C.pink})`, color:'#fff', fontWeight:700, cursor:'pointer', fontSize:'.95rem', boxShadow:'0 6px 24px rgba(232,35,122,.4)' }}>Je rejoins The Ultimate Academy</button>
             </div>
@@ -307,7 +307,7 @@ export default function VMACalculator() {
                   { n:'🏔', t:'Séances de côtes', d:"6 à 10 répétitions de 150-200m en montée à allure maximale. La côte force l'engagement musculaire et améliore la VMA sans l'impact du sprint plat. Idéal pour les traileurs." },
                   { n:'💪', t:'Renforcement musculaire', d:"Gainages, squats, fentes : un corps fort produit une foulée plus efficace. 2 séances de 30 min par semaine peuvent améliorer ta VMA de 3 à 5% en 3 mois." },
                   { n:'😴', t:'Récupération', d:"La progression se fait pendant le repos, pas pendant l'effort. Sommeil 7-9h, nutrition adaptée, alternance hard/easy : ces facteurs comptent autant que les séances elles-mêmes." },
-                ].map(p=><div key={p.n} style={{ display:'flex', gap:'.85rem', alignItems:'flex-start' }}><span style={{ fontSize:'1.5rem', flexShrink:0 }}>{p.n}</span><div><p style={{ fontWeight:700, color:'#fff', marginBottom:'.2rem', fontSize:'.95rem' }}>{p.t}</p><p style={{ color:'rgba(255,255,255,.6)', fontSize:'.88rem', lineHeight:1.65, margin:0 }}>{p.d}</p></div></div>)}
+                ].map(p=><div key={p.n} style={{ display:'flex', gap:'.85rem', alignItems:'flex-start' }}><span style={{ fontSize:'1.5rem', flexShrink:0 }}>{p.n}</span><div><p style={{ fontWeight:700, color:'#fff', marginBottom:'.2rem', fontSize:'.95rem' }}>{p.t}</p><p style={{ color:'rgba(255,255,255,.6)', fontSize:'.88rem', lineHeight:1.65, margin:0, textAlign:'justify' }}>{p.d}</p></div></div>)}
               </div>
               <div style={{ marginTop:'1.5rem', display:'flex', gap:'1rem', flexWrap:'wrap' }}>
                 <Link to="/calculateur/allures" style={{ color:'#C084FC', fontSize:'.85rem', textDecoration:'none' }}>→ Calculer mes allures d'entraînement</Link>
@@ -341,7 +341,7 @@ export default function VMACalculator() {
                 {item.q}
                 <svg width="14" height="14" viewBox="0 0 12 12" fill="none" style={{ flexShrink:0, transition:'transform .2s', transform:openFaq===i?'rotate(180deg)':'none' }}><path d="M1 4l5 5 5-5" stroke={C.purple} strokeWidth="2" strokeLinecap="round"/></svg>
               </button>
-              {openFaq===i&&<p style={{ margin:'0 0 1.25rem', color:'rgba(26,18,48,.65)', fontSize:'.9rem', lineHeight:1.75 }}>{item.a}</p>}
+              {openFaq===i&&<p style={{ margin:'0 0 1.25rem', color:'rgba(26,18,48,.65)', fontSize:'.9rem', lineHeight:1.75, textAlign:'justify' }}>{item.a}</p>}
             </div>
           ))}
         </Inner>

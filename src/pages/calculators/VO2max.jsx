@@ -196,8 +196,8 @@ export default function VO2maxCalculator() {
 
       <PageHero
         badge="Test de Cooper"
-        title={<><span style={gradText}>VO2max</span> &amp; Test de Cooper</>}
-        subtitle="Comprends ta capacité aérobie et mesure-la avec le test le plus utilisé au monde par les coachs et les militaires"
+        title={<><span style={gradText}>Calcule ta VO2max</span></>}
+        subtitle="Calcule ta VO2max avec le test de Cooper en 12 minutes. Découvre ton niveau aérobie et ta VMA estimée."
       >
         <button onClick={() => calcRef.current?.scrollIntoView({ behavior: 'smooth' })}
           style={{ padding:'1rem 2.5rem', borderRadius:50, border:'none', background:`linear-gradient(135deg,${C.purple},${C.pink})`, color:'#fff', fontSize:'1.05rem', fontWeight:700, cursor:'pointer', boxShadow:'0 8px 32px rgba(232,35,122,.5)' }}>
@@ -205,131 +205,15 @@ export default function VO2maxCalculator() {
         </button>
       </PageHero>
 
-      {/* ── C'EST QUOI LA VO2MAX ───────────────────────────── */}
-      <section style={{ background: '#fff', padding: '5rem 1.5rem' }}>
-        <Inner>
-          <div style={{ display: 'flex', gap: '3rem', alignItems: 'center', flexWrap: 'wrap' }}>
-            <div style={{ flex: '1 1 300px' }}>
-              <SectionTag>Comprendre les bases</SectionTag>
-              <H2L>C'est quoi la VO2max ?</H2L>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', color: 'rgba(26,18,48,.7)', fontSize: '.9rem', lineHeight: 1.8 }}>
-                <p style={{ margin: 0 }}>La <strong style={{ color: C.dark }}>VO2max</strong>, ou consommation maximale d'oxygène, représente la quantité maximale d'oxygène que ton corps peut utiliser par minute et par kilogramme de poids corporel lors d'un effort intense.</p>
-                <p style={{ margin: 0 }}>En termes simples : c'est la <strong style={{ color: C.dark }}>cylindrée de ton moteur aérobie</strong>. Plus elle est élevée, plus ton corps est efficace pour produire de l'énergie à haute intensité.</p>
-                <p style={{ margin: 0 }}>C'est l'indicateur de performance aérobie le plus utilisé par les coachs professionnels. Un coureur avec une VO2max élevée a un potentiel de performance plus important, mais l'entraînement peut significativement améliorer cette valeur chez n'importe quel athlète.</p>
-              </div>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '.55rem', margin: '1.25rem 0' }}>
-                {[
-                  ["🫁", "Absorber l'oxygène via les poumons"],
-                  ["❤️", "Le transporter via le cœur et le sang"],
-                  ["💪", "Le livrer aux muscles qui travaillent"],
-                  ["⚡", "L'utiliser pour produire de l'énergie"],
-                ].map(([icon, txt]) => (
-                  <div key={txt} style={{ display: 'flex', alignItems: 'center', gap: '.75rem', fontSize: '.875rem', color: C.dark }}>
-                    <span style={{ flexShrink: 0 }}>{icon}</span><span>{txt}</span>
-                  </div>
-                ))}
-              </div>
-              <div style={{ padding: '1.1rem 1.25rem', borderRadius: 12, background: `linear-gradient(135deg,rgba(139,47,201,.07),rgba(232,35,122,.05))`, border: '1px solid rgba(139,47,201,.15)' }}>
-                <p style={{ margin: 0, fontSize: '.875rem', color: C.dark, lineHeight: 1.7 }}>
-                  <strong style={{ color: C.purple }}>Lien entre VO2max et VMA :</strong> La VO2max se mesure en mL/kg/min, la VMA en km/h. Formule approximative : <strong>VO2max ÷ 3,5 ≈ VMA</strong>
-                </p>
-              </div>
-            </div>
-            <div style={{ flex: '1 1 380px', borderRadius: 20, overflow: 'hidden', maxHeight: 480 }}>
-              <svg viewBox="0 0 440 320" style={{width:'100%',height:'100%',display:'block',minHeight:300}}>
-                <defs>
-                  <linearGradient id="vog1" x1="0" y1="0" x2="1" y2="0">
-                    <stop offset="0%" stopColor="#8B2FC9"/>
-                    <stop offset="100%" stopColor="#E8237A"/>
-                  </linearGradient>
-                  <marker id="vo2-arr1" markerWidth="7" markerHeight="7" refX="3.5" refY="3.5" orient="auto">
-                    <path d="M0,1 L6,3.5 L0,6 Z" fill="#8B2FC9"/>
-                  </marker>
-                  <marker id="vo2-arr2" markerWidth="7" markerHeight="7" refX="3.5" refY="3.5" orient="auto">
-                    <path d="M0,1 L6,3.5 L0,6 Z" fill="#E8237A"/>
-                  </marker>
-                </defs>
-                <rect width="440" height="320" fill="#EDE8F7"/>
-                <text x="220" y="28" textAnchor="middle" fontSize="12" fill="#1a1230" fontWeight="700" fontFamily="system-ui,sans-serif">Comment fonctionne la VO2max ?</text>
-                <circle cx="100" cy="125" r="42" fill="rgba(139,47,201,.1)" stroke="#8B2FC9" strokeWidth="1.5"/>
-                <text x="100" y="115" textAnchor="middle" fontSize="20" fontFamily="system-ui,sans-serif">🫁</text>
-                <text x="100" y="138" textAnchor="middle" fontSize="10" fill="#8B2FC9" fontWeight="700" fontFamily="system-ui,sans-serif">Poumons</text>
-                <text x="100" y="152" textAnchor="middle" fontSize="8.5" fill="rgba(26,18,48,.45)" fontFamily="system-ui,sans-serif">Absorber O₂</text>
-                <path d="M 147 125 L 173 125" stroke="#8B2FC9" strokeWidth="2" markerEnd="url(#vo2-arr1)"/>
-                <circle cx="220" cy="125" r="42" fill="rgba(232,35,122,.1)" stroke="#E8237A" strokeWidth="1.5"/>
-                <text x="220" y="115" textAnchor="middle" fontSize="20" fontFamily="system-ui,sans-serif">❤️</text>
-                <text x="220" y="138" textAnchor="middle" fontSize="10" fill="#E8237A" fontWeight="700" fontFamily="system-ui,sans-serif">Cœur</text>
-                <text x="220" y="152" textAnchor="middle" fontSize="8.5" fill="rgba(26,18,48,.45)" fontFamily="system-ui,sans-serif">Transporter O₂</text>
-                <path d="M 267 125 L 293 125" stroke="#E8237A" strokeWidth="2" markerEnd="url(#vo2-arr2)"/>
-                <circle cx="340" cy="125" r="42" fill="rgba(163,230,53,.1)" stroke="#A3E635" strokeWidth="1.5"/>
-                <text x="340" y="115" textAnchor="middle" fontSize="20" fontFamily="system-ui,sans-serif">💪</text>
-                <text x="340" y="138" textAnchor="middle" fontSize="10" fill="#A3E635" fontWeight="700" fontFamily="system-ui,sans-serif">Muscles</text>
-                <text x="340" y="152" textAnchor="middle" fontSize="8.5" fill="rgba(26,18,48,.45)" fontFamily="system-ui,sans-serif">Utiliser O₂</text>
-                <line x1="40" y1="185" x2="400" y2="185" stroke="rgba(139,47,201,.1)" strokeWidth="1"/>
-                <rect x="115" y="200" width="210" height="72" rx="12" fill="white" style={{filter:'drop-shadow(0 4px 12px rgba(139,47,201,.15))'}}/>
-                <text x="220" y="222" textAnchor="middle" fontSize="10" fill="rgba(26,18,48,.4)" fontFamily="system-ui,sans-serif" fontWeight="600">VO2MAX ESTIMÉE</text>
-                <text x="220" y="248" textAnchor="middle" fontSize="24" fill="url(#vog1)" fontWeight="900" fontFamily="system-ui,sans-serif">52,3</text>
-                <text x="220" y="263" textAnchor="middle" fontSize="10" fill="rgba(26,18,48,.38)" fontFamily="system-ui,sans-serif">mL/kg/min · VMA ≈ 14,9 km/h</text>
-                <text x="220" y="300" textAnchor="middle" fontSize="9.5" fill="rgba(26,18,48,.25)" fontFamily="system-ui,sans-serif">Formule : VO2max ÷ 3,5 ≈ VMA</text>
-              </svg>
-            </div>
-          </div>
-        </Inner>
-      </section>
-
-      {/* ── TEST DE COOPER ─────────────────────────────────── */}
-      <section style={{ background: C.light, padding: '5rem 1.5rem' }}>
-        <Inner max={860}>
-          <div style={{ textAlign: 'center', marginBottom: '3rem' }}>
-            <SectionTag>Protocole officiel</SectionTag>
-            <H2L>Comment réaliser le Test de Cooper ?</H2L>
-            <p style={{ color: 'rgba(26,18,48,.55)', maxWidth: 520, margin: '0 auto' }}>4 étapes simples pour un résultat fiable en 12 minutes</p>
-          </div>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(min(260px,100%),1fr))', gap: '1.25rem', marginBottom: '1.25rem' }}>
-            {[
-              { n: '1', icon: '🏟️', title: 'Trouve un terrain plat', desc: "L'idéal est une piste d'athlétisme de 400m. Sinon, un terrain plat mesuré où tu peux courir sans t'arrêter : pas de feux ni d'obstacles." },
-              { n: '2', icon: '🔥', title: 'Échauffe-toi bien', desc: "15 à 20 min de footing progressif à 63-65% de ta VMA estimée. Ne néglige pas l'échauffement, il influence directement ton résultat." },
-              { n: '3', icon: '⏱️', title: 'Cours 12 minutes à fond', desc: "Lance ton chrono et cours aussi loin que possible pendant exactement 12 minutes. Gère ton effort dès le départ : partir trop vite est l'erreur classique. Note la distance GPS ou le nombre de tours." },
-            ].map(step => (
-              <div key={step.n} style={{ background: '#fff', borderRadius: 16, padding: '1.5rem', boxShadow: '0 4px 20px rgba(139,47,201,.07)', border: '1px solid rgba(139,47,201,.1)' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '.7rem', marginBottom: '.85rem' }}>
-                  <div style={{ width: 34, height: 34, borderRadius: '50%', background: `linear-gradient(135deg,${C.purple},${C.pink})`, display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontSize: '.78rem', fontWeight: 800, flexShrink: 0 }}>{step.n}</div>
-                  <span style={{ fontSize: '1.4rem' }}>{step.icon}</span>
-                </div>
-                <p style={{ fontWeight: 700, color: C.dark, marginBottom: '.45rem', fontSize: '.95rem' }}>{step.title}</p>
-                <p style={{ color: 'rgba(26,18,48,.6)', fontSize: '.875rem', lineHeight: 1.65, margin: 0 }}>{step.desc}</p>
-              </div>
-            ))}
-          </div>
-          <div style={{ background: '#fff', borderRadius: 16, padding: '1.5rem', boxShadow: '0 4px 20px rgba(139,47,201,.07)', border: '1px solid rgba(139,47,201,.1)', marginBottom: '2.5rem' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '.7rem', marginBottom: '.85rem' }}>
-              <div style={{ width: 34, height: 34, borderRadius: '50%', background: `linear-gradient(135deg,${C.purple},${C.pink})`, display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontSize: '.78rem', fontWeight: 800, flexShrink: 0 }}>4</div>
-              <span style={{ fontSize: '1.4rem' }}>📏</span>
-            </div>
-            <p style={{ fontWeight: 700, color: C.dark, marginBottom: '.45rem', fontSize: '.95rem' }}>Mesure la distance</p>
-            <p style={{ color: 'rgba(26,18,48,.6)', fontSize: '.875rem', lineHeight: 1.65, margin: 0 }}>Relève la distance totale parcourue en mètres ou kilomètres. C'est cette valeur qui permet de calculer ta VO2max et ta VMA estimée.</p>
-          </div>
-          <div style={{ background: `linear-gradient(135deg,rgba(139,47,201,.08),rgba(232,35,122,.05))`, borderRadius: 16, padding: '1.5rem 2rem', border: '1px solid rgba(139,47,201,.18)', display: 'flex', gap: '1rem', alignItems: 'flex-start' }}>
-            <span style={{ fontSize: '1.5rem', flexShrink: 0 }}>💬</span>
-            <div>
-              <p style={{ fontWeight: 700, color: C.dark, marginBottom: '.35rem', fontSize: '.95rem' }}>Mon conseil</p>
-              <p style={{ color: 'rgba(26,18,48,.65)', fontSize: '.9rem', lineHeight: 1.7, margin: 0, fontStyle: 'italic' }}>
-                "Le Test de Cooper est un excellent outil de progression. Je conseille à mes athlètes de le répéter tous les 2 à 3 mois pour mesurer leur évolution. L'amélioration de ta VO2max est l'un des meilleurs signes que ton entraînement fonctionne."
-              </p>
-            </div>
-          </div>
-        </Inner>
-      </section>
-
       {/* ── CALCULATEUR ────────────────────────────────────── */}
-      <section ref={calcRef} id="outil" style={{ background: '#fff', padding: '5rem 1.5rem' }}>
+      <section ref={calcRef} id="outil" style={{ background: C.light, padding: '5rem 1.5rem' }}>
         <Inner max={780}>
           <div style={{ textAlign: 'center', marginBottom: '2.5rem' }}>
             <SectionTag>Calculateur interactif</SectionTag>
             <h2 style={{ fontSize: 'clamp(1.5rem,3vw,2rem)', fontWeight: 900, color: C.dark, marginBottom: '.5rem' }}>Calcule ta VO2max</h2>
             <p style={{ color: 'rgba(26,18,48,.55)', fontSize: '.95rem' }}>Résultats instantanés, aucune inscription requise</p>
           </div>
-          <div style={{ background: C.light, borderRadius: 20, padding: '2rem', boxShadow: '0 8px 40px rgba(139,47,201,.1)', border: '1px solid rgba(139,47,201,.12)' }}>
+          <div style={{ background: '#fff', borderRadius: 20, padding: '2rem', boxShadow: '0 8px 40px rgba(139,47,201,.1)', border: '1px solid rgba(139,47,201,.12)' }}>
 
             {/* Step 1 — Distance */}
             <div style={{ marginBottom: '1.75rem' }}>
@@ -387,7 +271,7 @@ export default function VO2maxCalculator() {
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(210px,1fr))', gap: '1rem' }}>
 
                 {/* Card VO2max */}
-                <div style={{ background: '#fff', borderRadius: 16, padding: '1.5rem', border: `2px solid ${vo2Level?.color || C.purple}40`, boxShadow: `0 4px 20px ${vo2Level?.color || C.purple}18` }}>
+                <div style={{ background: C.light, borderRadius: 16, padding: '1.5rem', border: `2px solid ${vo2Level?.color || C.purple}40`, boxShadow: `0 4px 20px ${vo2Level?.color || C.purple}18` }}>
                   <p style={{ margin: '0 0 .35rem', fontSize: '.7rem', textTransform: 'uppercase', letterSpacing: '.1em', color: 'rgba(26,18,48,.4)', fontWeight: 600 }}>VO2max estimée</p>
                   <p style={{ margin: '0 0 .4rem', fontSize: '2.4rem', fontWeight: 900, lineHeight: 1, background: `linear-gradient(135deg,${C.purple},${C.pink})`, WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
                     {vo2max.toFixed(1)}
@@ -407,7 +291,7 @@ export default function VO2maxCalculator() {
                 </div>
 
                 {/* Card VMA */}
-                <div style={{ background: '#fff', borderRadius: 16, padding: '1.5rem', border: '2px solid rgba(139,47,201,.2)', boxShadow: '0 4px 20px rgba(139,47,201,.1)' }}>
+                <div style={{ background: C.light, borderRadius: 16, padding: '1.5rem', border: '2px solid rgba(139,47,201,.2)', boxShadow: '0 4px 20px rgba(139,47,201,.1)' }}>
                   <p style={{ margin: '0 0 .35rem', fontSize: '.7rem', textTransform: 'uppercase', letterSpacing: '.1em', color: 'rgba(26,18,48,.4)', fontWeight: 600 }}>VMA estimée</p>
                   <p style={{ margin: '0 0 .1rem', fontSize: '2.4rem', fontWeight: 900, lineHeight: 1, background: `linear-gradient(135deg,${C.purple},${C.pink})`, WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
                     {vma.toFixed(2)}
@@ -420,7 +304,7 @@ export default function VO2maxCalculator() {
                 </div>
 
                 {/* Card Distance */}
-                <div style={{ background: '#fff', borderRadius: 16, padding: '1.5rem', border: '1px solid rgba(139,47,201,.12)' }}>
+                <div style={{ background: C.light, borderRadius: 16, padding: '1.5rem', border: '1px solid rgba(139,47,201,.12)' }}>
                   <p style={{ margin: '0 0 .35rem', fontSize: '.7rem', textTransform: 'uppercase', letterSpacing: '.1em', color: 'rgba(26,18,48,.4)', fontWeight: 600 }}>Distance parcourue</p>
                   <p style={{ margin: '0 0 .1rem', fontSize: '2.4rem', fontWeight: 900, lineHeight: 1, color: C.dark }}>
                     {distanceM >= 1000 ? (distanceM / 1000).toFixed(2).replace('.', ',') : Math.round(distanceM)}
@@ -443,8 +327,124 @@ export default function VO2maxCalculator() {
         </Inner>
       </section>
 
-      {/* ── TABLEAU DE NORMES ──────────────────────────────── */}
+      {/* ── C'EST QUOI LA VO2MAX ───────────────────────────── */}
+      <section style={{ background: '#fff', padding: '5rem 1.5rem' }}>
+        <Inner>
+          <div style={{ display: 'flex', gap: '3rem', alignItems: 'center', flexWrap: 'wrap' }}>
+            <div style={{ flex: '1 1 300px' }}>
+              <SectionTag>Comprendre les bases</SectionTag>
+              <H2L>C'est quoi la VO2max ?</H2L>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', color: 'rgba(26,18,48,.7)', fontSize: '.9rem', lineHeight: 1.8 }}>
+                <p style={{ margin: 0, textAlign: 'justify' }}>La <strong style={{ color: C.dark }}>VO2max</strong>, ou consommation maximale d'oxygène, représente la quantité maximale d'oxygène que ton corps peut utiliser par minute et par kilogramme de poids corporel lors d'un effort intense.</p>
+                <p style={{ margin: 0, textAlign: 'justify' }}>En termes simples : c'est la <strong style={{ color: C.dark }}>cylindrée de ton moteur aérobie</strong>. Plus elle est élevée, plus ton corps est efficace pour produire de l'énergie à haute intensité.</p>
+                <p style={{ margin: 0, textAlign: 'justify' }}>C'est l'indicateur de performance aérobie le plus utilisé par les coachs professionnels. Un coureur avec une VO2max élevée a un potentiel de performance plus important, mais l'entraînement peut significativement améliorer cette valeur chez n'importe quel athlète.</p>
+              </div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '.55rem', margin: '1.25rem 0' }}>
+                {[
+                  ["🫁", "Absorber l'oxygène via les poumons"],
+                  ["❤️", "Le transporter via le cœur et le sang"],
+                  ["💪", "Le livrer aux muscles qui travaillent"],
+                  ["⚡", "L'utiliser pour produire de l'énergie"],
+                ].map(([icon, txt]) => (
+                  <div key={txt} style={{ display: 'flex', alignItems: 'center', gap: '.75rem', fontSize: '.875rem', color: C.dark }}>
+                    <span style={{ flexShrink: 0 }}>{icon}</span><span>{txt}</span>
+                  </div>
+                ))}
+              </div>
+              <div style={{ padding: '1.1rem 1.25rem', borderRadius: 12, background: `linear-gradient(135deg,rgba(139,47,201,.07),rgba(232,35,122,.05))`, border: '1px solid rgba(139,47,201,.15)' }}>
+                <p style={{ margin: 0, fontSize: '.875rem', color: C.dark, lineHeight: 1.7 }}>
+                  <strong style={{ color: C.purple }}>Lien entre VO2max et VMA :</strong> La VO2max se mesure en mL/kg/min, la VMA en km/h. Formule approximative : <strong>VO2max ÷ 3,5 ≈ VMA</strong>
+                </p>
+              </div>
+            </div>
+            <div style={{ flex: '1 1 380px', borderRadius: 20, overflow: 'hidden', maxHeight: 480 }}>
+              <svg viewBox="0 0 440 320" style={{width:'100%',height:'100%',display:'block',minHeight:300}}>
+                <defs>
+                  <linearGradient id="vog1" x1="0" y1="0" x2="1" y2="0">
+                    <stop offset="0%" stopColor="#8B2FC9"/>
+                    <stop offset="100%" stopColor="#E8237A"/>
+                  </linearGradient>
+                  <marker id="vo2-arr1" markerWidth="7" markerHeight="7" refX="3.5" refY="3.5" orient="auto">
+                    <path d="M0,1 L6,3.5 L0,6 Z" fill="#8B2FC9"/>
+                  </marker>
+                  <marker id="vo2-arr2" markerWidth="7" markerHeight="7" refX="3.5" refY="3.5" orient="auto">
+                    <path d="M0,1 L6,3.5 L0,6 Z" fill="#E8237A"/>
+                  </marker>
+                </defs>
+                <rect width="440" height="320" fill="#EDE8F7"/>
+                <text x="220" y="28" textAnchor="middle" fontSize="12" fill="#1a1230" fontWeight="700" fontFamily="system-ui,sans-serif">Comment fonctionne la VO2max ?</text>
+                <circle cx="100" cy="125" r="42" fill="rgba(139,47,201,.1)" stroke="#8B2FC9" strokeWidth="1.5"/>
+                <text x="100" y="115" textAnchor="middle" fontSize="20" fontFamily="system-ui,sans-serif">🫁</text>
+                <text x="100" y="138" textAnchor="middle" fontSize="10" fill="#8B2FC9" fontWeight="700" fontFamily="system-ui,sans-serif">Poumons</text>
+                <text x="100" y="152" textAnchor="middle" fontSize="8.5" fill="rgba(26,18,48,.55)" fontFamily="system-ui,sans-serif">Absorber O₂</text>
+                <path d="M 147 125 L 173 125" stroke="#8B2FC9" strokeWidth="2" markerEnd="url(#vo2-arr1)"/>
+                <circle cx="220" cy="125" r="42" fill="rgba(232,35,122,.1)" stroke="#E8237A" strokeWidth="1.5"/>
+                <text x="220" y="115" textAnchor="middle" fontSize="20" fontFamily="system-ui,sans-serif">❤️</text>
+                <text x="220" y="138" textAnchor="middle" fontSize="10" fill="#E8237A" fontWeight="700" fontFamily="system-ui,sans-serif">Cœur</text>
+                <text x="220" y="152" textAnchor="middle" fontSize="8.5" fill="rgba(26,18,48,.55)" fontFamily="system-ui,sans-serif">Transporter O₂</text>
+                <path d="M 267 125 L 293 125" stroke="#E8237A" strokeWidth="2" markerEnd="url(#vo2-arr2)"/>
+                <circle cx="340" cy="125" r="42" fill="rgba(163,230,53,.1)" stroke="#A3E635" strokeWidth="1.5"/>
+                <text x="340" y="115" textAnchor="middle" fontSize="20" fontFamily="system-ui,sans-serif">💪</text>
+                <text x="340" y="138" textAnchor="middle" fontSize="10" fill="#A3E635" fontWeight="700" fontFamily="system-ui,sans-serif">Muscles</text>
+                <text x="340" y="152" textAnchor="middle" fontSize="8.5" fill="rgba(26,18,48,.55)" fontFamily="system-ui,sans-serif">Utiliser O₂</text>
+                <line x1="40" y1="185" x2="400" y2="185" stroke="rgba(139,47,201,.1)" strokeWidth="1"/>
+                <rect x="115" y="200" width="210" height="72" rx="12" fill="white" style={{filter:'drop-shadow(0 4px 12px rgba(139,47,201,.15))'}}/>
+                <text x="220" y="222" textAnchor="middle" fontSize="10" fill="rgba(26,18,48,.55)" fontFamily="system-ui,sans-serif" fontWeight="600">VO2MAX ESTIMÉE</text>
+                <text x="220" y="248" textAnchor="middle" fontSize="24" fill="url(#vog1)" fontWeight="900" fontFamily="system-ui,sans-serif">52,3</text>
+                <text x="220" y="263" textAnchor="middle" fontSize="10" fill="rgba(26,18,48,.5)" fontFamily="system-ui,sans-serif">mL/kg/min · VMA ≈ 14,9 km/h</text>
+                <text x="220" y="300" textAnchor="middle" fontSize="9.5" fill="rgba(26,18,48,.4)" fontFamily="system-ui,sans-serif">Formule : VO2max ÷ 3,5 ≈ VMA</text>
+              </svg>
+            </div>
+          </div>
+        </Inner>
+      </section>
+
+      {/* ── TEST DE COOPER ─────────────────────────────────── */}
       <section style={{ background: C.light, padding: '5rem 1.5rem' }}>
+        <Inner max={860}>
+          <div style={{ textAlign: 'center', marginBottom: '3rem' }}>
+            <SectionTag>Protocole officiel</SectionTag>
+            <H2L>Comment réaliser le Test de Cooper ?</H2L>
+            <p style={{ color: 'rgba(26,18,48,.55)', maxWidth: 520, margin: '0 auto' }}>4 étapes simples pour un résultat fiable en 12 minutes</p>
+          </div>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(min(260px,100%),1fr))', gap: '1.25rem', marginBottom: '1.25rem' }}>
+            {[
+              { n: '1', icon: '🏟️', title: 'Trouve un terrain plat', desc: "L'idéal est une piste d'athlétisme de 400m. Sinon, un terrain plat mesuré où tu peux courir sans t'arrêter : pas de feux ni d'obstacles." },
+              { n: '2', icon: '🔥', title: 'Échauffe-toi bien', desc: "15 à 20 min de footing progressif à 63-65% de ta VMA estimée. Ne néglige pas l'échauffement, il influence directement ton résultat." },
+              { n: '3', icon: '⏱️', title: 'Cours 12 minutes à fond', desc: "Lance ton chrono et cours aussi loin que possible pendant exactement 12 minutes. Gère ton effort dès le départ : partir trop vite est l'erreur classique. Note la distance GPS ou le nombre de tours." },
+            ].map(step => (
+              <div key={step.n} style={{ background: '#fff', borderRadius: 16, padding: '1.5rem', boxShadow: '0 4px 20px rgba(139,47,201,.07)', border: '1px solid rgba(139,47,201,.1)' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '.7rem', marginBottom: '.85rem' }}>
+                  <div style={{ width: 34, height: 34, borderRadius: '50%', background: `linear-gradient(135deg,${C.purple},${C.pink})`, display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontSize: '.78rem', fontWeight: 800, flexShrink: 0 }}>{step.n}</div>
+                  <span style={{ fontSize: '1.4rem' }}>{step.icon}</span>
+                </div>
+                <p style={{ fontWeight: 700, color: C.dark, marginBottom: '.45rem', fontSize: '.95rem' }}>{step.title}</p>
+                <p style={{ color: 'rgba(26,18,48,.6)', fontSize: '.875rem', lineHeight: 1.65, margin: 0, textAlign: 'justify' }}>{step.desc}</p>
+              </div>
+            ))}
+          </div>
+          <div style={{ background: '#fff', borderRadius: 16, padding: '1.5rem', boxShadow: '0 4px 20px rgba(139,47,201,.07)', border: '1px solid rgba(139,47,201,.1)', marginBottom: '2.5rem' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '.7rem', marginBottom: '.85rem' }}>
+              <div style={{ width: 34, height: 34, borderRadius: '50%', background: `linear-gradient(135deg,${C.purple},${C.pink})`, display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontSize: '.78rem', fontWeight: 800, flexShrink: 0 }}>4</div>
+              <span style={{ fontSize: '1.4rem' }}>📏</span>
+            </div>
+            <p style={{ fontWeight: 700, color: C.dark, marginBottom: '.45rem', fontSize: '.95rem' }}>Mesure la distance</p>
+            <p style={{ color: 'rgba(26,18,48,.6)', fontSize: '.875rem', lineHeight: 1.65, margin: 0, textAlign: 'justify' }}>Relève la distance totale parcourue en mètres ou kilomètres. C'est cette valeur qui permet de calculer ta VO2max et ta VMA estimée.</p>
+          </div>
+          <div style={{ background: `linear-gradient(135deg,rgba(139,47,201,.08),rgba(232,35,122,.05))`, borderRadius: 16, padding: '1.5rem 2rem', border: '1px solid rgba(139,47,201,.18)', display: 'flex', gap: '1rem', alignItems: 'flex-start' }}>
+            <span style={{ fontSize: '1.5rem', flexShrink: 0 }}>💬</span>
+            <div>
+              <p style={{ fontWeight: 700, color: C.dark, marginBottom: '.35rem', fontSize: '.95rem' }}>Mon conseil</p>
+              <p style={{ color: 'rgba(26,18,48,.65)', fontSize: '.9rem', lineHeight: 1.7, margin: 0, fontStyle: 'italic', textAlign: 'justify' }}>
+                "Le Test de Cooper est un excellent outil de progression. Je conseille à mes athlètes de le répéter tous les 2 à 3 mois pour mesurer leur évolution. L'amélioration de ta VO2max est l'un des meilleurs signes que ton entraînement fonctionne."
+              </p>
+            </div>
+          </div>
+        </Inner>
+      </section>
+
+      {/* ── TABLEAU DE NORMES ──────────────────────────────── */}
+      <section style={{ background: '#fff', padding: '5rem 1.5rem' }}>
         <Inner max={860}>
           <div style={{ textAlign: 'center', marginBottom: '2.5rem' }}>
             <SectionTag>Normes officielles</SectionTag>
@@ -471,9 +471,9 @@ export default function VO2maxCalculator() {
           <div className="tbl-scroll" style={{ background: '#fff', borderRadius: 20, boxShadow: '0 8px 40px rgba(139,47,201,.1)', border: '1px solid rgba(139,47,201,.12)' }}>
             <table style={{ width: '100%', minWidth: 480, borderCollapse: 'collapse', fontSize: '.875rem' }}>
               <thead>
-                <tr style={{ background: 'rgba(139,47,201,.06)' }}>
+                <tr style={{ background: '#1a1230' }}>
                   {['Niveau', 'Distance', 'VO2max estimée'].map(h => (
-                    <th key={h} style={{ padding: '.7rem 1rem', textAlign: 'left', color: 'rgba(26,18,48,.4)', fontWeight: 600, fontSize: '.72rem', textTransform: 'uppercase', letterSpacing: '.07em' }}>{h}</th>
+                    <th key={h} style={{ padding: '.7rem 1rem', textAlign: 'left', color: 'rgba(255,255,255,.85)', fontWeight: 600, fontSize: '.72rem', textTransform: 'uppercase', letterSpacing: '.07em' }}>{h}</th>
                   ))}
                 </tr>
               </thead>
@@ -524,7 +524,7 @@ export default function VO2maxCalculator() {
       </section>
 
       {/* ── COMMENT AMÉLIORER SA VO2MAX ────────────────────── */}
-      <section style={{ background: '#fff', padding: '5rem 1.5rem' }}>
+      <section style={{ background: C.light, padding: '5rem 1.5rem' }}>
         <Inner>
           <div style={{ display: 'flex', gap: '3rem', alignItems: 'center', flexWrap: 'wrap', flexDirection: 'row-reverse' }}>
             <div style={{ flex: '1 1 380px', borderRadius: 20, overflow: 'hidden', maxHeight: 480 }}>
@@ -539,14 +539,14 @@ export default function VO2maxCalculator() {
                 <text x="220" y="26" textAnchor="middle" fontSize="12" fill="#1a1230" fontWeight="700" fontFamily="system-ui,sans-serif">Progression VO2max sur 8 semaines</text>
                 <line x1="50" y1="50" x2="50" y2="220" stroke="rgba(139,47,201,.12)" strokeWidth="1"/>
                 <line x1="50" y1="220" x2="415" y2="220" stroke="rgba(139,47,201,.12)" strokeWidth="1"/>
-                <text x="35" y="225" textAnchor="end" fontSize="9" fill="rgba(26,18,48,.28)" fontFamily="system-ui,sans-serif">S0</text>
-                <text x="130" y="225" textAnchor="middle" fontSize="9" fill="rgba(26,18,48,.28)" fontFamily="system-ui,sans-serif">S2</text>
-                <text x="210" y="225" textAnchor="middle" fontSize="9" fill="rgba(26,18,48,.28)" fontFamily="system-ui,sans-serif">S4</text>
-                <text x="290" y="225" textAnchor="middle" fontSize="9" fill="rgba(26,18,48,.28)" fontFamily="system-ui,sans-serif">S6</text>
-                <text x="410" y="225" textAnchor="middle" fontSize="9" fill="rgba(26,18,48,.28)" fontFamily="system-ui,sans-serif">S8</text>
-                <text x="38" y="80" textAnchor="end" fontSize="9" fill="rgba(26,18,48,.28)" fontFamily="system-ui,sans-serif">60</text>
-                <text x="38" y="130" textAnchor="end" fontSize="9" fill="rgba(26,18,48,.28)" fontFamily="system-ui,sans-serif">55</text>
-                <text x="38" y="180" textAnchor="end" fontSize="9" fill="rgba(26,18,48,.28)" fontFamily="system-ui,sans-serif">50</text>
+                <text x="35" y="225" textAnchor="end" fontSize="9" fill="rgba(26,18,48,.4)" fontFamily="system-ui,sans-serif">S0</text>
+                <text x="130" y="225" textAnchor="middle" fontSize="9" fill="rgba(26,18,48,.4)" fontFamily="system-ui,sans-serif">S2</text>
+                <text x="210" y="225" textAnchor="middle" fontSize="9" fill="rgba(26,18,48,.4)" fontFamily="system-ui,sans-serif">S4</text>
+                <text x="290" y="225" textAnchor="middle" fontSize="9" fill="rgba(26,18,48,.4)" fontFamily="system-ui,sans-serif">S6</text>
+                <text x="410" y="225" textAnchor="middle" fontSize="9" fill="rgba(26,18,48,.4)" fontFamily="system-ui,sans-serif">S8</text>
+                <text x="38" y="80" textAnchor="end" fontSize="9" fill="rgba(26,18,48,.4)" fontFamily="system-ui,sans-serif">60</text>
+                <text x="38" y="130" textAnchor="end" fontSize="9" fill="rgba(26,18,48,.4)" fontFamily="system-ui,sans-serif">55</text>
+                <text x="38" y="180" textAnchor="end" fontSize="9" fill="rgba(26,18,48,.4)" fontFamily="system-ui,sans-serif">50</text>
                 <line x1="50" y1="80" x2="415" y2="80" stroke="rgba(139,47,201,.05)" strokeWidth="1"/>
                 <line x1="50" y1="130" x2="415" y2="130" stroke="rgba(139,47,201,.05)" strokeWidth="1"/>
                 <line x1="50" y1="180" x2="415" y2="180" stroke="rgba(139,47,201,.05)" strokeWidth="1"/>
@@ -556,10 +556,10 @@ export default function VO2maxCalculator() {
                 <circle cx="290" cy="118" r="5" fill="white" stroke="#E8237A" strokeWidth="2"/>
                 <circle cx="410" cy="72" r="6" fill="url(#vog2)"/>
                 <text x="415" y="68" fontSize="10" fill="#8B2FC9" fontWeight="700" fontFamily="system-ui,sans-serif">+2,1</text>
-                <text x="415" y="80" fontSize="9" fill="rgba(26,18,48,.45)" fontFamily="system-ui,sans-serif">km/h VMA</text>
+                <text x="415" y="80" fontSize="9" fill="rgba(26,18,48,.55)" fontFamily="system-ui,sans-serif">km/h VMA</text>
                 <rect x="110" y="237" width="220" height="54" rx="10" fill="rgba(139,47,201,.08)" stroke="rgba(139,47,201,.2)" strokeWidth="1"/>
                 <text x="220" y="256" textAnchor="middle" fontSize="10.5" fill="#8B2FC9" fontWeight="700" fontFamily="system-ui,sans-serif">2 séances VMA / semaine</text>
-                <text x="220" y="277" textAnchor="middle" fontSize="9.5" fill="rgba(26,18,48,.4)" fontFamily="system-ui,sans-serif">Progression mesurable en 6 à 8 semaines</text>
+                <text x="220" y="277" textAnchor="middle" fontSize="9.5" fill="rgba(26,18,48,.55)" fontFamily="system-ui,sans-serif">Progression mesurable en 6 à 8 semaines</text>
               </svg>
             </div>
             <div style={{ flex: '1 1 300px' }}>
@@ -575,14 +575,14 @@ export default function VO2maxCalculator() {
                     <span style={{ fontSize: '1.5rem', flexShrink: 0 }}>{item.icon}</span>
                     <div>
                       <p style={{ fontWeight: 700, color: C.dark, marginBottom: '.2rem', fontSize: '.95rem' }}>{item.title}</p>
-                      <p style={{ color: 'rgba(26,18,48,.6)', fontSize: '.88rem', lineHeight: 1.65, margin: 0 }}>{item.desc}</p>
+                      <p style={{ color: 'rgba(26,18,48,.6)', fontSize: '.88rem', lineHeight: 1.65, margin: 0, textAlign: 'justify' }}>{item.desc}</p>
                       {item.sub && <p style={{ color: C.purple, fontSize: '.8rem', fontWeight: 600, margin: '.2rem 0 0', fontStyle: 'italic' }}>{item.sub}</p>}
                     </div>
                   </div>
                 ))}
               </div>
               <div style={{ padding: '1.1rem 1.25rem', borderRadius: 12, background: `linear-gradient(135deg,rgba(139,47,201,.07),rgba(232,35,122,.05))`, border: '1px solid rgba(139,47,201,.15)', marginBottom: '1.5rem' }}>
-                <p style={{ margin: 0, fontSize: '.88rem', color: C.dark, lineHeight: 1.7, fontStyle: 'italic' }}>
+                <p style={{ margin: 0, fontSize: '.88rem', color: C.dark, lineHeight: 1.7, fontStyle: 'italic', textAlign: 'justify' }}>
                   <strong style={{ color: C.purple }}>💬 Mon conseil :</strong> "Dans mes plans, je programme une séance de VMA par semaine pendant les phases de développement. C'est ce travail régulier et progressif qui fait vraiment bouger les curseurs sur le long terme."
                 </p>
               </div>
@@ -605,9 +605,9 @@ export default function VO2maxCalculator() {
           <div className="tbl-scroll" style={{ background: 'rgba(255,255,255,.04)', borderRadius: 20, border: '1px solid rgba(255,255,255,.08)' }}>
             <table style={{ width: '100%', minWidth: 400, borderCollapse: 'collapse', fontSize: '.9rem' }}>
               <thead>
-                <tr style={{ background: 'rgba(139,47,201,.18)' }}>
+                <tr style={{ background: 'rgba(139,47,201,.25)' }}>
                   {['', 'VO2max', 'VMA'].map(h => (
-                    <th key={h} style={{ padding: '.8rem 1.25rem', textAlign: 'left', color: 'rgba(255,255,255,.55)', fontWeight: 600, fontSize: '.73rem', textTransform: 'uppercase', letterSpacing: '.08em' }}>{h}</th>
+                    <th key={h} style={{ padding: '.8rem 1.25rem', textAlign: 'left', color: 'rgba(255,255,255,.9)', fontWeight: 600, fontSize: '.73rem', textTransform: 'uppercase', letterSpacing: '.08em' }}>{h}</th>
                   ))}
                 </tr>
               </thead>
@@ -620,9 +620,9 @@ export default function VO2maxCalculator() {
                   ['Formule',  'VO2max ÷ 3,5 ≈ VMA',           'VMA × 3,5 ≈ VO2max'],
                 ].map((row, i) => (
                   <tr key={i} style={{ borderTop: '1px solid rgba(255,255,255,.06)' }}>
-                    <td style={{ padding: '.7rem 1.25rem', color: 'rgba(255,255,255,.38)', fontSize: '.82rem', fontWeight: 600 }}>{row[0]}</td>
-                    <td style={{ padding: '.7rem 1.25rem', color: i === 4 ? '#C084FC' : 'rgba(255,255,255,.75)', fontWeight: i === 4 ? 700 : 400 }}>{row[1]}</td>
-                    <td style={{ padding: '.7rem 1.25rem', color: i === 4 ? '#C084FC' : 'rgba(255,255,255,.75)', fontWeight: i === 4 ? 700 : 400 }}>{row[2]}</td>
+                    <td style={{ padding: '.7rem 1.25rem', color: 'rgba(255,255,255,.55)', fontSize: '.82rem', fontWeight: 600 }}>{row[0]}</td>
+                    <td style={{ padding: '.7rem 1.25rem', color: i === 4 ? '#C084FC' : 'rgba(255,255,255,.8)', fontWeight: i === 4 ? 700 : 400 }}>{row[1]}</td>
+                    <td style={{ padding: '.7rem 1.25rem', color: i === 4 ? '#C084FC' : 'rgba(255,255,255,.8)', fontWeight: i === 4 ? 700 : 400 }}>{row[2]}</td>
                   </tr>
                 ))}
               </tbody>
@@ -667,7 +667,7 @@ export default function VO2maxCalculator() {
                   <path d="M1 4l5 5 5-5" stroke={C.purple} strokeWidth="2" strokeLinecap="round" />
                 </svg>
               </button>
-              {openFaq === i && <p style={{ margin: '0 0 1.25rem', color: 'rgba(26,18,48,.65)', fontSize: '.9rem', lineHeight: 1.75 }}>{item.a}</p>}
+              {openFaq === i && <p style={{ margin: '0 0 1.25rem', color: 'rgba(26,18,48,.65)', fontSize: '.9rem', lineHeight: 1.75, textAlign: 'justify' }}>{item.a}</p>}
             </div>
           ))}
         </Inner>

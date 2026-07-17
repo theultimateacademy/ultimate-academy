@@ -39,10 +39,10 @@ const CALCULATEURS = [
   },
   {
     icon: '🫁',
-    title: 'Calcule ton VO2max',
-    desc: 'Estime ton VO2max à partir du test de Cooper (12 minutes) ou d\'autres protocoles. Situe ton niveau par rapport aux normes internationales selon ton âge et ton sexe.',
+    title: 'Calcule ta VO2max',
+    desc: 'Estime ta VO2max à partir du test de Cooper (12 minutes) ou d\'autres protocoles. Situe ton niveau par rapport aux normes internationales selon ton âge et ton sexe.',
     path: '/calculateur/vo2max',
-    label: 'Tester mon VO2max',
+    label: 'Tester ma VO2max',
     tag: 'VO2max',
   },
   {
