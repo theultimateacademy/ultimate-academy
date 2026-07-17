@@ -413,28 +413,30 @@ export default function Landing() {
             {/* ── LEFT : Ebook card ── */}
             <div className="pricing-card" style={{
               padding: '2.5rem 2rem',
-              display: 'flex', flexDirection: 'column',
+              display: 'grid',
+              gridTemplateRows: 'auto auto auto auto 1fr auto',
               boxSizing: 'border-box',
             }}>
-              {/* label */}
+              {/* row 1 — label */}
               <div style={{ fontSize: '.78rem', fontWeight: 700, color: 'rgba(255,255,255,.55)', letterSpacing: '.12em', textTransform: 'uppercase', marginBottom: '1rem', textAlign: 'center' }}>
                 Ebooks Running
               </div>
-              {/* price */}
+              {/* row 2 — price */}
               <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'center', gap: '.4rem', marginBottom: '.3rem' }}>
                 <span className="price-amount">14,99€</span>
               </div>
-              {/* subtitles */}
+              {/* row 3 — subtitle 1 */}
               <p style={{ color: 'rgba(255,255,255,.65)', fontSize: '.85rem', marginBottom: '.4rem', lineHeight: 1.6, textAlign: 'center' }}>à partir de · selon le plan</p>
+              {/* row 4 — subtitle 2 */}
               <p style={{ color: 'rgba(255,255,255,.5)', fontSize: '.78rem', marginBottom: '2rem', lineHeight: 1.5, textAlign: 'center' }}>Achat unique. Accès illimité au PDF.</p>
-              {/* features */}
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '.85rem', textAlign: 'left', flex: 1, marginBottom: '2rem' }}>
+              {/* row 5 — features (1fr : remplit l'espace) */}
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '.85rem', textAlign: 'left', marginBottom: '2rem' }}>
                 {[
                   'Séances calculées selon ta VMA réelle',
                   "Choix d'objectif : 10 km, semi ou marathon",
                   "Long runs progressifs jusqu'à 32 km",
                   'Stratégie de course et gestion des allures',
-                  'Conseils nutrition et récupération',
+                  'Semaines de récupération et charge alternées',
                   'Téléchargement immédiat · sans abonnement',
                 ].map(f => (
                   <div key={f} style={{ display: 'flex', gap: '.75rem', alignItems: 'center', fontSize: '.88rem', color: 'rgba(255,255,255,.78)' }}>
@@ -442,8 +444,8 @@ export default function Landing() {
                   </div>
                 ))}
               </div>
-              {/* button */}
-              <div style={{ marginTop: 'auto' }}>
+              {/* row 6 — button (toujours en bas) */}
+              <div>
                 <Link to="/ebooks" style={{
                   display: 'block', width: '100%', padding: '1rem 1.5rem', borderRadius: 99,
                   textAlign: 'center', fontWeight: 800, fontSize: '1rem', color: '#fff', textDecoration: 'none',
@@ -467,7 +469,8 @@ export default function Landing() {
             <div className="pricing-card pricing-card--featured" style={{
               padding: '2.5rem 2rem',
               animation: 'pricePulse 3s ease-in-out infinite',
-              display: 'flex', flexDirection: 'column',
+              display: 'grid',
+              gridTemplateRows: 'auto auto auto auto 1fr auto',
               boxSizing: 'border-box',
             }}>
               <div style={{
@@ -479,20 +482,21 @@ export default function Landing() {
               }}>
                 ⭐ Populaire
               </div>
-              {/* label */}
+              {/* row 1 — label */}
               <div style={{ fontSize: '.78rem', fontWeight: 700, color: 'rgba(255,255,255,.55)', letterSpacing: '.12em', textTransform: 'uppercase', marginBottom: '1rem', textAlign: 'center' }}>
                 Course à pied · Trail
               </div>
-              {/* price */}
+              {/* row 2 — price */}
               <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'center', gap: '.4rem', marginBottom: '.3rem' }}>
                 <span className="price-amount">30€</span>
                 <span className="price-period">/mois</span>
               </div>
-              {/* subtitles */}
+              {/* row 3 — subtitle 1 */}
               <p style={{ color: 'rgba(255,255,255,.65)', fontSize: '.85rem', marginBottom: '.4rem', lineHeight: 1.6, textAlign: 'center' }}>après 14 jours offerts</p>
+              {/* row 4 — subtitle 2 */}
               <p style={{ color: 'rgba(255,255,255,.5)', fontSize: '.78rem', marginBottom: '2rem', lineHeight: 1.5, textAlign: 'center' }}>Sans engagement. Annule à tout moment.</p>
-              {/* features */}
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '.85rem', textAlign: 'left', flex: 1, marginBottom: '2rem' }}>
+              {/* row 5 — features (1fr) */}
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '.85rem', textAlign: 'left', marginBottom: '2rem' }}>
                 {[
                   "Plan d'entraînement 100% personnalisé",
                   'Adaptation hebdomadaire du programme',
@@ -506,8 +510,8 @@ export default function Landing() {
                   </div>
                 ))}
               </div>
-              {/* button */}
-              <div style={{ marginTop: 'auto' }}>
+              {/* row 6 — button (toujours en bas) */}
+              <div>
                 <button onClick={handleCTA} style={{
                   width: '100%', padding: '1rem 1.5rem', borderRadius: 99, border: 'none', cursor: 'pointer',
                   fontWeight: 800, fontSize: '1rem', fontFamily: 'inherit', color: '#fff',
@@ -530,23 +534,25 @@ export default function Landing() {
             {/* ── RIGHT : Coaching Triathlon ── */}
             <div className="pricing-card" style={{
               padding: '2.5rem 2rem',
-              display: 'flex', flexDirection: 'column',
+              display: 'grid',
+              gridTemplateRows: 'auto auto auto auto 1fr auto',
               boxSizing: 'border-box',
             }}>
-              {/* label */}
+              {/* row 1 — label */}
               <div style={{ fontSize: '.78rem', fontWeight: 700, color: 'rgba(255,255,255,.55)', letterSpacing: '.12em', textTransform: 'uppercase', marginBottom: '1rem', textAlign: 'center' }}>
                 Triathlon
               </div>
-              {/* price */}
+              {/* row 2 — price */}
               <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'center', gap: '.4rem', marginBottom: '.3rem' }}>
                 <span className="price-amount">50€</span>
                 <span className="price-period">/mois</span>
               </div>
-              {/* subtitles */}
+              {/* row 3 — subtitle 1 */}
               <p style={{ color: 'rgba(255,255,255,.65)', fontSize: '.85rem', marginBottom: '.4rem', lineHeight: 1.6, textAlign: 'center' }}>après 14 jours offerts</p>
+              {/* row 4 — subtitle 2 */}
               <p style={{ color: 'rgba(255,255,255,.5)', fontSize: '.78rem', marginBottom: '2rem', lineHeight: 1.5, textAlign: 'center' }}>Sans engagement. Annule à tout moment.</p>
-              {/* features */}
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '.85rem', textAlign: 'left', flex: 1, marginBottom: '2rem' }}>
+              {/* row 5 — features (1fr) */}
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '.85rem', textAlign: 'left', marginBottom: '2rem' }}>
                 {[
                   'Plan triathlon 100% personnalisé (nage · vélo · course)',
                   'Périodisation adaptée (sprint, olympique, longue distance)',
@@ -560,8 +566,8 @@ export default function Landing() {
                   </div>
                 ))}
               </div>
-              {/* button */}
-              <div style={{ marginTop: 'auto' }}>
+              {/* row 6 — button (toujours en bas) */}
+              <div>
                 <button onClick={handleCTA} style={{
                   width: '100%', padding: '1rem 1.5rem', borderRadius: 99, border: 'none', cursor: 'pointer',
                   fontWeight: 800, fontSize: '1rem', fontFamily: 'inherit', color: '#fff',
