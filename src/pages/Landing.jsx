@@ -400,7 +400,7 @@ export default function Landing() {
 
       {/* ── PRICING ──────────────────────────────────────────── */}
       <section id="tarifs" style={{ padding: '6rem 1.5rem', background: '#000', borderTop: '1px solid rgba(255,255,255,.06)' }}>
-        <div className="container" style={{ maxWidth: 1060 }}>
+        <div className="container" style={{ maxWidth: 1160 }}>
           <div style={{ textAlign: 'center', marginBottom: '3rem' }}>
             <h2 style={{ fontSize: 'clamp(2rem,5vw,3rem)', fontWeight: 800, letterSpacing: '-0.02em', marginBottom: '.6rem' }}>
               Choisis ton <span style={gd()}>niveau d'accompagnement</span>
@@ -408,12 +408,68 @@ export default function Landing() {
             <p style={{ color: 'rgba(255,255,255,.4)', fontSize: '1rem' }}>Coaching complet ou ressources pour progresser à ton rythme.</p>
           </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(340px,100%),1fr))', gap: '1.5rem', alignItems: 'start' }}>
+          <div className="pricing-grid">
 
-            {/* ── Coaching card ── */}
+            {/* ── LEFT : Ebook card ── */}
             <div className="pricing-card pricing-card--featured" style={{
-              padding: '3rem 2.5rem',
+              padding: '2.5rem 2rem',
+              display: 'flex', flexDirection: 'column',
+            }}>
+              <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
+                <div style={{ fontSize: '2.5rem', marginBottom: '.5rem' }}>📖</div>
+                <div style={{ fontSize: '.78rem', fontWeight: 700, color: 'rgba(255,255,255,.55)', letterSpacing: '.12em', textTransform: 'uppercase', marginBottom: '1rem' }}>
+                  Ebooks Running
+                </div>
+                <h3 style={{ fontSize: 'clamp(1.4rem,3vw,2rem)', fontWeight: 800, letterSpacing: '-0.02em', lineHeight: 1.15, marginBottom: '1rem' }}>
+                  Progresse à ton<br /><span style={gd()}>rythme</span>
+                </h3>
+                <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'center', gap: '.4rem', marginBottom: '.3rem' }}>
+                  <span className="price-amount">14,99€</span>
+                  <span className="price-period">et +</span>
+                </div>
+                <p style={{ color: 'rgba(255,255,255,.65)', fontSize: '.85rem', marginBottom: '.4rem', lineHeight: 1.6 }}>selon le plan et les options</p>
+                <p style={{ color: 'rgba(255,255,255,.5)', fontSize: '.78rem', marginBottom: '1.5rem', lineHeight: 1.5 }}>Achat unique. Accès illimité au PDF.</p>
+              </div>
+
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '.85rem', textAlign: 'left', marginBottom: '2rem', flex: 1 }}>
+                {[
+                  'Séances calculées selon ta VMA réelle',
+                  "Choix d'objectif : 10 km, semi ou marathon",
+                  "Long runs progressifs jusqu'à 32 km",
+                  'Prévention des blessures et renforcement',
+                  'Téléchargement immédiat · sans abonnement',
+                ].map(f => (
+                  <div key={f} style={{ display: 'flex', gap: '.75rem', alignItems: 'center', fontSize: '.88rem', color: 'rgba(255,255,255,.78)' }}>
+                    <span style={{ ...gd(), fontWeight: 700, fontSize: '1rem', flexShrink: 0 }}>✓</span> {f}
+                  </div>
+                ))}
+              </div>
+
+              <div>
+                <Link to="/ebooks" style={{
+                  display: 'block', width: '100%', padding: '1rem 1.5rem', borderRadius: 99, border: 'none',
+                  textAlign: 'center', fontWeight: 800, fontSize: '1rem', color: '#fff', textDecoration: 'none',
+                  background: 'linear-gradient(90deg, #8B2FC9, #E8237A, #8B2FC9)',
+                  backgroundSize: '200% auto',
+                  animation: 'shimmer 2.5s linear infinite',
+                  boxShadow: '0 8px 28px rgba(139,47,201,.4)',
+                  transition: 'transform .2s',
+                }}
+                  onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-2px)' }}
+                  onMouseLeave={e => { e.currentTarget.style.transform = '' }}>
+                  Voir les ebooks →
+                </Link>
+                <p style={{ color: 'rgba(255,255,255,.3)', fontSize: '.72rem', marginTop: '.65rem', textAlign: 'center' }}>
+                  Téléchargement immédiat · sans abonnement
+                </p>
+              </div>
+            </div>
+
+            {/* ── MIDDLE : Coaching Course à pied · Trail (Populaire) ── */}
+            <div className="pricing-card pricing-card--featured" style={{
+              padding: '2.5rem 2rem',
               animation: 'pricePulse 3s ease-in-out infinite',
+              display: 'flex', flexDirection: 'column',
             }}>
               <div style={{
                 position: 'absolute', top: '-1px', left: '50%', transform: 'translateX(-50%)',
@@ -422,19 +478,19 @@ export default function Landing() {
                 letterSpacing: '.07em', textTransform: 'uppercase', whiteSpace: 'nowrap',
                 animation: 'trialBlink 2.5s ease-in-out infinite',
               }}>
-                14 jours d'essai gratuit
+                ⭐ Populaire
               </div>
 
               <div style={{ textAlign: 'center', marginTop: '.5rem', marginBottom: '2rem' }}>
                 <div style={{ fontSize: '.78rem', fontWeight: 700, color: 'rgba(255,255,255,.55)', letterSpacing: '.12em', textTransform: 'uppercase', marginBottom: '1rem' }}>
-                  Coaching Personnalisé
+                  Course à pied · Trail
                 </div>
                 <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'center', gap: '.4rem', marginBottom: '.3rem' }}>
                   <span className="price-amount">30€</span>
                   <span className="price-period">/mois</span>
                 </div>
                 <p style={{ color: 'rgba(255,255,255,.65)', fontSize: '.85rem', marginBottom: '.4rem', lineHeight: 1.6 }}>après 14 jours offerts</p>
-                <p style={{ color: 'rgba(255,255,255,.5)', fontSize: '.78rem', marginBottom: '2rem', lineHeight: 1.5 }}>Sans engagement. Annule à tout moment.</p>
+                <p style={{ color: 'rgba(255,255,255,.5)', fontSize: '.78rem', marginBottom: '1.5rem', lineHeight: 1.5 }}>Sans engagement. Annule à tout moment.</p>
                 <button onClick={handleCTA} style={{
                   width: '100%', padding: '1rem 1.5rem', borderRadius: 99, border: 'none', cursor: 'pointer',
                   fontWeight: 800, fontSize: '1rem', fontFamily: 'inherit', color: '#fff',
@@ -453,7 +509,7 @@ export default function Landing() {
                 </p>
               </div>
 
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '.85rem', textAlign: 'left' }}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '.85rem', textAlign: 'left', flex: 1 }}>
                 {[
                   "Plan d'entraînement 100% personnalisé",
                   'Adaptation hebdomadaire du programme',
@@ -462,65 +518,69 @@ export default function Landing() {
                   'Messagerie directe avec moi',
                   'Analyse continue de ta progression',
                 ].map(f => (
-                  <div key={f} style={{ display: 'flex', gap: '.75rem', alignItems: 'center', fontSize: '.9rem', color: 'rgba(255,255,255,.78)' }}>
+                  <div key={f} style={{ display: 'flex', gap: '.75rem', alignItems: 'center', fontSize: '.88rem', color: 'rgba(255,255,255,.78)' }}>
                     <span style={{ ...gd(), fontWeight: 700, fontSize: '1rem', flexShrink: 0 }}>✓</span> {f}
                   </div>
                 ))}
               </div>
             </div>
 
-            {/* ── Ebook card ── */}
+            {/* ── RIGHT : Coaching Triathlon ── */}
             <div className="pricing-card pricing-card--featured" style={{
-              padding: '3rem 2.5rem',
-              animation: 'pricePulse 3s ease-in-out infinite',
+              padding: '2.5rem 2rem',
+              display: 'flex', flexDirection: 'column',
             }}>
-              <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
-                <div style={{ fontSize: '2.5rem', marginBottom: '.5rem' }}>📖</div>
+              <div style={{
+                position: 'absolute', top: '-1px', left: '50%', transform: 'translateX(-50%)',
+                background: 'rgba(255,255,255,.1)', color: 'rgba(255,255,255,.7)',
+                border: '1px solid rgba(255,255,255,.15)',
+                fontSize: '.72rem', fontWeight: 700, padding: '.35rem 1.6rem', borderRadius: '0 0 14px 14px',
+                letterSpacing: '.07em', textTransform: 'uppercase', whiteSpace: 'nowrap',
+              }}>
+                14 jours offerts
+              </div>
+
+              <div style={{ textAlign: 'center', marginTop: '.5rem', marginBottom: '2rem' }}>
                 <div style={{ fontSize: '.78rem', fontWeight: 700, color: 'rgba(255,255,255,.55)', letterSpacing: '.12em', textTransform: 'uppercase', marginBottom: '1rem' }}>
-                  Ebooks Running
+                  Triathlon
                 </div>
-                <h3 style={{ fontSize: 'clamp(1.6rem,3.5vw,2.2rem)', fontWeight: 800, letterSpacing: '-0.02em', lineHeight: 1.15, marginBottom: '1rem' }}>
-                  Progresse à ton<br /><span style={gd()}>rythme</span>
-                </h3>
                 <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'center', gap: '.4rem', marginBottom: '.3rem' }}>
-                  <span className="price-amount">14,99€</span>
-                  <span className="price-period">et +</span>
+                  <span className="price-amount">50€</span>
+                  <span className="price-period">/mois</span>
                 </div>
-                <p style={{ color: 'rgba(255,255,255,.65)', fontSize: '.85rem', marginBottom: '.4rem', lineHeight: 1.6 }}>selon le plan et les options</p>
-                <p style={{ color: 'rgba(255,255,255,.5)', fontSize: '.78rem', marginBottom: '1.5rem', lineHeight: 1.5 }}>Achat unique. Accès illimité au PDF.</p>
-              </div>
-
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '.85rem', textAlign: 'left', marginBottom: '2rem' }}>
-                {[
-                  'Séances calculées selon ta VMA réelle',
-                  'Choix d\'objectif : 10 km, semi ou marathon',
-                  'Long runs progressifs jusqu\'à 32 km',
-                  'Prévention des blessures et renforcement',
-                  'Téléchargement immédiat · sans abonnement',
-                ].map(f => (
-                  <div key={f} style={{ display: 'flex', gap: '.75rem', alignItems: 'center', fontSize: '.9rem', color: 'rgba(255,255,255,.78)' }}>
-                    <span style={{ ...gd(), fontWeight: 700, fontSize: '1rem', flexShrink: 0 }}>✓</span> {f}
-                  </div>
-                ))}
-              </div>
-
-              <div style={{ marginTop: 'auto' }}>
-                <Link to="/ebooks" style={{
-                  display: 'block', width: '100%', padding: '1rem 1.5rem', borderRadius: 99, border: 'none',
-                  textAlign: 'center', fontWeight: 800, fontSize: '1rem', color: '#fff', textDecoration: 'none',
+                <p style={{ color: 'rgba(255,255,255,.65)', fontSize: '.85rem', marginBottom: '.4rem', lineHeight: 1.6 }}>après 14 jours offerts</p>
+                <p style={{ color: 'rgba(255,255,255,.5)', fontSize: '.78rem', marginBottom: '1.5rem', lineHeight: 1.5 }}>Sans engagement. Annule à tout moment.</p>
+                <button onClick={handleCTA} style={{
+                  width: '100%', padding: '1rem 1.5rem', borderRadius: 99, border: 'none', cursor: 'pointer',
+                  fontWeight: 800, fontSize: '1rem', fontFamily: 'inherit', color: '#fff',
                   background: 'linear-gradient(90deg, #8B2FC9, #E8237A, #8B2FC9)',
                   backgroundSize: '200% auto',
                   animation: 'shimmer 2.5s linear infinite',
-                  boxShadow: '0 8px 28px rgba(139,47,201,.4)',
+                  boxShadow: '0 8px 28px rgba(139,47,201,.35)',
                   transition: 'transform .2s',
                 }}
                   onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-2px)' }}
                   onMouseLeave={e => { e.currentTarget.style.transform = '' }}>
-                  Voir les ebooks →
-                </Link>
-                <p style={{ color: 'rgba(255,255,255,.3)', fontSize: '.72rem', marginTop: '.65rem', textAlign: 'center' }}>
-                  Téléchargement immédiat · sans abonnement
+                  Commencer gratuitement →
+                </button>
+                <p style={{ color: 'rgba(255,255,255,.45)', fontSize: '.72rem', marginTop: '.75rem' }}>
+                  Carte requise · aucun débit pendant 14 jours
                 </p>
+              </div>
+
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '.85rem', textAlign: 'left', flex: 1 }}>
+                {[
+                  'Plan triathlon 100% personnalisé (nage · vélo · course)',
+                  'Périodisation adaptée (sprint, olympique, longue distance)',
+                  'Connexion Strava intégrée',
+                  'Renforcement musculaire spécifique tri',
+                  'Messagerie directe avec moi',
+                  'Analyse continue de ta progression',
+                ].map(f => (
+                  <div key={f} style={{ display: 'flex', gap: '.75rem', alignItems: 'center', fontSize: '.88rem', color: 'rgba(255,255,255,.78)' }}>
+                    <span style={{ ...gd(), fontWeight: 700, fontSize: '1rem', flexShrink: 0 }}>✓</span> {f}
+                  </div>
+                ))}
               </div>
             </div>
 
