@@ -337,17 +337,17 @@ export default function Landing() {
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '1rem' }}>
             {FEATURES.map(f => (
               <div key={f.title} style={{
-                display: 'flex', alignItems: 'flex-start', gap: '1rem', padding: '1.5rem 1.5rem',
+                padding: '1.5rem',
                 borderRadius: 18, background: 'rgba(255,255,255,.04)',
                 border: '1px solid rgba(255,255,255,.08)',
                 backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)',
                 transition: 'border-color .2s',
               }}>
-                <div style={{ fontSize: '1.75rem', flexShrink: 0, marginTop: '.1rem' }}>{f.icon}</div>
-                <div>
-                  <div style={{ fontWeight: 700, fontSize: '.95rem', color: '#fff', marginBottom: '.5rem' }}>{f.title}</div>
-                  <div style={{ fontSize: '.84rem', color: 'rgba(255,255,255,.5)', lineHeight: 1.7, textAlign: 'justify' }}>{f.desc}</div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '.75rem', marginBottom: '.5rem' }}>
+                  <div style={{ fontSize: '1.75rem', lineHeight: 1, flexShrink: 0 }}>{f.icon}</div>
+                  <div style={{ fontWeight: 700, fontSize: '.95rem', color: '#fff' }}>{f.title}</div>
                 </div>
+                <div style={{ fontSize: '.84rem', color: 'rgba(255,255,255,.5)', lineHeight: 1.7, textAlign: 'justify' }}>{f.desc}</div>
               </div>
             ))}
           </div>
@@ -415,7 +415,7 @@ export default function Landing() {
             <div className="pricing-card" style={{
               padding: '2.5rem 2rem',
               display: 'flex', flexDirection: 'column',
-              alignSelf: 'stretch',
+              height: '100%', boxSizing: 'border-box',
             }}>
               <div style={{ fontSize: '.78rem', fontWeight: 700, color: 'rgba(255,255,255,.55)', letterSpacing: '.12em', textTransform: 'uppercase', marginBottom: '1rem', textAlign: 'center' }}>
                 Ebooks Running
@@ -465,6 +465,7 @@ export default function Landing() {
               padding: '2.5rem 2rem',
               animation: 'pricePulse 3s ease-in-out infinite',
               display: 'flex', flexDirection: 'column',
+              height: '100%', boxSizing: 'border-box',
             }}>
               <div style={{
                 position: 'absolute', top: '-1px', left: '50%', transform: 'translateX(-50%)',
@@ -523,6 +524,7 @@ export default function Landing() {
             <div className="pricing-card" style={{
               padding: '2.5rem 2rem',
               display: 'flex', flexDirection: 'column',
+              height: '100%', boxSizing: 'border-box',
             }}>
               <div style={{ fontSize: '.78rem', fontWeight: 700, color: 'rgba(255,255,255,.55)', letterSpacing: '.12em', textTransform: 'uppercase', marginBottom: '1rem', textAlign: 'center' }}>
                 Triathlon
