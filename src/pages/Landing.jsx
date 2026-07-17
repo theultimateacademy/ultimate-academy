@@ -13,14 +13,14 @@ const TOOLS = [
 ]
 
 const FEATURES = [
-  { icon: '🎯', title: 'Plan sur-mesure',              desc: 'Conçu selon ton niveau, tes objectifs et tes disponibilités' },
-  { icon: '⚡', title: 'Adapté en continu',             desc: 'Ton plan évolue chaque semaine selon tes retours et ta progression' },
-  { icon: '💬', title: 'Coaching direct',               desc: 'Tu peux me contacter à tout moment, réponse sous 24h' },
-  { icon: '🌡️', title: 'Adaptation fatigue & canicule', desc: 'Ton plan s\'ajuste selon ta fatigue et les conditions météo extrêmes' },
-  { icon: '💪', title: 'Renforcement musculaire',       desc: 'Une séance de renfo adaptée chaque semaine pour courir plus fort' },
-  { icon: '🥗', title: 'Nutrition du sportif',          desc: "Conseils et recettes adaptés à l'endurance" },
-  { icon: '📊', title: 'Suivi de progression',          desc: 'Visualise tes progrès semaine après semaine' },
-  { icon: '🌸', title: 'Suivi cycle féminin',           desc: 'Adaptation automatique du plan selon ton cycle' },
+  { icon: '🎯', title: 'Plan sur-mesure', desc: "Ton programme est construit à partir de zéro — ton niveau actuel, ton historique de blessures, le temps que tu as chaque semaine et ton objectif précis. Aucun plan copié-collé : chaque séance a une raison d'être." },
+  { icon: '⚡', title: 'Adapté en continu', desc: "Chaque semaine, j'analyse tes séances Strava, tes ressentis et ta charge réelle. Si quelque chose ne colle pas — fatigue, manque de temps, séance ratée — j'ajuste immédiatement. Ton plan est vivant, pas figé." },
+  { icon: '💬', title: 'Coaching direct', desc: "Tu as une question sur une séance, un doute sur une douleur ou besoin d'un retour ? Tu m'écris directement depuis l'app. Je réponds sous 24h, souvent bien moins. Pas de formulaire, pas d'intermédiaire." },
+  { icon: '🌡️', title: 'Adaptation fatigue & canicule', desc: "Semaine chargée au boulot, mauvaise nuit ou 38°C dehors ? Je tiens compte de tout ça. Pas question de te faire exploser sur une sortie longue quand les conditions ne le permettent pas. L'intelligence de l'entraînement, c'est aussi savoir doser." },
+  { icon: '💪', title: 'Renforcement musculaire', desc: "Une séance de renforcement spécifique est intégrée chaque semaine — gainage, fessiers, chaîne postérieure. Moins de blessures, une foulée plus économique et une meilleure puissance en côte. Le renfo, c'est pas en option." },
+  { icon: '🥗', title: 'Nutrition du sportif', desc: "Hydratation, ravitaillement en course, nutrition avant une sortie longue : je t'accompagne sur les bases concrètes qui font la différence au moment où ça compte. Pas de régime, juste ce qui te permet de performer et de récupérer." },
+  { icon: '📊', title: 'Suivi de progression', desc: "Tes données Strava sont analysées chaque semaine : allures, fréquence cardiaque, volume accumulé. Tu vois noir sur blanc d'où tu es parti et jusqu'où tu es allé. La progression se mesure — et quand elle se mesure, elle motive." },
+  { icon: '🌸', title: 'Suivi cycle féminin', desc: "Le cycle menstruel impacte directement les performances, la récupération et le moral. Ton plan s'adapte selon les phases pour que tu t'entraînes avec ton corps, pas contre lui. Moins de frustration, plus d'efficacité." },
 ]
 
 const TESTIMONIALS = [
@@ -333,19 +333,19 @@ export default function Landing() {
             </h2>
             <p style={{ color: 'rgba(255,255,255,.4)', fontSize: '1rem' }}>Un accompagnement complet pour progresser intelligemment</p>
           </div>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '.75rem' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '1rem' }}>
             {FEATURES.map(f => (
               <div key={f.title} style={{
-                display: 'flex', alignItems: 'flex-start', gap: '1rem', padding: '1.1rem 1.25rem',
+                display: 'flex', alignItems: 'flex-start', gap: '1rem', padding: '1.5rem 1.5rem',
                 borderRadius: 18, background: 'rgba(255,255,255,.04)',
                 border: '1px solid rgba(255,255,255,.08)',
                 backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)',
                 transition: 'border-color .2s',
               }}>
-                <div style={{ fontSize: '1.6rem', flexShrink: 0, marginTop: '.1rem' }}>{f.icon}</div>
+                <div style={{ fontSize: '1.75rem', flexShrink: 0, marginTop: '.1rem' }}>{f.icon}</div>
                 <div>
-                  <div style={{ fontWeight: 700, fontSize: '.95rem', color: '#fff', marginBottom: '.25rem' }}>{f.title}</div>
-                  <div style={{ fontSize: '.82rem', color: 'rgba(255,255,255,.45)', lineHeight: 1.6 }}>{f.desc}</div>
+                  <div style={{ fontWeight: 700, fontSize: '.95rem', color: '#fff', marginBottom: '.5rem' }}>{f.title}</div>
+                  <div style={{ fontSize: '.84rem', color: 'rgba(255,255,255,.5)', lineHeight: 1.7 }}>{f.desc}</div>
                 </div>
               </div>
             ))}
