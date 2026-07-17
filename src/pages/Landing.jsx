@@ -148,9 +148,10 @@ export default function Landing() {
   const [visibleFeatures, setVisibleFeatures] = useState(new Set())
   const [coachIn, setCoachIn] = useState(false)
 
-  const statsRef  = useRef(null)
-  const featRef   = useRef(null)
-  const coachRef  = useRef(null)
+  const statsRef   = useRef(null)
+  const featRef    = useRef(null)
+  const coachRef   = useRef(null)
+  const pricingRef = useRef(null)
 
   const statsVisible = useOnScreen(statsRef)
   const featVisible  = useOnScreen(featRef, 0.1)
@@ -181,6 +182,21 @@ export default function Landing() {
   }, [featVisible])
 
   useEffect(() => { if (coachVisible) setCoachIn(true) }, [coachVisible])
+
+  useEffect(() => {
+    const el = pricingRef.current
+    if (!el) return
+    const equalize = () => {
+      const cards = el.querySelectorAll('.pricing-card')
+      cards.forEach(c => { c.style.height = 'auto' })
+      const maxH = Math.max(...Array.from(cards).map(c => c.offsetHeight))
+      cards.forEach(c => { c.style.height = maxH + 'px' })
+    }
+    equalize()
+    const ro = new ResizeObserver(equalize)
+    ro.observe(el)
+    return () => ro.disconnect()
+  }, [])
 
 
   const handleCTA = () => {
@@ -409,13 +425,12 @@ export default function Landing() {
             <p style={{ color: 'rgba(255,255,255,.4)', fontSize: '1rem' }}>Coaching complet ou ressources pour progresser à ton rythme.</p>
           </div>
 
-          <div className="pricing-grid" style={{ alignItems: 'stretch' }}>
+          <div className="pricing-grid" ref={pricingRef}>
 
             {/* ── LEFT : Ebook card ── */}
             <div className="pricing-card" style={{
               padding: '2.5rem 2rem',
               display: 'flex', flexDirection: 'column',
-              height: '100%', boxSizing: 'border-box',
             }}>
               <div style={{ fontSize: '.78rem', fontWeight: 700, color: 'rgba(255,255,255,.55)', letterSpacing: '.12em', textTransform: 'uppercase', marginBottom: '1rem', textAlign: 'center' }}>
                 Ebooks Running
@@ -423,19 +438,19 @@ export default function Landing() {
               <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'center', gap: '.4rem', marginBottom: '.3rem' }}>
                 <span className="price-amount">14,99€</span>
               </div>
-              <p style={{ color: 'rgba(255,255,255,.65)', fontSize: '.85rem', marginBottom: '.4rem', lineHeight: 1.6, textAlign: 'center' }}>à partir de · selon le plan</p>
+              <p style={{ color: 'rgba(255,255,255,.65)', fontSize: '.85rem', marginBottom: '.4rem', lineHeight: 1.6, textAlign: 'center' }}>à partir de 14,99€ · selon le plan</p>
               <p style={{ color: 'rgba(255,255,255,.5)', fontSize: '.78rem', marginBottom: '2rem', lineHeight: 1.5, textAlign: 'center' }}>Achat unique. Accès illimité au PDF.</p>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '.85rem', textAlign: 'left' }}>
                 {[
                   'Séances calculées selon ta VMA réelle',
+                  'Choix du nombre de séances par semaine',
                   "Choix d'objectif : 10 km, semi ou marathon",
                   "Long runs progressifs jusqu'à 32 km",
                   'Stratégie de course et gestion des allures',
-                  'Semaines de récupération et charge alternées',
                   'Téléchargement immédiat · sans abonnement',
                 ].map(f => (
-                  <div key={f} style={{ display: 'flex', gap: '.75rem', alignItems: 'center', fontSize: '.88rem', color: 'rgba(255,255,255,.78)' }}>
-                    <span style={{ ...gd(), fontWeight: 700, fontSize: '1rem', flexShrink: 0 }}>✓</span> {f}
+                  <div key={f} style={{ display: 'flex', gap: '.75rem', alignItems: 'flex-start', fontSize: '.88rem', color: 'rgba(255,255,255,.78)' }}>
+                    <span style={{ ...gd(), fontWeight: 700, fontSize: '1rem', flexShrink: 0, lineHeight: 1.4 }}>✓</span> {f}
                   </div>
                 ))}
               </div>
@@ -465,7 +480,6 @@ export default function Landing() {
               padding: '2.5rem 2rem',
               animation: 'pricePulse 3s ease-in-out infinite',
               display: 'flex', flexDirection: 'column',
-              height: '100%', boxSizing: 'border-box',
             }}>
               <div style={{
                 position: 'absolute', top: '-1px', left: '50%', transform: 'translateX(-50%)',
@@ -494,8 +508,8 @@ export default function Landing() {
                   'Messagerie directe avec moi',
                   'Analyse continue de ta progression',
                 ].map(f => (
-                  <div key={f} style={{ display: 'flex', gap: '.75rem', alignItems: 'center', fontSize: '.88rem', color: 'rgba(255,255,255,.78)' }}>
-                    <span style={{ ...gd(), fontWeight: 700, fontSize: '1rem', flexShrink: 0 }}>✓</span> {f}
+                  <div key={f} style={{ display: 'flex', gap: '.75rem', alignItems: 'flex-start', fontSize: '.88rem', color: 'rgba(255,255,255,.78)' }}>
+                    <span style={{ ...gd(), fontWeight: 700, fontSize: '1rem', flexShrink: 0, lineHeight: 1.4 }}>✓</span> {f}
                   </div>
                 ))}
               </div>
@@ -524,7 +538,6 @@ export default function Landing() {
             <div className="pricing-card" style={{
               padding: '2.5rem 2rem',
               display: 'flex', flexDirection: 'column',
-              height: '100%', boxSizing: 'border-box',
             }}>
               <div style={{ fontSize: '.78rem', fontWeight: 700, color: 'rgba(255,255,255,.55)', letterSpacing: '.12em', textTransform: 'uppercase', marginBottom: '1rem', textAlign: 'center' }}>
                 Triathlon
@@ -544,8 +557,8 @@ export default function Landing() {
                   'Messagerie directe avec moi',
                   'Analyse continue de ta progression',
                 ].map(f => (
-                  <div key={f} style={{ display: 'flex', gap: '.75rem', alignItems: 'center', fontSize: '.88rem', color: 'rgba(255,255,255,.78)' }}>
-                    <span style={{ ...gd(), fontWeight: 700, fontSize: '1rem', flexShrink: 0 }}>✓</span> {f}
+                  <div key={f} style={{ display: 'flex', gap: '.75rem', alignItems: 'flex-start', fontSize: '.88rem', color: 'rgba(255,255,255,.78)' }}>
+                    <span style={{ ...gd(), fontWeight: 700, fontSize: '1rem', flexShrink: 0, lineHeight: 1.4 }}>✓</span> {f}
                   </div>
                 ))}
               </div>
