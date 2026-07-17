@@ -13,14 +13,15 @@ const TOOLS = [
 ]
 
 const FEATURES = [
-  { icon: '🎯', title: 'Plan sur-mesure', desc: "Ton programme est construit à partir de zéro — ton niveau actuel, ton historique de blessures, le temps que tu as chaque semaine et ton objectif précis. Aucun plan copié-collé : chaque séance a une raison d'être." },
-  { icon: '⚡', title: 'Adapté en continu', desc: "Chaque semaine, j'analyse tes séances Strava, tes ressentis et ta charge réelle. Si quelque chose ne colle pas — fatigue, manque de temps, séance ratée — j'ajuste immédiatement. Ton plan est vivant, pas figé." },
+  { icon: '🎯', title: 'Plan sur-mesure', desc: "Ton programme est construit à partir de zéro : ton niveau actuel, ton historique de blessures, le temps que tu as chaque semaine et ton objectif précis. Aucun plan copié-collé, chaque séance a une raison d'être." },
+  { icon: '⚡', title: 'Adapté en continu', desc: "Chaque semaine, j'analyse tes séances Strava, tes ressentis et ta charge réelle. Si quelque chose ne colle pas (fatigue, manque de temps, séance ratée), j'ajuste immédiatement. Ton plan est vivant, pas figé." },
   { icon: '💬', title: 'Coaching direct', desc: "Tu as une question sur une séance, un doute sur une douleur ou besoin d'un retour ? Tu m'écris directement depuis l'app. Je réponds sous 24h, souvent bien moins. Pas de formulaire, pas d'intermédiaire." },
-  { icon: '🌡️', title: 'Adaptation fatigue & canicule', desc: "Semaine chargée au boulot, mauvaise nuit ou 38°C dehors ? Je tiens compte de tout ça. Pas question de te faire exploser sur une sortie longue quand les conditions ne le permettent pas. L'intelligence de l'entraînement, c'est aussi savoir doser." },
-  { icon: '💪', title: 'Renforcement musculaire', desc: "Une séance de renforcement spécifique est intégrée chaque semaine — gainage, fessiers, chaîne postérieure. Moins de blessures, une foulée plus économique et une meilleure puissance en côte. Le renfo, c'est pas en option." },
+  { icon: '🌡️', title: 'Adaptation fatigue & météo', desc: "Semaine chargée au boulot, mauvaise nuit ou 38°C dehors ? Je tiens compte de tout ça. Pas question de te faire exploser sur une sortie longue quand les conditions ne le permettent pas. Savoir doser, c'est aussi s'entraîner intelligemment." },
+  { icon: '💪', title: 'Renforcement musculaire', desc: "Une séance de renforcement spécifique est intégrée chaque semaine : gainage, fessiers, chaîne postérieure. Moins de blessures, une foulée plus économique et une meilleure puissance en côte. Le renfo, c'est pas en option." },
   { icon: '🥗', title: 'Nutrition du sportif', desc: "Hydratation, ravitaillement en course, nutrition avant une sortie longue : je t'accompagne sur les bases concrètes qui font la différence au moment où ça compte. Pas de régime, juste ce qui te permet de performer et de récupérer." },
-  { icon: '📊', title: 'Suivi de progression', desc: "Tes données Strava sont analysées chaque semaine : allures, fréquence cardiaque, volume accumulé. Tu vois noir sur blanc d'où tu es parti et jusqu'où tu es allé. La progression se mesure — et quand elle se mesure, elle motive." },
+  { icon: '📊', title: 'Suivi de progression', desc: "Tes données Strava sont analysées chaque semaine : allures, fréquence cardiaque, volume accumulé. Tu vois noir sur blanc d'où tu es parti et jusqu'où tu es allé. La progression se mesure, et quand elle se mesure, elle motive." },
   { icon: '🌸', title: 'Suivi cycle féminin', desc: "Le cycle menstruel impacte directement les performances, la récupération et le moral. Ton plan s'adapte selon les phases pour que tu t'entraînes avec ton corps, pas contre lui. Moins de frustration, plus d'efficacité." },
+  { icon: '🏆', title: 'Stratégie de course', desc: "Avant chaque objectif, je te prépare une fiche race day complète : échauffement, stratégie d'allure, gestion de l'effort et points de vigilance. Tu arrives prêt à tout donner, pas juste entraîné." },
 ]
 
 const TESTIMONIALS = [
@@ -413,24 +414,17 @@ export default function Landing() {
             {/* ── LEFT : Ebook card ── */}
             <div className="pricing-card" style={{
               padding: '2.5rem 2rem',
-              display: 'grid',
-              gridTemplateRows: 'auto auto auto auto 1fr auto',
-              boxSizing: 'border-box',
+              display: 'flex', flexDirection: 'column',
             }}>
-              {/* row 1 — label */}
               <div style={{ fontSize: '.78rem', fontWeight: 700, color: 'rgba(255,255,255,.55)', letterSpacing: '.12em', textTransform: 'uppercase', marginBottom: '1rem', textAlign: 'center' }}>
                 Ebooks Running
               </div>
-              {/* row 2 — price */}
               <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'center', gap: '.4rem', marginBottom: '.3rem' }}>
                 <span className="price-amount">14,99€</span>
               </div>
-              {/* row 3 — subtitle 1 */}
               <p style={{ color: 'rgba(255,255,255,.65)', fontSize: '.85rem', marginBottom: '.4rem', lineHeight: 1.6, textAlign: 'center' }}>à partir de · selon le plan</p>
-              {/* row 4 — subtitle 2 */}
               <p style={{ color: 'rgba(255,255,255,.5)', fontSize: '.78rem', marginBottom: '2rem', lineHeight: 1.5, textAlign: 'center' }}>Achat unique. Accès illimité au PDF.</p>
-              {/* row 5 — features (1fr : remplit l'espace) */}
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '.85rem', textAlign: 'left', marginBottom: '2rem' }}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '.85rem', textAlign: 'left' }}>
                 {[
                   'Séances calculées selon ta VMA réelle',
                   "Choix d'objectif : 10 km, semi ou marathon",
@@ -444,8 +438,8 @@ export default function Landing() {
                   </div>
                 ))}
               </div>
-              {/* row 6 — button (toujours en bas) */}
-              <div>
+              <div style={{ flex: 1 }} />
+              <div style={{ marginTop: '2rem' }}>
                 <Link to="/ebooks" style={{
                   display: 'block', width: '100%', padding: '1rem 1.5rem', borderRadius: 99,
                   textAlign: 'center', fontWeight: 800, fontSize: '1rem', color: '#fff', textDecoration: 'none',
@@ -469,9 +463,7 @@ export default function Landing() {
             <div className="pricing-card pricing-card--featured" style={{
               padding: '2.5rem 2rem',
               animation: 'pricePulse 3s ease-in-out infinite',
-              display: 'grid',
-              gridTemplateRows: 'auto auto auto auto 1fr auto',
-              boxSizing: 'border-box',
+              display: 'flex', flexDirection: 'column',
             }}>
               <div style={{
                 position: 'absolute', top: '-1px', left: '50%', transform: 'translateX(-50%)',
@@ -482,21 +474,16 @@ export default function Landing() {
               }}>
                 ⭐ Populaire
               </div>
-              {/* row 1 — label */}
               <div style={{ fontSize: '.78rem', fontWeight: 700, color: 'rgba(255,255,255,.55)', letterSpacing: '.12em', textTransform: 'uppercase', marginBottom: '1rem', textAlign: 'center' }}>
                 Course à pied · Trail
               </div>
-              {/* row 2 — price */}
               <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'center', gap: '.4rem', marginBottom: '.3rem' }}>
                 <span className="price-amount">30€</span>
                 <span className="price-period">/mois</span>
               </div>
-              {/* row 3 — subtitle 1 */}
               <p style={{ color: 'rgba(255,255,255,.65)', fontSize: '.85rem', marginBottom: '.4rem', lineHeight: 1.6, textAlign: 'center' }}>après 14 jours offerts</p>
-              {/* row 4 — subtitle 2 */}
               <p style={{ color: 'rgba(255,255,255,.5)', fontSize: '.78rem', marginBottom: '2rem', lineHeight: 1.5, textAlign: 'center' }}>Sans engagement. Annule à tout moment.</p>
-              {/* row 5 — features (1fr) */}
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '.85rem', textAlign: 'left', marginBottom: '2rem' }}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '.85rem', textAlign: 'left' }}>
                 {[
                   "Plan d'entraînement 100% personnalisé",
                   'Adaptation hebdomadaire du programme',
@@ -510,8 +497,8 @@ export default function Landing() {
                   </div>
                 ))}
               </div>
-              {/* row 6 — button (toujours en bas) */}
-              <div>
+              <div style={{ flex: 1 }} />
+              <div style={{ marginTop: '2rem' }}>
                 <button onClick={handleCTA} style={{
                   width: '100%', padding: '1rem 1.5rem', borderRadius: 99, border: 'none', cursor: 'pointer',
                   fontWeight: 800, fontSize: '1rem', fontFamily: 'inherit', color: '#fff',
@@ -534,28 +521,21 @@ export default function Landing() {
             {/* ── RIGHT : Coaching Triathlon ── */}
             <div className="pricing-card" style={{
               padding: '2.5rem 2rem',
-              display: 'grid',
-              gridTemplateRows: 'auto auto auto auto 1fr auto',
-              boxSizing: 'border-box',
+              display: 'flex', flexDirection: 'column',
             }}>
-              {/* row 1 — label */}
               <div style={{ fontSize: '.78rem', fontWeight: 700, color: 'rgba(255,255,255,.55)', letterSpacing: '.12em', textTransform: 'uppercase', marginBottom: '1rem', textAlign: 'center' }}>
                 Triathlon
               </div>
-              {/* row 2 — price */}
               <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'center', gap: '.4rem', marginBottom: '.3rem' }}>
                 <span className="price-amount">50€</span>
                 <span className="price-period">/mois</span>
               </div>
-              {/* row 3 — subtitle 1 */}
               <p style={{ color: 'rgba(255,255,255,.65)', fontSize: '.85rem', marginBottom: '.4rem', lineHeight: 1.6, textAlign: 'center' }}>après 14 jours offerts</p>
-              {/* row 4 — subtitle 2 */}
               <p style={{ color: 'rgba(255,255,255,.5)', fontSize: '.78rem', marginBottom: '2rem', lineHeight: 1.5, textAlign: 'center' }}>Sans engagement. Annule à tout moment.</p>
-              {/* row 5 — features (1fr) */}
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '.85rem', textAlign: 'left', marginBottom: '2rem' }}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '.85rem', textAlign: 'left' }}>
                 {[
-                  'Plan triathlon 100% personnalisé (nage · vélo · course)',
-                  'Périodisation adaptée (sprint, olympique, longue distance)',
+                  'Plan triathlon 100% personnalisé',
+                  'Périodisation sprint, olympique, longue distance',
                   'Connexion Strava intégrée',
                   'Programme de renforcement musculaire',
                   'Messagerie directe avec moi',
@@ -566,8 +546,8 @@ export default function Landing() {
                   </div>
                 ))}
               </div>
-              {/* row 6 — button (toujours en bas) */}
-              <div>
+              <div style={{ flex: 1 }} />
+              <div style={{ marginTop: '2rem' }}>
                 <button onClick={handleCTA} style={{
                   width: '100%', padding: '1rem 1.5rem', borderRadius: 99, border: 'none', cursor: 'pointer',
                   fontWeight: 800, fontSize: '1rem', fontFamily: 'inherit', color: '#fff',
