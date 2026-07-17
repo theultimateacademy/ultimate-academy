@@ -416,36 +416,15 @@ export default function Landing() {
               display: 'flex', flexDirection: 'column',
             }}>
               <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
-                <div style={{ fontSize: '2.5rem', marginBottom: '.5rem' }}>📖</div>
                 <div style={{ fontSize: '.78rem', fontWeight: 700, color: 'rgba(255,255,255,.55)', letterSpacing: '.12em', textTransform: 'uppercase', marginBottom: '1rem' }}>
                   Ebooks Running
                 </div>
-                <h3 style={{ fontSize: 'clamp(1.4rem,3vw,2rem)', fontWeight: 800, letterSpacing: '-0.02em', lineHeight: 1.15, marginBottom: '1rem' }}>
-                  Progresse à ton<br /><span style={gd()}>rythme</span>
-                </h3>
                 <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'center', gap: '.4rem', marginBottom: '.3rem' }}>
+                  <span style={{ fontSize: '1rem', fontWeight: 700, color: 'rgba(255,255,255,.55)', alignSelf: 'center' }}>À partir de</span>
                   <span className="price-amount">14,99€</span>
-                  <span className="price-period">et +</span>
                 </div>
                 <p style={{ color: 'rgba(255,255,255,.65)', fontSize: '.85rem', marginBottom: '.4rem', lineHeight: 1.6 }}>selon le plan et les options</p>
                 <p style={{ color: 'rgba(255,255,255,.5)', fontSize: '.78rem', marginBottom: '1.5rem', lineHeight: 1.5 }}>Achat unique. Accès illimité au PDF.</p>
-              </div>
-
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '.85rem', textAlign: 'left', marginBottom: '2rem', flex: 1 }}>
-                {[
-                  'Séances calculées selon ta VMA réelle',
-                  "Choix d'objectif : 10 km, semi ou marathon",
-                  "Long runs progressifs jusqu'à 32 km",
-                  'Prévention des blessures et renforcement',
-                  'Téléchargement immédiat · sans abonnement',
-                ].map(f => (
-                  <div key={f} style={{ display: 'flex', gap: '.75rem', alignItems: 'center', fontSize: '.88rem', color: 'rgba(255,255,255,.78)' }}>
-                    <span style={{ ...gd(), fontWeight: 700, fontSize: '1rem', flexShrink: 0 }}>✓</span> {f}
-                  </div>
-                ))}
-              </div>
-
-              <div>
                 <Link to="/ebooks" style={{
                   display: 'block', width: '100%', padding: '1rem 1.5rem', borderRadius: 99, border: 'none',
                   textAlign: 'center', fontWeight: 800, fontSize: '1rem', color: '#fff', textDecoration: 'none',
@@ -459,9 +438,23 @@ export default function Landing() {
                   onMouseLeave={e => { e.currentTarget.style.transform = '' }}>
                   Voir les ebooks →
                 </Link>
-                <p style={{ color: 'rgba(255,255,255,.3)', fontSize: '.72rem', marginTop: '.65rem', textAlign: 'center' }}>
-                  Téléchargement immédiat · sans abonnement
+                <p style={{ color: 'rgba(255,255,255,.3)', fontSize: '.72rem', marginTop: '.65rem' }}>
+                  Progresse à ton rythme · téléchargement immédiat
                 </p>
+              </div>
+
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '.85rem', textAlign: 'left', flex: 1 }}>
+                {[
+                  'Séances calculées selon ta VMA réelle',
+                  "Choix d'objectif : 10 km, semi ou marathon",
+                  "Long runs progressifs jusqu'à 32 km",
+                  'Stratégie de course et gestion des allures',
+                  'Téléchargement immédiat · sans abonnement',
+                ].map(f => (
+                  <div key={f} style={{ display: 'flex', gap: '.75rem', alignItems: 'center', fontSize: '.88rem', color: 'rgba(255,255,255,.78)' }}>
+                    <span style={{ ...gd(), fontWeight: 700, fontSize: '1rem', flexShrink: 0 }}>✓</span> {f}
+                  </div>
+                ))}
               </div>
             </div>
 
@@ -530,17 +523,7 @@ export default function Landing() {
               padding: '2.5rem 2rem',
               display: 'flex', flexDirection: 'column',
             }}>
-              <div style={{
-                position: 'absolute', top: '-1px', left: '50%', transform: 'translateX(-50%)',
-                background: 'rgba(255,255,255,.1)', color: 'rgba(255,255,255,.7)',
-                border: '1px solid rgba(255,255,255,.15)',
-                fontSize: '.72rem', fontWeight: 700, padding: '.35rem 1.6rem', borderRadius: '0 0 14px 14px',
-                letterSpacing: '.07em', textTransform: 'uppercase', whiteSpace: 'nowrap',
-              }}>
-                14 jours offerts
-              </div>
-
-              <div style={{ textAlign: 'center', marginTop: '.5rem', marginBottom: '2rem' }}>
+              <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
                 <div style={{ fontSize: '.78rem', fontWeight: 700, color: 'rgba(255,255,255,.55)', letterSpacing: '.12em', textTransform: 'uppercase', marginBottom: '1rem' }}>
                   Triathlon
                 </div>
@@ -573,7 +556,7 @@ export default function Landing() {
                   'Plan triathlon 100% personnalisé (nage · vélo · course)',
                   'Périodisation adaptée (sprint, olympique, longue distance)',
                   'Connexion Strava intégrée',
-                  'Renforcement musculaire spécifique tri',
+                  'Programme de renforcement musculaire',
                   'Messagerie directe avec moi',
                   'Analyse continue de ta progression',
                 ].map(f => (
