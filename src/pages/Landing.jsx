@@ -420,12 +420,11 @@ export default function Landing() {
                 Ebooks Running
               </div>
               {/* price */}
-              <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'center', gap: '.35rem', marginBottom: '.3rem' }}>
-                <span style={{ fontSize: '.95rem', fontWeight: 600, color: 'rgba(255,255,255,.5)' }}>À partir de</span>
+              <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'center', gap: '.4rem', marginBottom: '.3rem' }}>
                 <span className="price-amount">14,99€</span>
               </div>
               {/* subtitles */}
-              <p style={{ color: 'rgba(255,255,255,.65)', fontSize: '.85rem', marginBottom: '.4rem', lineHeight: 1.6, textAlign: 'center' }}>selon le plan et les options</p>
+              <p style={{ color: 'rgba(255,255,255,.65)', fontSize: '.85rem', marginBottom: '.4rem', lineHeight: 1.6, textAlign: 'center' }}>à partir de · selon le plan</p>
               <p style={{ color: 'rgba(255,255,255,.5)', fontSize: '.78rem', marginBottom: '2rem', lineHeight: 1.5, textAlign: 'center' }}>Achat unique. Accès illimité au PDF.</p>
               {/* features */}
               <div style={{ display: 'flex', flexDirection: 'column', gap: '.85rem', textAlign: 'left', flex: 1, marginBottom: '2rem' }}>
@@ -434,6 +433,7 @@ export default function Landing() {
                   "Choix d'objectif : 10 km, semi ou marathon",
                   "Long runs progressifs jusqu'à 32 km",
                   'Stratégie de course et gestion des allures',
+                  'Conseils nutrition et récupération',
                   'Téléchargement immédiat · sans abonnement',
                 ].map(f => (
                   <div key={f} style={{ display: 'flex', gap: '.75rem', alignItems: 'center', fontSize: '.88rem', color: 'rgba(255,255,255,.78)' }}>
