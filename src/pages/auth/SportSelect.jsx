@@ -71,35 +71,27 @@ export default function SportSelect() {
               style={{ ...baseCard, flex: '1 1 280px', background: 'linear-gradient(145deg, rgba(139,47,201,.15), rgba(232,35,122,.08))', border: '1.5px solid rgba(139,47,201,.45)' }}
               onMouseEnter={hover} onMouseLeave={unhover}
             >
-              {/* Top: emoji + title + subtitle — minHeight fixe pour aligner les prix */}
-              <div style={{ minHeight: '11rem' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '.65rem', marginBottom: '.5rem' }}>
-                  <span style={{ fontSize: '2rem', flexShrink: 0 }}>🏃 ⛰️</span>
-                  <div style={{ fontSize: 'clamp(1.3rem,3vw,1.6rem)', fontWeight: 800, letterSpacing: '-0.02em', lineHeight: 1.2 }}>
-                    <span style={gText}>Course à pied</span>{' '}&amp;{' '}<span style={gText}>Trail</span>
-                  </div>
-                </div>
-                <div style={{ fontSize: '.82rem', color: 'rgba(255,255,255,.4)', lineHeight: 1.5 }}>
-                  5km · 10km · Semi · Marathon · Trail
+              <div style={{ display: 'flex', alignItems: 'center', gap: '.65rem', marginBottom: '.25rem' }}>
+                <span style={{ fontSize: '1.9rem', flexShrink: 0 }}>🏃 ⛰️</span>
+                <div style={{ fontSize: 'clamp(1.2rem,2.8vw,1.5rem)', fontWeight: 800, letterSpacing: '-0.02em', lineHeight: 1.2, color: '#fff' }}>
+                  Course à pied &amp; Trail
                 </div>
               </div>
-
-              {/* Prix — toujours juste après le bloc du haut */}
-              <div style={{ display: 'flex', alignItems: 'baseline', gap: '.35rem', marginBottom: '1.4rem' }}>
-                <span style={{ fontSize: '2.4rem', fontWeight: 800, letterSpacing: '-0.04em' }}>30€</span>
+              <div style={{ fontSize: '.8rem', color: 'rgba(255,255,255,.4)', lineHeight: 1.4, marginBottom: '.6rem' }}>
+                5km · 10km · Semi · Marathon · Trail
+              </div>
+              <div style={{ display: 'flex', alignItems: 'baseline', gap: '.35rem', marginBottom: '1.1rem' }}>
+                <span style={{ fontSize: '2.4rem', fontWeight: 800, letterSpacing: '-0.04em', background: grad, WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text' }}>30€</span>
                 <span style={{ fontSize: '.85rem', color: 'rgba(255,255,255,.45)' }}>/mois</span>
               </div>
-
-              {/* Features flex:1 pour pousser le CTA vers le bas */}
-              <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '.65rem', marginBottom: '1.6rem' }}>
+              <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '.55rem', marginBottom: '1.2rem' }}>
                 {FEATURES_RUNNING_TRAIL.map(f => (
-                  <div key={f} style={{ display: 'flex', gap: '.65rem', alignItems: 'flex-start', fontSize: '.85rem', color: 'rgba(255,255,255,.72)' }}>
+                  <div key={f} style={{ display: 'flex', gap: '.6rem', alignItems: 'flex-start', fontSize: '.83rem', color: 'rgba(255,255,255,.72)' }}>
                     <Check />{f}
                   </div>
                 ))}
               </div>
-
-              <div style={{ width: '100%', padding: '.85rem', borderRadius: 12, textAlign: 'center', background: grad, color: '#fff', fontWeight: 700, fontSize: '.95rem', boxShadow: '0 6px 20px rgba(232,35,122,.3)' }}>
+              <div style={{ width: '100%', padding: '.8rem', borderRadius: 12, textAlign: 'center', background: grad, color: '#fff', fontWeight: 700, fontSize: '.92rem', boxShadow: '0 6px 20px rgba(232,35,122,.3)' }}>
                 Commencer gratuitement →
               </div>
             </button>
@@ -110,35 +102,27 @@ export default function SportSelect() {
               style={{ ...baseCard, flex: '1 1 280px', background: 'rgba(255,255,255,.04)', border: '1px solid rgba(255,255,255,.1)' }}
               onMouseEnter={hover} onMouseLeave={unhover}
             >
-              {/* Top: emoji + title + subtitle — même minHeight que l'autre carte */}
-              <div style={{ minHeight: '11rem' }}>
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '.65rem', marginBottom: '.5rem' }}>
-                  <span style={{ fontSize: '2rem', flexShrink: 0 }}>🏊</span>
-                  <div style={{ fontSize: 'clamp(1.3rem,3vw,1.6rem)', fontWeight: 800, letterSpacing: '-0.02em', lineHeight: 1.2 }}>
-                    <span style={gText}>Triathlon</span>
-                  </div>
-                </div>
-                <div style={{ fontSize: '.82rem', color: 'rgba(255,255,255,.4)', lineHeight: 1.5, textAlign: 'center' }}>
-                  Sprint · Olympique · Half Ironman · Ironman
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '.65rem', marginBottom: '.25rem' }}>
+                <span style={{ fontSize: '1.9rem', flexShrink: 0 }}>🏊</span>
+                <div style={{ fontSize: 'clamp(1.2rem,2.8vw,1.5rem)', fontWeight: 800, letterSpacing: '-0.02em', lineHeight: 1.2, color: '#fff' }}>
+                  Triathlon
                 </div>
               </div>
-
-              {/* Prix — toujours juste après le bloc du haut */}
-              <div style={{ display: 'flex', alignItems: 'baseline', gap: '.35rem', marginBottom: '1.4rem' }}>
-                <span style={{ fontSize: '2.4rem', fontWeight: 800, letterSpacing: '-0.04em' }}>50€</span>
+              <div style={{ fontSize: '.8rem', color: 'rgba(255,255,255,.4)', lineHeight: 1.4, marginBottom: '.6rem', textAlign: 'center' }}>
+                Sprint · Olympique · Half Ironman · Ironman
+              </div>
+              <div style={{ display: 'flex', alignItems: 'baseline', gap: '.35rem', marginBottom: '1.1rem' }}>
+                <span style={{ fontSize: '2.4rem', fontWeight: 800, letterSpacing: '-0.04em', background: grad, WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text' }}>50€</span>
                 <span style={{ fontSize: '.85rem', color: 'rgba(255,255,255,.45)' }}>/mois</span>
               </div>
-
-              {/* Features flex:1 pour pousser le CTA vers le bas */}
-              <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '.65rem', marginBottom: '1.6rem' }}>
+              <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '.55rem', marginBottom: '1.2rem' }}>
                 {FEATURES_TRIATHLON.map(f => (
-                  <div key={f} style={{ display: 'flex', gap: '.65rem', alignItems: 'flex-start', fontSize: '.85rem', color: 'rgba(255,255,255,.72)' }}>
+                  <div key={f} style={{ display: 'flex', gap: '.6rem', alignItems: 'flex-start', fontSize: '.83rem', color: 'rgba(255,255,255,.72)' }}>
                     <Check />{f}
                   </div>
                 ))}
               </div>
-
-              <div style={{ width: '100%', padding: '.85rem', borderRadius: 12, textAlign: 'center', background: grad, color: '#fff', fontWeight: 700, fontSize: '.95rem', boxShadow: '0 6px 20px rgba(232,35,122,.3)' }}>
+              <div style={{ width: '100%', padding: '.8rem', borderRadius: 12, textAlign: 'center', background: grad, color: '#fff', fontWeight: 700, fontSize: '.92rem', boxShadow: '0 6px 20px rgba(232,35,122,.3)' }}>
                 Commencer gratuitement →
               </div>
             </button>
