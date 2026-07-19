@@ -26,12 +26,12 @@ const TERRAIN = [
 ]
 
 const REFS = [
-  { race: 'UTMB',                    dist: '171 km', dp: '10 000 m', temps: '20h – 44h',  allure: "7'00/km – 10'00/km" },
-  { race: 'CCC',                     dist: '100 km', dp: '6 100 m',  temps: '12h – 26h',  allure: "6'00/km – 9'00/km"  },
-  { race: 'TDS',                     dist: '145 km', dp: '9 100 m',  temps: '18h – 40h',  allure: "7'00/km – 10'00/km" },
-  { race: 'Marathon du Mont Blanc',  dist: '42 km',  dp: '2 500 m',  temps: '4h30 – 9h',  allure: "6'00/km – 12'00/km" },
-  { race: 'Diagonale des Fous',      dist: '167 km', dp: '9 600 m',  temps: '22h – 56h',  allure: "7'00/km – 12'00/km" },
-  { race: 'Trail 20 km / 1 000 m',  dist: '20 km',  dp: '1 000 m',  temps: '1h45 – 3h',  allure: "5'00/km – 9'00/km"  },
+  { race: 'UTMB',                    dist: '171 km', dp: '10 000 m', temps: '20h – 44h',  allure: "7'01/km – 15'26/km" },
+  { race: 'CCC',                     dist: '100 km', dp: '6 100 m',  temps: '12h – 26h',  allure: "7'12/km – 15'36/km" },
+  { race: 'TDS',                     dist: '145 km', dp: '9 100 m',  temps: '18h – 40h',  allure: "7'27/km – 16'33/km" },
+  { race: 'Marathon du Mont Blanc',  dist: '42 km',  dp: '2 500 m',  temps: '4h30 – 9h',  allure: "6'26/km – 12'51/km" },
+  { race: 'Diagonale des Fous',      dist: '167 km', dp: '9 600 m',  temps: '22h – 56h',  allure: "7'54/km – 20'07/km" },
+  { race: 'Trail 20 km / 1 000 m',  dist: '20 km',  dp: '1 000 m',  temps: '1h45 – 3h',  allure: "5'15/km – 9'00/km"  },
 ]
 
 const FAQ = [
