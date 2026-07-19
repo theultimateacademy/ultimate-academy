@@ -303,7 +303,7 @@ export default function TrailCalculator() {
                 </div>
 
                 {/* Stats */}
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(125px, 1fr))', gap: '.75rem' }}>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(6, 1fr)', gap: '.75rem' }}>
                   {[
                     { label: 'Km équivalents', value: `${kmEq.toFixed(1)} km` },
                     { label: 'Km effort ITRA', value: `${kmEff.toFixed(1)} km` },
@@ -312,9 +312,9 @@ export default function TrailCalculator() {
                     { label: 'Temps D+', value: fmtTime(extraDp * adjPace) },
                     { label: 'Temps D-', value: fmtTime(extraDm * adjPace) },
                   ].map((s, i) => (
-                    <div key={i} style={{ background: C.light, borderRadius: 12, padding: '.9rem', textAlign: 'center' }}>
-                      <div style={{ fontSize: '.63rem', color: 'rgba(26,18,48,.4)', textTransform: 'uppercase', letterSpacing: '.07em', marginBottom: '.3rem' }}>{s.label}</div>
-                      <div style={{ fontSize: '1.15rem', fontWeight: 800, color: s.color || C.dark }}>{s.value || '--'}</div>
+                    <div key={i} style={{ background: C.light, borderRadius: 12, padding: '.9rem', textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
+                      <div style={{ fontSize: '.6rem', color: 'rgba(26,18,48,.4)', textTransform: 'uppercase', letterSpacing: '.07em', marginBottom: '.3rem', minHeight: '2.4rem', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>{s.label}</div>
+                      <div style={{ fontSize: '1.1rem', fontWeight: 800, color: s.color || C.dark }}>{s.value || '--'}</div>
                     </div>
                   ))}
                 </div>
