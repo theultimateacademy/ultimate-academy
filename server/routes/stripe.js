@@ -8,8 +8,11 @@ const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SER
 
 // POST /api/stripe/create-checkout
 router.post('/create-checkout', async (req, res) => {
-  const { userId, email, firstName, lastName } = req.body;
+  const { userId, email, firstName, lastName, sport } = req.body;
   if (!userId || !email) return res.status(400).json({ error: 'Missing userId or email' });
+  const priceId = sport === 'triathlon'
+    ? (process.env.STRIPE_PRICE_ID_TRIATHLON || process.env.STRIPE_PRICE_ID)
+    : process.env.STRIPE_PRICE_ID;
 
   try {
     const { data: profile } = await supabase
@@ -46,7 +49,7 @@ router.post('/create-checkout', async (req, res) => {
       customer: customerId,
       mode: 'subscription',
       payment_method_types: ['card'],
-      line_items: [{ price: process.env.STRIPE_PRICE_ID, quantity: 1 }],
+      line_items: [{ price: priceId, quantity: 1 }],
       success_url: `${process.env.CLIENT_URL}/welcome?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url:  `${process.env.CLIENT_URL}/register`,
       metadata: { userId },

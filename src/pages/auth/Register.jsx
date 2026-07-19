@@ -1,5 +1,5 @@
-import { useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { useState, useEffect } from 'react'
+import { Link, useNavigate, useSearchParams } from 'react-router-dom'
 import { useAuth } from '../../contexts/AuthContext'
 import { api } from '../../lib/api'
 import { supabase } from '../../lib/supabase'
@@ -7,12 +7,20 @@ import { supabase } from '../../lib/supabase'
 export default function Register() {
   const { signUp, signIn, refreshProfile } = useAuth()
   const navigate = useNavigate()
+  const [searchParams] = useSearchParams()
+  const sport = searchParams.get('sport') || localStorage.getItem('sport_type') || 'running'
+  const isTriathlon = sport === 'triathlon'
+
   const [form, setForm] = useState({ firstName: '', lastName: '', email: '', password: '', confirm: '' })
   const [error, setError]   = useState('')
   const [loading, setLoading] = useState(false)
   const [step, setStep]     = useState('form')  // 'form' | 'redirecting'
 
   const isDev = import.meta.env.DEV
+
+  useEffect(() => {
+    if (sport) localStorage.setItem('sport_type', sport)
+  }, [sport])
 
   const handleDevBypass = () => {
     window.location.href = '/dev-login'
@@ -54,7 +62,8 @@ export default function Register() {
         userId,
         email:     form.email,
         firstName: form.firstName,
-        lastName:  form.lastName
+        lastName:  form.lastName,
+        sport,
       })
       window.location.href = url
     } catch (err) {
@@ -100,8 +109,12 @@ export default function Register() {
       <main style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '1.5rem' }}>
         <div className="card" style={{ width: '100%', maxWidth: 460, padding: '2rem' }}>
           <h2 style={{ marginBottom: '.4rem' }}>Commencer mon essai gratuit</h2>
-          <p className="text-muted text-sm" style={{ marginBottom: '1.75rem' }}>
-            14 jours gratuits · puis <strong>30€/mois</strong> · annulable à tout moment
+          <p className="text-muted text-sm" style={{ marginBottom: '.5rem' }}>
+            14 jours gratuits · puis <strong>{isTriathlon ? '50€' : '30€'}/mois</strong> · annulable à tout moment
+          </p>
+          <p className="text-muted text-sm" style={{ marginBottom: '1.25rem', fontSize: '.8rem' }}>
+            {isTriathlon ? '🏊 Triathlon' : sport === 'trail' ? '⛰️ Trail' : '🏃 Course à pied'}
+            {' '}· <Link to="/choisir-sport" style={{ color: 'var(--primary)', fontWeight: 500 }}>Changer</Link>
           </p>
 
           {error && <div className="alert alert-error" style={{ marginBottom: '1rem' }}>⚠️ {error}</div>}

@@ -136,7 +136,7 @@ export default function Nav() {
               style={{ background: 'transparent', color: 'rgba(255,255,255,.7)', border: '1px solid rgba(255,255,255,.18)' }}>
               Connexion
             </Link>
-            <Link to="/register" className="btn btn-sm"
+            <Link to="/choisir-sport" className="btn btn-sm"
               style={{ background: 'linear-gradient(135deg,#8B2FC9,#E8237A)', color: '#fff', border: 'none',
                 fontWeight: 700, boxShadow: '0 3px 14px rgba(232,35,122,.45)' }}>
               Rejoindre
@@ -171,7 +171,7 @@ export default function Nav() {
                 background: 'rgba(255,255,255,.07)', border: '1px solid rgba(255,255,255,.15)', color: 'rgba(255,255,255,.8)', textDecoration: 'none' }}>
               Connexion
             </Link>
-            <Link to="/register" onClick={() => setMobileMenu(false)}
+            <Link to="/choisir-sport" onClick={() => setMobileMenu(false)}
               style={{ flex: 1, padding: '.75rem', borderRadius: 10, textAlign: 'center', fontWeight: 700, fontSize: '.9rem',
                 background: 'linear-gradient(135deg,#8B2FC9,#E8237A)', color: '#fff', textDecoration: 'none' }}>
               Rejoindre

@@ -67,7 +67,7 @@ export default function BlogNav() {
     return () => document.removeEventListener('mousedown', onDown)
   }, [])
 
-  const handleCTA = () => navigate(isCoach ? '/admin' : user ? '/app/home' : '/register')
+  const handleCTA = () => navigate(isCoach ? '/admin' : user ? '/app/home' : '/choisir-sport')
 
   return (
     <>
@@ -128,7 +128,7 @@ export default function BlogNav() {
                   style={{ background: 'transparent', color: 'rgba(255,255,255,.7)', border: '1px solid rgba(255,255,255,.18)' }}>
                   Connexion
                 </Link>
-                <Link to="/register" className="btn btn-sm"
+                <Link to="/choisir-sport" className="btn btn-sm"
                   style={{ background: 'linear-gradient(135deg,#8B2FC9,#E8237A)', color: '#fff', border: 'none',
                     fontWeight: 700, boxShadow: '0 3px 14px rgba(232,35,122,.45)' }}>
                   Rejoindre

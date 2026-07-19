@@ -11,6 +11,7 @@ import CanonicalTag  from './components/CanonicalTag'
 import Landing        from './pages/Landing'
 import Login          from './pages/auth/Login'
 import Register       from './pages/auth/Register'
+import SportSelect    from './pages/auth/SportSelect'
 import ResetPassword  from './pages/auth/ResetPassword'
 import Blog           from './pages/Blog'
 import BlogArticle    from './pages/BlogArticle'
@@ -90,6 +91,7 @@ function AppRoutes() {
       <Route path="/blog/:slug"     element={<BlogArticle />} />
       <Route path="/login"          element={<Login />} />
       <Route path="/register"       element={<Register />} />
+      <Route path="/choisir-sport"  element={<SportSelect />} />
       <Route path="/reset-password" element={<ResetPassword />} />
       <Route path="/dev-login" element={<DevLogin />} />
       <Route path="/welcome"  element={<RequireAuth><CheckoutSuccess /></RequireAuth>} />
