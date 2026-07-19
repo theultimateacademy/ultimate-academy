@@ -383,7 +383,7 @@ export default function TrailCalculator() {
       <section style={{ background: C.dark, padding: '5rem 1.5rem' }}>
         <div style={{ maxWidth: 920, margin: '0 auto' }}>
           <h2 style={{ fontSize: 'clamp(1.4rem, 3vw, 1.9rem)', fontWeight: 900, color: '#fff', marginBottom: '.6rem' }}>
-            Courses de référence
+            Courses de <span style={{ background: grad, WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text' }}>référence</span>
           </h2>
           <p style={{ color: 'rgba(255,255,255,.4)', marginBottom: '2.5rem', fontSize: '.9rem' }}>
             Ordres de grandeur pour situer ton niveau et fixer un objectif réaliste.
@@ -421,7 +421,7 @@ export default function TrailCalculator() {
       <section style={{ background: C.light, padding: '5rem 1.5rem' }}>
         <div style={{ maxWidth: 720, margin: '0 auto' }}>
           <h2 style={{ fontSize: 'clamp(1.4rem, 3vw, 1.9rem)', fontWeight: 900, color: C.dark, marginBottom: '2rem', textAlign: 'center' }}>
-            Questions fréquentes
+            Questions <span style={{ background: grad, WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text' }}>fréquentes</span>
           </h2>
           {FAQ.map((item, i) => (
             <div key={i} style={{ borderBottom: '1px solid rgba(139,47,201,.12)', overflow: 'hidden' }}>

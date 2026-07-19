@@ -465,7 +465,7 @@ export default function Triathlon() {
       <section style={{ background: '#000', padding: '5rem 1.5rem', borderTop: '1px solid rgba(255,255,255,.06)' }}>
         <div style={{ maxWidth: 760, margin: '0 auto' }}>
           <h2 style={{ fontSize: 'clamp(1.6rem,4vw,2.2rem)', fontWeight: 900, textAlign: 'center', marginBottom: '3rem' }}>
-            Questions fréquentes
+            Questions <span style={{ background: grad, WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text' }}>fréquentes</span>
           </h2>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '.75rem' }}>
             {FAQ.map((f, i) => (
