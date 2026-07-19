@@ -32,6 +32,7 @@ import VO2maxCalculator    from './pages/calculators/VO2max'
 import TriathlonCalculator from './pages/calculators/Triathlon'
 import CSSCalculator        from './pages/calculators/CSS'
 import CriticalPowerCalculator from './pages/calculators/CriticalPower'
+import TrailCalculator from './pages/calculators/Trail'
 
 import AthleteHome         from './pages/athlete/Home'
 import AthletePlan         from './pages/athlete/Plan'
@@ -109,6 +110,7 @@ function AppRoutes() {
       <Route path="/calculateur/triathlon"          element={<TriathlonCalculator />} />
       <Route path="/calculateur/css"               element={<CSSCalculator />} />
       <Route path="/calculateur/puissance"         element={<CriticalPowerCalculator />} />
+      <Route path="/calculateur/trail"            element={<TrailCalculator />} />
 
       <Route path="/app" element={<RequireActive><AthleteLayout /></RequireActive>}>
         <Route index element={<Navigate to="/app/home" replace />} />

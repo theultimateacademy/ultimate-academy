@@ -69,6 +69,14 @@ const CALCULATEURS = [
     label: 'Calculer ma CP',
     tag: 'Cyclisme',
   },
+  {
+    icon: '⛰️',
+    title: 'Estime ton temps sur trail',
+    desc: 'Renseigne distance, dénivelé positif, dénivelé négatif et ton allure terrain plat pour obtenir une estimation de ton temps trail. Basé sur la règle de Naismith, avec calcul de tes km équivalents et ton score ITRA.',
+    path: '/calculateur/trail',
+    label: 'Estimer mon temps trail',
+    tag: 'Trail',
+  },
 ]
 
 const grad = 'linear-gradient(135deg,#8B2FC9,#E8237A)'
