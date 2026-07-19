@@ -63,52 +63,53 @@ export default function SportSelect() {
         </p>
 
         {!showSubChoice ? (
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '1.25rem', width: '100%', maxWidth: 680 }}>
+          <div style={{ display: 'flex', gap: '1.25rem', width: '100%', maxWidth: 680, alignItems: 'stretch', flexWrap: 'wrap' }}>
 
             {/* Course à pied & Trail */}
             <button
               onClick={() => setShowSubChoice(true)}
-              style={{ ...baseCard, background: 'linear-gradient(145deg, rgba(139,47,201,.15), rgba(232,35,122,.08))', border: '1.5px solid rgba(139,47,201,.45)' }}
+              style={{ ...baseCard, flex: '1 1 280px', background: 'linear-gradient(145deg, rgba(139,47,201,.15), rgba(232,35,122,.08))', border: '1.5px solid rgba(139,47,201,.45)' }}
               onMouseEnter={hover} onMouseLeave={unhover}
             >
-              {/* Top section — minHeight ensures prices align across both cards */}
-              <div style={{ flex: 1, minHeight: '9rem' }}>
+              {/* Top: emoji + title + subtitle — minHeight fixe pour aligner les prix */}
+              <div style={{ minHeight: '11rem' }}>
                 <div style={{ fontSize: '2rem', marginBottom: '1rem' }}>🏃 ⛰️</div>
                 <div style={{ fontSize: 'clamp(1.3rem,3vw,1.6rem)', fontWeight: 800, letterSpacing: '-0.02em', lineHeight: 1.2, marginBottom: '.5rem' }}>
                   <span style={gText}>Course à pied</span>{' '}&amp;{' '}<span style={gText}>Trail</span>
                 </div>
-                <div style={{ fontSize: '.82rem', color: 'rgba(255,255,255,.4)', marginBottom: 0, lineHeight: 1.5 }}>
+                <div style={{ fontSize: '.82rem', color: 'rgba(255,255,255,.4)', lineHeight: 1.5 }}>
                   5km · 10km · Semi · Marathon · Trail
                 </div>
               </div>
 
-              {/* Bottom section — price + features + CTA */}
-              <div style={{ marginTop: '1.5rem' }}>
-                <div style={{ display: 'flex', alignItems: 'baseline', gap: '.35rem', marginBottom: '1.4rem' }}>
-                  <span style={{ fontSize: '2.4rem', fontWeight: 800, letterSpacing: '-0.04em' }}>30€</span>
-                  <span style={{ fontSize: '.85rem', color: 'rgba(255,255,255,.45)' }}>/mois</span>
-                </div>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '.65rem', marginBottom: '1.6rem' }}>
-                  {FEATURES_RUNNING_TRAIL.map(f => (
-                    <div key={f} style={{ display: 'flex', gap: '.65rem', alignItems: 'flex-start', fontSize: '.85rem', color: 'rgba(255,255,255,.72)' }}>
-                      <Check />{f}
-                    </div>
-                  ))}
-                </div>
-                <div style={{ width: '100%', padding: '.85rem', borderRadius: 12, textAlign: 'center', background: grad, color: '#fff', fontWeight: 700, fontSize: '.95rem', boxShadow: '0 6px 20px rgba(232,35,122,.3)' }}>
-                  Commencer gratuitement →
-                </div>
+              {/* Prix — toujours juste après le bloc du haut */}
+              <div style={{ display: 'flex', alignItems: 'baseline', gap: '.35rem', marginBottom: '1.4rem' }}>
+                <span style={{ fontSize: '2.4rem', fontWeight: 800, letterSpacing: '-0.04em' }}>30€</span>
+                <span style={{ fontSize: '.85rem', color: 'rgba(255,255,255,.45)' }}>/mois</span>
+              </div>
+
+              {/* Features flex:1 pour pousser le CTA vers le bas */}
+              <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '.65rem', marginBottom: '1.6rem' }}>
+                {FEATURES_RUNNING_TRAIL.map(f => (
+                  <div key={f} style={{ display: 'flex', gap: '.65rem', alignItems: 'flex-start', fontSize: '.85rem', color: 'rgba(255,255,255,.72)' }}>
+                    <Check />{f}
+                  </div>
+                ))}
+              </div>
+
+              <div style={{ width: '100%', padding: '.85rem', borderRadius: 12, textAlign: 'center', background: grad, color: '#fff', fontWeight: 700, fontSize: '.95rem', boxShadow: '0 6px 20px rgba(232,35,122,.3)' }}>
+                Commencer gratuitement →
               </div>
             </button>
 
             {/* Triathlon */}
             <button
               onClick={() => handleSport('triathlon')}
-              style={{ ...baseCard, background: 'rgba(255,255,255,.04)', border: '1px solid rgba(255,255,255,.1)' }}
+              style={{ ...baseCard, flex: '1 1 280px', background: 'rgba(255,255,255,.04)', border: '1px solid rgba(255,255,255,.1)' }}
               onMouseEnter={hover} onMouseLeave={unhover}
             >
-              {/* Top section — minHeight ensures prices align across both cards */}
-              <div style={{ flex: 1, minHeight: '9rem' }}>
+              {/* Top: emoji + title + subtitle — même minHeight que l'autre carte */}
+              <div style={{ minHeight: '11rem' }}>
                 <div style={{ fontSize: '2rem', marginBottom: '1rem' }}>🏊</div>
                 <div style={{ fontSize: 'clamp(1.3rem,3vw,1.6rem)', fontWeight: 800, letterSpacing: '-0.02em', lineHeight: 1.2, marginBottom: '.5rem' }}>
                   <span style={gText}>Triathlon</span>
@@ -118,22 +119,23 @@ export default function SportSelect() {
                 </div>
               </div>
 
-              {/* Bottom section — price + features + CTA */}
-              <div style={{ marginTop: '1.5rem' }}>
-                <div style={{ display: 'flex', alignItems: 'baseline', gap: '.35rem', marginBottom: '1.4rem' }}>
-                  <span style={{ fontSize: '2.4rem', fontWeight: 800, letterSpacing: '-0.04em' }}>50€</span>
-                  <span style={{ fontSize: '.85rem', color: 'rgba(255,255,255,.45)' }}>/mois</span>
-                </div>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '.65rem', marginBottom: '1.6rem' }}>
-                  {FEATURES_TRIATHLON.map(f => (
-                    <div key={f} style={{ display: 'flex', gap: '.65rem', alignItems: 'flex-start', fontSize: '.85rem', color: 'rgba(255,255,255,.72)' }}>
-                      <Check />{f}
-                    </div>
-                  ))}
-                </div>
-                <div style={{ width: '100%', padding: '.85rem', borderRadius: 12, textAlign: 'center', background: grad, color: '#fff', fontWeight: 700, fontSize: '.95rem', boxShadow: '0 6px 20px rgba(232,35,122,.3)' }}>
-                  Commencer gratuitement →
-                </div>
+              {/* Prix — toujours juste après le bloc du haut */}
+              <div style={{ display: 'flex', alignItems: 'baseline', gap: '.35rem', marginBottom: '1.4rem' }}>
+                <span style={{ fontSize: '2.4rem', fontWeight: 800, letterSpacing: '-0.04em' }}>50€</span>
+                <span style={{ fontSize: '.85rem', color: 'rgba(255,255,255,.45)' }}>/mois</span>
+              </div>
+
+              {/* Features flex:1 pour pousser le CTA vers le bas */}
+              <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '.65rem', marginBottom: '1.6rem' }}>
+                {FEATURES_TRIATHLON.map(f => (
+                  <div key={f} style={{ display: 'flex', gap: '.65rem', alignItems: 'flex-start', fontSize: '.85rem', color: 'rgba(255,255,255,.72)' }}>
+                    <Check />{f}
+                  </div>
+                ))}
+              </div>
+
+              <div style={{ width: '100%', padding: '.85rem', borderRadius: 12, textAlign: 'center', background: grad, color: '#fff', fontWeight: 700, fontSize: '.95rem', boxShadow: '0 6px 20px rgba(232,35,122,.3)' }}>
+                Commencer gratuitement →
               </div>
             </button>
           </div>

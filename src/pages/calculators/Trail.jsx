@@ -246,19 +246,19 @@ export default function TrailCalculator() {
             <div style={{ height: 1, background: 'rgba(139,47,201,.1)', marginBottom: '2rem' }}/>
 
             {/* Inputs */}
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '1.25rem', marginBottom: '2rem' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '1.25rem', marginBottom: '2rem', alignItems: 'end' }}>
               <div>
-                <label style={labelSt}>Distance totale (km)</label>
+                <label style={{ ...labelSt, display: 'block', minHeight: '2.6rem' }}>Distance totale (km)</label>
                 <input type="number" min="0" step="0.5" placeholder="Ex : 42"
                   value={dist} onChange={e => setDist(e.target.value)} style={inputSt}/>
               </div>
               <div>
-                <label style={labelSt}>Dénivelé positif D+ (m)</label>
+                <label style={{ ...labelSt, display: 'block', minHeight: '2.6rem' }}>Dénivelé positif D+ (m)</label>
                 <input type="number" min="0" step="50" placeholder="Ex : 2 800"
                   value={dp} onChange={e => setDp(e.target.value)} style={inputSt}/>
               </div>
               <div>
-                <label style={labelSt}>
+                <label style={{ ...labelSt, display: 'block', minHeight: '2.6rem' }}>
                   Dénivelé négatif D- (m){' '}
                   <span style={{ opacity: .5, textTransform: 'none', letterSpacing: 0 }}>optionnel</span>
                 </label>
@@ -267,7 +267,7 @@ export default function TrailCalculator() {
                   value={dm} onChange={e => setDm(e.target.value)} style={inputSt}/>
               </div>
               <div>
-                <label style={labelSt}>Allure terrain plat (min : sec)</label>
+                <label style={{ ...labelSt, display: 'block', minHeight: '2.6rem' }}>Allure 10km (min : sec)</label>
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr auto 1fr', gap: '.35rem', alignItems: 'center' }}>
                   <input type="number" min="0" max="20" placeholder="min"
                     value={paceMin} onChange={e => setPaceMin(e.target.value)} style={inputSt}/>
@@ -276,7 +276,7 @@ export default function TrailCalculator() {
                     value={paceSec} onChange={e => setPaceSec(e.target.value)} style={inputSt}/>
                 </div>
                 <div style={{ fontSize: '.7rem', color: 'rgba(26,18,48,.35)', marginTop: '.3rem' }}>
-                  Ton allure sur route plane (10km ou semi)
+                  Ton allure sur 10km sur route plate
                 </div>
               </div>
             </div>
