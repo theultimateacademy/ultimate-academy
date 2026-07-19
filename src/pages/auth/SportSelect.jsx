@@ -112,13 +112,13 @@ export default function SportSelect() {
             >
               {/* Top: emoji + title + subtitle — même minHeight que l'autre carte */}
               <div style={{ minHeight: '11rem' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '.65rem', marginBottom: '.5rem' }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '.65rem', marginBottom: '.5rem' }}>
                   <span style={{ fontSize: '2rem', flexShrink: 0 }}>🏊</span>
                   <div style={{ fontSize: 'clamp(1.3rem,3vw,1.6rem)', fontWeight: 800, letterSpacing: '-0.02em', lineHeight: 1.2 }}>
                     <span style={gText}>Triathlon</span>
                   </div>
                 </div>
-                <div style={{ fontSize: '.82rem', color: 'rgba(255,255,255,.4)', lineHeight: 1.5 }}>
+                <div style={{ fontSize: '.82rem', color: 'rgba(255,255,255,.4)', lineHeight: 1.5, textAlign: 'center' }}>
                   Sprint · Olympique · Half Ironman · Ironman
                 </div>
               </div>

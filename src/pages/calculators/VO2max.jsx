@@ -210,7 +210,7 @@ export default function VO2maxCalculator() {
         <Inner max={780}>
           <div style={{ textAlign: 'center', marginBottom: '2.5rem' }}>
             <SectionTag>Calculateur interactif</SectionTag>
-            <h2 style={{ fontSize: 'clamp(1.5rem,3vw,2rem)', fontWeight: 900, color: C.dark, marginBottom: '.5rem' }}>Calcule ta <span style={gradText}>VO2max</span></h2>
+            <h2 style={{ fontSize: 'clamp(1.5rem,3vw,2rem)', fontWeight: 900, color: C.dark, marginBottom: '.5rem' }}><span style={gradText}>Calcule</span> ta VO2max</h2>
             <p style={{ color: 'rgba(26,18,48,.55)', fontSize: '.95rem' }}>Résultats instantanés, aucune inscription requise</p>
           </div>
           <div style={{ background: '#fff', borderRadius: 20, padding: '2rem', boxShadow: '0 8px 40px rgba(139,47,201,.1)', border: '1px solid rgba(139,47,201,.12)' }}>
