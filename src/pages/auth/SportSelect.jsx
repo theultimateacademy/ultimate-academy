@@ -14,6 +14,7 @@ const FEATURES_RUNNING_TRAIL = [
 
 const FEATURES_TRIATHLON = [
   'Plan triathlon 100% personnalisé',
+  'Adaptation hebdomadaire du programme',
   'Périodisation natation · vélo · course',
   'Connexion Strava intégrée',
   'Programme de renforcement musculaire',
