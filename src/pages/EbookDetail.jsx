@@ -586,6 +586,12 @@ export default function EbookDetail() {
                   <strong style={{ fontWeight: 800, background: grad, WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text' }}>calculée depuis ta VMA réelle et adaptée à ton palier</strong>
                   {' '}: tu cours aux bonnes allures, au bon moment, sans jamais avoir à convertir des pourcentages.
                 </>
+              ) : slug === 'marathon-16sem' ? (
+                <>
+                  Le plan marathon le plus complet. 16 semaines pour{' '}
+                  <strong style={{ fontWeight: 800, background: grad, WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text' }}>construire progressivement ton endurance, développer ta résistance et arriver au départ en pleine confiance</strong>
+                  {' '}: chaque séance calculée depuis ta VMA réelle, chaque bloc pensé pour te faire progresser sans te casser.
+                </>
               ) : (meta.full_description || ebook.description)}
             </p>
 
