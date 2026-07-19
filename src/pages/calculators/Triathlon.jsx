@@ -250,7 +250,7 @@ export default function Triathlon() {
               Calculateur triathlon
             </div>
             <h2 style={{ fontSize: 'clamp(1.5rem,3vw,2rem)', fontWeight: 900, color: C.dark, marginBottom: '.5rem' }}>
-              Choisis ta distance ou saisis tes valeurs
+              Choisis ta <span style={gradText}>distance</span> ou saisis tes valeurs
             </h2>
             <p style={{ color: 'rgba(26,18,48,.5)', fontSize: '.95rem', margin: 0 }}>
               Applique un format prédéfini ou personnalise chaque discipline librement

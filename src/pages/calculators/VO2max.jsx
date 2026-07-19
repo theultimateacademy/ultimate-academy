@@ -210,7 +210,7 @@ export default function VO2maxCalculator() {
         <Inner max={780}>
           <div style={{ textAlign: 'center', marginBottom: '2.5rem' }}>
             <SectionTag>Calculateur interactif</SectionTag>
-            <h2 style={{ fontSize: 'clamp(1.5rem,3vw,2rem)', fontWeight: 900, color: C.dark, marginBottom: '.5rem' }}>Calcule ta VO2max</h2>
+            <h2 style={{ fontSize: 'clamp(1.5rem,3vw,2rem)', fontWeight: 900, color: C.dark, marginBottom: '.5rem' }}>Calcule ta <span style={gradText}>VO2max</span></h2>
             <p style={{ color: 'rgba(26,18,48,.55)', fontSize: '.95rem' }}>Résultats instantanés, aucune inscription requise</p>
           </div>
           <div style={{ background: '#fff', borderRadius: 20, padding: '2rem', boxShadow: '0 8px 40px rgba(139,47,201,.1)', border: '1px solid rgba(139,47,201,.12)' }}>
@@ -333,7 +333,7 @@ export default function VO2maxCalculator() {
           <div style={{ display: 'flex', gap: '3rem', alignItems: 'center', flexWrap: 'wrap' }}>
             <div style={{ flex: '1 1 300px' }}>
               <SectionTag>Comprendre les bases</SectionTag>
-              <H2L>C'est quoi la VO2max ?</H2L>
+              <H2L>C'est quoi la <span style={gradText}>VO2max</span> ?</H2L>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', color: 'rgba(26,18,48,.7)', fontSize: '.9rem', lineHeight: 1.8 }}>
                 <p style={{ margin: 0, textAlign: 'justify' }}>La <strong style={{ color: C.dark }}>VO2max</strong>, ou consommation maximale d'oxygène, représente la quantité maximale d'oxygène que ton corps peut utiliser par minute et par kilogramme de poids corporel lors d'un effort intense.</p>
                 <p style={{ margin: 0, textAlign: 'justify' }}>En termes simples : c'est la <strong style={{ color: C.dark }}>cylindrée de ton moteur aérobie</strong>. Plus elle est élevée, plus ton corps est efficace pour produire de l'énergie à haute intensité.</p>
@@ -404,7 +404,7 @@ export default function VO2maxCalculator() {
         <Inner max={860}>
           <div style={{ textAlign: 'center', marginBottom: '3rem' }}>
             <SectionTag>Protocole officiel</SectionTag>
-            <H2L>Comment réaliser le Test de Cooper ?</H2L>
+            <H2L>Comment réaliser le Test de <span style={gradText}>Cooper</span> ?</H2L>
             <p style={{ color: 'rgba(26,18,48,.55)', maxWidth: 520, margin: '0 auto' }}>4 étapes simples pour un résultat fiable en 12 minutes</p>
           </div>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(min(260px,100%),1fr))', gap: '1.25rem', marginBottom: '1.25rem' }}>
@@ -448,7 +448,7 @@ export default function VO2maxCalculator() {
         <Inner max={860}>
           <div style={{ textAlign: 'center', marginBottom: '2.5rem' }}>
             <SectionTag>Normes officielles</SectionTag>
-            <H2L>Comment tu te situes ?</H2L>
+            <H2L>Comment tu te <span style={gradText}>situes</span> ?</H2L>
             <p style={{ color: 'rgba(26,18,48,.55)', maxWidth: 500, margin: '0 auto' }}>Basé sur les normes Cooper Institute. Ta ligne est mise en surbrillance automatiquement.</p>
           </div>
 
@@ -564,7 +564,7 @@ export default function VO2maxCalculator() {
             </div>
             <div style={{ flex: '1 1 300px' }}>
               <SectionTag>Progresser</SectionTag>
-              <H2L>Comment améliorer sa VO2max ?</H2L>
+              <H2L>Comment améliorer sa <span style={gradText}>VO2max</span> ?</H2L>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem', marginBottom: '2rem' }}>
                 {[
                   { icon: '🔥', title: 'Fractionné court (VMA)', desc: "Les séances à 95-105% de ta VMA sont les plus efficaces. Efforts de 30 sec à 3 min avec récupération équivalente.", sub: "Exemple : 10×400m à 95% VMA, récup 1 min" },
@@ -599,7 +599,7 @@ export default function VO2maxCalculator() {
         <Inner max={760}>
           <div style={{ textAlign: 'center', marginBottom: '2.5rem' }}>
             <SectionTag dark>Concepts clés</SectionTag>
-            <H2D>VO2max et VMA : quelle différence ?</H2D>
+            <H2D>VO2max et VMA : quelle <span style={gradText}>différence</span> ?</H2D>
             <p style={{ color: 'rgba(255,255,255,.5)', maxWidth: 460, margin: '0 auto' }}>Deux indicateurs complémentaires, souvent confondus</p>
           </div>
           <div className="tbl-scroll" style={{ background: 'rgba(255,255,255,.04)', borderRadius: 20, border: '1px solid rgba(255,255,255,.08)', overflow: 'hidden' }}>
@@ -641,7 +641,7 @@ export default function VO2maxCalculator() {
         <Inner>
           <div style={{ textAlign: 'center', marginBottom: '2.5rem' }}>
             <SectionTag>Témoignages</SectionTag>
-            <H2L>Ce que disent nos athlètes</H2L>
+            <H2L>Ce que disent nos <span style={gradText}>athlètes</span></H2L>
           </div>
         </Inner>
         <TestimonialsCarousel testimonials={TESTIMONIALS_VO2MAX} />
@@ -657,7 +657,7 @@ export default function VO2maxCalculator() {
         <Inner max={720}>
           <div style={{ textAlign: 'center', marginBottom: '2.5rem' }}>
             <SectionTag>Questions fréquentes</SectionTag>
-            <H2L>Tout ce que tu dois savoir sur la VO2max</H2L>
+            <H2L>Tout ce que tu dois savoir sur la <span style={gradText}>VO2max</span></H2L>
           </div>
           {FAQ.map((item, i) => (
             <div key={i} style={{ borderBottom: '1px solid rgba(139,47,201,.1)' }}>

@@ -127,8 +127,8 @@ export default function PredictorCalculator() {
       <section id="predictor-tool" style={{ background: C.light, padding: '5rem 1.5rem' }}>
         <div style={{ maxWidth: 800, margin: '0 auto' }}>
           <div style={{ textAlign: 'center', marginBottom: '2.5rem' }}>
-            <h2 style={{ fontSize: 'clamp(1.6rem,4vw,2.4rem)', fontWeight: 900, letterSpacing: '-0.02em', marginBottom: '.6rem' }}>
-              Estime ton chrono cible
+            <h2 style={{ fontSize: 'clamp(1.6rem,4vw,2.4rem)', fontWeight: 900, letterSpacing: '-0.02em', marginBottom: '.6rem', color: C.dark }}>
+              Estime ton <span style={gradText}>chrono cible</span>
             </h2>
             <p style={{ color: 'rgba(26,26,46,.5)', fontSize: '1rem' }}>
               Entre un chrono récent et choisis la distance que tu vises
@@ -342,8 +342,8 @@ export default function PredictorCalculator() {
               Comment ça fonctionne
             </div>
             <h2 style={{ fontSize: 'clamp(1.6rem,4vw,2.4rem)', fontWeight: 900, letterSpacing: '-0.02em',
-              lineHeight: 1.15, marginBottom: '1.25rem' }}>
-              La formule de Riegel,<br />expliquée simplement
+              lineHeight: 1.15, marginBottom: '1.25rem', color: C.dark }}>
+              La formule de <span style={gradText}>Riegel</span>,<br />expliquée simplement
             </h2>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '1.1rem' }}>
               {[
@@ -379,8 +379,8 @@ export default function PredictorCalculator() {
               Pour aller plus loin
             </div>
             <h2 style={{ fontSize: 'clamp(1.6rem,4vw,2.4rem)', fontWeight: 900, letterSpacing: '-0.02em',
-              lineHeight: 1.15, marginBottom: '1.5rem' }}>
-              Comprendre les limites<br />du modèle
+              lineHeight: 1.15, marginBottom: '1.5rem', color: '#fff' }}>
+              Comprendre les <span style={gradText}>limites</span><br />du modèle
             </h2>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
               {[
@@ -439,8 +439,8 @@ export default function PredictorCalculator() {
       <section style={{ background: C.light, padding: '5rem 1.5rem' }}>
         <div style={{ maxWidth: 700, margin: '0 auto' }}>
           <div style={{ textAlign: 'center', marginBottom: '2.5rem' }}>
-            <h2 style={{ fontSize: 'clamp(1.6rem,4vw,2.4rem)', fontWeight: 900, letterSpacing: '-0.02em', marginBottom: '.6rem' }}>
-              Table d'équivalences
+            <h2 style={{ fontSize: 'clamp(1.6rem,4vw,2.4rem)', fontWeight: 900, letterSpacing: '-0.02em', marginBottom: '.6rem', color: C.dark }}>
+              Table d'<span style={gradText}>équivalences</span>
             </h2>
             <p style={{ color: 'rgba(26,26,46,.45)', fontSize: '1rem' }}>
               Correspondances indicatives entre 10km, semi et marathon
@@ -483,8 +483,8 @@ export default function PredictorCalculator() {
       <section style={{ background: '#fff', padding: '5rem 1.5rem' }}>
         <div style={{ maxWidth: 800, margin: '0 auto' }}>
           <div style={{ textAlign: 'center', marginBottom: '2.5rem' }}>
-            <h2 style={{ fontSize: 'clamp(1.6rem,4vw,2.4rem)', fontWeight: 900, letterSpacing: '-0.02em', marginBottom: '.6rem' }}>
-              Plan de ravitaillement
+            <h2 style={{ fontSize: 'clamp(1.6rem,4vw,2.4rem)', fontWeight: 900, letterSpacing: '-0.02em', marginBottom: '.6rem', color: C.dark }}>
+              Plan de <span style={gradText}>ravitaillement</span>
             </h2>
             <p style={{ color: 'rgba(26,26,46,.45)', fontSize: '1rem' }}>
               Mange avant d'avoir faim, bois avant d'avoir soif
@@ -539,8 +539,8 @@ export default function PredictorCalculator() {
       {/* ── TÉMOIGNAGES ─────────────────────────────────── */}
       <section style={{ background: C.light, padding: '5rem 1.5rem' }}>
         <div style={{ maxWidth: 1000, margin: '0 auto', textAlign: 'center', marginBottom: '2.5rem' }}>
-          <h2 style={{ fontSize: 'clamp(1.6rem,4vw,2.4rem)', fontWeight: 900, letterSpacing: '-0.02em', marginBottom: '.6rem' }}>
-            Ils ont atteint leur chrono cible
+          <h2 style={{ fontSize: 'clamp(1.6rem,4vw,2.4rem)', fontWeight: 900, letterSpacing: '-0.02em', marginBottom: '.6rem', color: C.dark }}>
+            Ils ont atteint leur <span style={gradText}>chrono cible</span>
           </h2>
           <p style={{ color: 'rgba(26,26,46,.45)', fontSize: '1rem' }}>Des vrais résultats, avec un suivi structuré</p>
         </div>
@@ -556,8 +556,8 @@ export default function PredictorCalculator() {
       <section style={{ background: '#fff', padding: '5rem 1.5rem' }}>
         <div style={{ maxWidth: 720, margin: '0 auto' }}>
           <div style={{ textAlign: 'center', marginBottom: '2.5rem' }}>
-            <h2 style={{ fontSize: 'clamp(1.6rem,4vw,2.4rem)', fontWeight: 900, letterSpacing: '-0.02em', marginBottom: '.6rem' }}>
-              Questions fréquentes
+            <h2 style={{ fontSize: 'clamp(1.6rem,4vw,2.4rem)', fontWeight: 900, letterSpacing: '-0.02em', marginBottom: '.6rem', color: C.dark }}>
+              Questions <span style={gradText}>fréquentes</span>
             </h2>
             <p style={{ color: 'rgba(26,26,46,.45)', fontSize: '1rem' }}>
               Tout sur la prédiction de chrono et la formule de Riegel

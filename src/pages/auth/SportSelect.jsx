@@ -73,9 +73,11 @@ export default function SportSelect() {
             >
               {/* Top: emoji + title + subtitle — minHeight fixe pour aligner les prix */}
               <div style={{ minHeight: '11rem' }}>
-                <div style={{ fontSize: '2rem', marginBottom: '1rem' }}>🏃 ⛰️</div>
-                <div style={{ fontSize: 'clamp(1.3rem,3vw,1.6rem)', fontWeight: 800, letterSpacing: '-0.02em', lineHeight: 1.2, marginBottom: '.5rem' }}>
-                  <span style={gText}>Course à pied</span>{' '}&amp;{' '}<span style={gText}>Trail</span>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '.65rem', marginBottom: '.5rem' }}>
+                  <span style={{ fontSize: '2rem', flexShrink: 0 }}>🏃 ⛰️</span>
+                  <div style={{ fontSize: 'clamp(1.3rem,3vw,1.6rem)', fontWeight: 800, letterSpacing: '-0.02em', lineHeight: 1.2 }}>
+                    <span style={gText}>Course à pied</span>{' '}&amp;{' '}<span style={gText}>Trail</span>
+                  </div>
                 </div>
                 <div style={{ fontSize: '.82rem', color: 'rgba(255,255,255,.4)', lineHeight: 1.5 }}>
                   5km · 10km · Semi · Marathon · Trail
@@ -110,9 +112,11 @@ export default function SportSelect() {
             >
               {/* Top: emoji + title + subtitle — même minHeight que l'autre carte */}
               <div style={{ minHeight: '11rem' }}>
-                <div style={{ fontSize: '2rem', marginBottom: '1rem' }}>🏊</div>
-                <div style={{ fontSize: 'clamp(1.3rem,3vw,1.6rem)', fontWeight: 800, letterSpacing: '-0.02em', lineHeight: 1.2, marginBottom: '.5rem' }}>
-                  <span style={gText}>Triathlon</span>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '.65rem', marginBottom: '.5rem' }}>
+                  <span style={{ fontSize: '2rem', flexShrink: 0 }}>🏊</span>
+                  <div style={{ fontSize: 'clamp(1.3rem,3vw,1.6rem)', fontWeight: 800, letterSpacing: '-0.02em', lineHeight: 1.2 }}>
+                    <span style={gText}>Triathlon</span>
+                  </div>
                 </div>
                 <div style={{ fontSize: '.82rem', color: 'rgba(255,255,255,.4)', lineHeight: 1.5 }}>
                   Sprint · Olympique · Half Ironman · Ironman

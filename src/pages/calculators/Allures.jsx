@@ -93,7 +93,7 @@ export default function AlluresCalculator() {
         <Inner max={780}>
           <div style={{ textAlign:'center', marginBottom:'2.5rem' }}>
             <SectionTag>Calculateur d'allures</SectionTag>
-            <h2 style={{ fontSize:'clamp(1.5rem,3vw,2rem)', fontWeight:900, color:C.dark, marginBottom:'.5rem' }}>Tes zones personnalisées</h2>
+            <h2 style={{ fontSize:'clamp(1.5rem,3vw,2rem)', fontWeight:900, color:C.dark, marginBottom:'.5rem' }}>Tes zones <span style={gradText}>personnalisées</span></h2>
             <div style={{ display:'flex', gap:'.5rem', justifyContent:'center', flexWrap:'wrap' }}>
               <Chip active={mode==='vma'} onClick={()=>setMode('vma')}>⚡ Depuis ma VMA</Chip>
               <Chip active={mode==='fc'} onClick={()=>setMode('fc')}>❤️ Zones fréquence cardiaque</Chip>
@@ -287,7 +287,7 @@ export default function AlluresCalculator() {
             </div>
             <div style={{ flex:'1 1 300px' }}>
               <SectionTag>S'entraîner intelligemment</SectionTag>
-              <H2L>Pourquoi s'entraîner par zones ?</H2L>
+              <H2L>Pourquoi s'entraîner par <span style={gradText}>zones</span> ?</H2L>
               <div style={{ display:'flex', flexDirection:'column', gap:'1.25rem', marginBottom:'2rem', color:'rgba(26,18,48,.7)', fontSize:'.9rem', lineHeight:1.7 }}>
                 <p style={{ margin:0, textAlign:'justify' }}>L'erreur la plus courante chez les coureurs amateurs : courir <strong style={{ color:C.dark }}>trop vite en endurance et trop lentement en fractionné</strong>. Résultat : fatigue chronique, stagnation des chronos, risque de blessure accru.</p>
                 <p style={{ margin:0, textAlign:'justify' }}>La règle des <strong style={{ color:C.dark }}>80/20</strong> est prouvée par la science du sport : 80% du volume à basse intensité (zones 1-2), 20% à haute intensité (zones 4-5). C'est la répartition des meilleurs coureurs mondiaux, des récréatifs aux élites.</p>
@@ -336,7 +336,7 @@ export default function AlluresCalculator() {
             </div>
             <div style={{ flex:'1 1 300px' }}>
               <SectionTag dark>Mon conseil</SectionTag>
-              <H2D>La polarisation de l'entraînement</H2D>
+              <H2D>La <span style={gradText}>polarisation</span> de l'entraînement</H2D>
               <div style={{ color:'rgba(255,255,255,.7)', fontSize:'.9rem', lineHeight:1.8, display:'flex', flexDirection:'column', gap:'1rem' }}>
                 <p style={{ margin:0, textAlign:'justify' }}>La <strong style={{ color:'#fff' }}>polarisation</strong> est l'approche adoptée par tous les grands entraîneurs : concentrer les efforts soit dans la zone 1-2 (facile), soit dans la zone 4-5 (dur), en évitant la zone 3 (modérée).</p>
                 <p style={{ margin:0, textAlign:'justify' }}>La zone 3, ni trop facile ni assez intense, est la <strong style={{ color:'#fff' }}>zone grise</strong> qui accumule la fatigue sans produire les adaptations des zones hautes. C'est là que stagnent la plupart des amateurs.</p>
@@ -354,7 +354,7 @@ export default function AlluresCalculator() {
       {/* TÉMOIGNAGES */}
       <section style={{ background:C.light, padding:'5rem 1.5rem' }}>
         <Inner>
-          <div style={{ textAlign:'center', marginBottom:'2.5rem' }}><SectionTag>Témoignages</SectionTag><H2L>Ce que disent nos athlètes</H2L></div>
+          <div style={{ textAlign:'center', marginBottom:'2.5rem' }}><SectionTag>Témoignages</SectionTag><H2L>Ce que disent nos <span style={gradText}>athlètes</span></H2L></div>
         </Inner>
         <TestimonialsCarousel testimonials={TESTIMONIALS_ALLURES} />
       </section>
@@ -367,7 +367,7 @@ export default function AlluresCalculator() {
       {/* FAQ */}
       <section style={{ background:'#fff', padding:'5rem 1.5rem' }}>
         <Inner max={720}>
-          <div style={{ textAlign:'center', marginBottom:'2.5rem' }}><SectionTag>Questions fréquentes</SectionTag><H2L>Tout ce que tu dois savoir sur les allures</H2L></div>
+          <div style={{ textAlign:'center', marginBottom:'2.5rem' }}><SectionTag>Questions fréquentes</SectionTag><H2L>Tout ce que tu dois savoir sur les <span style={gradText}>allures</span></H2L></div>
           {FAQ.map((item,i)=>(
             <div key={i} style={{ borderBottom:'1px solid rgba(139,47,201,.1)' }}>
               <button onClick={()=>setOpenFaq(openFaq===i?null:i)} style={{ width:'100%', display:'flex', justifyContent:'space-between', alignItems:'center', padding:'1.1rem 0', background:'none', border:'none', cursor:'pointer', color:C.dark, fontSize:'.95rem', fontWeight:600, textAlign:'left', gap:'1rem' }}>

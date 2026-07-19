@@ -90,7 +90,7 @@ export default function VMACalculator() {
         <Inner max={780}>
           <div style={{ textAlign:'center', marginBottom:'2.5rem' }}>
             <SectionTag>Calculateur de VMA</SectionTag>
-            <h2 style={{ fontSize:'clamp(1.5rem,3vw,2rem)', fontWeight:900, color:C.dark, marginBottom:'.5rem' }}>3 méthodes au choix</h2>
+            <h2 style={{ fontSize:'clamp(1.5rem,3vw,2rem)', fontWeight:900, color:C.dark, marginBottom:'.5rem' }}>3 <span style={gradText}>méthodes</span> au choix</h2>
             <p style={{ color:'rgba(26,18,48,.55)', fontSize:'.95rem' }}>Utilise celle qui correspond à ton niveau et tes ressources</p>
           </div>
           <div style={{ display:'flex', flexDirection:'column', gap:'1.25rem' }}>
@@ -230,7 +230,7 @@ export default function VMACalculator() {
             </div>
             <div style={{ flex:'1 1 300px' }}>
               <SectionTag>C'est quoi la VMA ?</SectionTag>
-              <H2L>La donnée qui pilote tout ton entraînement</H2L>
+              <H2L>La donnée qui <span style={gradText}>pilote</span> tout ton entraînement</H2L>
               <div style={{ display:'flex', flexDirection:'column', gap:'1.25rem', marginBottom:'2rem' }}>
                 {[
                   { n:'⚡', t:'Définition simple', d:"La VMA (Vitesse Maximale Aérobie) est la vitesse à laquelle ton corps consomme le maximum d'oxygène possible. C'est ton moteur : plus il est puissant, plus tu es rapide et endurant sur toutes les distances." },
@@ -300,7 +300,7 @@ export default function VMACalculator() {
             </div>
             <div style={{ flex:'1 1 300px' }}>
               <SectionTag dark>Comment améliorer sa VMA</SectionTag>
-              <H2D>Les séances qui font vraiment progresser</H2D>
+              <H2D>Les séances qui font vraiment <span style={gradText}>progresser</span></H2D>
               <div style={{ display:'flex', flexDirection:'column', gap:'1.25rem' }}>
                 {[
                   { n:'🔁', t:'Fractionné court (30/30)', d:"30 secondes à 100-105% VMA suivies de 30 secondes de récupération active. 10 à 15 répétitions. La séance reine pour développer la VMA sans s'épuiser. À faire sur piste ou terrain plat." },
@@ -321,7 +321,7 @@ export default function VMACalculator() {
       {/* TÉMOIGNAGES */}
       <section style={{ background:C.light, padding:'5rem 1.5rem' }}>
         <Inner>
-          <div style={{ textAlign:'center', marginBottom:'2.5rem' }}><SectionTag>Témoignages</SectionTag><H2L>Ce que disent nos athlètes</H2L></div>
+          <div style={{ textAlign:'center', marginBottom:'2.5rem' }}><SectionTag>Témoignages</SectionTag><H2L>Ce que disent nos <span style={gradText}>athlètes</span></H2L></div>
         </Inner>
         <TestimonialsCarousel testimonials={TESTIMONIALS_VMA} />
       </section>
@@ -334,7 +334,7 @@ export default function VMACalculator() {
       {/* FAQ */}
       <section style={{ background:'#fff', padding:'5rem 1.5rem' }}>
         <Inner max={720}>
-          <div style={{ textAlign:'center', marginBottom:'2.5rem' }}><SectionTag>Questions fréquentes</SectionTag><H2L>Tout ce que tu dois savoir sur la VMA</H2L></div>
+          <div style={{ textAlign:'center', marginBottom:'2.5rem' }}><SectionTag>Questions fréquentes</SectionTag><H2L>Tout ce que tu dois savoir sur la <span style={gradText}>VMA</span></H2L></div>
           {FAQ.map((item,i)=>(
             <div key={i} style={{ borderBottom:'1px solid rgba(139,47,201,.1)' }}>
               <button onClick={()=>setOpenFaq(openFaq===i?null:i)} style={{ width:'100%', display:'flex', justifyContent:'space-between', alignItems:'center', padding:'1.1rem 0', background:'none', border:'none', cursor:'pointer', color:C.dark, fontSize:'.95rem', fontWeight:600, textAlign:'left', gap:'1rem' }}>
