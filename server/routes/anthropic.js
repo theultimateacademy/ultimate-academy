@@ -1989,12 +1989,12 @@ Format JSON :
 
     const message = await client.messages.create({
       model:      'claude-sonnet-4-6',
-      max_tokens: 1000,
+      max_tokens: 2000,
       messages:   [{ role: 'user', content: analysisPrompt }]
     });
 
-    const rawText      = message.content[0].text.trim();
-    const jsonText     = rawText.replace(/^```json\s*/i, '').replace(/^```\s*/i, '').replace(/\s*```$/i, '');
+    const rawText  = message.content[0].text.trim();
+    const jsonText = rawText.replace(/^```json\s*/i, '').replace(/^```\s*/i, '').replace(/\s*```$/i, '').trim();
     const analysisData = JSON.parse(jsonText);
 
     const { data: analysis, error } = await supabase
