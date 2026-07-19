@@ -196,7 +196,7 @@ export default function VO2maxCalculator() {
 
       <PageHero
         badge="Test de Cooper"
-        title={<><span style={gradText}>Calcule ta VO2max</span></>}
+        title={<>Calcule ta <span style={gradText}>VO2max</span></>}
         subtitle="Calcule ta VO2max avec le test de Cooper en 12 minutes. Découvre ton niveau aérobie et ta VMA estimée."
       >
         <button onClick={() => calcRef.current?.scrollIntoView({ behavior: 'smooth' })}
