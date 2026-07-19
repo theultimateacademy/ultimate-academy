@@ -208,4 +208,24 @@ router.delete('/plans/:planId/session', async (req, res) => {
   }
 });
 
+// POST /api/admin/weekly-feedback — save weekly recap (bypasses RLS via service key)
+router.post('/weekly-feedback', async (req, res) => {
+  try {
+    const { user_id, plan_id, week_number, rpe_semaine, ressenti, commentaire } = req.body;
+    if (!user_id || !plan_id || !week_number || !ressenti)
+      return res.status(400).json({ error: 'Missing required fields' });
+    const { error } = await supabase.from('weekly_feedbacks').upsert({
+      user_id, plan_id,
+      week_number: parseInt(week_number),
+      rpe_semaine: parseInt(rpe_semaine) || 6,
+      ressenti,
+      commentaire: commentaire || null,
+    }, { onConflict: 'user_id,plan_id,week_number' });
+    if (error) throw error;
+    res.json({ ok: true });
+  } catch (e) {
+    res.status(500).json({ error: e.message });
+  }
+});
+
 module.exports = router;

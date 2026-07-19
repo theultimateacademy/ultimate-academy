@@ -793,17 +793,21 @@ function WeeklyFeedbackCard({ weekNum, planId, userId, onSaved }) {
   const [comment,   setComment]   = useState('')
   const [saving,    setSaving]    = useState(false)
   const [saved,     setSaved]     = useState(false)
+  const [error,     setError]     = useState(null)
 
   async function submit() {
     if (!ressenti) return
     setSaving(true)
+    setError(null)
     try {
-      await supabase.from('weekly_feedbacks').upsert({
+      await api.weeklyFeedback({
         user_id: userId, plan_id: planId, week_number: weekNum,
         rpe_semaine: rpe, ressenti, commentaire: comment
-      }, { onConflict: 'user_id,plan_id,week_number' })
+      })
       setSaved(true)
       onSaved?.()
+    } catch (e) {
+      setError('Erreur lors de l\'enregistrement. Réessaie dans quelques secondes.')
     } finally {
       setSaving(false)
     }
@@ -850,6 +854,13 @@ function WeeklyFeedbackCard({ weekNum, planId, userId, onSaved }) {
         <textarea className="form-textarea" placeholder="Comment s'est passée cette semaine ?"
           value={comment} onChange={e => setComment(e.target.value)} style={{ minHeight: 70 }} />
       </div>
+      {error && (
+        <div style={{ background: 'rgba(239,68,68,.12)', border: '1px solid rgba(239,68,68,.3)',
+          borderRadius: 8, padding: '.65rem .85rem', marginBottom: '1rem',
+          color: '#fca5a5', fontSize: '.85rem' }}>
+          {error}
+        </div>
+      )}
       <button className="btn btn-primary btn-sm btn-full" disabled={saving || !ressenti} onClick={submit}>
         {saving ? 'Enregistrement…' : '✅ Envoyer mon bilan'}
       </button>

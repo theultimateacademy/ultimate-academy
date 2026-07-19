@@ -57,30 +57,43 @@ function timeToPace(min, sec, distM) {
   return s ? s.time : null
 }
 
-// Detect N×M intervals: checks bullet lines first, then BLOC headers
-function detectIntervals(corps) {
-  if (!corps) return null
+// Detect ALL N×M interval blocs — returns array of {reps, label, blocHeader}
+function detectAllBlocs(corps) {
+  if (!corps) return []
   const RE = /(\d+)\s*[×x×]\s*(\d+(?:[.,]\d+)?)\s*(m\b|km\b|min\b)/i
-  for (const line of corps.split('\n')) {
-    const t = line.trim()
-    if (!t.startsWith('•')) continue
-    const m = t.match(RE)
-    if (m) {
-      const reps = parseInt(m[1])
-      if (reps >= 2 && reps <= 25) return { reps, label: `${m[1]}×${m[2]}${m[3]}` }
-    }
-  }
-  // Also detect from BLOC headers: "BLOC N×M unit — ..."
+  const results = []
+
+  // Priority: BLOC headers with N×M patterns
   for (const line of corps.split('\n')) {
     const t = line.trim()
     if (!/^BLOC\b/i.test(t)) continue
     const m = t.match(RE)
     if (m) {
       const reps = parseInt(m[1])
-      if (reps >= 2 && reps <= 25) return { reps, label: `${m[1]}×${m[2]}${m[3]}` }
+      if (reps >= 2 && reps <= 25)
+        results.push({ reps, label: `${m[1]}×${m[2]}${m[3]}`, blocHeader: t })
     }
   }
-  return null
+
+  // Fallback: first bullet line with N×M pattern
+  if (results.length === 0) {
+    for (const line of corps.split('\n')) {
+      const t = line.trim()
+      if (!t.startsWith('•')) continue
+      const m = t.match(RE)
+      if (m) {
+        const reps = parseInt(m[1])
+        if (reps >= 2 && reps <= 25) { results.push({ reps, label: `${m[1]}×${m[2]}${m[3]}`, blocHeader: null }); break }
+      }
+    }
+  }
+  return results
+}
+
+// Backward-compat wrapper — returns first bloc or null
+function detectIntervals(corps) {
+  const blocs = detectAllBlocs(corps)
+  return blocs.length > 0 ? blocs[0] : null
 }
 
 // Get target allure for a phase from session.allures array
@@ -252,8 +265,10 @@ export default function PostSessionFlow({
   const [wuPaceSec,     setWuPaceSec]     = useState('')
   const [mainPaceMin,   setMainPaceMin]   = useState('')
   const [mainPaceSec,   setMainPaceSec]   = useState('')
-  const [repPaces,      setRepPaces]      = useState([]) // [{min:'', sec:''}] — allure mode
-  const [repTimes,      setRepTimes]      = useState([]) // [{min:'', sec:''}] — temps/distance mode
+  const [repPaces,      setRepPaces]      = useState([]) // [{min:'', sec:''}] — allure mode bloc 1
+  const [repTimes,      setRepTimes]      = useState([]) // [{min:'', sec:''}] — temps/distance mode bloc 1
+  const [repPaces2,     setRepPaces2]     = useState([]) // idem bloc 2
+  const [repTimes2,     setRepTimes2]     = useState([]) // idem bloc 2
   const [repWatts,      setRepWatts]      = useState([]) // [string] — watts par bloc vélo
   const [repMode,       setRepMode]       = useState('time') // 'time' | 'pace'
   const [cdPaceMin,     setCdPaceMin]     = useState('')
@@ -269,19 +284,25 @@ export default function PostSessionFlow({
   const isNonRunning   = isNatation || isVelo ||
     sessionTypeL.includes('brique') || sessionTypeL.includes('renforcement')
 
-  // Detect intervals/blocs for ALL session types
-  const intervals = useMemo(() => detectIntervals(session.corps), [session.corps])
+  // Detect ALL interval blocs
+  const allBlocs  = useMemo(() => detectAllBlocs(session.corps), [session.corps])
+  const intervals = allBlocs[0] || null   // first bloc (backward compat)
+  const intervals2 = allBlocs[1] || null  // second bloc (e.g. 6×70m côtes)
   const numReps   = intervals?.reps || 0
+  const numReps2  = intervals2?.reps || 0
   const hasBlocs  = numReps > 0
 
-  // Extract distance in metres from intervals.label (e.g. "6×300m" → 300, "3×20min" → null)
-  const distM = useMemo(() => {
-    if (!intervals?.label) return null
-    const m = intervals.label.match(/[×x]\s*(\d+(?:[.,]\d+)?)\s*(m|km)/i)
+  function extractDistM(label) {
+    if (!label) return null
+    const m = label.match(/[×x]\s*(\d+(?:[.,]\d+)?)\s*(m|km)/i)
     if (!m) return null
     const val = parseFloat(m[1].replace(',', '.'))
     return m[2].toLowerCase() === 'km' ? val * 1000 : val
-  }, [intervals?.label])
+  }
+
+  // Extract distance in metres from intervals.label (e.g. "6×300m" → 300, "3×20min" → null)
+  const distM  = useMemo(() => extractDistM(intervals?.label),  [intervals?.label])
+  const distM2 = useMemo(() => extractDistM(intervals2?.label), [intervals2?.label])
 
   // Effective rep paces (grows dynamically as user edits)
   const effectiveRepPaces = useMemo(() => {
@@ -298,6 +319,16 @@ export default function PostSessionFlow({
     if (numReps === 0) return []
     return Array.from({ length: numReps }, (_, i) => repWatts[i] || '')
   }, [numReps, repWatts])
+
+  const effectiveRepTimes2 = useMemo(() => {
+    if (numReps2 === 0) return []
+    return Array.from({ length: numReps2 }, (_, i) => repTimes2[i] || { min: '', sec: '' })
+  }, [numReps2, repTimes2])
+
+  const effectiveRepPaces2 = useMemo(() => {
+    if (numReps2 === 0) return []
+    return Array.from({ length: numReps2 }, (_, i) => repPaces2[i] || { min: '', sec: '' })
+  }, [numReps2, repPaces2])
 
   const wuAllure   = getPhaseAllure(session.allures, 'warmup')
   const mainAllure = getPhaseAllure(session.allures, 'main')
@@ -363,7 +394,22 @@ export default function PostSessionFlow({
           }
           return `${i+1}:${timeStr}/km`
         }).filter(Boolean).join(' | ')
-        if (repsStr) parts.push(`[Blocs: ${repsStr}]`)
+        if (repsStr) parts.push(`[Blocs ${intervals?.label}: ${repsStr}]`)
+        // Second bloc (e.g. côtes 6×70m)
+        if (intervals2 && numReps2 > 0) {
+          const useTimeMode2 = repMode === 'time' && distM2
+          const arr2 = useTimeMode2 ? effectiveRepTimes2 : effectiveRepPaces2
+          const repsStr2 = arr2.map((t, i) => {
+            if (!t.min && !t.sec) return null
+            const timeStr = `${t.min||'0'}'${String(t.sec||'0').padStart(2,'0')}"`
+            if (useTimeMode2) {
+              const split = timeToSplit(t.min, t.sec, distM2, isNatation)
+              return split ? `${i+1}:${timeStr}(${split.time}${split.unit})` : `${i+1}:${timeStr}`
+            }
+            return `${i+1}:${timeStr}/km`
+          }).filter(Boolean).join(' | ')
+          if (repsStr2) parts.push(`[Blocs ${intervals2?.label}: ${repsStr2}]`)
+        }
       }
     } else if (!isNonRunning && (mainPaceMin || mainPaceSec)) {
       parts.push(`[Corps: ${mainPaceMin||'0'}'${String(mainPaceSec||'0').padStart(2,'0')}"/km]`)
@@ -729,6 +775,75 @@ export default function PostSessionFlow({
                     secVal={mainPaceSec} onSecChange={setMainPaceSec}
                   />
                 )}
+
+                {/* ── Second bloc (e.g. côtes 6×70m) ── */}
+                {intervals2 && numReps2 > 0 && !isVelo && (() => {
+                  const useTimeMode2 = repMode === 'time' && distM2
+                  const setter2      = useTimeMode2 ? setRepTimes2 : setRepPaces2
+                  const arr2         = useTimeMode2 ? effectiveRepTimes2 : effectiveRepPaces2
+                  return (
+                    <>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '.5rem', margin: '1.25rem 0 .875rem' }}>
+                        <div style={{ flex: 1, height: 1, background: typeColor + '30' }} />
+                        <span style={{ fontSize: '.65rem', fontWeight: 800, letterSpacing: '.1em', color: typeColor,
+                          textTransform: 'uppercase', background: typeColor + '15', borderRadius: 99,
+                          padding: '.2rem .65rem', border: `1px solid ${typeColor}30` }}>
+                          {intervals2.blocHeader || intervals2.label}
+                        </span>
+                        <div style={{ flex: 1, height: 1, background: typeColor + '30' }} />
+                      </div>
+                      <div style={{ fontSize: '.8rem', color: 'rgba(26,26,46,.45)', marginBottom: '.65rem' }}>
+                        {distM2 ? `Entre le temps réalisé sur chaque ${distM2}m.` : `Entre l'allure pour chaque répétition.`}
+                      </div>
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '.5rem' }}>
+                        {arr2.map((rp, i) => {
+                          const split2 = (useTimeMode2 && distM2)
+                            ? timeToSplit(rp.min, rp.sec, distM2, isNatation)
+                            : null
+                          return (
+                            <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '.75rem',
+                              background: 'rgba(139,47,201,.04)', borderRadius: 12,
+                              padding: '.6rem .875rem', border: '1px solid rgba(139,47,201,.1)' }}>
+                              <span style={{ fontSize: '.78rem', fontWeight: 800, color: typeColor,
+                                minWidth: 22, textAlign: 'center' }}>{i + 1}</span>
+                              <div style={{ display: 'flex', alignItems: 'center', gap: '.3rem', flex: 1 }}>
+                                <input
+                                  type="number" min="0" max="99" placeholder="MM" value={rp.min || ''}
+                                  onChange={e => setter2(prev => {
+                                    const next = Array.from({ length: numReps2 }, (_, j) => prev[j] || { min: '', sec: '' })
+                                    next[i] = { ...next[i], min: e.target.value }
+                                    return next
+                                  })}
+                                  style={{ width: 50, padding: '.4rem .3rem', borderRadius: 8, fontSize: '.95rem',
+                                    fontWeight: 700, border: '2px solid rgba(139,47,201,.18)', background: '#fff',
+                                    textAlign: 'center', outline: 'none', color: '#1a1a2e' }} />
+                                <span style={{ color: 'rgba(26,26,46,.25)', fontSize: '1rem' }}>:</span>
+                                <input
+                                  type="number" min="0" max="59" placeholder="SS" value={rp.sec || ''}
+                                  onChange={e => setter2(prev => {
+                                    const next = Array.from({ length: numReps2 }, (_, j) => prev[j] || { min: '', sec: '' })
+                                    next[i] = { ...next[i], sec: e.target.value }
+                                    return next
+                                  })}
+                                  style={{ width: 50, padding: '.4rem .3rem', borderRadius: 8, fontSize: '.95rem',
+                                    fontWeight: 700, border: '2px solid rgba(139,47,201,.18)', background: '#fff',
+                                    textAlign: 'center', outline: 'none', color: '#1a1a2e' }} />
+                                {!split2 && <span style={{ fontSize: '.75rem', color: 'rgba(26,26,46,.35)' }}>/km</span>}
+                              </div>
+                              {split2 && (
+                                <span style={{ fontSize: '.8rem', fontWeight: 800, color: typeColor,
+                                  flexShrink: 0, whiteSpace: 'nowrap' }}>
+                                  = {split2.time}<span style={{ fontSize: '.68rem', fontWeight: 400, opacity: .6 }}>{split2.unit}</span>
+                                </span>
+                              )}
+                            </div>
+                          )
+                        })}
+                      </div>
+                    </>
+                  )
+                })()}
+
                 <SkipLink onSkip={skipToNext} />
               </>
             )
