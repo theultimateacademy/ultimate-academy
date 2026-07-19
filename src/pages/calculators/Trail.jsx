@@ -246,7 +246,7 @@ export default function TrailCalculator() {
             <div style={{ height: 1, background: 'rgba(139,47,201,.1)', marginBottom: '2rem' }}/>
 
             {/* Inputs */}
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '1.25rem', marginBottom: '2rem', alignItems: 'end' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '1.25rem', marginBottom: '.5rem' }}>
               <div>
                 <label style={{ ...labelSt, display: 'block', minHeight: '2.6rem' }}>Distance totale (km)</label>
                 <input type="number" min="0" step="0.5" placeholder="Ex : 42"
@@ -275,10 +275,10 @@ export default function TrailCalculator() {
                   <input type="number" min="0" max="59" placeholder="sec"
                     value={paceSec} onChange={e => setPaceSec(e.target.value)} style={inputSt}/>
                 </div>
-                <div style={{ fontSize: '.7rem', color: 'rgba(26,18,48,.35)', marginTop: '.3rem' }}>
-                  Ton allure sur 10km sur route plate
-                </div>
               </div>
+            </div>
+            <div style={{ fontSize: '.7rem', color: 'rgba(26,18,48,.35)', marginBottom: '1.5rem', textAlign: 'right' }}>
+              Utilise ton allure sur 10km sur route plate
             </div>
 
             {/* Résultats */}
