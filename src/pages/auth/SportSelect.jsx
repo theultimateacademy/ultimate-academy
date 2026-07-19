@@ -81,7 +81,7 @@ export default function SportSelect() {
                 <span style={{ fontSize: '2.2rem', fontWeight: 800, letterSpacing: '-0.04em' }}>30€</span>
                 <span style={{ fontSize: '.85rem', color: 'rgba(255,255,255,.45)' }}>/mois</span>
               </div>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '.7rem', marginBottom: '1.75rem' }}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '.7rem', marginBottom: '1.75rem', flex: 1 }}>
                 {FEATURES_RUNNING_TRAIL.map(f => (
                   <div key={f} style={{ display: 'flex', gap: '.65rem', alignItems: 'flex-start', fontSize: '.85rem', color: 'rgba(255,255,255,.72)' }}>
                     <span style={{ background: grad, WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text', fontWeight: 700, fontSize: '1rem', flexShrink: 0, lineHeight: 1.3 }}>✓</span>
@@ -112,7 +112,7 @@ export default function SportSelect() {
                 <span style={{ fontSize: '2.2rem', fontWeight: 800, letterSpacing: '-0.04em' }}>50€</span>
                 <span style={{ fontSize: '.85rem', color: 'rgba(255,255,255,.45)' }}>/mois</span>
               </div>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '.7rem', marginBottom: '1.75rem' }}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '.7rem', marginBottom: '1.75rem', flex: 1 }}>
                 {FEATURES_TRIATHLON.map(f => (
                   <div key={f} style={{ display: 'flex', gap: '.65rem', alignItems: 'flex-start', fontSize: '.85rem', color: 'rgba(255,255,255,.72)' }}>
                     <span style={{ background: grad, WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text', fontWeight: 700, fontSize: '1rem', flexShrink: 0, lineHeight: 1.3 }}>✓</span>
