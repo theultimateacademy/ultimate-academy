@@ -20,7 +20,7 @@ export default function AthleteMessages() {
         event: 'INSERT', schema: 'public', table: 'messages',
         filter: `user_id=eq.${profile.id}`
       }, payload => {
-        setMessages(prev => [...prev, payload.new])
+        setMessages(prev => prev.find(m => m.id === payload.new.id) ? prev : [...prev, payload.new])
         // Mark coach messages as read
         if (payload.new.sender === 'coach') {
           supabase.from('messages').update({ read: true }).eq('id', payload.new.id)
@@ -62,11 +62,12 @@ export default function AthleteMessages() {
     const content = input.trim()
     setInput('')
     try {
-      await supabase.from('messages').insert({
+      const { data } = await supabase.from('messages').insert({
         user_id: profile.id,
         sender: 'athlete',
         content
-      })
+      }).select().single()
+      if (data) setMessages(prev => prev.find(m => m.id === data.id) ? prev : [...prev, data])
     } finally {
       setSending(false)
     }

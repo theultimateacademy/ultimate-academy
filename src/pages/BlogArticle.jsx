@@ -150,6 +150,11 @@ export default function BlogArticle() {
 
       <article style={{ maxWidth: 740, margin: '0 auto', padding: '3.5rem 1.25rem 7rem', wordBreak: 'break-word', overflowWrap: 'break-word' }}>
 
+        {/* Back link */}
+        <Link to="/blog" style={{ display: 'inline-flex', alignItems: 'center', gap: '.4rem', color: 'rgba(255,255,255,.45)', textDecoration: 'none', fontSize: '.85rem', marginBottom: '2rem', fontWeight: 500 }}>
+          ← Tous les articles
+        </Link>
+
         {/* Tags */}
         {article.tags?.length > 0 && (
           <div style={{ display: 'flex', gap: '.4rem', flexWrap: 'wrap', marginBottom: '1.5rem' }}>

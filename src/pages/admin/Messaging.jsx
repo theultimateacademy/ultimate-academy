@@ -18,7 +18,7 @@ function Conversation({ athlete, onBack }) {
       .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'messages',
           filter: `user_id=eq.${athlete.id}` },
         payload => {
-          setMessages(prev => [...prev, payload.new])
+          setMessages(prev => prev.find(m => m.id === payload.new.id) ? prev : [...prev, payload.new])
           // Mark incoming athlete message as read immediately since coach is viewing
           if (payload.new.sender === 'athlete') {
             supabase.from('messages').update({ read: true }).eq('id', payload.new.id)
@@ -63,9 +63,10 @@ function Conversation({ athlete, onBack }) {
     setInput('')
     setSuggestion('')
     try {
-      await supabase.from('messages').insert({
+      const { data } = await supabase.from('messages').insert({
         user_id: athlete.id, sender: 'coach', content
-      })
+      }).select().single()
+      if (data) setMessages(prev => prev.find(m => m.id === data.id) ? prev : [...prev, data])
     } finally {
       setSending(false)
     }

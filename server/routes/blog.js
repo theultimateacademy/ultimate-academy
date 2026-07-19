@@ -222,4 +222,51 @@ router.post('/fix-reading-time', async (req, res) => {
   }
 });
 
+// POST /api/blog/backfill-images — ajoute des images aux articles sans photo
+router.post('/backfill-images', async (req, res) => {
+  const auth = req.headers['x-service-key'];
+  if (!process.env.SUPABASE_SERVICE_KEY || auth !== process.env.SUPABASE_SERVICE_KEY) {
+    return res.status(401).json({ error: 'Unauthorized' });
+  }
+  function slugToQuery(slug) {
+    if (slug.includes('utmb') && slug.includes('world')) return 'trail running world series mountain race';
+    if (slug.includes('utmb')) return 'utmb ultra trail chamonix mountain';
+    if (slug.includes('chaleur') || slug.includes('chaud')) return 'running summer heat sun athlete';
+    if (slug.includes('triathlon')) return 'triathlon swim bike run athlete';
+    if (slug.includes('blessure')) return 'runner injury recovery physical therapy';
+    if (slug.includes('ironman')) return 'ironman triathlon athlete finish line';
+    if (slug.includes('mentale') || slug.includes('psycho')) return 'runner focus mental strength';
+    if (slug.includes('planif') || slug.includes('saison')) return 'running training calendar plan';
+    if (slug.includes('nutrition') || slug.includes('ravitail')) return 'runner nutrition energy gel race';
+    if (slug.includes('sommeil')) return 'athlete sleep recovery rest bedroom';
+    if (slug.includes('sortie-longue') || slug.includes('longue')) return 'long run marathon training forest';
+    if (slug.includes('mont-blanc')) return 'mont blanc alps mountain running race';
+    if (slug.includes('diagonale')) return 'trail running reunion island mountain';
+    if (slug.includes('fractionne') || slug.includes('fractionnee')) return 'interval training track running sprint';
+    if (slug.includes('vma') || slug.includes('seuil')) return 'running training zones track athlete';
+    if (slug.includes('10km') || slug.includes('premier')) return '10km running race crowd start';
+    if (slug.includes('montagne')) return 'mountain trail running uphill summit';
+    return 'running athlete trail race training';
+  }
+  try {
+    const { data: articles, error } = await supabase
+      .from('articles').select('id, slug').is('image_url', null);
+    if (error) throw error;
+    const results = [];
+    for (const article of articles || []) {
+      const query = slugToQuery(article.slug);
+      const { url, alt } = await fetchImage(query);
+      if (url) {
+        await supabase.from('articles').update({ image_url: url, image_alt: alt || query }).eq('id', article.id);
+        results.push({ slug: article.slug, ok: true });
+      } else {
+        results.push({ slug: article.slug, ok: false });
+      }
+    }
+    res.json({ success: true, processed: results.length, results });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 module.exports = { router, generateAndPublish };
