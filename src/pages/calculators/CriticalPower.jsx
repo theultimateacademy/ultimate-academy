@@ -105,7 +105,7 @@ export default function CriticalPowerCalculator() {
         <Inner max={800}>
           <div style={{ textAlign:'center', marginBottom:'2.5rem' }}>
             <SectionTag>Calculateur de puissance</SectionTag>
-            <h2 style={{ fontSize:'clamp(1.5rem,3vw,2rem)', fontWeight:900, color:C.dark, marginBottom:'.5rem' }}>Tes zones de puissance personnalisées</h2>
+            <h2 style={{ fontSize:'clamp(1.5rem,3vw,2rem)', fontWeight:900, color:C.dark, marginBottom:'.5rem' }}>Tes zones de puissance <span style={gradText}>personnalisées</span></h2>
             <p style={{ color:'rgba(26,18,48,.5)', fontSize:'.9rem' }}>Renseigne ta puissance maximale soutenue sur 5 et 20 minutes. Le test à 12 min est optionnel mais améliore la précision.</p>
           </div>
 
@@ -223,7 +223,7 @@ export default function CriticalPowerCalculator() {
             </div>
             <div style={{ flex:'1 1 320px' }}>
               <SectionTag>La science derrière la CP</SectionTag>
-              <H2L>Pourquoi la CP est supérieure à la FTP ?</H2L>
+              <H2L>Pourquoi la CP est <span style={gradText}>supérieure</span> à la FTP ?</H2L>
               <div style={{ color:'rgba(26,18,48,.65)', fontSize:'.9rem', lineHeight:1.8, display:'flex', flexDirection:'column', gap:'1rem' }}>
                 <p style={{ textAlign:'justify' }}>La <strong style={{ color:C.dark }}>Puissance Critique (CP)</strong> est définie par le modèle de <strong style={{ color:C.dark }}>Monod & Scherrer (1965)</strong> (<em>Ergonomics</em>) comme la valeur asymptotique de la relation puissance–durée : la puissance que tu pourrais théoriquement maintenir indéfiniment, sans puiser dans ta réserve anaérobie.</p>
                 <p style={{ textAlign:'justify' }}>La <strong style={{ color:C.dark }}>W' (W prime)</strong> est ta réserve d'énergie anaérobie en joules. Au-dessus de ta CP, cette réserve se vide à un rythme dépendant de l'excès de puissance. Dès que tu repasses sous la CP, elle se reconstitue progressivement. <strong style={{ color:C.dark }}>Jones et al. (2010)</strong> (<em>Journal of Applied Physiology</em>) ont montré que ce modèle prédit avec précision la tolérance à l'effort intense.</p>
@@ -239,7 +239,7 @@ export default function CriticalPowerCalculator() {
         <Inner max={1100}>
           <div style={{ textAlign:'center', marginBottom:'3rem' }}>
             <SectionTag dark>Protocole</SectionTag>
-            <H2D>Comment réaliser tes tests de puissance ?</H2D>
+            <H2D>Comment réaliser tes <span style={gradText}>tests</span> de puissance ?</H2D>
             <p style={{ color:'rgba(255,255,255,.45)', fontSize:'.9rem', maxWidth:600, margin:'.5rem auto 0' }}>Chaque test doit être réalisé à effort maximal soutenable, jamais à fond dès la première seconde. L'objectif est de trouver la puissance la plus élevée que tu peux maintenir jusqu'à la fin, pas de t'effondrer à mi-parcours. La qualité d'exécution conditionne directement la précision de ta CP.</p>
           </div>
           <div style={{ display:'grid', gridTemplateColumns:'repeat(4, 1fr)', gap:'1.25rem', marginBottom:'2rem' }}>

@@ -246,7 +246,7 @@ export default function TrailCalculator() {
             <div style={{ height: 1, background: 'rgba(139,47,201,.1)', marginBottom: '2rem' }}/>
 
             {/* Inputs */}
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '1.25rem', marginBottom: '2rem' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '1.25rem', marginBottom: '2rem' }}>
               <div>
                 <label style={labelSt}>Distance totale (km)</label>
                 <input type="number" min="0" step="0.5" placeholder="Ex : 42"
@@ -328,10 +328,10 @@ export default function TrailCalculator() {
 
           {/* Illustration + légende après le calculateur */}
           <div style={{ marginTop: '3.5rem', background: '#fff', borderRadius: 20, padding: '2.5rem', boxShadow: '0 8px 40px rgba(139,47,201,.08)' }}>
-            <h3 style={{ fontSize: '1.1rem', fontWeight: 900, color: C.dark, marginBottom: '.4rem' }}>
-              Comment le calcul fonctionne ?
-            </h3>
-            <p style={{ color: 'rgba(26,18,48,.5)', fontSize: '.88rem', marginBottom: '2rem', lineHeight: 1.6 }}>
+            <h2 style={{ fontSize: 'clamp(1.4rem, 3vw, 1.9rem)', fontWeight: 900, color: C.dark, marginBottom: '.4rem', textAlign: 'center' }}>
+              Comment le calcul <span style={{ background: grad, WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text' }}>fonctionne</span> ?
+            </h2>
+            <p style={{ color: 'rgba(26,18,48,.5)', fontSize: '.88rem', marginBottom: '2rem', lineHeight: 1.6, textAlign: 'center' }}>
               Le schéma ci-dessous représente le profil altimétrique d'un trail. Chaque élément du dessin correspond à une donnée que tu as saisie.
             </p>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '2.5rem', alignItems: 'center' }}>
@@ -363,7 +363,7 @@ export default function TrailCalculator() {
                     <div style={{ width: 12, height: 12, borderRadius: '50%', background: item.color, flexShrink: 0, marginTop: '.2rem' }}/>
                     <div>
                       <div style={{ fontWeight: 700, color: C.dark, fontSize: '.85rem', marginBottom: '.2rem' }}>{item.title}</div>
-                      <div style={{ color: 'rgba(26,18,48,.55)', fontSize: '.8rem', lineHeight: 1.65 }}>{item.desc}</div>
+                      <div style={{ color: 'rgba(26,18,48,.55)', fontSize: '.8rem', lineHeight: 1.65, textAlign: 'justify' }}>{item.desc}</div>
                     </div>
                   </div>
                 ))}
@@ -382,10 +382,10 @@ export default function TrailCalculator() {
       {/* ── Courses de référence (fond sombre) ── */}
       <section style={{ background: C.dark, padding: '5rem 1.5rem' }}>
         <div style={{ maxWidth: 920, margin: '0 auto' }}>
-          <h2 style={{ fontSize: 'clamp(1.4rem, 3vw, 1.9rem)', fontWeight: 900, color: '#fff', marginBottom: '.6rem' }}>
+          <h2 style={{ fontSize: 'clamp(1.7rem, 3.5vw, 2.3rem)', fontWeight: 900, color: '#fff', marginBottom: '.6rem', textAlign: 'center' }}>
             Courses de <span style={{ background: grad, WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text' }}>référence</span>
           </h2>
-          <p style={{ color: 'rgba(255,255,255,.4)', marginBottom: '2.5rem', fontSize: '.9rem' }}>
+          <p style={{ color: 'rgba(255,255,255,.4)', marginBottom: '2.5rem', fontSize: '.9rem', textAlign: 'center' }}>
             Ordres de grandeur pour situer ton niveau et fixer un objectif réaliste.
           </p>
           <div style={{ overflowX: 'auto', borderRadius: 16, border: '1px solid rgba(255,255,255,.07)' }}>
@@ -441,7 +441,7 @@ export default function TrailCalculator() {
                 }}>+</span>
               </button>
               {openFaq === i && (
-                <div style={{ paddingBottom: '1.1rem', fontSize: '.875rem', color: 'rgba(26,18,48,.6)', lineHeight: 1.8 }}>
+                <div style={{ paddingBottom: '1.1rem', fontSize: '.875rem', color: 'rgba(26,18,48,.6)', lineHeight: 1.8, textAlign: 'justify' }}>
                   {item.a}
                 </div>
               )}

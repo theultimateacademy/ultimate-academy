@@ -85,7 +85,7 @@ export default function CSSCalculator() {
         <Inner max={760}>
           <div style={{ textAlign:'center', marginBottom:'2.5rem' }}>
             <SectionTag>Calculateur CSS</SectionTag>
-            <h2 style={{ fontSize:'clamp(1.5rem,3vw,2rem)', fontWeight:900, color:C.dark, marginBottom:'.5rem' }}>Tes allures natation personnalisées</h2>
+            <h2 style={{ fontSize:'clamp(1.5rem,3vw,2rem)', fontWeight:900, color:C.dark, marginBottom:'.5rem' }}>Tes allures natation <span style={gradText}>personnalisées</span></h2>
             <p style={{ color:'rgba(26,18,48,.5)', fontSize:'.9rem' }}>Deux tests suffisent : un 200m et un 400m à allure maximale, avec 10-15 min de récupération entre les deux</p>
           </div>
 
@@ -223,7 +223,7 @@ export default function CSSCalculator() {
             </div>
             <div style={{ flex:'1 1 320px' }}>
               <SectionTag>La science derrière la CSS</SectionTag>
-              <H2L>L'allure de seuil en natation</H2L>
+              <H2L>L'allure de <span style={gradText}>seuil</span> en natation</H2L>
               <div style={{ color:'rgba(26,18,48,.65)', fontSize:'.9rem', lineHeight:1.8, display:'flex', flexDirection:'column', gap:'1rem' }}>
                 <p style={{ textAlign:'justify' }}>La <strong style={{ color:C.dark }}>CSS (Critical Swim Speed)</strong> est la vitesse maximale que tu peux maintenir sur une longue distance (environ 1 500m) sans accumuler excessivement de lactate. Elle a été formalisée par <strong style={{ color:C.dark }}>Wakayoshi et al. en 1992</strong> (<em>Journal of Applied Physiology</em>) comme l'équivalent natation du seuil anaérobie.</p>
                 <p style={{ textAlign:'justify' }}>Son principe repose sur le fait que pour aller vite, tu utilises ta réserve anaérobie. La CSS est exactement la vitesse à partir de laquelle cette réserve n'est plus sollicitée : tu peux donc théoriquement la tenir sur une très longue durée sans t'épuiser.</p>
@@ -239,7 +239,7 @@ export default function CSSCalculator() {
         <Inner max={1100}>
           <div style={{ textAlign:'center', marginBottom:'3rem' }}>
             <SectionTag dark>Protocole de test</SectionTag>
-            <H2D>Comment réaliser tes tests ?</H2D>
+            <H2D>Comment réaliser tes <span style={gradText}>tests</span> ?</H2D>
             <p style={{ color:'rgba(255,255,255,.45)', fontSize:'.9rem', maxWidth:600, margin:'.5rem auto 0' }}>Les deux tests doivent être réalisés le même jour, dans cet ordre précis, en piscine de 25m ou 50m. La qualité de l'exécution conditionne directement la fiabilité de ta CSS.</p>
           </div>
           <div style={{ display:'grid', gridTemplateColumns:'repeat(4, 1fr)', gap:'1.25rem' }}>
@@ -270,7 +270,7 @@ export default function CSSCalculator() {
         <Inner max={1100}>
           <div style={{ textAlign:'center', marginBottom:'3rem' }}>
             <SectionTag>Utiliser sa CSS</SectionTag>
-            <H2L>Entraîner sa CSS efficacement</H2L>
+            <H2L>Entraîner sa CSS <span style={gradText}>efficacement</span></H2L>
           </div>
           <div style={{ display:'grid', gridTemplateColumns:'repeat(4, 1fr)', gap:'1.25rem' }}>
             {[
@@ -299,7 +299,7 @@ export default function CSSCalculator() {
         <Inner max={720}>
           <div style={{ textAlign:'center', marginBottom:'2.5rem' }}>
             <SectionTag>FAQ</SectionTag>
-            <H2L>Questions fréquentes sur la CSS</H2L>
+            <H2L>Questions <span style={gradText}>fréquentes</span> sur la CSS</H2L>
           </div>
           {FAQ.map((item,i)=>(
             <div key={i} style={{ borderBottom:'1px solid rgba(139,47,201,.1)' }}>

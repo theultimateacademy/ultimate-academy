@@ -71,8 +71,8 @@ export default function SportSelect() {
               style={{ ...baseCard, background: 'linear-gradient(145deg, rgba(139,47,201,.15), rgba(232,35,122,.08))', border: '1.5px solid rgba(139,47,201,.45)' }}
               onMouseEnter={hover} onMouseLeave={unhover}
             >
-              {/* Top section — flex:1 so price always aligns with the other card */}
-              <div style={{ flex: 1 }}>
+              {/* Top section — minHeight ensures prices align across both cards */}
+              <div style={{ flex: 1, minHeight: '9rem' }}>
                 <div style={{ fontSize: '2rem', marginBottom: '1rem' }}>🏃 ⛰️</div>
                 <div style={{ fontSize: 'clamp(1.3rem,3vw,1.6rem)', fontWeight: 800, letterSpacing: '-0.02em', lineHeight: 1.2, marginBottom: '.5rem' }}>
                   <span style={gText}>Course à pied</span>{' '}&amp;{' '}<span style={gText}>Trail</span>
@@ -107,8 +107,8 @@ export default function SportSelect() {
               style={{ ...baseCard, background: 'rgba(255,255,255,.04)', border: '1px solid rgba(255,255,255,.1)' }}
               onMouseEnter={hover} onMouseLeave={unhover}
             >
-              {/* Top section — flex:1 aligns price with the other card */}
-              <div style={{ flex: 1 }}>
+              {/* Top section — minHeight ensures prices align across both cards */}
+              <div style={{ flex: 1, minHeight: '9rem' }}>
                 <div style={{ fontSize: '2rem', marginBottom: '1rem' }}>🏊</div>
                 <div style={{ fontSize: 'clamp(1.3rem,3vw,1.6rem)', fontWeight: 800, letterSpacing: '-0.02em', lineHeight: 1.2, marginBottom: '.5rem' }}>
                   <span style={gText}>Triathlon</span>
