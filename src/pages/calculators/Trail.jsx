@@ -26,12 +26,12 @@ const TERRAIN = [
 ]
 
 const REFS = [
-  { race: 'UTMB',                    dist: '171 km', dp: '10 000 m', temps: '20h – 44h',  allure: "7'–10'/km" },
-  { race: 'CCC',                     dist: '100 km', dp: '6 100 m',  temps: '12h – 26h',  allure: "6'–9'/km"  },
-  { race: 'TDS',                     dist: '145 km', dp: '9 100 m',  temps: '18h – 40h',  allure: "7'–10'/km" },
-  { race: 'Marathon du Mont Blanc',  dist: '42 km',  dp: '2 500 m',  temps: '4h30 – 9h',  allure: "6'–12'/km" },
-  { race: 'Diagonale des Fous',      dist: '167 km', dp: '9 600 m',  temps: '22h – 56h',  allure: "7'–12'/km" },
-  { race: 'Trail 20 km / 1 000 m',  dist: '20 km',  dp: '1 000 m',  temps: '1h45 – 3h',  allure: "5'–9'/km"  },
+  { race: 'UTMB',                    dist: '171 km', dp: '10 000 m', temps: '20h – 44h',  allure: "7'00/km – 10'00/km" },
+  { race: 'CCC',                     dist: '100 km', dp: '6 100 m',  temps: '12h – 26h',  allure: "6'00/km – 9'00/km"  },
+  { race: 'TDS',                     dist: '145 km', dp: '9 100 m',  temps: '18h – 40h',  allure: "7'00/km – 10'00/km" },
+  { race: 'Marathon du Mont Blanc',  dist: '42 km',  dp: '2 500 m',  temps: '4h30 – 9h',  allure: "6'00/km – 12'00/km" },
+  { race: 'Diagonale des Fous',      dist: '167 km', dp: '9 600 m',  temps: '22h – 56h',  allure: "7'00/km – 12'00/km" },
+  { race: 'Trail 20 km / 1 000 m',  dist: '20 km',  dp: '1 000 m',  temps: '1h45 – 3h',  allure: "5'00/km – 9'00/km"  },
 ]
 
 const FAQ = [
@@ -209,42 +209,20 @@ export default function TrailCalculator() {
       <section id="trail-calc" style={{ background: C.light, padding: '5rem 1.5rem' }}>
         <div style={{ maxWidth: 920, margin: '0 auto' }}>
 
-          {/* Illustration + explication */}
-          <div style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))',
-            gap: '3rem', alignItems: 'center', marginBottom: '3.5rem',
-          }}>
-            <div>
-              <div style={{
-                display: 'inline-block', background: 'rgba(139,47,201,.1)',
-                borderRadius: 50, padding: '.3rem .9rem',
-                fontSize: '.75rem', fontWeight: 700, color: C.purple,
-                letterSpacing: '.08em', textTransform: 'uppercase', marginBottom: '1rem',
-              }}>Règle de Naismith</div>
-              <h2 style={{ fontSize: 'clamp(1.4rem, 3vw, 1.9rem)', fontWeight: 900, color: C.dark, lineHeight: 1.2, marginBottom: '1rem' }}>
-                km éq = D +{' '}
-                <span style={{ background: grad, WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text' }}>
-                  D+/100 + D-/200
-                </span>
-              </h2>
-              <p style={{ color: 'rgba(26,18,48,.6)', lineHeight: 1.75, fontSize: '.92rem', marginBottom: '1rem' }}>
-                On convertit le dénivelé en kilomètres fictifs sur terrain plat, puis on applique ton allure de référence. Plus le terrain est technique, plus le coefficient de ralentissement augmente.
-              </p>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '.5rem' }}>
-                {[
-                  { dot: C.purple, text: '100 m D+ ≈ 1 km supplémentaire' },
-                  { dot: C.pink,   text: '200 m D- ≈ 1 km supplémentaire' },
-                  { dot: '#A3E635',text: 'Score ITRA = km effort = D + D+/100 + D-/200' },
-                ].map((item, i) => (
-                  <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '.6rem', fontSize: '.83rem', color: 'rgba(26,18,48,.65)' }}>
-                    <div style={{ width: 8, height: 8, borderRadius: '50%', background: item.dot, flexShrink: 0 }}/>
-                    {item.text}
-                  </div>
-                ))}
-              </div>
-            </div>
-            <MountainSVG />
+          {/* Titre intro */}
+          <div style={{ textAlign: 'center', marginBottom: '3rem' }}>
+            <div style={{
+              display: 'inline-block', background: 'rgba(139,47,201,.1)',
+              borderRadius: 50, padding: '.3rem .9rem',
+              fontSize: '.75rem', fontWeight: 700, color: C.purple,
+              letterSpacing: '.08em', textTransform: 'uppercase', marginBottom: '1rem',
+            }}>Règle de Naismith</div>
+            <h2 style={{ fontSize: 'clamp(1.4rem, 3vw, 1.9rem)', fontWeight: 900, color: C.dark, lineHeight: 1.2, margin: '0 auto', maxWidth: 600 }}>
+              Renseigne tes données et obtiens ton{' '}
+              <span style={{ background: grad, WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text' }}>
+                temps estimé trail
+              </span>
+            </h2>
           </div>
 
           {/* Carte blanche : terrain + inputs + résultats */}
@@ -328,8 +306,8 @@ export default function TrailCalculator() {
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(125px, 1fr))', gap: '.75rem' }}>
                   {[
                     { label: 'Km équivalents', value: `${kmEq.toFixed(1)} km` },
-                    { label: 'Score ITRA', value: `${kmEff.toFixed(1)} km` },
-                    { label: 'Catégorie', value: cat?.label, color: cat?.color },
+                    { label: 'Km effort ITRA', value: `${kmEff.toFixed(1)} km` },
+                    { label: 'Catégorie ITRA', value: cat?.label, color: cat?.color },
                     { label: 'Temps partie plate', value: fmtTime(distN * adjPace) },
                     { label: 'Temps D+', value: fmtTime(extraDp * adjPace) },
                     { label: 'Temps D-', value: fmtTime(extraDm * adjPace) },
@@ -346,6 +324,51 @@ export default function TrailCalculator() {
                 Remplis les champs pour voir ton estimation ↑
               </div>
             )}
+          </div>
+
+          {/* Illustration + légende après le calculateur */}
+          <div style={{ marginTop: '3.5rem', background: '#fff', borderRadius: 20, padding: '2.5rem', boxShadow: '0 8px 40px rgba(139,47,201,.08)' }}>
+            <h3 style={{ fontSize: '1.1rem', fontWeight: 900, color: C.dark, marginBottom: '.4rem' }}>
+              Comment le calcul fonctionne ?
+            </h3>
+            <p style={{ color: 'rgba(26,18,48,.5)', fontSize: '.88rem', marginBottom: '2rem', lineHeight: 1.6 }}>
+              Le schéma ci-dessous représente le profil altimétrique d'un trail. Chaque élément du dessin correspond à une donnée que tu as saisie.
+            </p>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '2.5rem', alignItems: 'center' }}>
+              <MountainSVG />
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+                {[
+                  {
+                    color: C.purple,
+                    title: 'D+ — Dénivelé positif (violet)',
+                    desc: "Total des mètres montés sur l'ensemble du parcours. Règle Naismith : 100 m D+ = 1 km de temps supplémentaire sur terrain plat.",
+                  },
+                  {
+                    color: C.pink,
+                    title: 'D- — Dénivelé négatif (rose)',
+                    desc: "Total des mètres descendus. La descente fatigue les quadriceps et ralentit. Règle : 200 m D- = 1 km supplémentaire (moitié moins que le D+).",
+                  },
+                  {
+                    color: 'rgba(139,47,201,.4)',
+                    title: 'Distance totale (axe horizontal)',
+                    desc: "La longueur du tracé en kilomètres, du départ à l'arrivée, sans tenir compte du dénivelé.",
+                  },
+                  {
+                    color: '#A3E635',
+                    title: 'Km effort ITRA',
+                    desc: "Valeur utilisée par l'ITRA pour classer les courses : km effort = Distance + D+/100 + D-/200. Ce n'est pas un score de points, c'est la distance fictive qui sert à déterminer la catégorie (XS → XXL).",
+                  },
+                ].map((item, i) => (
+                  <div key={i} style={{ display: 'flex', gap: '.75rem' }}>
+                    <div style={{ width: 12, height: 12, borderRadius: '50%', background: item.color, flexShrink: 0, marginTop: '.2rem' }}/>
+                    <div>
+                      <div style={{ fontWeight: 700, color: C.dark, fontSize: '.85rem', marginBottom: '.2rem' }}>{item.title}</div>
+                      <div style={{ color: 'rgba(26,18,48,.55)', fontSize: '.8rem', lineHeight: 1.65 }}>{item.desc}</div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
           </div>
 
           <div style={{ textAlign: 'center', marginTop: '2rem' }}>
