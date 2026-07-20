@@ -15,9 +15,6 @@ export default function AthleteProfile() {
   const [stravaStatus,   setStravaStatus]   = useState('')
   const [importing,      setImporting]      = useState(false)
   const [uploading,      setUploading]      = useState(false)
-  const [suuntoStatus,   setSuuntoStatus]   = useState('')
-  const [garminLoading,  setGarminLoading]  = useState(false)
-  const [garminStatus,   setGarminStatus]   = useState('')
   // Adaptations
   const [heatLoading,    setHeatLoading]    = useState(false)
   const [fatigueLoading, setFatigueLoading] = useState(false)
@@ -84,17 +81,13 @@ export default function AthleteProfile() {
 
   useEffect(() => {
     const strava  = searchParams.get('strava')
-    const suunto  = searchParams.get('suunto')
-    const garmin  = searchParams.get('garmin')
     if (strava)  setStravaStatus(strava)
-    if (suunto)  setSuuntoStatus(suunto)
-    if (garmin)  setGarminStatus(garmin)
     loadStats()
   }, [])
 
   useEffect(() => {
-    if (stravaStatus === 'connected' || suuntoStatus === 'connected' || garminStatus === 'connected') refreshProfile()
-  }, [stravaStatus, suuntoStatus, garminStatus])
+    if (stravaStatus === 'connected') refreshProfile()
+  }, [stravaStatus])
 
   useEffect(() => {
     if (!profile?.intermediate_race_date) return
@@ -214,24 +207,6 @@ export default function AthleteProfile() {
       setImporting(false)
     }
   }
-
-  async function connectGarmin() {
-    setGarminLoading(true)
-    window.location.href = api.garminConnect(profile.id)
-  }
-
-  async function disconnectGarmin() {
-    if (!confirm('Déconnecter Garmin ?')) return
-    setGarminLoading(true)
-    try {
-      await api.garminDisconnect({ userId: profile.id })
-      await refreshProfile()
-      setGarminStatus('disconnected')
-    } finally {
-      setGarminLoading(false)
-    }
-  }
-
 
   async function saveField(dbKey, value) {
     setEditSaving(true)
@@ -540,10 +515,6 @@ export default function AthleteProfile() {
       {stravaStatus === 'connected' && <div className="alert alert-success" style={{ marginBottom:'1rem' }}>✅ Strava connecté avec succès !</div>}
       {stravaStatus === 'error'     && <div className="alert alert-error"   style={{ marginBottom:'1rem' }}>⚠️ La connexion Strava a échoué.</div>}
       {String(stravaStatus).startsWith('imported_') && <div className="alert alert-success" style={{ marginBottom:'1rem' }}>✅ {stravaStatus.split('_')[1]} activités importées depuis Strava.</div>}
-      {suuntoStatus === 'connected' && <div className="alert alert-success" style={{ marginBottom:'1rem' }}>✅ Suunto connecté ! Les séances s'enverront automatiquement.</div>}
-      {suuntoStatus === 'error'     && <div className="alert alert-error"   style={{ marginBottom:'1rem' }}>⚠️ La connexion Suunto a échoué.</div>}
-      {garminStatus === 'connected' && <div className="alert alert-success" style={{ marginBottom:'1rem' }}>✅ Garmin Connect connecté ! Tu peux envoyer tes séances directement sur ta montre.</div>}
-      {garminStatus === 'error'     && <div className="alert alert-error"   style={{ marginBottom:'1rem' }}>⚠️ La connexion Garmin a échoué. Réessaie.</div>}
 
       {/* Profile info */}
       <div className="card" style={{ marginBottom: '1.25rem' }}>
@@ -827,55 +798,26 @@ export default function AthleteProfile() {
                 </div>
               </FieldRow>
 
-              {isTri && (() => {
-                function TriMetricRow({ fieldKey, label, unit, knownKey, valueKey, min, max, step, placeholder }) {
-                  const isEditing = editField === fieldKey
-                  const known = profile?.[knownKey]
-                  const val   = profile?.[valueKey]
-                  const display = (known === false || val == null) ? 'Non mesuré' : `${val} ${unit}`
-                  return (
-                    <div style={{ ...rowBase, cursor: isEditing ? 'default' : 'pointer', alignItems: isEditing ? 'flex-start' : 'center' }}
-                      onClick={() => { if (!isEditing) { setEditField(fieldKey); setEditVal(prev => ({ ...prev, [`${fieldKey}_val`]: val ?? '', [`${fieldKey}_none`]: known === false || val == null })) } }}>
-                      <span style={{ fontSize: '.82rem', color: 'var(--text-muted)', flexShrink: 0, minWidth: 160 }}>{label}</span>
-                      {isEditing ? (
-                        <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '.4rem' }}
-                          onClick={e => e.stopPropagation()}>
-                          <div style={{ display: 'flex', gap: '.4rem', width: '100%', justifyContent: 'flex-end', alignItems: 'center' }}>
-                            <input type="number" className="form-input" style={{ width: 90, fontSize: '.875rem' }}
-                              step={step || 1} min={min} max={max}
-                              value={editVal[`${fieldKey}_none`] ? '' : (editVal[`${fieldKey}_val`] ?? '')}
-                              disabled={!!editVal[`${fieldKey}_none`]}
-                              placeholder={placeholder}
-                              autoFocus
-                              onChange={e => setEditVal(prev => ({ ...prev, [`${fieldKey}_val`]: e.target.value, [`${fieldKey}_none`]: false }))} />
-                            <button
-                              className={`btn btn-sm ${editVal[`${fieldKey}_none`] ? 'btn-primary' : 'btn-ghost'}`}
-                              style={{ fontSize: '.75rem', whiteSpace: 'nowrap' }}
-                              onClick={() => setEditVal(prev => ({ ...prev, [`${fieldKey}_none`]: !prev[`${fieldKey}_none`], [`${fieldKey}_val`]: '' }))}>
-                              Non mesuré
-                            </button>
-                          </div>
-                          <div style={{ display: 'flex', gap: '.4rem' }}>
-                            <button className="btn btn-ghost btn-sm" style={{ fontSize: '.75rem', padding: '.22rem .55rem' }}
-                              onClick={cancelEdit} disabled={editSaving}>Annuler</button>
-                            <button className="btn btn-primary btn-sm" style={{ fontSize: '.75rem', padding: '.22rem .6rem' }}
-                              onClick={() => saveMulti({
-                                [knownKey]: !editVal[`${fieldKey}_none`],
-                                [valueKey]: editVal[`${fieldKey}_none`] ? null : (parseFloat(editVal[`${fieldKey}_val`]) || null),
-                              })} disabled={editSaving}>{editSaving ? '…' : '✓'}</button>
-                          </div>
-                        </div>
-                      ) : (
-                        <span style={{ fontWeight: 600, fontSize: '.875rem', textAlign: 'right' }}>{display}</span>
-                      )}
-                    </div>
-                  )
-                }
-                return (<>
-                  <TriMetricRow fieldKey="css" label="CSS (s/100m)" unit="s/100m" knownKey="css_known" valueKey="css_value" min={60} max={200} step={0.1} placeholder="ex: 90" />
-                  <TriMetricRow fieldKey="ftp" label="FTP / CP (watts)" unit="W" knownKey="ftp_known" valueKey="ftp_value" min={50} max={600} step={1} placeholder="ex: 220" />
-                </>)
-              })()}
+              {isTri && (<>
+                {/* CSS — lecture seule, renseigné par le coach */}
+                <div style={{ ...rowBase, cursor: 'default' }}>
+                  <span style={{ fontSize: '.82rem', color: 'var(--text-muted)', flexShrink: 0, minWidth: 160 }}>CSS (/100m)</span>
+                  <span style={{ fontWeight: 600, fontSize: '.875rem', textAlign: 'right' }}>
+                    {profile?.css_known === false || profile?.css_value == null
+                      ? 'Non mesuré'
+                      : `${profile.css_value} s/100m`}
+                  </span>
+                </div>
+                {/* CP — lecture seule, renseigné par le coach */}
+                <div style={{ ...rowBase, cursor: 'default' }}>
+                  <span style={{ fontSize: '.82rem', color: 'var(--text-muted)', flexShrink: 0, minWidth: 160 }}>CP (en watts)</span>
+                  <span style={{ fontWeight: 600, fontSize: '.875rem', textAlign: 'right' }}>
+                    {profile?.ftp_known === false || profile?.ftp_value == null
+                      ? 'Non mesuré'
+                      : `${profile.ftp_value} W`}
+                  </span>
+                </div>
+              </>)}
 
               {!isTri && (
                 <FieldRow fieldKey="chrono_goal" dbKey="chrono_goal" label="Chrono cible"
@@ -1109,80 +1051,6 @@ export default function AthleteProfile() {
                   {stravaLoading ? '…' : 'Connecter'}
                 </button>
               )}
-            </div>
-            {profile?.strava_connected && (
-              <div style={{ fontSize: '.75rem', color: 'var(--text-muted)', lineHeight: 1.45 }}>
-                Garmin, Coros et Suunto se synchronisent automatiquement via Strava.
-              </div>
-            )}
-          </div>
-
-          {/* Coros */}
-          <div style={{
-            borderRadius: 14,
-            border: '1.5px solid rgba(20,184,166,.25)',
-            background: 'rgba(20,184,166,.03)',
-            padding: '1rem 1.125rem',
-          }}>
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '1rem', marginBottom: '.625rem' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '.75rem' }}>
-                <BrandLogo src="https://logo.clearbit.com/coros.com" bg="#0A0A0A" fallback="CO" />
-                <div>
-                  <div style={{ fontWeight: 700, fontSize: '.9rem', color: '#14B8A6' }}>Coros</div>
-                  <div style={{ fontSize: '.75rem', color: 'var(--text-muted)' }}>Export FIT par séance</div>
-                </div>
-              </div>
-              <span style={{ fontSize: '.7rem', background: 'rgba(20,184,166,.12)', color: '#14B8A6', border: '1px solid rgba(20,184,166,.25)', borderRadius: 99, padding: '.15rem .6rem', flexShrink: 0 }}>
-                Disponible
-              </span>
-            </div>
-            <div style={{ fontSize: '.75rem', color: 'var(--text-muted)', lineHeight: 1.45 }}>
-              Utilise le bouton <strong style={{ color: 'var(--text)' }}>Envoyer sur ma Coros</strong> sur chaque séance.
-              {profile?.strava_connected && <span style={{ color: '#FC4C02' }}> Tes données sont aussi importées via Strava ✓</span>}
-            </div>
-          </div>
-
-          {/* Garmin */}
-          <div style={{
-            borderRadius: 14,
-            border: '1.5px solid rgba(99,102,241,.2)',
-            background: 'rgba(99,102,241,.03)',
-            padding: '1rem 1.125rem',
-            opacity: .75,
-          }}>
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '1rem' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '.75rem' }}>
-                <BrandLogo src="https://logo.clearbit.com/garmin.com" bg="#1A1F6C" fallback="G" />
-                <div>
-                  <div style={{ fontWeight: 700, fontSize: '.9rem', color: '#818CF8' }}>Garmin Connect</div>
-                  <div style={{ fontSize: '.75rem', color: 'var(--text-muted)' }}>Connexion directe à la montre</div>
-                </div>
-              </div>
-              <span style={{ fontSize: '.7rem', background: 'rgba(255,255,255,.05)', color: 'rgba(255,255,255,.35)', border: '1px solid rgba(255,255,255,.1)', borderRadius: 99, padding: '.15rem .6rem', flexShrink: 0 }}>
-                Bientôt
-              </span>
-            </div>
-          </div>
-
-          {/* Suunto */}
-          <div style={{
-            borderRadius: 14,
-            border: '1.5px solid rgba(239,68,68,.2)',
-            background: 'rgba(239,68,68,.03)',
-            padding: '1rem 1.125rem',
-            opacity: .75,
-          }}>
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '1rem' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '.75rem' }}>
-                <BrandLogo src="https://logo.clearbit.com/suunto.com" bg="#CC0000" fallback="S" />
-                <div>
-                  <div style={{ fontWeight: 700, fontSize: '.9rem', color: '#F87171' }}>Suunto</div>
-                  <div style={{ fontSize: '.75rem', color: 'var(--text-muted)' }}>Connexion directe à la montre</div>
-                </div>
-              </div>
-              <span style={{ fontSize: '.7rem', background: 'rgba(255,255,255,.05)', color: 'rgba(255,255,255,.35)', border: '1px solid rgba(255,255,255,.1)', borderRadius: 99, padding: '.15rem .6rem', flexShrink: 0 }}>
-                Bientôt
-              </span>
             </div>
           </div>
 
