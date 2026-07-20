@@ -356,6 +356,9 @@ export default function AdminPlans() {
   const [deletingPlan,   setDeletingPlan]   = useState(false)
   const [selectedPlans,  setSelectedPlans]  = useState(new Set())
   const [bulkDeleting,   setBulkDeleting]   = useState(false)
+  const [showEditForm,   setShowEditForm]   = useState(false)
+  const [editAthlete,    setEditAthlete]    = useState('')
+  const [editNoplan,     setEditNoplan]     = useState(false)
 
   useEffect(() => { loadPlans(); loadAllAthletes() }, [])
 
@@ -418,6 +421,17 @@ export default function AdminPlans() {
     }
   }
 
+  function openActivePlan(athleteId) {
+    setEditNoplan(false)
+    const activePlan = plans.find(p => p.user_id === athleteId && p.status === 'active')
+    const athleteProfile = allAthletes.find(a => a.id === athleteId) || athletes[athleteId]
+    if (activePlan && athleteProfile) {
+      setModal({ plan: activePlan, athlete: athleteProfile })
+    } else {
+      setEditNoplan(true)
+    }
+  }
+
   async function loadPlans() {
     setLoading(true)
     try {
@@ -442,15 +456,48 @@ export default function AdminPlans() {
     <div className="page">
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
         <h2 className="page-heading">Plans d'entraînement</h2>
-        <div style={{ display: 'flex', gap: '.5rem' }}>
-          <button className="btn btn-ghost btn-sm" onClick={() => navigate('/admin/plans/builder')}>
+        <div style={{ display: 'flex', gap: '.5rem', flexWrap: 'wrap' }}>
+          <button className="btn btn-ghost btn-sm"
+            onClick={() => { setShowEditForm(v => !v); setShowGenForm(false); setEditAthlete(''); setEditNoplan(false) }}
+            style={showEditForm ? { borderColor: 'var(--primary)', color: '#C084FC' } : {}}>
+            ✏️ Modifier un plan en cours
+          </button>
+          <button className="btn btn-ghost btn-sm" onClick={() => { navigate('/admin/plans/builder'); setShowGenForm(false); setShowEditForm(false) }}>
             🗓️ Créer manuellement
           </button>
-          <button className="btn btn-primary btn-sm" onClick={() => setShowGenForm(v => !v)}>
+          <button className="btn btn-primary btn-sm" onClick={() => { setShowGenForm(v => !v); setShowEditForm(false) }}>
             🤖 Générer avec IA
           </button>
         </div>
       </div>
+
+      {showEditForm && (
+        <div className="card" style={{ marginBottom: '1.25rem', background: 'var(--surface-2)', border: '1px solid rgba(139,47,201,.25)' }}>
+          <h4 style={{ marginBottom: '.875rem', color: '#C084FC' }}>✏️ Modifier un plan en cours</h4>
+          <div style={{ display: 'flex', gap: '.75rem', alignItems: 'flex-end', flexWrap: 'wrap' }}>
+            <div className="form-group" style={{ flex: 1, minWidth: 220, marginBottom: 0 }}>
+              <label className="form-label">Athlète</label>
+              <select className="form-input" value={editAthlete}
+                onChange={e => { setEditAthlete(e.target.value); setEditNoplan(false); if (e.target.value) openActivePlan(e.target.value) }}>
+                <option value="">-- Choisir un athlète --</option>
+                {allAthletes.map(a => (
+                  <option key={a.id} value={a.id}>{a.first_name} {a.last_name}</option>
+                ))}
+              </select>
+            </div>
+          </div>
+          {editNoplan && (
+            <p style={{ marginTop: '.75rem', fontSize: '.85rem', color: '#F59E0B' }}>
+              ⚠️ Cet athlète n'a pas de plan actif en ce moment.
+            </p>
+          )}
+          {!editNoplan && !editAthlete && (
+            <p className="text-muted text-sm" style={{ marginTop: '.75rem' }}>
+              Sélectionne un athlète pour ouvrir son plan en cours et modifier les séances.
+            </p>
+          )}
+        </div>
+      )}
 
       {showGenForm && (
         <div className="card" style={{ marginBottom: '1.25rem', background: 'var(--surface-2)' }}>
