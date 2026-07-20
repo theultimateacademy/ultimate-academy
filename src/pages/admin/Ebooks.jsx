@@ -5,6 +5,15 @@ const API = import.meta.env.VITE_API_URL || 'http://localhost:3001'
 const STATUS_LABELS = { pending: 'En attente', paid: 'Payé', sent: 'Envoyé' }
 const STATUS_COLORS = { pending: '#F59E0B', paid: '#06B6D4', sent: '#10B981' }
 
+// Prix réels par slug (palier 3 séances = prix de départ affiché)
+const PRICE_TIERS = {
+  '10km-8sem':      { 3: 1499, 4: 1799, 5: 1999, 6: 2299 },
+  '10km-12sem':     { 3: 1799, 4: 1999, 5: 2299, 6: 2499 },
+  'semi-12sem':     { 3: 1999, 4: 2299, 5: 2499, 6: 2999 },
+  'marathon-12sem': { 3: 2299, 4: 2499, 5: 2799, 6: 2999 },
+  'marathon-16sem': { 3: 2499, 4: 2799, 5: 2999, 6: 3299 },
+}
+
 const EBOOK_CATALOG = [
   { slug: '10km-8sem',      label: '10 km — 8 semaines',      icon: '🏃' },
   { slug: '10km-12sem',     label: '10 km — 12 semaines',     icon: '🏃' },
@@ -227,7 +236,11 @@ export default function AdminEbooks() {
                 <tr key={e.id} style={{ borderBottom: '1px solid var(--border)' }}>
                   <td style={{ padding: '.75rem 1rem', fontWeight: 600 }}>{e.title}</td>
                   <td style={{ padding: '.75rem 1rem', fontSize: '.8rem', color: 'var(--text-muted)' }}>{e.slug}</td>
-                  <td style={{ padding: '.75rem 1rem', fontSize: '.875rem' }}>{(e.price_cents / 100).toFixed(2)}€</td>
+                  <td style={{ padding: '.75rem 1rem', fontSize: '.875rem' }}>
+                    {PRICE_TIERS[e.slug]
+                      ? `${(Math.min(...Object.values(PRICE_TIERS[e.slug])) / 100).toFixed(2)}€ – ${(Math.max(...Object.values(PRICE_TIERS[e.slug])) / 100).toFixed(2)}€`
+                      : `${(e.price_cents / 100).toFixed(2)}€`}
+                  </td>
                   <td style={{ padding: '.75rem 1rem', fontWeight: 700, color: e.sales > 0 ? 'var(--primary)' : 'var(--text-muted)' }}>{e.sales}</td>
                   <td style={{ padding: '.75rem 1rem' }}>
                     <span style={{ background: e.active ? 'rgba(16,185,129,.15)' : 'rgba(107,114,128,.15)', color: e.active ? '#10B981' : '#6B7280', borderRadius: 99, padding: '.2rem .65rem', fontSize: '.72rem', fontWeight: 700 }}>
