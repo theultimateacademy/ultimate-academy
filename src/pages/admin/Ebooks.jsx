@@ -13,7 +13,11 @@ const EBOOK_CATALOG = [
   { slug: 'marathon-16sem', label: 'Marathon — 16 semaines',  icon: '🏆' },
 ]
 
-const VMA_OPTIONS = Array.from({ length: 29 }, (_, i) => (10 + i * 0.5).toFixed(1))
+// Génère 10, 10.5, 11, 11.5 ... 24 — correspond aux noms de fichiers réels
+const VMA_OPTIONS = Array.from({ length: 29 }, (_, i) => {
+  const v = 10 + i * 0.5
+  return Number.isInteger(v) ? String(v) : v.toFixed(1)
+})
 const SEANCES_OPTIONS = [3, 4, 5, 6]
 
 function EbookCard({ slug, label, icon }) {
