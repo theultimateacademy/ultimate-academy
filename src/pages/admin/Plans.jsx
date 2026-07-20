@@ -424,9 +424,8 @@ export default function AdminPlans() {
   function openActivePlan(athleteId) {
     setEditNoplan(false)
     const activePlan = plans.find(p => p.user_id === athleteId && p.status === 'active')
-    const athleteProfile = allAthletes.find(a => a.id === athleteId) || athletes[athleteId]
-    if (activePlan && athleteProfile) {
-      setModal({ plan: activePlan, athlete: athleteProfile })
+    if (activePlan) {
+      navigate(`/admin/plans/builder?planId=${activePlan.id}&userId=${athleteId}`)
     } else {
       setEditNoplan(true)
     }
