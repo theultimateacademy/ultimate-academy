@@ -799,23 +799,72 @@ export default function AthleteProfile() {
               </FieldRow>
 
               {isTri && (<>
-                {/* CSS — lecture seule, renseigné par le coach */}
-                <div style={{ ...rowBase, cursor: 'default' }}>
+                {/* CSS — éditable par l'athlète */}
+                <div style={{ ...rowBase, cursor: editField === 'css' ? 'default' : 'pointer', alignItems: editField === 'css' ? 'flex-start' : 'center' }}
+                  onClick={() => { if (editField !== 'css') { setEditField('css'); setEditVal(prev => ({ ...prev, css: profile?.css_value ?? '' })) } }}>
                   <span style={{ fontSize: '.82rem', color: 'var(--text-muted)', flexShrink: 0, minWidth: 160 }}>CSS (/100m)</span>
-                  <span style={{ fontWeight: 600, fontSize: '.875rem', textAlign: 'right' }}>
-                    {profile?.css_known === false || profile?.css_value == null
-                      ? 'Non mesuré'
-                      : `${profile.css_value} s/100m`}
-                  </span>
+                  {editField === 'css' ? (
+                    <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '.4rem' }}
+                      onClick={e => e.stopPropagation()}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '.4rem' }}>
+                        <input type="number" className="form-input" style={{ fontSize: '.875rem', width: 90, textAlign: 'right' }}
+                          placeholder="ex: 108" min={60} max={300} autoFocus
+                          value={editVal.css ?? ''}
+                          onChange={e => setEditVal(prev => ({ ...prev, css: e.target.value }))} />
+                        <span style={{ fontSize: '.8rem', color: 'var(--text-muted)', whiteSpace: 'nowrap' }}>s/100m</span>
+                      </div>
+                      <div style={{ display: 'flex', gap: '.4rem' }}>
+                        <button className="btn btn-ghost btn-sm" style={{ fontSize: '.75rem', padding: '.22rem .55rem' }}
+                          onClick={cancelEdit} disabled={editSaving}>Annuler</button>
+                        <button className="btn btn-primary btn-sm" style={{ fontSize: '.75rem', padding: '.22rem .6rem' }}
+                          onClick={() => {
+                            const v = editVal.css
+                            const n = parseInt(v, 10)
+                            saveMulti(!v || isNaN(n) ? { css_known: false, css_value: null } : { css_known: true, css_value: n })
+                          }} disabled={editSaving}>
+                          {editSaving ? '…' : '✓'}
+                        </button>
+                      </div>
+                    </div>
+                  ) : (
+                    <span style={{ fontWeight: 600, fontSize: '.875rem', textAlign: 'right' }}>
+                      {profile?.css_known === false || profile?.css_value == null ? 'Non mesuré' : `${profile.css_value} s/100m`}
+                    </span>
+                  )}
                 </div>
-                {/* CP — lecture seule, renseigné par le coach */}
-                <div style={{ ...rowBase, cursor: 'default' }}>
+
+                {/* CP — éditable par l'athlète */}
+                <div style={{ ...rowBase, cursor: editField === 'ftp' ? 'default' : 'pointer', alignItems: editField === 'ftp' ? 'flex-start' : 'center' }}
+                  onClick={() => { if (editField !== 'ftp') { setEditField('ftp'); setEditVal(prev => ({ ...prev, ftp: profile?.ftp_value ?? '' })) } }}>
                   <span style={{ fontSize: '.82rem', color: 'var(--text-muted)', flexShrink: 0, minWidth: 160 }}>CP (en watts)</span>
-                  <span style={{ fontWeight: 600, fontSize: '.875rem', textAlign: 'right' }}>
-                    {profile?.ftp_known === false || profile?.ftp_value == null
-                      ? 'Non mesuré'
-                      : `${profile.ftp_value} W`}
-                  </span>
+                  {editField === 'ftp' ? (
+                    <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '.4rem' }}
+                      onClick={e => e.stopPropagation()}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '.4rem' }}>
+                        <input type="number" className="form-input" style={{ fontSize: '.875rem', width: 90, textAlign: 'right' }}
+                          placeholder="ex: 220" min={50} max={600} autoFocus
+                          value={editVal.ftp ?? ''}
+                          onChange={e => setEditVal(prev => ({ ...prev, ftp: e.target.value }))} />
+                        <span style={{ fontSize: '.8rem', color: 'var(--text-muted)', whiteSpace: 'nowrap' }}>W</span>
+                      </div>
+                      <div style={{ display: 'flex', gap: '.4rem' }}>
+                        <button className="btn btn-ghost btn-sm" style={{ fontSize: '.75rem', padding: '.22rem .55rem' }}
+                          onClick={cancelEdit} disabled={editSaving}>Annuler</button>
+                        <button className="btn btn-primary btn-sm" style={{ fontSize: '.75rem', padding: '.22rem .6rem' }}
+                          onClick={() => {
+                            const v = editVal.ftp
+                            const n = parseInt(v, 10)
+                            saveMulti(!v || isNaN(n) ? { ftp_known: false, ftp_value: null } : { ftp_known: true, ftp_value: n })
+                          }} disabled={editSaving}>
+                          {editSaving ? '…' : '✓'}
+                        </button>
+                      </div>
+                    </div>
+                  ) : (
+                    <span style={{ fontWeight: 600, fontSize: '.875rem', textAlign: 'right' }}>
+                      {profile?.ftp_known === false || profile?.ftp_value == null ? 'Non mesuré' : `${profile.ftp_value} W`}
+                    </span>
+                  )}
                 </div>
               </>)}
 

@@ -96,12 +96,11 @@ export default function ManualPlanBuilder() {
   const [savingPlan, setSavingPlan] = useState(false)
   const [savedMsg,   setSavedMsg]   = useState('')
 
-  // Chargement initial : tous les athlètes via API serveur (service key, bypass RLS) + sessions
+  // Chargement initial : tous les athlètes + sessions
   useEffect(() => {
-    fetch(`${API}/api/admin/athletes`)
-      .then(r => r.json())
-      .then(({ athletes: list }) => setAthletes(list || []))
-      .catch(err => console.error('[ManualPlanBuilder] athletes:', err))
+    supabase.from('profiles').select('id, first_name, last_name, email, objective, sport_type, subscription_status')
+      .eq('role', 'athlete').order('first_name')
+      .then(({ data }) => setAthletes(data || []))
 
     supabase.from('session_library').select('*').order('code')
       .then(({ data }) => { setSessions(data || []); setLoadingSessions(false) })

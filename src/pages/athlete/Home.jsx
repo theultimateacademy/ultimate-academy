@@ -156,7 +156,7 @@ function MonthlyAnalysisModal({ analysis, onClose }) {
           </button>
           <div style={{ flex: 1, minWidth: 0 }}>
             <div style={{ fontWeight: 800, fontSize: '.95rem', color: '#fff', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-              📅 Bilan — {month}
+              📅 Analyse du mois de {month}
             </div>
             {analysis.sent_at && (
               <div style={{ fontSize: '.65rem', color: 'rgba(255,255,255,.28)' }}>
@@ -170,7 +170,7 @@ function MonthlyAnalysisModal({ analysis, onClose }) {
           {conseil ? (
             <div style={{ background: 'rgba(6,182,212,.07)', border: '1px solid rgba(6,182,212,.22)', borderRadius: 14, padding: '1.5rem' }}>
               <div style={{ fontSize: '.6rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '.12em', color: '#22D3EE', marginBottom: '.875rem' }}>
-                Retour d'Alexis — {month}
+                Analyse du mois de {month}
               </div>
               <p style={{ fontSize: '.92rem', lineHeight: 1.8, margin: 0, color: 'rgba(255,255,255,.88)', textAlign: 'justify', whiteSpace: 'pre-wrap' }}>
                 {renderRich(conseil, '#22D3EE')}
@@ -237,7 +237,7 @@ function WeeklyAnalysisModal({ analysis, onClose }) {
           </button>
           <div style={{ flex: 1, minWidth: 0 }}>
             <div style={{ fontWeight: 800, fontSize: '.95rem', color: '#fff', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-              {m.icon} Semaine {analysis.week_number} · {m.label}
+              {m.icon} Analyse de la semaine {analysis.week_number}
             </div>
             {analysis.sent_at && (
               <div style={{ fontSize: '.65rem', color: 'rgba(255,255,255,.28)' }}>
@@ -704,7 +704,7 @@ export default function AthleteHome() {
                 <div style={{ fontSize: '1.6rem', lineHeight: 1, flexShrink: 0 }}>{m.icon}</div>
                 <div style={{ flex: 1, minWidth: 0 }}>
                   <div style={{ fontWeight: 800, fontSize: '.88rem', color: '#fff', marginBottom: '.15rem' }}>
-                    Semaine {analysis.week_number} · Retour d'Alexis
+                    Analyse de la semaine {analysis.week_number}
                   </div>
                   <div style={{ fontSize: '.75rem', color: 'rgba(255,255,255,.4)' }}>
                     {doneReal}/{totalCount} séances effectuées
@@ -748,7 +748,7 @@ export default function AthleteHome() {
                 <div style={{ fontSize: '1.5rem', lineHeight: 1, flexShrink: 0 }}>📅</div>
                 <div style={{ flex: 1, minWidth: 0 }}>
                   <div style={{ fontWeight: 800, fontSize: '.88rem', color: '#22D3EE', marginBottom: '.15rem' }}>
-                    Bilan {d.month || 'mensuel'} · Retour d'Alexis
+                    Analyse du mois de {d.month || ''}
                   </div>
                   <div style={{ fontSize: '.75rem', color: 'rgba(255,255,255,.4)' }}>
                     Analyse mensuelle disponible

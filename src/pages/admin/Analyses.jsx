@@ -357,8 +357,8 @@ function AnalysisModal({ analysis, athlete, onClose, onSend }) {
             </div>
             <h3 style={{ margin: 0, fontSize: '1.05rem' }}>
               {data0.is_monthly
-                ? `Analyse mensuelle — ${data0.month || ''}`
-                : `Analyse Semaine ${analysis.week_number}`}
+                ? `Analyse du mois de ${data0.month || ''}`
+                : `Analyse de la semaine ${analysis.week_number}`}
             </h3>
             <div style={{ fontSize: '.8rem', color: 'var(--text-muted)', marginTop: '.2rem' }}>
               {athlete?.first_name} {athlete?.last_name}
@@ -474,10 +474,9 @@ export default function AdminAnalyses() {
 
   useEffect(() => {
     loadAnalyses()
-    fetch(`${API}/api/admin/athletes`)
-      .then(r => r.json())
-      .then(({ athletes: list }) => setMonthAthletes(list || []))
-      .catch(() => {})
+    supabase.from('profiles').select('id, first_name, last_name')
+      .eq('role', 'athlete').order('first_name')
+      .then(({ data }) => setMonthAthletes(data || []))
   }, [])
 
   async function deleteAnalysis(id) {
