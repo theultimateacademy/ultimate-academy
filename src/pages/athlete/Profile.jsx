@@ -799,39 +799,62 @@ export default function AthleteProfile() {
               </FieldRow>
 
               {isTri && (<>
-                {/* CSS — éditable par l'athlète */}
-                <div style={{ ...rowBase, cursor: editField === 'css' ? 'default' : 'pointer', alignItems: editField === 'css' ? 'flex-start' : 'center' }}
-                  onClick={() => { if (editField !== 'css') { setEditField('css'); setEditVal(prev => ({ ...prev, css: profile?.css_value ?? '' })) } }}>
-                  <span style={{ fontSize: '.82rem', color: 'var(--text-muted)', flexShrink: 0, minWidth: 160 }}>CSS (/100m)</span>
-                  {editField === 'css' ? (
-                    <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '.4rem' }}
-                      onClick={e => e.stopPropagation()}>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '.4rem' }}>
-                        <input type="number" className="form-input" style={{ fontSize: '.875rem', width: 90, textAlign: 'right' }}
-                          placeholder="ex: 108" min={60} max={300} autoFocus
-                          value={editVal.css ?? ''}
-                          onChange={e => setEditVal(prev => ({ ...prev, css: e.target.value }))} />
-                        <span style={{ fontSize: '.8rem', color: 'var(--text-muted)', whiteSpace: 'nowrap' }}>s/100m</span>
-                      </div>
-                      <div style={{ display: 'flex', gap: '.4rem' }}>
-                        <button className="btn btn-ghost btn-sm" style={{ fontSize: '.75rem', padding: '.22rem .55rem' }}
-                          onClick={cancelEdit} disabled={editSaving}>Annuler</button>
-                        <button className="btn btn-primary btn-sm" style={{ fontSize: '.75rem', padding: '.22rem .6rem' }}
-                          onClick={() => {
-                            const v = editVal.css
-                            const n = parseInt(v, 10)
-                            saveMulti(!v || isNaN(n) ? { css_known: false, css_value: null } : { css_known: true, css_value: n })
-                          }} disabled={editSaving}>
-                          {editSaving ? '…' : '✓'}
-                        </button>
-                      </div>
+                {/* CSS — éditable par l'athlète (min:sec /100m) */}
+                {(() => {
+                  const totalSec = profile?.css_value
+                  const displayCSS = (!profile?.css_known && profile?.css_known !== undefined) || totalSec == null
+                    ? 'Non mesuré'
+                    : `${Math.floor(totalSec / 60)}'${String(totalSec % 60).padStart(2, '0')}" /100m`
+                  return (
+                    <div style={{ ...rowBase, cursor: editField === 'css' ? 'default' : 'pointer', alignItems: editField === 'css' ? 'flex-start' : 'center' }}
+                      onClick={() => {
+                        if (editField !== 'css') {
+                          const s = profile?.css_value ?? null
+                          setEditField('css')
+                          setEditVal(prev => ({
+                            ...prev,
+                            css_min: s != null ? String(Math.floor(s / 60)) : '',
+                            css_sec: s != null ? String(s % 60) : '',
+                          }))
+                        }
+                      }}>
+                      <span style={{ fontSize: '.82rem', color: 'var(--text-muted)', flexShrink: 0, minWidth: 160 }}>CSS (/100m)</span>
+                      {editField === 'css' ? (
+                        <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '.4rem' }}
+                          onClick={e => e.stopPropagation()}>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '.35rem' }}>
+                            <input type="number" className="form-input" style={{ fontSize: '.875rem', width: 52, textAlign: 'center' }}
+                              placeholder="1" min={1} max={5} autoFocus
+                              value={editVal.css_min ?? ''}
+                              onChange={e => setEditVal(prev => ({ ...prev, css_min: e.target.value }))} />
+                            <span style={{ fontSize: '.9rem', color: 'var(--text-muted)', fontWeight: 700 }}>:</span>
+                            <input type="number" className="form-input" style={{ fontSize: '.875rem', width: 52, textAlign: 'center' }}
+                              placeholder="48" min={0} max={59}
+                              value={editVal.css_sec ?? ''}
+                              onChange={e => setEditVal(prev => ({ ...prev, css_sec: e.target.value }))} />
+                            <span style={{ fontSize: '.8rem', color: 'var(--text-muted)', whiteSpace: 'nowrap' }}>/100m</span>
+                          </div>
+                          <div style={{ display: 'flex', gap: '.4rem' }}>
+                            <button className="btn btn-ghost btn-sm" style={{ fontSize: '.75rem', padding: '.22rem .55rem' }}
+                              onClick={cancelEdit} disabled={editSaving}>Annuler</button>
+                            <button className="btn btn-primary btn-sm" style={{ fontSize: '.75rem', padding: '.22rem .6rem' }}
+                              onClick={() => {
+                                const m = parseInt(editVal.css_min, 10)
+                                const s = parseInt(editVal.css_sec, 10)
+                                if (isNaN(m) && isNaN(s)) { saveMulti({ css_known: false, css_value: null }); return }
+                                const total = (isNaN(m) ? 0 : m) * 60 + (isNaN(s) ? 0 : s)
+                                saveMulti(total > 0 ? { css_known: true, css_value: total } : { css_known: false, css_value: null })
+                              }} disabled={editSaving}>
+                              {editSaving ? '…' : '✓'}
+                            </button>
+                          </div>
+                        </div>
+                      ) : (
+                        <span style={{ fontWeight: 600, fontSize: '.875rem', textAlign: 'right' }}>{displayCSS}</span>
+                      )}
                     </div>
-                  ) : (
-                    <span style={{ fontWeight: 600, fontSize: '.875rem', textAlign: 'right' }}>
-                      {profile?.css_known === false || profile?.css_value == null ? 'Non mesuré' : `${profile.css_value} s/100m`}
-                    </span>
-                  )}
-                </div>
+                  )
+                })()}
 
                 {/* CP — éditable par l'athlète */}
                 <div style={{ ...rowBase, cursor: editField === 'ftp' ? 'default' : 'pointer', alignItems: editField === 'ftp' ? 'flex-start' : 'center' }}

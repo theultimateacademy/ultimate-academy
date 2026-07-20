@@ -98,9 +98,12 @@ export default function ManualPlanBuilder() {
 
   // Chargement initial : tous les athlètes + sessions
   useEffect(() => {
-    supabase.from('profiles').select('id, first_name, last_name, email, objective, sport_type, subscription_status')
+    supabase.from('profiles').select('*')
       .eq('role', 'athlete').order('first_name')
-      .then(({ data }) => setAthletes(data || []))
+      .then(({ data, error }) => {
+        if (error) console.error('[ManualPlanBuilder] athletes:', error)
+        setAthletes(data || [])
+      })
 
     supabase.from('session_library').select('*').order('code')
       .then(({ data }) => { setSessions(data || []); setLoadingSessions(false) })
