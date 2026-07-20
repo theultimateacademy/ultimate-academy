@@ -50,6 +50,7 @@ import AdminEbooks          from './pages/admin/Ebooks'
 import AdminDashboard       from './pages/admin/Dashboard'
 import AdminAthletes        from './pages/admin/Athletes'
 import AdminPlans           from './pages/admin/Plans'
+import ManualPlanBuilder    from './pages/admin/ManualPlanBuilder'
 import AdminAnalyses        from './pages/admin/Analyses'
 import AdminMessaging       from './pages/admin/Messaging'
 import AdminSessionLibrary  from './pages/admin/SessionLibrary'
@@ -130,7 +131,8 @@ function AppRoutes() {
       <Route path="/admin" element={<RequireCoach><AdminLayout /></RequireCoach>}>
         <Route index            element={<AdminDashboard />} />
         <Route path="athletes"  element={<AdminAthletes />} />
-        <Route path="plans"     element={<AdminPlans />} />
+        <Route path="plans"          element={<AdminPlans />} />
+        <Route path="plans/builder"  element={<ManualPlanBuilder />} />
         <Route path="analyses"  element={<AdminAnalyses />} />
         <Route path="messages"  element={<AdminMessaging />} />
         <Route path="ebooks"    element={<AdminEbooks />} />

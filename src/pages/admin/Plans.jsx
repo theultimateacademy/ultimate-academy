@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { supabase } from '../../lib/supabase'
 import { SESSION_TYPE_COLORS } from '../../lib/utils'
 import LoadingSpinner from '../../components/UI/LoadingSpinner'
@@ -341,6 +342,7 @@ function EditSessionForm({ session, onSave, onCancel, onDelete }) {
 }
 
 export default function AdminPlans() {
+  const navigate = useNavigate()
   const [plans,      setPlans]      = useState([])
   const [athletes,   setAthletes]   = useState({})
   const [modal,      setModal]      = useState(null)
@@ -440,9 +442,14 @@ export default function AdminPlans() {
     <div className="page">
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
         <h2 className="page-heading">Plans d'entraînement</h2>
-        <button className="btn btn-primary btn-sm" onClick={() => setShowGenForm(v => !v)}>
-          + Générer un plan
-        </button>
+        <div style={{ display: 'flex', gap: '.5rem' }}>
+          <button className="btn btn-ghost btn-sm" onClick={() => navigate('/admin/plans/builder')}>
+            🗓️ Créer manuellement
+          </button>
+          <button className="btn btn-primary btn-sm" onClick={() => setShowGenForm(v => !v)}>
+            🤖 Générer avec IA
+          </button>
+        </div>
       </div>
 
       {showGenForm && (

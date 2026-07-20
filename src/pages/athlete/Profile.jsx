@@ -276,6 +276,23 @@ export default function AthleteProfile() {
     }
   }
 
+  async function saveMulti(patch) {
+    setEditSaving(true)
+    try {
+      const { data: updated, error: dbErr } = await supabase
+        .from('profiles').update(patch).eq('id', profile.id).select().single()
+      if (dbErr) throw dbErr
+      updateProfile(updated)
+      setEditField(null)
+      showToast('Profil mis à jour ✓')
+    } catch (err) {
+      console.error('[saveMulti]', err)
+      showToast((err?.message || 'Erreur inconnue') + ' ✗', 'error')
+    } finally {
+      setEditSaving(false)
+    }
+  }
+
   async function saveNameField() {
     setEditSaving(true)
     try {
@@ -809,6 +826,56 @@ export default function AthleteProfile() {
                   <span style={{ fontSize: '.8rem', color: 'var(--text-muted)', whiteSpace: 'nowrap' }}>km/h</span>
                 </div>
               </FieldRow>
+
+              {isTri && (() => {
+                function TriMetricRow({ fieldKey, label, unit, knownKey, valueKey, min, max, step, placeholder }) {
+                  const isEditing = editField === fieldKey
+                  const known = profile?.[knownKey]
+                  const val   = profile?.[valueKey]
+                  const display = (known === false || val == null) ? 'Non mesuré' : `${val} ${unit}`
+                  return (
+                    <div style={{ ...rowBase, cursor: isEditing ? 'default' : 'pointer', alignItems: isEditing ? 'flex-start' : 'center' }}
+                      onClick={() => { if (!isEditing) { setEditField(fieldKey); setEditVal(prev => ({ ...prev, [`${fieldKey}_val`]: val ?? '', [`${fieldKey}_none`]: known === false || val == null })) } }}>
+                      <span style={{ fontSize: '.82rem', color: 'var(--text-muted)', flexShrink: 0, minWidth: 160 }}>{label}</span>
+                      {isEditing ? (
+                        <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '.4rem' }}
+                          onClick={e => e.stopPropagation()}>
+                          <div style={{ display: 'flex', gap: '.4rem', width: '100%', justifyContent: 'flex-end', alignItems: 'center' }}>
+                            <input type="number" className="form-input" style={{ width: 90, fontSize: '.875rem' }}
+                              step={step || 1} min={min} max={max}
+                              value={editVal[`${fieldKey}_none`] ? '' : (editVal[`${fieldKey}_val`] ?? '')}
+                              disabled={!!editVal[`${fieldKey}_none`]}
+                              placeholder={placeholder}
+                              autoFocus
+                              onChange={e => setEditVal(prev => ({ ...prev, [`${fieldKey}_val`]: e.target.value, [`${fieldKey}_none`]: false }))} />
+                            <button
+                              className={`btn btn-sm ${editVal[`${fieldKey}_none`] ? 'btn-primary' : 'btn-ghost'}`}
+                              style={{ fontSize: '.75rem', whiteSpace: 'nowrap' }}
+                              onClick={() => setEditVal(prev => ({ ...prev, [`${fieldKey}_none`]: !prev[`${fieldKey}_none`], [`${fieldKey}_val`]: '' }))}>
+                              Non mesuré
+                            </button>
+                          </div>
+                          <div style={{ display: 'flex', gap: '.4rem' }}>
+                            <button className="btn btn-ghost btn-sm" style={{ fontSize: '.75rem', padding: '.22rem .55rem' }}
+                              onClick={cancelEdit} disabled={editSaving}>Annuler</button>
+                            <button className="btn btn-primary btn-sm" style={{ fontSize: '.75rem', padding: '.22rem .6rem' }}
+                              onClick={() => saveMulti({
+                                [knownKey]: !editVal[`${fieldKey}_none`],
+                                [valueKey]: editVal[`${fieldKey}_none`] ? null : (parseFloat(editVal[`${fieldKey}_val`]) || null),
+                              })} disabled={editSaving}>{editSaving ? '…' : '✓'}</button>
+                          </div>
+                        </div>
+                      ) : (
+                        <span style={{ fontWeight: 600, fontSize: '.875rem', textAlign: 'right' }}>{display}</span>
+                      )}
+                    </div>
+                  )
+                }
+                return (<>
+                  <TriMetricRow fieldKey="css" label="CSS (s/100m)" unit="s/100m" knownKey="css_known" valueKey="css_value" min={60} max={200} step={0.1} placeholder="ex: 90" />
+                  <TriMetricRow fieldKey="ftp" label="FTP / CP (watts)" unit="W" knownKey="ftp_known" valueKey="ftp_value" min={50} max={600} step={1} placeholder="ex: 220" />
+                </>)
+              })()}
 
               {!isTri && (
                 <FieldRow fieldKey="chrono_goal" dbKey="chrono_goal" label="Chrono cible"
