@@ -6,13 +6,14 @@ import { SESSION_TYPE_COLORS } from '../../lib/utils'
 const DAY_NAMES = ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi', 'Dimanche']
 const SPORT_LABELS = { running: '🏃 Course', trail: '⛰️ Trail', triathlon: '🏊 Triathlon' }
 
-function getMonday(date) {
-  const d = new Date(date)
-  const day = d.getDay()
-  const diff = day === 0 ? -6 : 1 - day
-  d.setDate(d.getDate() + diff)
-  d.setHours(0, 0, 0, 0)
-  return d
+function firstMondayOfNextMonth() {
+  const now = new Date()
+  const first = new Date(now.getFullYear(), now.getMonth() + 1, 1)
+  const day = first.getDay() // 0=dim, 1=lun…
+  const diff = day === 1 ? 0 : day === 0 ? 1 : 8 - day
+  first.setDate(first.getDate() + diff)
+  first.setHours(0, 0, 0, 0)
+  return first
 }
 
 function addDays(date, n) {
@@ -40,11 +41,7 @@ export default function ManualPlanBuilder() {
   const [loadingSessions, setLoadingSessions] = useState(true)
 
   // Plan state: 4 weeks × 7 days, each cell = array of session objects
-  const [startMonday] = useState(() => {
-    // Commence le lundi suivant aujourd'hui
-    const next = getMonday(addDays(new Date(), 7))
-    return next
-  })
+  const [startMonday] = useState(() => firstMondayOfNextMonth())
   const [plan, setPlan] = useState(() => Array.from({ length: 4 }, () => Array.from({ length: 7 }, () => [])))
 
   // Drag state
