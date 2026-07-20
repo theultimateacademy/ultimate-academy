@@ -228,4 +228,72 @@ router.post('/weekly-feedback', async (req, res) => {
   }
 });
 
+// GET /api/admin/athletes — liste tous les athlètes (service key, bypass RLS)
+router.get('/athletes', async (req, res) => {
+  try {
+    const { data, error } = await supabase
+      .from('profiles')
+      .select('id, first_name, last_name, email, objective, sport_type, subscription_status')
+      .eq('role', 'athlete')
+      .order('first_name');
+    if (error) throw error;
+    res.json({ athletes: data || [] });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// GET /api/admin/athletes/:id/adaptation — adaptation active sur le plan courant
+router.get('/athletes/:id/adaptation', async (req, res) => {
+  try {
+    const { data: plans } = await supabase
+      .from('training_plans')
+      .select('id, plan_data, updated_at')
+      .eq('user_id', req.params.id)
+      .in('status', ['active'])
+      .order('updated_at', { ascending: false })
+      .limit(1);
+    const plan = plans?.[0];
+    if (!plan) return res.json({ adaptation: null });
+    const adapted = plan.plan_data?.semaines?.find(s => s._adapted_for);
+    res.json({
+      adaptation: adapted?._adapted_for || null,
+      updated_at: plan.updated_at,
+    });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// POST /api/admin/monthly-analysis — crée une analyse mensuelle pour un athlète
+router.post('/monthly-analysis', async (req, res) => {
+  const { user_id, month_label } = req.body;
+  if (!user_id) return res.status(400).json({ error: 'user_id requis' });
+  try {
+    const { data: existing } = await supabase
+      .from('weekly_analyses')
+      .select('id')
+      .eq('user_id', user_id)
+      .eq('status', 'pending')
+      .filter('analysis_data->>is_monthly', 'eq', 'true')
+      .limit(1);
+    if (existing?.length > 0) {
+      return res.json({ id: existing[0].id, already_exists: true });
+    }
+    const month = month_label || new Date().toLocaleDateString('fr-FR', { month: 'long', year: 'numeric' });
+    const { data, error } = await supabase.from('weekly_analyses').insert({
+      user_id,
+      week_number: 0,
+      status: 'pending',
+      analysis_data: { is_monthly: true, month, conseil: '', mood: 'good' },
+      coach_message: '',
+      created_at: new Date().toISOString(),
+    }).select().single();
+    if (error) throw error;
+    res.json({ id: data.id });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 module.exports = router;

@@ -531,6 +531,11 @@ export default function AdminPlans() {
                 </div>
                 {/* Action buttons — compact, never overflow */}
                 <div style={{ display: 'flex', gap: '.4rem', flexShrink: 0, alignItems: 'center' }}>
+                  <button className="btn btn-ghost btn-sm"
+                    style={{ whiteSpace: 'nowrap' }}
+                    onClick={() => navigate(`/admin/plans/builder?planId=${plan.id}&userId=${plan.user_id}`)}>
+                    ✏️ Modifier
+                  </button>
                   <button className="btn btn-primary btn-sm"
                     style={{ whiteSpace: 'nowrap' }}
                     onClick={() => setModal({ plan, athlete })}>

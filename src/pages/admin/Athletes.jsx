@@ -1171,6 +1171,15 @@ function AthleteDetailPanel({ athlete, onClose, onUpdated, onAlertDismissed }) {
           </span>}
           {local.heat_mode && <span className="badge" style={{ background:'rgba(245,158,11,.12)', color:'#FCD34D' }}>🌡️</span>}
           {local.injury_mode && <span className="badge" style={{ background:'rgba(239,68,68,.12)', color:'#FCA5A5' }}>🩹</span>}
+          {plan?.plan_data?.semaines?.some(s => s._adapted_for) && (
+            <span className="badge" style={{ background:'rgba(139,47,201,.15)', color:'#C084FC', border:'1px solid rgba(139,47,201,.3)' }}>
+              ⚡ {(() => {
+                const labels = { fatigue:'Fatigue', heat:'Canicule', injury:'Blessure', cycle:'Cycle' }
+                const found = plan.plan_data.semaines.find(s => s._adapted_for)
+                return labels[found._adapted_for] || found._adapted_for
+              })()} en cours
+            </span>
+          )}
         </div>
       </div>
 

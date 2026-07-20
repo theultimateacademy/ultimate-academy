@@ -1,7 +1,9 @@
 import { useState, useEffect } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useSearchParams } from 'react-router-dom'
 import { supabase } from '../../lib/supabase'
 import { SESSION_TYPE_COLORS } from '../../lib/utils'
+
+const API = import.meta.env.VITE_API_URL || 'http://localhost:3001'
 
 const DAY_NAMES = ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi', 'Dimanche']
 
@@ -73,12 +75,13 @@ function planDataToGrid(plan_data) {
 }
 
 export default function ManualPlanBuilder() {
-  const navigate = useNavigate()
+  const navigate       = useNavigate()
+  const [searchParams] = useSearchParams()
 
   const [athletes,        setAthletes]        = useState([])
-  const [selectedAthlete, setSelectedAthlete] = useState('')
-  const [athletePlans,    setAthletePlans]    = useState([])   // plans existants de l'athlète
-  const [loadedPlanId,    setLoadedPlanId]    = useState(null) // null = nouveau plan
+  const [selectedAthlete, setSelectedAthlete] = useState(searchParams.get('userId') || '')
+  const [athletePlans,    setAthletePlans]    = useState([])
+  const [loadedPlanId,    setLoadedPlanId]    = useState(null)
 
   const [sessions,        setSessions]        = useState([])
   const [search,          setSearch]          = useState('')
@@ -93,12 +96,12 @@ export default function ManualPlanBuilder() {
   const [savingPlan, setSavingPlan] = useState(false)
   const [savedMsg,   setSavedMsg]   = useState('')
 
-  // Chargement initial : tous les athlètes (sans filtre subscription) + sessions
+  // Chargement initial : tous les athlètes via API serveur (service key, bypass RLS) + sessions
   useEffect(() => {
-    supabase.from('profiles').select('id, first_name, last_name, email, objective, sport_type')
-      .eq('role', 'athlete')
-      .order('first_name')
-      .then(({ data }) => setAthletes(data || []))
+    fetch(`${API}/api/admin/athletes`)
+      .then(r => r.json())
+      .then(({ athletes: list }) => setAthletes(list || []))
+      .catch(err => console.error('[ManualPlanBuilder] athletes:', err))
 
     supabase.from('session_library').select('*').order('code')
       .then(({ data }) => { setSessions(data || []); setLoadingSessions(false) })
@@ -111,11 +114,20 @@ export default function ManualPlanBuilder() {
       .select('id, status, created_at, plan_data')
       .eq('user_id', selectedAthlete)
       .order('created_at', { ascending: false })
-      .then(({ data }) => setAthletePlans(data || []))
-    // Réinitialise le plan vide et l'id chargé quand on change d'athlète
-    setLoadedPlanId(null)
-    setStartMonday(firstMondayOfNextMonth())
-    setPlan(Array.from({ length: 4 }, () => Array.from({ length: 7 }, () => [])))
+      .then(({ data }) => {
+        setAthletePlans(data || [])
+        // Si un planId est passé en URL et qu'on vient de charger l'athlète correspondant
+        const urlPlanId = searchParams.get('planId')
+        if (urlPlanId && data?.length) {
+          const found = data.find(p => p.id === urlPlanId)
+          if (found) {
+            setLoadedPlanId(found.id)
+            setPlan(planDataToGrid(found.plan_data))
+            const firstDate = found.plan_data?.semaines?.[0]?.date_debut
+            if (firstDate) { const d = new Date(firstDate); d.setHours(0,0,0,0); setStartMonday(d) }
+          }
+        }
+      })
   }, [selectedAthlete])
 
   const athlete = athletes.find(a => a.id === selectedAthlete)

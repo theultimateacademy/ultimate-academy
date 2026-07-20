@@ -108,7 +108,7 @@ export default function AthleteLayout() {
               <span className="icon">{item.icon}</span>
               {item.label}
               {item.label === 'Messages' && unread > 0 && location.pathname !== '/app/messages' && <span className="notif" />}
-              {item.label === 'Accueil' && newAnalysis && location.pathname !== '/app/home' && <span className="notif" style={{ background: '#8B2FC9' }} />}
+              {item.label === 'Accueil' && newAnalysis && location.pathname !== '/app/home' && <span className="notif" style={{ background: '#EF4444' }} />}
             </NavLink>
           ))}
         </nav>
@@ -170,7 +170,7 @@ export default function AthleteLayout() {
             <span className="icon">{item.icon}</span>
             <span>{item.label}</span>
             {item.label === 'Messages' && unread > 0 && location.pathname !== '/app/messages' && <span className="notif" />}
-            {item.label === 'Accueil' && newAnalysis && location.pathname !== '/app/home' && <span className="notif" style={{ background: '#8B2FC9' }} />}
+            {item.label === 'Accueil' && newAnalysis && location.pathname !== '/app/home' && <span className="notif" style={{ background: '#EF4444' }} />}
           </NavLink>
         ))}
       </nav>

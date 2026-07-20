@@ -3,6 +3,14 @@ import { supabase } from '../../lib/supabase'
 import LoadingSpinner from '../../components/UI/LoadingSpinner'
 import { SESSION_TYPE_COLORS } from '../../lib/utils'
 
+const API = import.meta.env.VITE_API_URL || 'http://localhost:3001'
+
+function lastMonthLabel() {
+  const d = new Date()
+  d.setMonth(d.getMonth() - 1)
+  return d.toLocaleDateString('fr-FR', { month: 'long', year: 'numeric' })
+}
+
 const MOOD_OPTIONS = [
   { v: 'fire',      icon: '🔥', label: 'En feu !',      color: '#F97316' },
   { v: 'good',      icon: '💪', label: 'Bonne semaine', color: '#10B981' },
@@ -347,7 +355,11 @@ function AnalysisModal({ analysis, athlete, onClose, onSend }) {
             <div style={{ fontSize: '.7rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '.08em', color: isSent ? '#34D399' : '#C084FC', marginBottom: '.25rem' }}>
               {isSent ? '✅ Envoyée' : '✏️ Brouillon'}
             </div>
-            <h3 style={{ margin: 0, fontSize: '1.05rem' }}>Analyse Semaine {analysis.week_number}</h3>
+            <h3 style={{ margin: 0, fontSize: '1.05rem' }}>
+              {data0.is_monthly
+                ? `Analyse mensuelle — ${data0.month || ''}`
+                : `Analyse Semaine ${analysis.week_number}`}
+            </h3>
             <div style={{ fontSize: '.8rem', color: 'var(--text-muted)', marginTop: '.2rem' }}>
               {athlete?.first_name} {athlete?.last_name}
             </div>
@@ -374,44 +386,48 @@ function AnalysisModal({ analysis, athlete, onClose, onSend }) {
             </div>
           </div>
 
-          {/* Séances accordion */}
-          <div>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '.5rem' }}>
-              <label style={{ fontSize: '.72rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '.08em', color: 'rgba(255,255,255,.4)' }}>
-                Séances de la semaine
-              </label>
-              {!loadingData && sessionCards.length > 0 && (
-                <span style={{ fontSize: '.72rem', color: doneCount === sessionCards.length ? '#34D399' : 'rgba(255,255,255,.3)', fontWeight: 600 }}>
-                  {doneCount}/{sessionCards.length} effectuées
-                </span>
+          {/* Séances accordion — weekly only */}
+          {!data0.is_monthly && (
+            <div>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '.5rem' }}>
+                <label style={{ fontSize: '.72rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '.08em', color: 'rgba(255,255,255,.4)' }}>
+                  Séances de la semaine
+                </label>
+                {!loadingData && sessionCards.length > 0 && (
+                  <span style={{ fontSize: '.72rem', color: doneCount === sessionCards.length ? '#34D399' : 'rgba(255,255,255,.3)', fontWeight: 600 }}>
+                    {doneCount}/{sessionCards.length} effectuées
+                  </span>
+                )}
+              </div>
+              {loadingData ? (
+                <div style={{ fontSize: '.8rem', color: 'rgba(255,255,255,.3)', padding: '.5rem 0' }}>Chargement…</div>
+              ) : sessionCards.length === 0 ? (
+                <div style={{ fontSize: '.8rem', color: 'rgba(255,255,255,.25)', fontStyle: 'italic' }}>Aucune séance trouvée dans le plan.</div>
+              ) : (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '.35rem' }}>
+                  {sessionCards.map(s => (
+                    <SessionAccordion
+                      key={s.idx}
+                      session={s}
+                      expanded={expandedIdx === s.idx}
+                      onToggle={() => setExpandedIdx(expandedIdx === s.idx ? null : s.idx)}
+                    />
+                  ))}
+                </div>
               )}
             </div>
-            {loadingData ? (
-              <div style={{ fontSize: '.8rem', color: 'rgba(255,255,255,.3)', padding: '.5rem 0' }}>Chargement…</div>
-            ) : sessionCards.length === 0 ? (
-              <div style={{ fontSize: '.8rem', color: 'rgba(255,255,255,.25)', fontStyle: 'italic' }}>Aucune séance trouvée dans le plan.</div>
-            ) : (
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '.35rem' }}>
-                {sessionCards.map(s => (
-                  <SessionAccordion
-                    key={s.idx}
-                    session={s}
-                    expanded={expandedIdx === s.idx}
-                    onToggle={() => setExpandedIdx(expandedIdx === s.idx ? null : s.idx)}
-                  />
-                ))}
-              </div>
-            )}
-          </div>
+          )}
 
-          {/* Focus semaine prochaine */}
+          {/* Conseil / bilan */}
           <div>
             <label style={{ fontSize: '.72rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '.08em', color: 'rgba(255,255,255,.4)', display: 'block', marginBottom: '.4rem' }}>
-              Focus semaine prochaine
+              {data0.is_monthly ? 'Bilan du mois' : 'Focus semaine prochaine'}
             </label>
             <textarea value={conseil} onChange={e => setConseil(e.target.value)}
-              placeholder="Ce sur quoi elle doit se concentrer la semaine prochaine..."
-              rows={2}
+              placeholder={data0.is_monthly
+                ? 'Retour sur les moments forts du mois, les progrès, les points à travailler...'
+                : 'Ce sur quoi elle doit se concentrer la semaine prochaine...'}
+              rows={data0.is_monthly ? 5 : 2}
               style={{ ...inp, resize: 'vertical', lineHeight: 1.6 }} />
           </div>
 
@@ -445,18 +461,50 @@ function AnalysisModal({ analysis, athlete, onClose, onSend }) {
 }
 
 export default function AdminAnalyses() {
-  const [analyses,  setAnalyses]  = useState([])
-  const [athletes,  setAthletes]  = useState({})
-  const [modal,     setModal]     = useState(null)
-  const [filter,    setFilter]    = useState('pending')
-  const [loading,   setLoading]   = useState(true)
+  const [analyses,             setAnalyses]            = useState([])
+  const [athletes,             setAthletes]            = useState({})
+  const [modal,                setModal]               = useState(null)
+  const [filter,               setFilter]              = useState('pending')
+  const [loading,              setLoading]             = useState(true)
+  const [showMonthForm,        setShowMonthForm]       = useState(false)
+  const [monthAthletes,        setMonthAthletes]       = useState([])
+  const [monthSelectedAthlete, setMonthSelectedAthlete] = useState('')
+  const [monthLabel,           setMonthLabel]          = useState(lastMonthLabel())
+  const [monthCreating,        setMonthCreating]       = useState(false)
 
-  useEffect(() => { loadAnalyses() }, [])
+  useEffect(() => {
+    loadAnalyses()
+    fetch(`${API}/api/admin/athletes`)
+      .then(r => r.json())
+      .then(({ athletes: list }) => setMonthAthletes(list || []))
+      .catch(() => {})
+  }, [])
 
   async function deleteAnalysis(id) {
     if (!window.confirm('Supprimer cette analyse ?')) return
     await supabase.from('weekly_analyses').delete().eq('id', id)
     setAnalyses(prev => prev.filter(a => a.id !== id))
+  }
+
+  async function createMonthlyAnalysis() {
+    if (!monthSelectedAthlete) return
+    setMonthCreating(true)
+    try {
+      const res = await fetch(`${API}/api/admin/monthly-analysis`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ user_id: monthSelectedAthlete, month_label: monthLabel }),
+      })
+      const json = await res.json()
+      if (json.error) throw new Error(json.error)
+      setShowMonthForm(false)
+      setMonthSelectedAthlete('')
+      loadAnalyses()
+    } catch (err) {
+      alert('Erreur : ' + err.message)
+    } finally {
+      setMonthCreating(false)
+    }
   }
 
   async function loadAnalyses() {
@@ -480,14 +528,62 @@ export default function AdminAnalyses() {
 
   return (
     <div className="page">
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1.5rem', flexWrap: 'wrap', gap: '1rem' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1rem', flexWrap: 'wrap', gap: '1rem' }}>
         <div>
-          <h2 className="page-heading" style={{ marginBottom: '.2rem' }}>Analyses hebdomadaires</h2>
+          <h2 className="page-heading" style={{ marginBottom: '.2rem' }}>Analyses</h2>
           <p style={{ fontSize: '.85rem', color: 'var(--text-muted)', margin: 0 }}>
             Rédige et envoie tes analyses à chaque athlète — elles apparaissent directement sur leur tableau de bord.
           </p>
         </div>
+        <button
+          onClick={() => setShowMonthForm(v => !v)}
+          style={{
+            padding: '.4rem 1rem', borderRadius: 8, border: '1px solid rgba(6,182,212,.35)',
+            background: showMonthForm ? 'rgba(6,182,212,.15)' : 'rgba(6,182,212,.07)',
+            color: '#22D3EE', cursor: 'pointer', fontFamily: 'inherit',
+            fontSize: '.82rem', fontWeight: 600,
+          }}>
+          📅 Analyse mensuelle
+        </button>
       </div>
+
+      {showMonthForm && (
+        <div style={{
+          background: 'rgba(6,182,212,.06)', border: '1px solid rgba(6,182,212,.2)',
+          borderRadius: 12, padding: '1rem 1.25rem', marginBottom: '1.25rem',
+        }}>
+          <div style={{ fontSize: '.78rem', fontWeight: 700, color: '#22D3EE', marginBottom: '.75rem' }}>
+            📅 Créer une analyse mensuelle
+          </div>
+          <div style={{ display: 'flex', gap: '.75rem', alignItems: 'flex-end', flexWrap: 'wrap' }}>
+            <div style={{ flex: 1, minWidth: 180 }}>
+              <label style={{ fontSize: '.7rem', color: 'rgba(255,255,255,.4)', display: 'block', marginBottom: '.3rem' }}>Athlète</label>
+              <select value={monthSelectedAthlete} onChange={e => setMonthSelectedAthlete(e.target.value)}
+                style={{ width: '100%', padding: '.4rem .65rem', border: '1px solid rgba(255,255,255,.12)', borderRadius: 8, fontSize: '.85rem', fontFamily: 'inherit', background: 'rgba(255,255,255,.05)', color: '#fff', outline: 'none' }}>
+                <option value="">— Choisir un athlète —</option>
+                {monthAthletes.map(a => (
+                  <option key={a.id} value={a.id}>{a.first_name} {a.last_name}</option>
+                ))}
+              </select>
+            </div>
+            <div style={{ flex: 1, minWidth: 150 }}>
+              <label style={{ fontSize: '.7rem', color: 'rgba(255,255,255,.4)', display: 'block', marginBottom: '.3rem' }}>Mois concerné</label>
+              <input value={monthLabel} onChange={e => setMonthLabel(e.target.value)}
+                style={{ width: '100%', padding: '.4rem .65rem', border: '1px solid rgba(255,255,255,.12)', borderRadius: 8, fontSize: '.85rem', fontFamily: 'inherit', background: 'rgba(255,255,255,.05)', color: '#fff', outline: 'none', boxSizing: 'border-box' }} />
+            </div>
+            <button onClick={createMonthlyAnalysis} disabled={monthCreating || !monthSelectedAthlete}
+              style={{
+                padding: '.42rem 1.1rem', borderRadius: 8, border: 'none',
+                background: !monthSelectedAthlete ? 'rgba(255,255,255,.08)' : 'rgba(6,182,212,.85)',
+                color: !monthSelectedAthlete ? 'rgba(255,255,255,.3)' : '#fff',
+                cursor: monthSelectedAthlete ? 'pointer' : 'not-allowed',
+                fontFamily: 'inherit', fontSize: '.85rem', fontWeight: 700,
+              }}>
+              {monthCreating ? 'Création…' : 'Créer'}
+            </button>
+          </div>
+        </div>
+      )}
 
       <div style={{ display: 'flex', gap: '.5rem', marginBottom: '1.25rem', flexWrap: 'wrap' }}>
         {[
@@ -521,10 +617,10 @@ export default function AdminAnalyses() {
             <div key={analysis.id}
               style={{
                 background: 'rgba(255,255,255,.03)', borderRadius: 12, overflow: 'hidden',
-                border: `1px solid ${isSent ? 'rgba(16,185,129,.2)' : 'rgba(245,158,11,.2)'}`,
+                border: `1px solid ${isSent ? 'rgba(16,185,129,.2)' : data.is_monthly ? 'rgba(6,182,212,.2)' : 'rgba(245,158,11,.2)'}`,
                 display: 'flex', gap: 0,
               }}>
-              <div style={{ width: 4, background: isSent ? '#10B981' : '#F59E0B', flexShrink: 0 }} />
+              <div style={{ width: 4, background: isSent ? '#10B981' : data.is_monthly ? '#06B6D4' : '#F59E0B', flexShrink: 0 }} />
               <div style={{ flex: 1, padding: '1rem 1.1rem', minWidth: 0 }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '1rem', flexWrap: 'wrap' }}>
                   <div style={{ minWidth: 0 }}>
@@ -533,7 +629,13 @@ export default function AdminAnalyses() {
                         {athlete?.first_name?.[0]?.toUpperCase()}
                       </div>
                       <span style={{ fontWeight: 700, fontSize: '.9rem' }}>{athlete?.first_name} {athlete?.last_name}</span>
-                      <span style={{ fontSize: '.72rem', color: 'rgba(255,255,255,.35)' }}>· S{analysis.week_number}</span>
+                      {data.is_monthly ? (
+                        <span style={{ fontSize: '.68rem', fontWeight: 700, color: '#22D3EE', background: 'rgba(6,182,212,.12)', border: '1px solid rgba(6,182,212,.25)', borderRadius: 99, padding: '.06rem .45rem' }}>
+                          📅 Mensuelle
+                        </span>
+                      ) : (
+                        <span style={{ fontSize: '.72rem', color: 'rgba(255,255,255,.35)' }}>· S{analysis.week_number}</span>
+                      )}
                       {data.mood && (
                         <span style={{ fontSize: '.75rem', color: m.color, background: m.color + '18', border: `1px solid ${m.color}30`, borderRadius: 99, padding: '.08rem .45rem' }}>
                           {m.icon}

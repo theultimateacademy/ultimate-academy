@@ -128,6 +128,65 @@ function SportLegend({ sessions }) {
   )
 }
 
+// Modale analyse mensuelle
+function MonthlyAnalysisModal({ analysis, onClose }) {
+  const d       = analysis.analysis_data || {}
+  const month   = d.month || ''
+  const conseil = d.conseil || ''
+
+  useEffect(() => {
+    const prev = document.body.style.overflow
+    document.body.style.overflow = 'hidden'
+    return () => { document.body.style.overflow = prev }
+  }, [])
+
+  return (
+    <div style={{ position: 'fixed', inset: 0, zIndex: 500, background: '#09090F', overflowY: 'auto' }}>
+      <div style={{ maxWidth: 700, margin: '0 auto' }}>
+        <div style={{
+          position: 'sticky', top: 0, zIndex: 2,
+          background: 'linear-gradient(160deg, rgba(6,182,212,.15) 0%, #09090F 75%)',
+          backdropFilter: 'blur(20px)',
+          borderBottom: '1px solid rgba(255,255,255,.07)',
+          padding: 'calc(env(safe-area-inset-top, 0px) + 1.25rem) 1.5rem 1rem',
+          display: 'flex', alignItems: 'center', gap: '.875rem',
+        }}>
+          <button onClick={onClose} style={{ background: 'rgba(255,255,255,.07)', border: 'none', borderRadius: 10, padding: '.4rem .85rem', cursor: 'pointer', color: 'rgba(255,255,255,.65)', fontSize: '.8rem', fontWeight: 700, fontFamily: 'inherit', flexShrink: 0 }}>
+            ← Retour
+          </button>
+          <div style={{ flex: 1, minWidth: 0 }}>
+            <div style={{ fontWeight: 800, fontSize: '.95rem', color: '#fff', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+              📅 Bilan — {month}
+            </div>
+            {analysis.sent_at && (
+              <div style={{ fontSize: '.65rem', color: 'rgba(255,255,255,.28)' }}>
+                {new Date(analysis.sent_at).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })}
+              </div>
+            )}
+          </div>
+        </div>
+
+        <div style={{ padding: '1.75rem 1.5rem 5rem', display: 'flex', flexDirection: 'column', gap: '2rem' }}>
+          {conseil ? (
+            <div style={{ background: 'rgba(6,182,212,.07)', border: '1px solid rgba(6,182,212,.22)', borderRadius: 14, padding: '1.5rem' }}>
+              <div style={{ fontSize: '.6rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '.12em', color: '#22D3EE', marginBottom: '.875rem' }}>
+                Retour d'Alexis — {month}
+              </div>
+              <p style={{ fontSize: '.92rem', lineHeight: 1.8, margin: 0, color: 'rgba(255,255,255,.88)', textAlign: 'justify', whiteSpace: 'pre-wrap' }}>
+                {renderRich(conseil, '#22D3EE')}
+              </p>
+            </div>
+          ) : (
+            <div style={{ textAlign: 'center', padding: '3rem', color: 'rgba(255,255,255,.3)', fontSize: '.9rem' }}>
+              Ton bilan mensuel est en cours de rédaction...
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  )
+}
+
 // Modale analyse — pleine page
 function WeeklyAnalysisModal({ analysis, onClose }) {
   const d = analysis.analysis_data || {}
@@ -292,10 +351,12 @@ export default function AthleteHome() {
   const [weekProgress,  setWeekProgress]  = useState({ done: 0, total: 0 })
   const [lastMessage,   setLastMessage]   = useState(null)
   const [loading,       setLoading]       = useState(true)
-  const [analysis,      setAnalysis]      = useState(null)
-  const [analysisOpen,  setAnalysisOpen]  = useState(false)
-  const [preRaceAnalysis, setPreRaceAnalysis] = useState(null)
-  const [hasPostRace,     setHasPostRace]     = useState(false)
+  const [analysis,         setAnalysis]         = useState(null)
+  const [analysisOpen,     setAnalysisOpen]     = useState(false)
+  const [monthlyAnalysis,  setMonthlyAnalysis]  = useState(null)
+  const [monthlyOpen,      setMonthlyOpen]      = useState(false)
+  const [preRaceAnalysis,  setPreRaceAnalysis]  = useState(null)
+  const [hasPostRace,      setHasPostRace]      = useState(false)
 
   useEffect(() => {
     if (!profile?.id) return
@@ -314,7 +375,7 @@ export default function AthleteHome() {
       const basePromises = [
         supabase.from('training_plans').select('*').eq('user_id', profile.id).eq('status', 'active').single(),
         supabase.from('messages').select('*').eq('user_id', profile.id).eq('sender', 'coach').order('created_at', { ascending: false }).limit(1),
-        supabase.from('weekly_analyses').select('*').eq('user_id', profile.id).eq('status', 'sent').order('created_at', { ascending: false }).limit(1)
+        supabase.from('weekly_analyses').select('*').eq('user_id', profile.id).eq('status', 'sent').order('created_at', { ascending: false }).limit(3)
       ]
       const [{ data: plans }, { data: msgs }, { data: analyses }] = await Promise.all(basePromises)
 
@@ -334,7 +395,10 @@ export default function AthleteHome() {
 
       setPlan(plans)
       setLastMessage(msgs?.[0] || null)
-      setAnalysis(analyses?.[0] || null)
+      const weeklyA   = (analyses || []).find(a => !a.analysis_data?.is_monthly)
+      const monthlyA  = (analyses || []).find(a =>  a.analysis_data?.is_monthly)
+      setAnalysis(weeklyA || null)
+      setMonthlyAnalysis(monthlyA || null)
 
       if (plans) {
         const weeks        = plans.plan_data?.semaines || []
@@ -662,6 +726,44 @@ export default function AthleteHome() {
       {/* Modale analyse immersive */}
       {analysisOpen && analysis && (
         <WeeklyAnalysisModal analysis={analysis} onClose={() => setAnalysisOpen(false)} />
+      )}
+
+      {/* Analyse mensuelle — trigger compact */}
+      {monthlyAnalysis && (() => {
+        const d = monthlyAnalysis.analysis_data || {}
+        return (
+          <div style={{ marginBottom: '1.5rem' }}>
+            <button
+              onClick={() => setMonthlyOpen(true)}
+              style={{ width: '100%', background: 'none', border: 'none', padding: 0, cursor: 'pointer', fontFamily: 'inherit', textAlign: 'left' }}>
+              <div style={{
+                display: 'flex', alignItems: 'center', gap: '.875rem',
+                background: 'linear-gradient(135deg, rgba(6,182,212,.12), rgba(255,255,255,.02))',
+                border: '1px solid rgba(6,182,212,.3)', borderRadius: 14,
+                padding: '.875rem 1.1rem',
+                transition: 'transform .15s, box-shadow .15s',
+              }}
+                onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-1px)'; e.currentTarget.style.boxShadow = '0 6px 24px rgba(6,182,212,.18)' }}
+                onMouseLeave={e => { e.currentTarget.style.transform = ''; e.currentTarget.style.boxShadow = '' }}>
+                <div style={{ fontSize: '1.5rem', lineHeight: 1, flexShrink: 0 }}>📅</div>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{ fontWeight: 800, fontSize: '.88rem', color: '#22D3EE', marginBottom: '.15rem' }}>
+                    Bilan {d.month || 'mensuel'} · Retour d'Alexis
+                  </div>
+                  <div style={{ fontSize: '.75rem', color: 'rgba(255,255,255,.4)' }}>
+                    Analyse mensuelle disponible
+                  </div>
+                </div>
+                <div style={{ color: '#22D3EE', fontSize: '1rem', flexShrink: 0 }}>›</div>
+              </div>
+            </button>
+          </div>
+        )
+      })()}
+
+      {/* Modale analyse mensuelle */}
+      {monthlyOpen && monthlyAnalysis && (
+        <MonthlyAnalysisModal analysis={monthlyAnalysis} onClose={() => setMonthlyOpen(false)} />
       )}
 
       {/* Monthly message from coach (from plan_data) */}
