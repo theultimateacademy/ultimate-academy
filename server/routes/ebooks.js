@@ -267,6 +267,25 @@ router.get('/admin/stats', async (req, res) => {
   }
 });
 
+router.delete('/admin/purchases/:id', async (req, res) => {
+  try {
+    const { error } = await supabase.from('ebook_purchases').delete().eq('id', req.params.id);
+    if (error) throw error;
+    res.json({ ok: true });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+router.get('/admin/pdf/:slug/:vma/:seances', (req, res) => {
+  const { slug, vma, seances } = req.params;
+  const pdfPath = variantPdfPath(slug, vma, seances);
+  if (!fs.existsSync(pdfPath)) return res.status(404).json({ error: 'PDF introuvable' });
+  res.setHeader('Content-Type', 'application/pdf');
+  res.setHeader('Content-Disposition', `inline; filename="${slug}-vma${vma}-${seances}seances.pdf"`);
+  fs.createReadStream(pdfPath).pipe(res);
+});
+
 router.patch('/admin/:id/toggle', async (req, res) => {
   try {
     const { data: current } = await supabase.from('ebooks').select('active').eq('id', req.params.id).single();
