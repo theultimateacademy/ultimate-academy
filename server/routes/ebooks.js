@@ -112,6 +112,17 @@ router.get('/', async (req, res) => {
   }
 });
 
+// ─── GET /api/ebooks/admin/pdf/:slug/:vma/:seances — accès PDF coach ─────────
+
+router.get('/admin/pdf/:slug/:vma/:seances', (req, res) => {
+  const { slug, vma, seances } = req.params;
+  const pdfPath = variantPdfPath(slug, vma, seances);
+  if (!fs.existsSync(pdfPath)) return res.status(404).json({ error: 'PDF introuvable' });
+  res.setHeader('Content-Type', 'application/pdf');
+  res.setHeader('Content-Disposition', `inline; filename="${slug}-vma${vma}-${seances}seances.pdf"`);
+  fs.createReadStream(pdfPath).pipe(res);
+});
+
 // ─── GET /api/ebooks/:slug — détail ──────────────────────────────────────────
 
 router.get('/:slug', async (req, res) => {
@@ -275,15 +286,6 @@ router.delete('/admin/purchases/:id', async (req, res) => {
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
-});
-
-router.get('/admin/pdf/:slug/:vma/:seances', (req, res) => {
-  const { slug, vma, seances } = req.params;
-  const pdfPath = variantPdfPath(slug, vma, seances);
-  if (!fs.existsSync(pdfPath)) return res.status(404).json({ error: 'PDF introuvable' });
-  res.setHeader('Content-Type', 'application/pdf');
-  res.setHeader('Content-Disposition', `inline; filename="${slug}-vma${vma}-${seances}seances.pdf"`);
-  fs.createReadStream(pdfPath).pipe(res);
 });
 
 router.patch('/admin/:id/toggle', async (req, res) => {
