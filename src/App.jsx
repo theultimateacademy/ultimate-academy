@@ -45,6 +45,10 @@ import AthleticDrills      from './pages/athlete/Drills'
 import PreRaceAnalysis     from './pages/athlete/PreRaceAnalysis'
 import PostRaceFlow        from './pages/athlete/PostRaceFlow'
 
+import DemoStravaSeance    from './pages/demo/StravaSeance'
+import DemoStravaCoach     from './pages/demo/StravaCoach'
+import DemoStravaDashboard from './pages/demo/StravaDashboard'
+
 import DevLogin        from './pages/DevLogin'
 import AdminEbooks          from './pages/admin/Ebooks'
 import AdminDashboard       from './pages/admin/Dashboard'
@@ -138,6 +142,10 @@ function AppRoutes() {
         <Route path="ebooks"    element={<AdminEbooks />} />
         <Route path="sessions"  element={<AdminSessionLibrary />} />
       </Route>
+
+      <Route path="/demo/strava-seance"    element={<DemoStravaSeance />} />
+      <Route path="/demo/strava-coach"     element={<DemoStravaCoach />} />
+      <Route path="/demo/strava-dashboard" element={<DemoStravaDashboard />} />
 
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
