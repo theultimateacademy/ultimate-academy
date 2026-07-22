@@ -22,6 +22,12 @@ const ACTIVITIES = [
 export default function DemoStravaCoach() {
   return (
     <div style={{ minHeight: '100vh', background: '#09090F', color: '#fff', fontFamily: 'system-ui, sans-serif' }}>
+      <style>{`
+        @media (max-width: 600px) {
+          .strava-act-stats  { grid-template-columns: repeat(3, 1fr) !important; }
+          .strava-month-stats{ grid-template-columns: repeat(2, 1fr) !important; }
+        }
+      `}</style>
       <div style={{ maxWidth: 860, margin: '0 auto', padding: '2rem 1.25rem' }}>
 
         {/* Athlete header */}
@@ -103,7 +109,7 @@ export default function DemoStravaCoach() {
                 </div>
 
                 {/* Stats en grille */}
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: '.5rem' }}>
+                <div className="strava-act-stats" style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: '.5rem' }}>
                   {[
                     { l: 'Distance',   v: act.dist },
                     { l: 'Durée',      v: act.duree },
@@ -128,7 +134,7 @@ export default function DemoStravaCoach() {
             <StravaLogo size={22} />
             <span style={{ fontWeight: 700, fontSize: '.88rem', color: STRAVA_ORANGE }}>Bilan du mois — Juillet 2026</span>
           </div>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '.75rem' }}>
+          <div className="strava-month-stats" style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '.75rem' }}>
             {[
               { l: 'Sorties',     v: '12' },
               { l: 'Volume total',v: '87 km' },

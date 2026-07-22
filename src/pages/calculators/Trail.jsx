@@ -183,6 +183,12 @@ export default function TrailCalculator() {
 
   return (
     <div style={{ background: '#000', minHeight: '100vh', color: '#fff' }}>
+      <style>{`
+        @media (max-width: 640px) {
+          .trail-inputs-grid { grid-template-columns: repeat(2, 1fr) !important; }
+          .trail-stats-grid  { grid-template-columns: repeat(3, 1fr) !important; }
+        }
+      `}</style>
       <Nav />
 
       <PageHero
@@ -246,7 +252,7 @@ export default function TrailCalculator() {
             <div style={{ height: 1, background: 'rgba(139,47,201,.1)', marginBottom: '2rem' }}/>
 
             {/* Inputs */}
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '1.25rem', marginBottom: '.5rem' }}>
+            <div className="trail-inputs-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '1.25rem', marginBottom: '.5rem' }}>
               <div>
                 <label style={{ ...labelSt, display: 'block', minHeight: '2.6rem' }}>Distance totale (km)</label>
                 <input type="number" min="0" step="0.5" placeholder="Ex : 42"
@@ -303,7 +309,7 @@ export default function TrailCalculator() {
                 </div>
 
                 {/* Stats */}
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(6, 1fr)', gap: '.75rem' }}>
+                <div className="trail-stats-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(6, 1fr)', gap: '.75rem' }}>
                   {[
                     { label: 'Km équivalents', value: `${kmEq.toFixed(1)} km` },
                     { label: 'Km effort ITRA', value: `${kmEff.toFixed(1)} km` },

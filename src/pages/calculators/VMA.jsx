@@ -155,7 +155,7 @@ export default function VMACalculator() {
                   <p style={{ margin:'.3rem 0 0', color:'rgba(26,18,48,.5)', fontSize:'.85rem' }}>Allure VMA : {kmhToPace(vma)}/km</p>
                 </div>
                 {lvl&&(
-                  <div style={{ padding:'1rem 1.5rem', borderRadius:14, background:lvl.bg, textAlign:'right' }}>
+                  <div style={{ padding:'1rem 1.5rem', borderRadius:14, background:lvl.bg, textAlign:'left' }}>
                     <p style={{ margin:0, fontWeight:800, color:lvl.color, fontSize:'1.1rem' }}>{lvl.label}</p>
                     <p style={{ margin:'.35rem 0 0', fontSize:'.82rem', color:'rgba(26,18,48,.6)', maxWidth:220 }}>{lvl.desc}</p>
                   </div>
