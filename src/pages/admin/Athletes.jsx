@@ -1673,7 +1673,8 @@ function AthleteDetailPanel({ athlete, onClose, onUpdated, onAlertDismissed }) {
                     DAY_NAMES_R.forEach(d => { byDayR[d] = [] })
                     seances.forEach(s => { if (byDayR[s.jour]) byDayR[s.jour].push(s) })
                     return (
-                      <div style={{ display:'grid', gridTemplateColumns:'repeat(7,1fr)', gap:'.45rem' }}>
+                      <div style={{ overflowX:'auto', WebkitOverflowScrolling:'touch' }}>
+                      <div style={{ display:'grid', gridTemplateColumns:'repeat(7,1fr)', gap:'.45rem', minWidth:560 }}>
                         {/* En-têtes jours */}
                         {DAY_SHORT_R.map(d => (
                           <div key={d} style={{ textAlign:'center', fontSize:'.62rem', fontWeight:800,
@@ -1754,6 +1755,7 @@ function AthleteDetailPanel({ athlete, onClose, onUpdated, onAlertDismissed }) {
                             </div>
                           )
                         })}
+                      </div>
                       </div>
                     )
                   })()}
