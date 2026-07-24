@@ -84,6 +84,7 @@ export default function AlluresCalculator() {
         badge="Allures running"
         title={<><span style={gradText}>Allures d'entraînement</span> &amp; zones FC</>}
         subtitle="Entraîne-toi dans les bonnes zones pour progresser sans te blesser, avec ta VMA et ta fréquence cardiaque"
+        backTo="/calculateur" backLabel="Calculateurs"
       >
         <button onClick={()=>calcRef.current?.scrollIntoView({behavior:'smooth'})} style={{ padding:'1rem 2.5rem', borderRadius:50, border:'none', background:`linear-gradient(135deg,${C.purple},${C.pink})`, color:'#fff', fontSize:'1.05rem', fontWeight:700, cursor:'pointer', boxShadow:'0 8px 32px rgba(232,35,122,.5)' }}>Calculer mes allures ↓</button>
       </PageHero>

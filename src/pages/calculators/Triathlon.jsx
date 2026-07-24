@@ -235,6 +235,7 @@ export default function Triathlon() {
         badge="🏊 + 🚴 + 🏃 Triathlon"
         title={<>Calcule tes allures <span style={gradText}>triathlon</span></>}
         subtitle="Renseigne tes distances et tes temps cibles pour chaque discipline. Obtiens ton allure natation, ta vitesse vélo, ton allure course et ton temps total."
+        backTo="/calculateur" backLabel="Calculateurs"
       >
         <button onClick={() => calcRef.current?.scrollIntoView({ behavior: 'smooth' })}
           style={{ padding:'1rem 2.5rem', borderRadius:50, border:'none', background:grad, color:'#fff', fontSize:'1.05rem', fontWeight:700, cursor:'pointer', boxShadow:'0 8px 32px rgba(232,35,122,.5)' }}>

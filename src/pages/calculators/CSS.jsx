@@ -76,6 +76,7 @@ export default function CSSCalculator() {
         badge="Natation"
         title={<>CSS : <span style={gradText}>Vitesse Critique</span> de Nage</>}
         subtitle="Calcule ta Critical Swim Speed à partir de deux tests maximaux et découvre tes zones d'intensité en natation"
+        backTo="/calculateur" backLabel="Calculateurs"
       >
         <button onClick={()=>calcRef.current?.scrollIntoView({behavior:'smooth'})} style={{ padding:'1rem 2.5rem', borderRadius:50, border:'none', background:`linear-gradient(135deg,${C.purple},${C.pink})`, color:'#fff', fontSize:'1.05rem', fontWeight:700, cursor:'pointer', boxShadow:'0 8px 32px rgba(232,35,122,.5)' }}>Calculer ma CSS ↓</button>
       </PageHero>

@@ -195,6 +195,7 @@ export default function TrailCalculator() {
         badge="Trail Running"
         title={<>Temps Trail <span style={gradText}>& Dénivelé</span></>}
         subtitle="Distance, D+, D- et type de terrain : calcule ton temps de course trail basé sur la règle de Naismith."
+        backTo="/calculateur" backLabel="Calculateurs"
       >
         <button
           onClick={() => document.getElementById('trail-calc')?.scrollIntoView({ behavior: 'smooth' })}

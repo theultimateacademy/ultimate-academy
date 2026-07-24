@@ -81,6 +81,7 @@ export default function VMACalculator() {
         badge="Calculateur VMA"
         title={<>Calculateur de <span style={gradText}>VMA running</span></>}
         subtitle="Vitesse Maximale Aérobie : la donnée clé pour programmer ton entraînement et exploser tes chronos"
+        backTo="/calculateur" backLabel="Calculateurs"
       >
         <button onClick={()=>calcRef.current?.scrollIntoView({behavior:'smooth'})} style={{ padding:'1rem 2.5rem', borderRadius:50, border:'none', background:`linear-gradient(135deg,${C.purple},${C.pink})`, color:'#fff', fontSize:'1.05rem', fontWeight:700, cursor:'pointer', boxShadow:'0 8px 32px rgba(232,35,122,.5)' }}>Calculer ma VMA ↓</button>
       </PageHero>

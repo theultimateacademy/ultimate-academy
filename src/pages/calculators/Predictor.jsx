@@ -116,6 +116,7 @@ export default function PredictorCalculator() {
         badge="Prédicteur de chrono"
         title={<>Estime ton chrono sur <span style={gradText}>n'importe quelle distance</span></>}
         subtitle="À partir d'un chrono récent, estime ta performance sur 5km, 10km, semi ou marathon grâce à la formule de Riegel."
+        backTo="/calculateur" backLabel="Calculateurs"
       >
         <button onClick={() => document.getElementById('predictor-tool')?.scrollIntoView({ behavior:'smooth' })}
           style={{ padding:'.85rem 2.2rem', borderRadius:50, cursor:'pointer', fontWeight:800, fontSize:'1rem', border:'none', color:'#fff', background:`linear-gradient(135deg,${C.purple},${C.pink})`, boxShadow:'0 8px 32px rgba(232,35,122,.45)' }}>

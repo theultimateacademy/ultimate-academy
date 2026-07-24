@@ -1593,6 +1593,16 @@ function AthleteDetailPanel({ athlete, onClose, onUpdated, onAlertDismissed }) {
 
               return (
                 <div className="coach-tab-pane" style={{ maxWidth:720, margin:'0 auto', padding:'1.5rem' }}>
+                  <style>{`
+                    @media (max-width: 767px) {
+                      .retour-grid-outer { overflow: visible !important; }
+                      .retour-grid { display: flex !important; flex-direction: column !important; min-width: unset !important; gap: .75rem !important; }
+                      .retour-day-header { display: none !important; }
+                      .retour-day-empty { display: none !important; }
+                      .retour-day-col { gap: .5rem !important; }
+                      .retour-day-col::before { content: attr(data-day); display: block; font-size: .72rem; font-weight: 800; text-transform: uppercase; letter-spacing: .06em; color: rgba(255,255,255,.35); padding-bottom: .4rem; border-bottom: 1px solid rgba(255,255,255,.06); margin-bottom: .15rem; }
+                    }
+                  `}</style>
 
                   {/* ── Stat cards ── */}
                   <div style={{ display:'grid', gridTemplateColumns:'repeat(3,1fr)', gap:'.75rem', marginBottom:'1.5rem' }}>
@@ -1678,11 +1688,11 @@ function AthleteDetailPanel({ athlete, onClose, onUpdated, onAlertDismissed }) {
                     DAY_NAMES_R.forEach(d => { byDayR[d] = [] })
                     seances.forEach(s => { if (byDayR[s.jour]) byDayR[s.jour].push(s) })
                     return (
-                      <div style={{ overflowX:'auto', WebkitOverflowScrolling:'touch' }}>
-                      <div style={{ display:'grid', gridTemplateColumns:'repeat(7,1fr)', gap:'.45rem', minWidth:560 }}>
+                      <div className="retour-grid-outer" style={{ overflowX:'auto', WebkitOverflowScrolling:'touch' }}>
+                      <div className="retour-grid" style={{ display:'grid', gridTemplateColumns:'repeat(7,1fr)', gap:'.45rem', minWidth:560 }}>
                         {/* En-têtes jours */}
                         {DAY_SHORT_R.map(d => (
-                          <div key={d} style={{ textAlign:'center', fontSize:'.62rem', fontWeight:800,
+                          <div key={d} className="retour-day-header" style={{ textAlign:'center', fontSize:'.62rem', fontWeight:800,
                             textTransform:'uppercase', letterSpacing:'.07em',
                             color:'rgba(255,255,255,.35)', paddingBottom:'.4rem',
                             borderBottom:'1px solid rgba(255,255,255,.06)', marginBottom:'.15rem' }}>{d}</div>
@@ -1691,7 +1701,7 @@ function AthleteDetailPanel({ athlete, onClose, onUpdated, onAlertDismissed }) {
                         {DAY_NAMES_R.map(day => {
                           const daySessions = byDayR[day]
                           return (
-                            <div key={day} style={{ display:'flex', flexDirection:'column', gap:'.45rem' }}>
+                            <div key={day} data-day={day} className={`retour-day-col${daySessions.length === 0 ? ' retour-day-empty' : ''}`} style={{ display:'flex', flexDirection:'column', gap:'.45rem' }}>
                               {daySessions.length === 0 ? (
                                 <div style={{ minHeight:110, display:'flex', alignItems:'center', justifyContent:'center',
                                   border:'1px dashed rgba(255,255,255,.05)', borderRadius:10,

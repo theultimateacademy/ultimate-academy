@@ -198,6 +198,7 @@ export default function VO2maxCalculator() {
         badge="Test de Cooper"
         title={<>Calcule ta <span style={gradText}>VO2max</span></>}
         subtitle="Calcule ta VO2max avec le test de Cooper en 12 minutes. Découvre ton niveau aérobie et ta VMA estimée."
+        backTo="/calculateur" backLabel="Calculateurs"
       >
         <button onClick={() => calcRef.current?.scrollIntoView({ behavior: 'smooth' })}
           style={{ padding:'1rem 2.5rem', borderRadius:50, border:'none', background:`linear-gradient(135deg,${C.purple},${C.pink})`, color:'#fff', fontSize:'1.05rem', fontWeight:700, cursor:'pointer', boxShadow:'0 8px 32px rgba(232,35,122,.5)' }}>

@@ -180,7 +180,7 @@ export default function SessionLibrary() {
   if (loading) return <LoadingSpinner />
 
   return (
-    <div style={{ padding: '2rem', maxWidth: 860, margin: '0 auto' }}>
+    <div className="page"><div style={{ maxWidth: 860, margin: '0 auto' }}>
       {/* Header */}
       <div style={{ marginBottom: '1.5rem' }}>
         <h1 style={{ fontSize: '1.5rem', fontWeight: 800, margin: 0 }}>Bibliothèque de séances</h1>
@@ -250,6 +250,6 @@ export default function SessionLibrary() {
           Aucune séance trouvée.
         </p>
       )}
-    </div>
+    </div></div>
   )
 }

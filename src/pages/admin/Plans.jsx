@@ -453,6 +453,12 @@ export default function AdminPlans() {
 
   return (
     <div className="page">
+      <style>{`
+        @media (max-width: 767px) {
+          .plan-card-actions { flex-wrap: wrap !important; gap: .3rem !important; }
+          .plan-card-actions .btn { font-size: .72rem !important; padding: .28rem .5rem !important; }
+        }
+      `}</style>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
         <h2 className="page-heading">Plans d'entraînement</h2>
         <div style={{ display: 'flex', gap: '.5rem', flexWrap: 'wrap' }}>
@@ -576,7 +582,7 @@ export default function AdminPlans() {
                   </div>
                 </div>
                 {/* Action buttons — compact, never overflow */}
-                <div style={{ display: 'flex', gap: '.4rem', flexShrink: 0, alignItems: 'center' }}>
+                <div className="plan-card-actions" style={{ display: 'flex', gap: '.4rem', flexShrink: 0, alignItems: 'center' }}>
                   <button className="btn btn-ghost btn-sm"
                     style={{ whiteSpace: 'nowrap' }}
                     onClick={() => navigate(`/admin/plans/builder?planId=${plan.id}&userId=${plan.user_id}`)}>

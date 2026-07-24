@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { useParams, Link, useNavigate } from 'react-router-dom'
 import Nav from '../components/Nav'
 import SiteFooter from '../components/SiteFooter'
+import PricingCTA from '../components/PricingCTA'
 
 const C = { purple: '#8B2FC9', pink: '#E8237A', bg: '#0C0A18' }
 const grad = 'linear-gradient(135deg,#8B2FC9,#E8237A)'
@@ -545,7 +546,7 @@ export default function EbookDetail() {
         <Link to="/ebooks" style={{ display: 'inline-flex', alignItems: 'center', gap: '.4rem',
           color: 'rgba(255,255,255,.5)', textDecoration: 'none', fontSize: '.85rem',
           marginBottom: '2rem', fontWeight: 500 }}>
-          ← Tous les plans
+          ← Tous les ebooks
         </Link>
 
         <div className="ebook-detail-grid" style={{ display: 'grid', gridTemplateColumns: 'minmax(0,1fr) minmax(0,340px)', gap: '2.5rem', alignItems: 'start' }}>
@@ -765,6 +766,8 @@ export default function EbookDetail() {
 
         </div>
       </div>
+      <PricingCTA />
+      <SiteFooter />
     </div>
   )
 }

@@ -162,7 +162,7 @@ export default function Nav() {
             <button key={id} className="nav-mobile-link" onClick={() => goToSection(id)}>{label}</button>
           ))}
           <Link to="/blog" className="nav-mobile-link accent" onClick={() => setMobileMenu(false)}>Blog</Link>
-          <Link to="/ebooks" className="nav-mobile-link accent" onClick={() => setMobileMenu(false)}>Ebooks 📚</Link>
+          <Link to="/ebooks" className="nav-mobile-link accent" onClick={() => setMobileMenu(false)}>Ebooks</Link>
           <Link to="/calculateur" className="nav-mobile-link accent" onClick={() => setMobileMenu(false)}>Calculateur</Link>
           <Link to="/contact" className="nav-mobile-link accent" onClick={() => setMobileMenu(false)}>Contact</Link>
           <div style={{ display: 'flex', gap: '.75rem', padding: '.75rem .5rem .25rem', borderTop: '1px solid rgba(255,255,255,.08)', marginTop: '.25rem' }}>

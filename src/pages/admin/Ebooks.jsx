@@ -223,7 +223,8 @@ export default function AdminEbooks() {
       {/* ── CATALOGUE ── */}
       {tab === 'catalogue' && (
         <div className="card" style={{ padding: 0, overflow: 'hidden' }}>
-          <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+          <div style={{ overflowX: 'auto' }}>
+          <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: 560 }}>
             <thead>
               <tr style={{ borderBottom: '1px solid var(--border)' }}>
                 {['Titre', 'Slug', 'Prix', 'Ventes', 'Statut', ''].map(h => (
@@ -257,6 +258,7 @@ export default function AdminEbooks() {
               ))}
             </tbody>
           </table>
+          </div>
         </div>
       )}
     </div>

@@ -64,7 +64,7 @@ export default function Contact() {
       <Nav />
 
       <PageHero
-        badge="Nous contacter"
+        badge="Me contacter"
         title={<>Une question ? <span style={gradText}>Écris-moi.</span></>}
         subtitle="Je réponds personnellement à chaque message sous 48h."
       >
