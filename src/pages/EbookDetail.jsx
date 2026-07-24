@@ -160,6 +160,7 @@ function IllustrationRunning({ dist, kmText, kmInline, weeksLabel, price }) {
 
   return (
     <svg viewBox="0 0 640 260" xmlns="http://www.w3.org/2000/svg"
+      preserveAspectRatio="xMidYMid slice"
       style={{ width: '100%', height: '100%', position: 'absolute', inset: 0 }}>
       <defs>
         <linearGradient id="il-bg" x1="0" y1="0" x2="1" y2="1">
@@ -195,8 +196,8 @@ function IllustrationRunning({ dist, kmText, kmInline, weeksLabel, price }) {
 
       {price && (
         <>
-          <rect x="448" y="8" width="184" height="40" rx="20" fill="url(#il-g)" opacity="0.93" />
-          <text x="540" y="33" fontFamily="Poppins,sans-serif" fontSize="14.5" fontWeight="800"
+          <rect x="228" y="8" width="184" height="40" rx="20" fill="url(#il-g)" opacity="0.93" />
+          <text x="320" y="33" fontFamily="Poppins,sans-serif" fontSize="14.5" fontWeight="800"
             fill="white" textAnchor="middle">{price}</text>
         </>
       )}
@@ -222,6 +223,7 @@ function Illustration10km({ price }) {
 function IllustrationAntiBlessure({ price }) {
   return (
     <svg viewBox="0 0 640 260" xmlns="http://www.w3.org/2000/svg"
+      preserveAspectRatio="xMidYMid slice"
       style={{ width: '100%', height: '100%', position: 'absolute', inset: 0 }}>
       <defs>
         <linearGradient id="il-bg" x1="0" y1="0" x2="1" y2="1">
@@ -249,8 +251,8 @@ function IllustrationAntiBlessure({ price }) {
         fill="rgba(255,255,255,.32)" letterSpacing="3" textAnchor="middle">COURIR DURABLEMENT</text>
       {price && (
         <>
-          <rect x="448" y="8" width="184" height="40" rx="20" fill="url(#il-g)" opacity="0.93" />
-          <text x="540" y="33" fontFamily="Poppins,sans-serif" fontSize="14.5" fontWeight="800"
+          <rect x="228" y="8" width="184" height="40" rx="20" fill="url(#il-g)" opacity="0.93" />
+          <text x="320" y="33" fontFamily="Poppins,sans-serif" fontSize="14.5" fontWeight="800"
             fill="white" textAnchor="middle">{price}</text>
         </>
       )}
@@ -535,6 +537,7 @@ export default function EbookDetail() {
           .ebook-detail-grid { grid-template-columns: 1fr !important; }
           .ebook-detail-buy  { position: static !important; }
           .ebook-detail-wrap { padding-top: 2rem !important; }
+          .ebook-detail-illustration { height: 56vw !important; max-height: 240px !important; }
         }
       `}</style>
       <Nav />
@@ -550,7 +553,7 @@ export default function EbookDetail() {
           {/* ── Colonne gauche ── */}
           <div>
             {/* Illustration */}
-            <div style={{ height: 260, borderRadius: 20, overflow: 'hidden', position: 'relative', marginBottom: '1.5rem' }}>
+            <div className="ebook-detail-illustration" style={{ height: 260, borderRadius: 20, overflow: 'hidden', position: 'relative', marginBottom: '1.5rem' }}>
               {slugIllustration ?? (ebook.cover_image
                 ? <img src={ebook.cover_image} alt={ebook.title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                 : <IllustrationGeneric icon={meta.icon || '📋'} title={ebook.title} />
