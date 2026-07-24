@@ -243,7 +243,7 @@ export default function CSSCalculator() {
             <H2D>Comment réaliser tes <span style={gradText}>tests</span> ?</H2D>
             <p style={{ color:'rgba(255,255,255,.45)', fontSize:'.9rem', maxWidth:600, margin:'.5rem auto 0' }}>Les deux tests doivent être réalisés le même jour, dans cet ordre précis, en piscine de 25m ou 50m. La qualité de l'exécution conditionne directement la fiabilité de ta CSS.</p>
           </div>
-          <div style={{ display:'grid', gridTemplateColumns:'repeat(4, 1fr)', gap:'1.25rem' }}>
+          <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fit, minmax(min(260px, 100%), 1fr))', gap:'1.25rem' }}>
             {[
               { n:'01', t:'Échauffement complet', d:"Nage 400 à 600m en progressant en intensité : commence très lentement, puis passe par quelques accélérations de 25m pour activer ton système cardio-vasculaire. Termine par 2 à 3 longueurs à l'allure cible du 400m. Ton cœur doit être chaud, tes épaules déverrouillées et ta respiration fluide avant de lancer le premier test." },
               { n:'02', t:'Test 400m : effort soutenu', d:"Lance le chrono et nage 400m à l'allure la plus élevée que tu puisses maintenir jusqu'à la fin sans décrocher. L'erreur classique est de partir trop vite sur les 100 premiers mètres : commence légèrement en dessous de ton maximum et gère ton effort pour finir fort. Note ton temps au centième de seconde si possible." },
@@ -273,7 +273,7 @@ export default function CSSCalculator() {
             <SectionTag>Utiliser sa CSS</SectionTag>
             <H2L>Entraîner sa CSS <span style={gradText}>efficacement</span></H2L>
           </div>
-          <div style={{ display:'grid', gridTemplateColumns:'repeat(4, 1fr)', gap:'1.25rem' }}>
+          <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fit, minmax(min(260px, 100%), 1fr))', gap:'1.25rem' }}>
             {[
               { icon:'🔁', t:'Répétitions CSS', d:"La séance de référence : 8 à 12 × 100m à exactement ton allure CSS, avec 15-20 secondes de repos entre chaque répétition. C'est l'équivalent d'une séance tempo en course à pied." },
               { icon:'📈', t:'Blocs progressifs', d:"Commence par 6 × 100m et augmente progressivement à 10 × 100m ou 5 × 200m sur 6-8 semaines. L'objectif est de tenir l'allure CSS sur un volume croissant." },

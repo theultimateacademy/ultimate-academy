@@ -149,18 +149,23 @@ const EBOOK_DETAILS = {
 // ─── Illustrations SVG ───────────────────────────────────────────────────────
 function IllustrationRunning({ dist, kmText, kmInline, weeksLabel, price }) {
   const isWord = /[A-Za-z]/.test(dist)
-  const distFs = isWord
-    ? (dist.length <= 4 ? 100 : dist.length <= 8 ? 72 : 54)
-    : (dist.length <= 2 ? 140 : dist.length <= 4 ? 108 : 78)
+  // Split "SEMI-MARATHON" into two lines
+  const hasSplit = isWord && dist.includes('-')
+  const [part1, part2] = hasSplit ? dist.split('-') : [dist, null]
   const km = !kmInline && (kmText !== undefined ? kmText : 'KM')
 
-  const distY  = isWord ? (km ? 129 : distFs <= 54 ? 112 : 143) : 162
-  const kmY    = isWord ? 187 : 207
-  const semsY  = isWord ? (km ? 212 : 175) : 232
-  const lineY  = isWord ? (km ? 220 : 184) : 241
+  const distFs = isWord
+    ? (hasSplit ? 0 : dist.length <= 4 ? 90 : dist.length <= 8 ? 65 : 46)
+    : (dist.length <= 2 ? 125 : dist.length <= 4 ? 100 : 74)
+
+  // Y positions in 520×240 viewBox
+  const distY = isWord ? (km ? 112 : hasSplit ? 0 : 130) : 148
+  const kmY   = 172
+  const semsY = kmInline ? 204 : hasSplit ? 198 : km ? 192 : 172
+  const lineY = kmInline ? 212 : hasSplit ? 206 : km ? 200 : 180
 
   return (
-    <svg viewBox="0 0 640 260" xmlns="http://www.w3.org/2000/svg"
+    <svg viewBox="0 0 520 240" xmlns="http://www.w3.org/2000/svg"
       preserveAspectRatio="xMidYMid slice"
       style={{ width: '100%', height: '100%', position: 'absolute', inset: 0 }}>
       <defs>
@@ -175,44 +180,54 @@ function IllustrationRunning({ dist, kmText, kmInline, weeksLabel, price }) {
           <stop offset="100%" stopColor="#8B2FC9" stopOpacity="0" />
         </radialGradient>
       </defs>
-      <rect width="640" height="260" fill="url(#il-bg)" />
-      <rect width="640" height="260" fill="url(#il-gl1)" />
+      <rect width="520" height="240" fill="url(#il-bg)" />
+      <rect width="520" height="240" fill="url(#il-gl1)" />
 
       {kmInline ? (
-        <text x="320" y="162" textAnchor="middle"
+        <text x="260" y="148" textAnchor="middle"
           fontFamily="Poppins,sans-serif" fontWeight="900"
           fill="url(#il-g)" opacity="0.92">
-          <tspan fontSize="140" letterSpacing="-2">{dist}</tspan>
-          <tspan fontSize="50" letterSpacing="4" dx="16">KM</tspan>
+          <tspan fontSize="125" letterSpacing="-2">{dist}</tspan>
+          <tspan fontSize="46" letterSpacing="4" dx="12">KM</tspan>
         </text>
+      ) : hasSplit ? (
+        <>
+          <text x="260" y="92" fontFamily="Poppins,sans-serif" fontSize="80" fontWeight="900"
+            fill="url(#il-g)" opacity="0.92" letterSpacing="-1" textAnchor="middle">{part1}</text>
+          <text x="260" y="162" fontFamily="Poppins,sans-serif" fontSize="56" fontWeight="900"
+            fill="url(#il-g)" opacity="0.92" letterSpacing="-1" textAnchor="middle">{part2}</text>
+        </>
       ) : (
-        <text x="320" y={distY} fontFamily="Poppins,sans-serif" fontSize={distFs} fontWeight="900"
-          fill="url(#il-g)" opacity="0.92" letterSpacing="-2" textAnchor="middle">{dist}</text>
+        <text x="260" y={distY} fontFamily="Poppins,sans-serif" fontSize={distFs} fontWeight="900"
+          fill="url(#il-g)" opacity="0.92" letterSpacing="-1" textAnchor="middle">{dist}</text>
       )}
-      {!kmInline && km && <text x="320" y={kmY} fontFamily="Poppins,sans-serif" fontSize={km === 'KM' ? 44 : 36} fontWeight="900"
-        fill="url(#il-g)" opacity="0.80" letterSpacing={km === 'KM' ? '8' : '4'} textAnchor="middle">{km}</text>}
-      <text x="320" dx="3" y={kmInline ? '232' : semsY} fontFamily="Poppins,sans-serif" fontSize="15" fontWeight="700"
-        fill="rgba(255,255,255,.35)" letterSpacing="6" textAnchor="middle">{weeksLabel} SEMAINES</text>
-      <rect x="278" y={kmInline ? '241' : lineY} width="88" height="1.5" rx="1" fill="url(#il-g)" opacity="0.35" />
+      {!kmInline && km && (
+        <text x="260" y={kmY} fontFamily="Poppins,sans-serif" fontSize={km === 'KM' ? 40 : 32} fontWeight="900"
+          fill="url(#il-g)" opacity="0.80" letterSpacing={km === 'KM' ? '7' : '3'} textAnchor="middle">{km}</text>
+      )}
+      <text x="260" dx="3" y={semsY} fontFamily="Poppins,sans-serif" fontSize="13" fontWeight="700"
+        fill="rgba(255,255,255,.35)" letterSpacing="5" textAnchor="middle">{weeksLabel} SEMAINES</text>
+      <rect x="222" y={lineY} width="76" height="1.5" rx="1" fill="url(#il-g)" opacity="0.35" />
 
+      {/* Price badge — top right */}
       {price && (
         <>
-          <rect x="228" y="8" width="184" height="40" rx="20" fill="url(#il-g)" opacity="0.93" />
-          <text x="320" y="33" fontFamily="Poppins,sans-serif" fontSize="14.5" fontWeight="800"
+          <rect x="270" y="8" width="196" height="34" rx="17" fill="url(#il-g)" opacity="0.93" />
+          <text x="368" y="30" fontFamily="Poppins,sans-serif" fontSize="13" fontWeight="800"
             fill="white" textAnchor="middle">{price}</text>
         </>
       )}
 
-      <circle cx="58" cy="38" r="1.2" fill="white" opacity="0.14" />
-      <circle cx="142" cy="24" r="1.8" fill="white" opacity="0.12" />
-      <circle cx="498" cy="48" r="1.4" fill="white" opacity="0.16" />
-      <circle cx="82" cy="210" r="1" fill="white" opacity="0.13" />
-      <circle cx="228" cy="228" r="1.5" fill="white" opacity="0.12" />
-      <circle cx="558" cy="220" r="1.2" fill="white" opacity="0.16" />
-      <circle cx="600" cy="85" r="1.6" fill="white" opacity="0.13" />
-      <circle cx="44" cy="185" r="1" fill="white" opacity="0.12" />
-      <circle cx="186" cy="52" r="1.4" fill="#C084FC" opacity="0.22" />
-      <circle cx="454" cy="198" r="1.2" fill="#F472B6" opacity="0.20" />
+      <circle cx="46" cy="32" r="1.2" fill="white" opacity="0.14" />
+      <circle cx="112" cy="20" r="1.8" fill="white" opacity="0.12" />
+      <circle cx="408" cy="42" r="1.4" fill="white" opacity="0.16" />
+      <circle cx="64" cy="192" r="1" fill="white" opacity="0.13" />
+      <circle cx="188" cy="210" r="1.5" fill="white" opacity="0.12" />
+      <circle cx="456" cy="202" r="1.2" fill="white" opacity="0.16" />
+      <circle cx="482" cy="76" r="1.6" fill="white" opacity="0.13" />
+      <circle cx="36" cy="168" r="1" fill="white" opacity="0.12" />
+      <circle cx="150" cy="46" r="1.4" fill="#C084FC" opacity="0.22" />
+      <circle cx="368" cy="184" r="1.2" fill="#F472B6" opacity="0.20" />
     </svg>
   )
 }
@@ -554,7 +569,7 @@ export default function EbookDetail() {
           {/* ── Colonne gauche ── */}
           <div>
             {/* Illustration */}
-            <div className="ebook-detail-illustration" style={{ height: 260, borderRadius: 20, overflow: 'hidden', position: 'relative', marginBottom: '1.5rem' }}>
+            <div className="ebook-detail-illustration" style={{ height: 260, borderRadius: 20, overflow: 'hidden', position: 'relative', marginBottom: '1.5rem', background: '#1A0A2E' }}>
               {slugIllustration ?? (ebook.cover_image
                 ? <img src={ebook.cover_image} alt={ebook.title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                 : <IllustrationGeneric icon={meta.icon || '📋'} title={ebook.title} />
@@ -766,7 +781,30 @@ export default function EbookDetail() {
 
         </div>
       </div>
-      <PricingCTA />
+      {(() => {
+        const EBOOK_CTA = {
+          '10km-8sem':     { tag: 'Envie d\'aller plus loin ?', title: 'Prêt à franchir la ligne en un temps record ?', desc: 'Ce plan structure ta préparation — mais avec un coaching personnalisé, chaque séance est calibrée sur ta VMA réelle du moment, avec des ajustements hebdomadaires selon ta récupération et ta progression.' },
+          '10km-12sem':    { tag: 'Envie d\'aller plus loin ?', title: 'Ton prochain 10km peut être encore plus rapide', desc: 'Ce plan longue durée est une excellente base. En coaching, j\'adapte le volume et l\'intensité semaine par semaine selon tes données réelles — pas un programme générique.' },
+          'semi-12sem':    { tag: 'Prêt à conquérir ton semi ?', title: 'Un semi réussi, ça se prépare sur-mesure', desc: 'Ce plan donne le cadre. Avec un coaching, chaque séance est ajustée à ta VMA du moment, ton allure cible, et tes contraintes de vie — pour arriver à la ligne en pleine forme.' },
+          'marathon-12sem':{ tag: 'Prêt pour les 42,195 km ?', title: 'Le marathon, ça se prépare sérieusement', desc: 'Ce plan pose les fondations. En coaching, j\'adapte chaque phase — développement, spécificité, affûtage — à ta progression réelle, tes longues sorties et ton objectif de chrono.' },
+          'marathon-16sem':{ tag: '16 semaines pour ton meilleur marathon', title: 'Du temps, de la méthode, et ton meilleur chrono', desc: 'Ce plan structure 4 mois de préparation. Avec un suivi personnalisé, je surveille ta charge semaine par semaine et j\'ajuste en temps réel selon ta forme, tes récupérations et l\'objectif visé.' },
+          'anti-blessure': { tag: 'Courir sans se blesser, ça s\'apprend', title: 'La meilleure blessure, c\'est celle qu\'on évite', desc: 'Ce programme pose les bases de la prévention. En coaching, je surveille tes charges d\'entraînement, tes signaux d\'alerte et t\'accompagne pour ne jamais rejouer le même scénario.' },
+        }
+        const cta = EBOOK_CTA[slug]
+        if (!cta) return <PricingCTA />
+        return (
+          <section style={{ background: 'linear-gradient(135deg,#0C0A18,#1A0A2E)', padding: '4rem 1.5rem', borderTop: '1px solid rgba(139,47,201,.12)' }}>
+            <div style={{ maxWidth: 660, margin: '0 auto', textAlign: 'center' }}>
+              <p style={{ fontSize: '.72rem', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '.18em', color: '#8B2FC9', marginBottom: '1rem' }}>{cta.tag}</p>
+              <h2 style={{ fontSize: 'clamp(1.5rem,4vw,2.1rem)', fontWeight: 900, color: '#fff', marginBottom: '1rem', lineHeight: 1.2 }}>{cta.title}</h2>
+              <p style={{ color: 'rgba(255,255,255,.6)', fontSize: '.92rem', lineHeight: 1.75, marginBottom: '2rem', textAlign: 'center' }}>{cta.desc}</p>
+              <Link to="/register" style={{ display: 'inline-block', padding: '.85rem 2.25rem', borderRadius: 50, background: 'linear-gradient(135deg,#8B2FC9,#E8237A)', color: '#fff', fontWeight: 700, fontSize: '.95rem', textDecoration: 'none', boxShadow: '0 6px 24px rgba(232,35,122,.35)' }}>
+                Commencer mon coaching
+              </Link>
+            </div>
+          </section>
+        )
+      })()}
       <SiteFooter />
     </div>
   )

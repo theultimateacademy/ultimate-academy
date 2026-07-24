@@ -396,7 +396,7 @@ export default function TrailCalculator() {
             Ordres de grandeur pour situer ton niveau et fixer un objectif réaliste.
           </p>
           <div style={{ overflowX: 'auto', borderRadius: 16, border: '1px solid rgba(255,255,255,.07)' }}>
-            <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '.875rem' }}>
+            <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '.875rem', minWidth: 520 }}>
               <thead>
                 <tr style={{ background: 'rgba(139,47,201,.2)' }}>
                   {['Course', 'Distance', 'D+', 'Temps', 'Allure'].map(h => (
@@ -411,11 +411,11 @@ export default function TrailCalculator() {
               <tbody>
                 {REFS.map((r, i) => (
                   <tr key={i} style={{ borderTop: '1px solid rgba(255,255,255,.06)' }}>
-                    <td style={{ padding: '.875rem 1.25rem', fontWeight: 700, color: '#fff' }}>{r.race}</td>
-                    <td style={{ padding: '.875rem 1.25rem', color: 'rgba(255,255,255,.55)' }}>{r.dist}</td>
-                    <td style={{ padding: '.875rem 1.25rem', color: '#C084FC' }}>{r.dp}</td>
-                    <td style={{ padding: '.875rem 1.25rem', color: 'rgba(255,255,255,.75)', fontWeight: 600 }}>{r.temps}</td>
-                    <td style={{ padding: '.875rem 1.25rem', color: 'rgba(255,255,255,.4)' }}>{r.allure}</td>
+                    <td style={{ padding: '.875rem 1.25rem', fontWeight: 700, color: '#fff', whiteSpace: 'nowrap' }}>{r.race}</td>
+                    <td style={{ padding: '.875rem 1.25rem', color: 'rgba(255,255,255,.55)', whiteSpace: 'nowrap' }}>{r.dist}</td>
+                    <td style={{ padding: '.875rem 1.25rem', color: '#C084FC', whiteSpace: 'nowrap' }}>{r.dp}</td>
+                    <td style={{ padding: '.875rem 1.25rem', color: 'rgba(255,255,255,.75)', fontWeight: 600, whiteSpace: 'nowrap' }}>{r.temps}</td>
+                    <td style={{ padding: '.875rem 1.25rem', color: 'rgba(255,255,255,.4)', whiteSpace: 'nowrap' }}>{r.allure}</td>
                   </tr>
                 ))}
               </tbody>

@@ -232,17 +232,17 @@ export default function AlluresCalculator() {
             <p style={{ fontWeight:800, color:C.dark, marginBottom:'.4rem', fontSize:'1.05rem' }}>Quelle allure selon ton objectif chrono ?</p>
             <p style={{ color:'rgba(26,18,48,.5)', fontSize:'.85rem', marginBottom:'1.25rem' }}>Repères pour chaque objectif courant</p>
             <div style={{ overflow:'hidden', overflowX:'auto', borderRadius:12, border:'1px solid rgba(139,47,201,.1)' }}>
-              <table style={{ width:'100%', borderCollapse:'collapse', fontSize:'.875rem' }}>
+              <table style={{ width:'100%', borderCollapse:'collapse', fontSize:'.875rem', minWidth:420 }}>
                 <thead><tr style={{ background:'#1a1230' }}>
-                  {['Distance','Objectif','Allure à tenir','Niveau'].map(h=><th key={h} style={{ padding:'.6rem .85rem', textAlign:'left', color:'rgba(255,255,255,.75)', fontWeight:600, fontSize:'.72rem', textTransform:'uppercase', letterSpacing:'.07em' }}>{h}</th>)}
+                  {['Distance','Objectif','Allure à tenir','Niveau'].map(h=><th key={h} style={{ padding:'.6rem .85rem', textAlign:'left', color:'rgba(255,255,255,.75)', fontWeight:600, fontSize:'.72rem', textTransform:'uppercase', letterSpacing:'.07em', whiteSpace:'nowrap' }}>{h}</th>)}
                 </tr></thead>
                 <tbody>
                   {ALLURE_TABLE.map((row,i)=>(
                     <tr key={i} style={{ borderTop:'1px solid rgba(139,47,201,.07)', background:i%2===0?'transparent':'rgba(139,47,201,.02)' }}>
-                      <td style={{ padding:'.6rem .85rem', color:C.purple, fontWeight:600 }}>{row.dist}</td>
-                      <td style={{ padding:'.6rem .85rem', color:C.dark, fontWeight:600, fontVariantNumeric:'tabular-nums' }}>{row.chrono}</td>
-                      <td style={{ padding:'.6rem .85rem', color:C.dark, fontVariantNumeric:'tabular-nums' }}>{row.allure}</td>
-                      <td style={{ padding:'.6rem .85rem', color:'rgba(26,18,48,.45)', fontSize:'.82rem' }}>{row.note}</td>
+                      <td style={{ padding:'.6rem .85rem', color:C.purple, fontWeight:600, whiteSpace:'nowrap' }}>{row.dist}</td>
+                      <td style={{ padding:'.6rem .85rem', color:C.dark, fontWeight:600, fontVariantNumeric:'tabular-nums', whiteSpace:'nowrap' }}>{row.chrono}</td>
+                      <td style={{ padding:'.6rem .85rem', color:C.dark, fontVariantNumeric:'tabular-nums', whiteSpace:'nowrap' }}>{row.allure}</td>
+                      <td style={{ padding:'.6rem .85rem', color:'rgba(26,18,48,.45)', fontSize:'.82rem', whiteSpace:'nowrap' }}>{row.note}</td>
                     </tr>
                   ))}
                 </tbody>

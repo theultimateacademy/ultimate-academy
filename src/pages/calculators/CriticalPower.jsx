@@ -243,7 +243,7 @@ export default function CriticalPowerCalculator() {
             <H2D>Comment réaliser tes <span style={gradText}>tests</span> de puissance ?</H2D>
             <p style={{ color:'rgba(255,255,255,.45)', fontSize:'.9rem', maxWidth:600, margin:'.5rem auto 0' }}>Chaque test doit être réalisé à effort maximal soutenable, jamais à fond dès la première seconde. L'objectif est de trouver la puissance la plus élevée que tu peux maintenir jusqu'à la fin, pas de t'effondrer à mi-parcours. La qualité d'exécution conditionne directement la précision de ta CP.</p>
           </div>
-          <div style={{ display:'grid', gridTemplateColumns:'repeat(4, 1fr)', gap:'1.25rem', marginBottom:'2rem' }}>
+          <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fit, minmax(min(260px, 100%), 1fr))', gap:'1.25rem', marginBottom:'2rem' }}>
             {[
               { t:'Test 5 minutes', icon:'⚡', d:"Après un échauffement de 20 minutes incluant 3 à 4 accélérations progressives de 30 secondes, lance le chrono et maintiens la puissance la plus élevée que tu peux soutenir sur 5 minutes complètes. C'est l'effort le plus intense des trois tests : tu dois être à la limite du supportable dès la 2e minute, mais encore capable d'accélérer sur les 30 dernières secondes. Récupère au moins 48h avant le test suivant." },
               { t:'Test 20 minutes', icon:'🔥', d:"Le classique du cyclisme structuré. Après un échauffement complet de 20 à 30 minutes, maintiens la puissance la plus élevée que tu puisses soutenir pendant 20 minutes sans baisser. L'erreur la plus commune est de partir trop fort les 5 premières minutes puis de s'effondrer. Commence à 5-10% sous ton estimation et remonte si tu peux. La FTP est estimée à 95% de ce résultat." },

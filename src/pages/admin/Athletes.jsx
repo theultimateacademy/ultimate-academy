@@ -1976,6 +1976,7 @@ function AthleteDetailPanel({ athlete, onClose, onUpdated, onAlertDismissed }) {
           <div style={{ position:'fixed', inset:0, zIndex:400, background:'rgba(0,0,0,.78)', backdropFilter:'blur(8px)',
             display:'flex', alignItems:'center', justifyContent:'center', padding:'1.25rem' }}
             onClick={() => setOpenRetour(null)}>
+            <style>{`.retour-panel-grid { display:grid; grid-template-columns:1fr 1fr; } @media (max-width:767px) { .retour-panel-grid { grid-template-columns:1fr !important; } }`}</style>
             <div style={{ width:'100%', maxWidth:680, background:'#12121E', borderRadius:22,
               border:`1px solid ${color}35`, boxShadow:`0 30px 80px rgba(0,0,0,.7), 0 0 0 1px ${color}12`,
               overflow:'hidden', maxHeight:'92vh', overflowY:'auto' }}
@@ -2005,7 +2006,7 @@ function AthleteDetailPanel({ athlete, onClose, onUpdated, onAlertDismissed }) {
               </div>
 
               {/* ── Deux panneaux côte à côte ── */}
-              <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', minHeight:200 }}>
+              <div className="retour-panel-grid" style={{ minHeight:200 }}>
 
                 {/* PRÉVU — rendu identique à la vue athlète */}
                 <div style={{ borderRight:'1px solid rgba(255,255,255,.06)', overflowY:'auto' }}>

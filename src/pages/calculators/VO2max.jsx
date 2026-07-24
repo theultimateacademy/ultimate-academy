@@ -469,7 +469,7 @@ export default function VO2maxCalculator() {
             ))}
           </div>
 
-          <div className="tbl-scroll" style={{ background: '#fff', borderRadius: 20, boxShadow: '0 8px 40px rgba(139,47,201,.1)', border: '1px solid rgba(139,47,201,.12)', overflow: 'hidden' }}>
+          <div className="tbl-scroll" style={{ background: '#fff', borderRadius: 20, boxShadow: '0 8px 40px rgba(139,47,201,.1)', border: '1px solid rgba(139,47,201,.12)', overflow: 'hidden', overflowX: 'auto' }}>
             <table style={{ width: '100%', minWidth: 480, borderCollapse: 'collapse', fontSize: '.875rem' }}>
               <thead>
                 <tr style={{ background: '#1a1230' }}>
@@ -556,8 +556,8 @@ export default function VO2maxCalculator() {
                 <circle cx="170" cy="168" r="5" fill="white" stroke="#8B2FC9" strokeWidth="2"/>
                 <circle cx="290" cy="118" r="5" fill="white" stroke="#E8237A" strokeWidth="2"/>
                 <circle cx="410" cy="72" r="6" fill="url(#vog2)"/>
-                <text x="415" y="68" fontSize="10" fill="#8B2FC9" fontWeight="700" fontFamily="system-ui,sans-serif">+2,1</text>
-                <text x="415" y="80" fontSize="9" fill="rgba(26,18,48,.55)" fontFamily="system-ui,sans-serif">km/h VMA</text>
+                <text x="408" y="68" fontSize="10" fill="#8B2FC9" fontWeight="700" fontFamily="system-ui,sans-serif" textAnchor="end">+2,1</text>
+                <text x="408" y="80" fontSize="9" fill="rgba(26,18,48,.55)" fontFamily="system-ui,sans-serif" textAnchor="end">km/h VMA</text>
                 <rect x="110" y="237" width="220" height="54" rx="10" fill="rgba(139,47,201,.08)" stroke="rgba(139,47,201,.2)" strokeWidth="1"/>
                 <text x="220" y="256" textAnchor="middle" fontSize="10.5" fill="#8B2FC9" fontWeight="700" fontFamily="system-ui,sans-serif">2 séances VMA / semaine</text>
                 <text x="220" y="277" textAnchor="middle" fontSize="9.5" fill="rgba(26,18,48,.55)" fontFamily="system-ui,sans-serif">Progression mesurable en 6 à 8 semaines</text>
@@ -603,7 +603,7 @@ export default function VO2maxCalculator() {
             <H2D>VO2max et VMA : quelle <span style={gradText}>différence</span> ?</H2D>
             <p style={{ color: 'rgba(255,255,255,.5)', maxWidth: 460, margin: '0 auto' }}>Deux indicateurs complémentaires, souvent confondus</p>
           </div>
-          <div className="tbl-scroll" style={{ background: 'rgba(255,255,255,.04)', borderRadius: 20, border: '1px solid rgba(255,255,255,.08)', overflow: 'hidden' }}>
+          <div className="tbl-scroll" style={{ background: 'rgba(255,255,255,.04)', borderRadius: 20, border: '1px solid rgba(255,255,255,.08)', overflow: 'hidden', overflowX: 'auto' }}>
             <table style={{ width: '100%', minWidth: 400, borderCollapse: 'collapse', fontSize: '.9rem' }}>
               <thead>
                 <tr style={{ background: 'rgba(139,47,201,.25)' }}>

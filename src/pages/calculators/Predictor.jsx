@@ -447,9 +447,9 @@ export default function PredictorCalculator() {
               Correspondances indicatives entre 10km, semi et marathon
             </p>
           </div>
-          <div style={{ background: '#fff', borderRadius: 20, overflow: 'hidden',
+          <div style={{ background: '#fff', borderRadius: 20, overflow: 'hidden', overflowX: 'auto',
             boxShadow: '0 4px 32px rgba(139,47,201,.08)', border: '1px solid rgba(139,47,201,.1)' }}>
-            <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '.9rem' }}>
+            <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '.9rem', minWidth: 340 }}>
               <thead>
                 <tr style={{ background: `linear-gradient(135deg, #8B2FC9, #E8237A)` }}>
                   {['10 km', 'Semi-marathon', 'Marathon'].map(h => (
