@@ -304,8 +304,13 @@ function parseRetourComment(comment) {
   const match = (re) => { const m = comment.match(re); return m ? m[1].trim() : null }
   r.ressenti = match(/\[Ressenti:\s*([^\]]+)\]/)
   r.ech      = match(/\[Ech:\s*([^\]]+)\]/)
-  const blocsM = comment.match(/\[Blocs:\s*([^\]]+)\]/)
-  r.blocs = blocsM ? blocsM[1].split('|').map(b => b.trim()).filter(Boolean) : []
+  // Format: [Blocs: ...] (old) ou [Blocs 7×300m: ...] (nouveau avec label)
+  const blocsAll = [...comment.matchAll(/\[Blocs([^\]:]*):\s*([^\]]+)\]/g)]
+  r.blocsData = blocsAll.map(m => ({
+    label: m[1].trim(),
+    items: m[2].split('|').map(b => b.trim()).filter(Boolean),
+  }))
+  r.blocs = r.blocsData.flatMap(b => b.items)
   r.corps  = match(/\[Corps:\s*([^\]]+)\]/)
   r.rac    = match(/\[RAC:\s*([^\]]+)\]/)
   r.fcMoy  = match(/\[FC moy:\s*([^\]]+)\]/)
@@ -2096,16 +2101,26 @@ function AthleteDetailPanel({ athlete, onClose, onUpdated, onAlertDismissed }) {
                   {parsed.blocs?.length > 0 && (
                     <div style={{ marginBottom:'.75rem' }}>
                       <div style={{ fontSize:'.58rem', fontWeight:800, textTransform:'uppercase',
-                        letterSpacing:'.08em', color:`${rc}cc`, marginBottom:'.4rem' }}>Blocs réalisés</div>
-                      <div style={{ display:'flex', flexDirection:'column', gap:'.25rem' }}>
-                        {parsed.blocs.map((b, i) => (
-                          <div key={i} style={{ fontSize:'.8rem', fontWeight:700, color:'#fff',
-                            background:'rgba(255,255,255,.06)', borderRadius:8, padding:'.25rem .65rem',
-                            borderLeft:`2px solid ${rc}` }}>
-                            {b}
+                        letterSpacing:'.08em', color:`${rc}cc`, marginBottom:'.5rem' }}>Chronos réalisés</div>
+                      {(parsed.blocsData?.length > 0 ? parsed.blocsData : [{ label:'', items: parsed.blocs }]).map((bloc, bi) => (
+                        <div key={bi} style={{ marginTop: bi > 0 ? '.6rem' : 0 }}>
+                          {bloc.label && (
+                            <div style={{ fontSize:'.62rem', fontWeight:800, color:`${rc}bb`,
+                              textTransform:'uppercase', letterSpacing:'.06em', marginBottom:'.25rem' }}>
+                              {bloc.label}
+                            </div>
+                          )}
+                          <div style={{ display:'flex', flexDirection:'column', gap:'.2rem' }}>
+                            {bloc.items.map((b, i) => (
+                              <div key={i} style={{ fontSize:'.8rem', fontWeight:700, color:'#fff',
+                                background:'rgba(255,255,255,.06)', borderRadius:8, padding:'.28rem .65rem',
+                                borderLeft:`2px solid ${rc}` }}>
+                                {b}
+                              </div>
+                            ))}
                           </div>
-                        ))}
-                      </div>
+                        </div>
+                      ))}
                     </div>
                   )}
 

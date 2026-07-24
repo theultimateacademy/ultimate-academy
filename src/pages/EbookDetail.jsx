@@ -530,15 +530,22 @@ export default function EbookDetail() {
 
   return (
     <div style={{ background: C.bg, minHeight: '100vh', color: '#fff', fontFamily: 'inherit' }}>
+      <style>{`
+        @media (max-width: 767px) {
+          .ebook-detail-grid { grid-template-columns: 1fr !important; }
+          .ebook-detail-buy  { position: static !important; }
+          .ebook-detail-wrap { padding-top: 2rem !important; }
+        }
+      `}</style>
       <Nav />
-      <div style={{ maxWidth: 940, margin: '0 auto', padding: '5rem 1.5rem 5rem' }}>
+      <div className="ebook-detail-wrap" style={{ maxWidth: 940, margin: '0 auto', padding: '5rem 1.5rem 5rem' }}>
         <Link to="/ebooks" style={{ display: 'inline-flex', alignItems: 'center', gap: '.4rem',
           color: 'rgba(255,255,255,.5)', textDecoration: 'none', fontSize: '.85rem',
           marginBottom: '2rem', fontWeight: 500 }}>
           ← Tous les plans
         </Link>
 
-        <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0,1fr) minmax(0,340px)', gap: '2.5rem', alignItems: 'start' }}>
+        <div className="ebook-detail-grid" style={{ display: 'grid', gridTemplateColumns: 'minmax(0,1fr) minmax(0,340px)', gap: '2.5rem', alignItems: 'start' }}>
 
           {/* ── Colonne gauche ── */}
           <div>
@@ -639,7 +646,7 @@ export default function EbookDetail() {
           </div>
 
           {/* ── Colonne droite: achat (sticky) ── */}
-          <div style={{ position: 'sticky', top: '1.5rem' }}>
+          <div className="ebook-detail-buy" style={{ position: 'sticky', top: '1.5rem' }}>
             <div id="buy-form" style={{ background: 'rgba(255,255,255,.05)', border: '1px solid rgba(255,255,255,.1)',
               borderRadius: 24, padding: '1.75rem' }}>
 
