@@ -377,10 +377,10 @@ export default function Landing() {
       {/* ── COACH ────────────────────────────────────────────── */}
       <section id="coach" ref={coachRef} style={{ padding: '6rem 1.5rem', background: '#0A0A0A', borderTop: '1px solid rgba(255,255,255,.06)' }}>
         <div className="container" style={{ maxWidth: 960 }}>
-          <div style={{ display: 'flex', gap: '4rem', alignItems: 'flex-start', flexWrap: 'wrap' }}>
+          <div style={{ display: 'flex', gap: '4rem', alignItems: 'center', flexWrap: 'wrap' }}>
             <div style={{
               flexShrink: 0, width: 'min(100%, 300px)',
-              marginTop: '2.5rem',
+              marginTop: '3rem',
               opacity: coachIn ? 1 : 0,
               transform: coachIn ? 'translateX(0)' : 'translateX(-40px)',
               transition: 'opacity 0.8s ease, transform 0.8s ease',
