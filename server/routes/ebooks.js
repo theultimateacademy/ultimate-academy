@@ -112,7 +112,21 @@ router.get('/', async (req, res) => {
   }
 });
 
-// ─── GET /api/ebooks/admin/pdf/:slug/:vma/:seances — accès PDF coach ─────────
+// ─── GET /api/ebooks/admin/pdf/:slug — accès PDF coach (ebook simple, pas de variante) ──
+
+router.get('/admin/pdf/:slug', async (req, res) => {
+  const { slug } = req.params;
+  // Ebooks sans variante : chercher le pdf_path en DB
+  const { data: ebook } = await supabase.from('ebooks').select('pdf_path').eq('slug', slug).single();
+  if (!ebook?.pdf_path) return res.status(404).json({ error: 'PDF introuvable' });
+  const pdfPath = path.join(__dirname, '../../public/ebooks', ebook.pdf_path);
+  if (!fs.existsSync(pdfPath)) return res.status(404).json({ error: 'Fichier PDF introuvable sur le serveur' });
+  res.setHeader('Content-Type', 'application/pdf');
+  res.setHeader('Content-Disposition', `inline; filename="${slug}.pdf"`);
+  fs.createReadStream(pdfPath).pipe(res);
+});
+
+// ─── GET /api/ebooks/admin/pdf/:slug/:vma/:seances — accès PDF coach (variantes) ──────
 
 router.get('/admin/pdf/:slug/:vma/:seances', (req, res) => {
   const { slug, vma, seances } = req.params;

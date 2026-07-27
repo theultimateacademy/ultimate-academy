@@ -15,11 +15,12 @@ const PRICE_TIERS = {
 }
 
 const EBOOK_CATALOG = [
-  { slug: '10km-8sem',      label: '10 km — 8 semaines',      icon: '🏃' },
-  { slug: '10km-12sem',     label: '10 km — 12 semaines',     icon: '🏃' },
-  { slug: 'semi-12sem',     label: 'Semi-Marathon — 12 sem',  icon: '🏅' },
-  { slug: 'marathon-12sem', label: 'Marathon — 12 semaines',  icon: '🏆' },
-  { slug: 'marathon-16sem', label: 'Marathon — 16 semaines',  icon: '🏆' },
+  { slug: '10km-8sem',      label: '10 km — 8 semaines',      icon: '🏃', variant: true },
+  { slug: '10km-12sem',     label: '10 km — 12 semaines',     icon: '🏃', variant: true },
+  { slug: 'semi-12sem',     label: 'Semi-Marathon — 12 sem',  icon: '🏅', variant: true },
+  { slug: 'marathon-12sem', label: 'Marathon — 12 semaines',  icon: '🏆', variant: true },
+  { slug: 'marathon-16sem', label: 'Marathon — 16 semaines',  icon: '🏆', variant: true },
+  { slug: 'anti-blessure',  label: 'Guide Anti-Blessure',     icon: '🩺', variant: false },
 ]
 
 // Génère 10, 10.5, 11, 11.5 ... 24 — correspond aux noms de fichiers réels
@@ -29,6 +30,26 @@ const VMA_OPTIONS = Array.from({ length: 29 }, (_, i) => {
 })
 const SEANCES_OPTIONS = [3, 4, 5, 6]
 
+// Ebook à PDF unique (pas de variante VMA/séances)
+function SimpleEbookCard({ slug, label, icon }) {
+  const handleOpen = () => window.open(`${API}/api/ebooks/admin/pdf/${slug}`, '_blank')
+  return (
+    <div className="card" style={{ padding: '1.25rem', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '.6rem' }}>
+        <span style={{ fontSize: '1.6rem' }}>{icon}</span>
+        <div style={{ flex: 1 }}>
+          <div style={{ fontWeight: 700, fontSize: '.95rem', lineHeight: 1.3 }}>{label}</div>
+          <div style={{ fontSize: '.72rem', color: 'var(--text-muted)', marginTop: '.15rem' }}>PDF unique — 11 pages</div>
+        </div>
+      </div>
+      <button onClick={handleOpen} className="btn btn-primary btn-sm" style={{ alignSelf: 'flex-start' }}>
+        Ouvrir le PDF ↗
+      </button>
+    </div>
+  )
+}
+
+// Ebook à variantes (VMA × séances/semaine)
 function EbookCard({ slug, label, icon }) {
   const [vma, setVma] = useState('14.0')
   const [seances, setSeances] = useState(4)
@@ -149,7 +170,10 @@ export default function AdminEbooks() {
       {/* ── MES EBOOKS ── */}
       {tab === 'ebooks' && (
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: '1rem' }}>
-          {EBOOK_CATALOG.map(e => <EbookCard key={e.slug} {...e} />)}
+          {EBOOK_CATALOG.map(e => e.variant
+            ? <EbookCard key={e.slug} {...e} />
+            : <SimpleEbookCard key={e.slug} {...e} />
+          )}
         </div>
       )}
 
