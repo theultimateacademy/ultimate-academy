@@ -903,6 +903,7 @@ function AthleteDetailPanel({ athlete, onClose, onUpdated, onAlertDismissed }) {
   const [retourWeek,   setRetourWeek]    = useState(null) // selected week in retours tab
   const [bilans,       setBilans]        = useState([])
   const [bilansLoaded, setBilansLoaded]  = useState(false)
+  const [bilansError,  setBilansError]   = useState(null)
   const [bilanResponses, setBilanResponses] = useState({}) // { [bilanId]: string }
   const [bilanSaving,  setBilanSaving]   = useState({}) // { [bilanId]: bool }
 
@@ -934,9 +935,12 @@ function AthleteDetailPanel({ athlete, onClose, onUpdated, onAlertDismissed }) {
         resps[b.id] = b.coach_response || ''
       }
       setBilanResponses(resps)
-      setBilansLoaded(true)
     } catch (err) {
       console.error('[Bilans] load error:', err.message)
+      setBilans([])
+      setBilansError(err.message)
+    } finally {
+      setBilansLoaded(true)
     }
   }
 
@@ -1828,6 +1832,41 @@ function AthleteDetailPanel({ athlete, onClose, onUpdated, onAlertDismissed }) {
               <div className="coach-tab-pane" style={{ maxWidth:720, margin:'0 auto', padding:'1.5rem' }}>
                 {!bilansLoaded ? (
                   <div style={{ textAlign:'center', padding:'3rem', color:'var(--text-muted)' }}>Chargement...</div>
+                ) : bilansError ? (
+                  <div style={{ background:'rgba(239,68,68,.08)', border:'1px solid rgba(239,68,68,.25)', borderRadius:12, padding:'1.25rem 1.5rem' }}>
+                    <div style={{ fontWeight:700, color:'#FCA5A5', marginBottom:'.5rem' }}>Table manquante en base de données</div>
+                    <div style={{ fontSize:'.84rem', color:'rgba(255,255,255,.7)', lineHeight:1.6, marginBottom:'1rem' }}>
+                      La table <code style={{ background:'rgba(255,255,255,.08)', borderRadius:4, padding:'1px 5px', fontFamily:'monospace' }}>weekly_bilans</code> n'existe pas encore dans Supabase. Execute le SQL ci-dessous dans le <strong>SQL Editor</strong> de ton dashboard Supabase pour la créer, puis recharge cette page.
+                    </div>
+                    <pre style={{ background:'rgba(0,0,0,.4)', border:'1px solid rgba(255,255,255,.08)', borderRadius:8, padding:'1rem', fontSize:'.75rem', color:'#A5F3FC', overflowX:'auto', lineHeight:1.7, margin:0 }}>{`CREATE TABLE IF NOT EXISTS public.weekly_bilans (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id uuid NOT NULL,
+  plan_id uuid NOT NULL,
+  week_number integer NOT NULL,
+  submitted_at timestamptz DEFAULT now(),
+  overall_rating integer,
+  fatigue_level integer,
+  motivation_level integer,
+  sleep_quality integer,
+  pain_areas text,
+  what_went_well text,
+  what_was_hard text,
+  wishes_next_week text,
+  coach_message text,
+  coach_response text,
+  coach_responded_at timestamptz,
+  UNIQUE (user_id, plan_id, week_number)
+);
+ALTER TABLE public.weekly_bilans ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Athletes insert own" ON public.weekly_bilans
+  FOR INSERT WITH CHECK (auth.uid() = user_id);
+CREATE POLICY "Athletes read own" ON public.weekly_bilans
+  FOR SELECT USING (auth.uid() = user_id);`}</pre>
+                    <button onClick={() => { setBilansLoaded(false); setBilansError(null); loadBilans() }}
+                      style={{ marginTop:'.875rem', background:'rgba(239,68,68,.15)', border:'1px solid rgba(239,68,68,.3)', borderRadius:8, padding:'.45rem 1rem', color:'#FCA5A5', fontSize:'.82rem', fontWeight:700, cursor:'pointer' }}>
+                      Réessayer
+                    </button>
+                  </div>
                 ) : bilans.length === 0 ? (
                   <div style={{ textAlign:'center', padding:'3rem', color:'var(--text-muted)', fontSize:'.88rem' }}>
                     Aucun bilan soumis pour cet athlète.
