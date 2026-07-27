@@ -28,7 +28,7 @@ export default function PageHero({ title, subtitle, badge, children, backTo, bac
     <div style={{
       background: 'linear-gradient(-45deg, #0a0a0a, #1a0a2e, #2d0a4e, #8B2FC9, #5a1fa0, #1a0a2e, #0a0a0a)',
       backgroundSize: '400% 400%',
-      backgroundPosition: '0% 50%',
+      animation: 'gradientShift 8s ease infinite',
       minHeight: '100vh',
       display: 'flex',
       flexDirection: 'column',
@@ -41,6 +41,11 @@ export default function PageHero({ title, subtitle, badge, children, backTo, bac
       overflow: 'hidden',
     }}>
       <style>{`
+        @keyframes gradientShift {
+          0%   { background-position: 0% 50% }
+          50%  { background-position: 100% 50% }
+          100% { background-position: 0% 50% }
+        }
         @keyframes floatParticle {
           0%   { transform: translateY(0px) translateX(0px) }
           33%  { transform: translateY(-28px) translateX(18px) }
