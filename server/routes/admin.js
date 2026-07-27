@@ -228,6 +228,44 @@ router.post('/weekly-feedback', async (req, res) => {
   }
 });
 
+// GET /api/admin/weekly-bilans — tous les bilans (coach)
+router.get('/weekly-bilans', async (req, res) => {
+  try {
+    const { userId } = req.query;
+    let query = supabase
+      .from('weekly_bilans')
+      .select('*, profiles(first_name, last_name)')
+      .order('submitted_at', { ascending: false });
+    if (userId) query = query.eq('user_id', userId);
+    const { data, error } = await query;
+    if (error) throw error;
+    res.json({ bilans: data || [] });
+  } catch (err) {
+    console.error('[Admin] weekly-bilans GET error:', err.message);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// POST /api/admin/weekly-bilans/:id/response — réponse du coach
+router.post('/weekly-bilans/:id/response', async (req, res) => {
+  const { id } = req.params;
+  const { response } = req.body;
+  if (!id || !response) return res.status(400).json({ error: 'Missing id or response' });
+  try {
+    const { data, error } = await supabase
+      .from('weekly_bilans')
+      .update({ coach_response: response, coach_responded_at: new Date().toISOString() })
+      .eq('id', id)
+      .select()
+      .single();
+    if (error) throw error;
+    res.json({ success: true, bilan: data });
+  } catch (err) {
+    console.error('[Admin] weekly-bilans response error:', err.message);
+    res.status(500).json({ error: err.message });
+  }
+});
+
 // GET /api/admin/athletes — liste tous les athlètes (service key, bypass RLS)
 router.get('/athletes', async (req, res) => {
   try {

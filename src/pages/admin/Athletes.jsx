@@ -901,6 +901,10 @@ function AthleteDetailPanel({ athlete, onClose, onUpdated, onAlertDismissed }) {
   const [openRetour,    setOpenRetour]    = useState(null)
   const [coachWeekIdx, setCoachWeekIdx]  = useState(0)  // active week tab in plan view
   const [retourWeek,   setRetourWeek]    = useState(null) // selected week in retours tab
+  const [bilans,       setBilans]        = useState([])
+  const [bilansLoaded, setBilansLoaded]  = useState(false)
+  const [bilanResponses, setBilanResponses] = useState({}) // { [bilanId]: string }
+  const [bilanSaving,  setBilanSaving]   = useState({}) // { [bilanId]: bool }
 
   const currentWeekNum = getCurrentWeekNum(plan)
 
@@ -915,7 +919,47 @@ function AthleteDetailPanel({ athlete, onClose, onUpdated, onAlertDismissed }) {
 
   useEffect(() => {
     sessionStorage.setItem(`admin_tab_${athlete.id}`, tab)
+    if (tab === 'bilans' && !bilansLoaded) loadBilans()
   }, [athlete.id, tab])
+
+  async function loadBilans() {
+    try {
+      const resp = await fetch(`/api/admin/weekly-bilans?userId=${athlete.id}`)
+      const body = await resp.json()
+      if (!resp.ok) throw new Error(body.error || 'Erreur')
+      setBilans(body.bilans || [])
+      // Pre-fill responses
+      const resps = {}
+      for (const b of body.bilans || []) {
+        resps[b.id] = b.coach_response || ''
+      }
+      setBilanResponses(resps)
+      setBilansLoaded(true)
+    } catch (err) {
+      console.error('[Bilans] load error:', err.message)
+    }
+  }
+
+  async function submitBilanResponse(bilanId) {
+    const response = bilanResponses[bilanId]?.trim()
+    if (!response) return
+    setBilanSaving(s => ({ ...s, [bilanId]: true }))
+    try {
+      const resp = await fetch(`/api/admin/weekly-bilans/${bilanId}/response`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ response }),
+      })
+      const body = await resp.json()
+      if (!resp.ok) throw new Error(body.error || 'Erreur')
+      setBilans(bs => bs.map(b => b.id === bilanId ? { ...b, coach_response: response, coach_responded_at: new Date().toISOString() } : b))
+      showSaveToast('Réponse envoyée')
+    } catch (err) {
+      showSaveToast('Erreur : ' + err.message, false)
+    } finally {
+      setBilanSaving(s => ({ ...s, [bilanId]: false }))
+    }
+  }
 
   // Realtime : met à jour le plan coach quand l'athlète déplace une séance
   useEffect(() => {
@@ -1133,6 +1177,7 @@ function AthleteDetailPanel({ athlete, onClose, onUpdated, onAlertDismissed }) {
     { v:'profile',  l:'👤 Profil' },
     { v:'plan',     l:`📋 Plan${plan ? ` · S${currentWeekNum}` : ''}` },
     { v:'retours',  l:`📊 Retours (${planComps.length})` },
+    { v:'bilans',   l:'📝 Bilans' },
     ...(alerts.length > 0 ? [{ v:'alertes', l:`⚠️ Alertes (${alerts.length})` }] : []),
   ]
 
@@ -1777,6 +1822,148 @@ function AthleteDetailPanel({ athlete, onClose, onUpdated, onAlertDismissed }) {
                 </div>
               )
             })()}
+
+            {/* ══════════ BILANS HEBDO ══════════ */}
+            {tab === 'bilans' && (
+              <div className="coach-tab-pane" style={{ maxWidth:720, margin:'0 auto', padding:'1.5rem' }}>
+                {!bilansLoaded ? (
+                  <div style={{ textAlign:'center', padding:'3rem', color:'var(--text-muted)' }}>Chargement...</div>
+                ) : bilans.length === 0 ? (
+                  <div style={{ textAlign:'center', padding:'3rem', color:'var(--text-muted)', fontSize:'.88rem' }}>
+                    Aucun bilan soumis pour cet athlète.
+                  </div>
+                ) : (
+                  <div style={{ display:'flex', flexDirection:'column', gap:'1.25rem' }}>
+                    {bilans.map(b => {
+                      const responded = !!b.coach_response
+                      return (
+                        <div key={b.id} style={{
+                          background:'var(--surface)', border:`1px solid ${responded ? 'rgba(16,185,129,.25)' : 'rgba(139,47,201,.25)'}`,
+                          borderRadius:14, overflow:'hidden',
+                        }}>
+                          {/* Header bilan */}
+                          <div style={{
+                            background: responded ? 'rgba(16,185,129,.07)' : 'rgba(139,47,201,.07)',
+                            padding:'.875rem 1rem',
+                            display:'flex', justifyContent:'space-between', alignItems:'center', gap:'.75rem',
+                            borderBottom:'1px solid rgba(255,255,255,.06)',
+                          }}>
+                            <div>
+                              <div style={{ fontWeight:800, fontSize:'.92rem', color:'#fff' }}>
+                                Semaine {b.week_number}
+                                {responded && <span style={{ marginLeft:'.5rem', fontSize:'.7rem', color:'#6EE7B7', fontWeight:700, background:'rgba(16,185,129,.12)', borderRadius:99, padding:'.1rem .4rem' }}>Répondu</span>}
+                              </div>
+                              <div style={{ fontSize:'.7rem', color:'var(--text-muted)', marginTop:'.15rem' }}>
+                                {new Date(b.submitted_at).toLocaleDateString('fr-FR', { day:'numeric', month:'long', year:'numeric', hour:'2-digit', minute:'2-digit' })}
+                              </div>
+                            </div>
+                            {/* Scores */}
+                            <div style={{ display:'flex', gap:'.5rem', flexWrap:'wrap', justifyContent:'flex-end' }}>
+                              {b.overall_rating != null && (
+                                <span style={{ fontSize:'.72rem', fontWeight:700, background:'rgba(139,47,201,.12)', border:'1px solid rgba(139,47,201,.25)', borderRadius:99, padding:'.2rem .55rem', color:'#C084FC' }}>
+                                  Note {b.overall_rating}/10
+                                </span>
+                              )}
+                              {b.fatigue_level != null && (
+                                <span style={{ fontSize:'.72rem', fontWeight:700, background:'rgba(239,68,68,.08)', border:'1px solid rgba(239,68,68,.2)', borderRadius:99, padding:'.2rem .55rem', color:'#FCA5A5' }}>
+                                  Fatigue {b.fatigue_level}/10
+                                </span>
+                              )}
+                              {b.motivation_level != null && (
+                                <span style={{ fontSize:'.72rem', fontWeight:700, background:'rgba(16,185,129,.08)', border:'1px solid rgba(16,185,129,.2)', borderRadius:99, padding:'.2rem .55rem', color:'#6EE7B7' }}>
+                                  Motiv. {b.motivation_level}/10
+                                </span>
+                              )}
+                              {b.sleep_quality != null && (
+                                <span style={{ fontSize:'.72rem', fontWeight:700, background:'rgba(245,158,11,.08)', border:'1px solid rgba(245,158,11,.2)', borderRadius:99, padding:'.2rem .55rem', color:'#FCD34D' }}>
+                                  Sommeil {'⭐'.repeat(b.sleep_quality)}
+                                </span>
+                              )}
+                            </div>
+                          </div>
+
+                          {/* Contenu texte */}
+                          <div style={{ padding:'1rem', display:'flex', flexDirection:'column', gap:'.75rem' }}>
+                            {b.pain_areas && (
+                              <div>
+                                <div style={{ fontSize:'.65rem', fontWeight:700, textTransform:'uppercase', letterSpacing:'.08em', color:'#FCA5A5', marginBottom:'.25rem' }}>Douleurs/gênes</div>
+                                <p style={{ fontSize:'.84rem', color:'rgba(255,255,255,.8)', margin:0, lineHeight:1.6 }}>{b.pain_areas}</p>
+                              </div>
+                            )}
+                            {b.what_went_well && (
+                              <div>
+                                <div style={{ fontSize:'.65rem', fontWeight:700, textTransform:'uppercase', letterSpacing:'.08em', color:'#6EE7B7', marginBottom:'.25rem' }}>Ce qui s'est bien passé</div>
+                                <p style={{ fontSize:'.84rem', color:'rgba(255,255,255,.8)', margin:0, lineHeight:1.6 }}>{b.what_went_well}</p>
+                              </div>
+                            )}
+                            {b.what_was_hard && (
+                              <div>
+                                <div style={{ fontSize:'.65rem', fontWeight:700, textTransform:'uppercase', letterSpacing:'.08em', color:'#FCD34D', marginBottom:'.25rem' }}>Ce qui a été difficile</div>
+                                <p style={{ fontSize:'.84rem', color:'rgba(255,255,255,.8)', margin:0, lineHeight:1.6 }}>{b.what_was_hard}</p>
+                              </div>
+                            )}
+                            {b.wishes_next_week && (
+                              <div>
+                                <div style={{ fontSize:'.65rem', fontWeight:700, textTransform:'uppercase', letterSpacing:'.08em', color:'#93C5FD', marginBottom:'.25rem' }}>Souhaits semaine prochaine</div>
+                                <p style={{ fontSize:'.84rem', color:'rgba(255,255,255,.8)', margin:0, lineHeight:1.6 }}>{b.wishes_next_week}</p>
+                              </div>
+                            )}
+                            {b.coach_message && (
+                              <div>
+                                <div style={{ fontSize:'.65rem', fontWeight:700, textTransform:'uppercase', letterSpacing:'.08em', color:'#C084FC', marginBottom:'.25rem' }}>Message au coach</div>
+                                <p style={{ fontSize:'.84rem', color:'rgba(255,255,255,.8)', margin:0, lineHeight:1.6 }}>{b.coach_message}</p>
+                              </div>
+                            )}
+
+                            {/* Réponse coach existante */}
+                            {b.coach_response && (
+                              <div style={{ background:'rgba(16,185,129,.07)', border:'1px solid rgba(16,185,129,.2)', borderRadius:10, padding:'.75rem' }}>
+                                <div style={{ fontSize:'.65rem', fontWeight:700, textTransform:'uppercase', letterSpacing:'.08em', color:'#6EE7B7', marginBottom:'.25rem' }}>
+                                  Ta réponse · {new Date(b.coach_responded_at).toLocaleDateString('fr-FR', { day:'numeric', month:'short' })}
+                                </div>
+                                <p style={{ fontSize:'.84rem', color:'rgba(255,255,255,.82)', margin:0, lineHeight:1.6 }}>{b.coach_response}</p>
+                              </div>
+                            )}
+
+                            {/* Zone de réponse coach */}
+                            <div>
+                              <div style={{ fontSize:'.65rem', fontWeight:700, textTransform:'uppercase', letterSpacing:'.08em', color:'rgba(255,255,255,.3)', marginBottom:'.4rem' }}>
+                                {b.coach_response ? 'Modifier ta réponse' : 'Répondre à cet athlète'}
+                              </div>
+                              <textarea
+                                value={bilanResponses[b.id] ?? ''}
+                                onChange={e => setBilanResponses(r => ({ ...r, [b.id]: e.target.value }))}
+                                placeholder="Écris ta réponse personnalisée..."
+                                rows={3}
+                                style={{
+                                  width:'100%', background:'rgba(255,255,255,.04)',
+                                  border:'1px solid rgba(139,47,201,.25)', borderRadius:10,
+                                  padding:'.6rem .75rem', color:'#fff', fontSize:'.84rem',
+                                  fontFamily:'inherit', resize:'vertical', outline:'none', boxSizing:'border-box',
+                                }}
+                              />
+                              <button
+                                onClick={() => submitBilanResponse(b.id)}
+                                disabled={bilanSaving[b.id] || !bilanResponses[b.id]?.trim()}
+                                style={{
+                                  marginTop:'.5rem', padding:'.5rem 1.25rem',
+                                  background: bilanSaving[b.id] ? 'rgba(139,47,201,.3)' : 'linear-gradient(135deg,#8B2FC9,#E8237A)',
+                                  border:'none', borderRadius:9, color:'#fff', fontWeight:700,
+                                  fontSize:'.82rem', cursor: bilanSaving[b.id] || !bilanResponses[b.id]?.trim() ? 'not-allowed' : 'pointer',
+                                  fontFamily:'inherit', opacity: !bilanResponses[b.id]?.trim() ? 0.5 : 1,
+                                }}
+                              >
+                                {bilanSaving[b.id] ? 'Envoi...' : 'Envoyer la réponse'}
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+                      )
+                    })}
+                  </div>
+                )}
+              </div>
+            )}
 
             {/* ══════════ ALERTES ══════════ */}
             {tab === 'alertes' && (

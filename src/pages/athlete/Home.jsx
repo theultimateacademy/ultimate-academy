@@ -5,6 +5,7 @@ import { supabase } from '../../lib/supabase'
 import { api } from '../../lib/api'
 import { daysUntil, OBJECTIVE_LABELS, getPlanStartMonday, getPlanWeeksElapsed } from '../../lib/utils'
 import LoadingSpinner from '../../components/UI/LoadingSpinner'
+import BilanHebdo from '../../components/BilanHebdo'
 
 // ── Helpers visuels ────────────────────────────────────────────────────────────
 const rpeColor = r => !r ? 'rgba(255,255,255,.3)' : r >= 8 ? '#EF4444' : r >= 6 ? '#F59E0B' : '#10B981'
@@ -357,6 +358,8 @@ export default function AthleteHome() {
   const [monthlyOpen,      setMonthlyOpen]      = useState(false)
   const [preRaceAnalysis,  setPreRaceAnalysis]  = useState(null)
   const [hasPostRace,      setHasPostRace]      = useState(false)
+  const [bilanSubmitted,   setBilanSubmitted]   = useState(false)
+  const [currentWeekNum,   setCurrentWeekNum]   = useState(null)
 
   useEffect(() => {
     if (!profile?.id) return
@@ -449,8 +452,21 @@ export default function AthleteHome() {
             })
 
             setWeekProgress({ done: doneIdxs.size, total: rawSeances.length, statuses: sessionStatuses, seances: seancesWithIdx, avgRpe })
+            setCurrentWeekNum(weeksElapsed)
 
-            const next = seances.find((_, idx) => !doneIdxs.has(idx))
+            // Check if bilan already submitted for this week
+            supabase
+              .from('weekly_bilans')
+              .select('id')
+              .eq('user_id', profile.id)
+              .eq('plan_id', plans.id)
+              .eq('week_number', weeksElapsed)
+              .maybeSingle()
+              .then(({ data: existingBilan }) => {
+                if (existingBilan) setBilanSubmitted(true)
+              })
+
+            const next = seancesWithIdx.find(s => !doneIdxs.has(s._origIdx))
             if (next) setNextSession({ ...next, weekNum: currentWeek.numero })
           }
         }
@@ -558,6 +574,30 @@ export default function AthleteHome() {
               ✅ Toutes les séances de la semaine effectuées !
             </div>
           )}
+        </div>
+      )}
+
+      {/* Bilan hebdomadaire — s'affiche quand toutes les séances sont faites et aucun bilan soumis */}
+      {plan && weekProgress.done === weekProgress.total && weekProgress.total > 0 && !bilanSubmitted && currentWeekNum && (
+        <BilanHebdo
+          planId={plan.id}
+          weekNumber={currentWeekNum}
+          onSubmitted={() => setBilanSubmitted(true)}
+        />
+      )}
+
+      {/* Confirmation bilan soumis */}
+      {plan && weekProgress.done === weekProgress.total && weekProgress.total > 0 && bilanSubmitted && (
+        <div style={{
+          background: 'rgba(16,185,129,.08)', border: '1px solid rgba(16,185,129,.25)',
+          borderRadius: 14, padding: '.875rem 1.25rem', marginBottom: '1.5rem',
+          display: 'flex', alignItems: 'center', gap: '.75rem',
+        }}>
+          <span style={{ fontSize: '1.2rem' }}>✅</span>
+          <div>
+            <div style={{ fontWeight: 700, fontSize: '.88rem', color: '#6EE7B7' }}>Bilan envoyé !</div>
+            <div style={{ fontSize: '.78rem', color: 'rgba(255,255,255,.4)' }}>Merci pour ton retour — je l'ai bien reçu.</div>
+          </div>
         </div>
       )}
 

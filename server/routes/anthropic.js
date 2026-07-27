@@ -2053,12 +2053,21 @@ router.post('/analyses/run-weekly', async (req, res) => {
       const weekData = plan.plan_data?.semaines?.find(s => s.numero === weeksElapsed);
       if (!weekData) continue;
 
-      const { data: completions } = await supabase
-        .from('session_completions')
-        .select('*')
-        .eq('user_id', athlete.id)
-        .eq('plan_id', plan.id)
-        .eq('week_number', weeksElapsed);
+      const [{ data: completions }, { data: bilan }] = await Promise.all([
+        supabase
+          .from('session_completions')
+          .select('*')
+          .eq('user_id', athlete.id)
+          .eq('plan_id', plan.id)
+          .eq('week_number', weeksElapsed),
+        supabase
+          .from('weekly_bilans')
+          .select('*')
+          .eq('user_id', athlete.id)
+          .eq('plan_id', plan.id)
+          .eq('week_number', weeksElapsed)
+          .maybeSingle(),
+      ]);
 
       const plannedCount = weekData.seances?.length || 0;
       const rpeList      = (completions || []).filter(c => c.rpe).map(c => c.rpe);
@@ -2127,6 +2136,17 @@ ${sessionsDetailStr}
 
 Séances PRÉVUES pour la semaine ${weeksElapsed + 1} (plan actuel, avant ajustement automatique) :
 ${nextWeekStr}
+${bilan ? `
+Bilan hebdomadaire rempli par l'athlète :
+- Note globale : ${bilan.overall_rating}/10
+- Fatigue : ${bilan.fatigue_level}/10
+- Motivation : ${bilan.motivation_level}/10
+- Sommeil : ${bilan.sleep_quality}/5
+- Douleurs : ${bilan.pain_areas || 'Aucune'}
+- Ce qui s'est bien passé : ${bilan.what_went_well || 'Non renseigné'}
+- Ce qui a été difficile : ${bilan.what_was_hard || 'RAS'}
+- Souhaits semaine prochaine : ${bilan.wishes_next_week || 'Non renseigné'}
+- Message au coach : ${bilan.coach_message || 'Aucun'}` : ''}
 
 RÈGLES pour les coach_comment :
 - Écris un commentaire COACH pour CHAQUE séance, même un footing EF basique
@@ -3003,6 +3023,52 @@ router.post('/plans/reschedule-session', async (req, res) => {
     res.json({ success: true, plan_data: pd });
   } catch (err) {
     console.error('[reschedule-session]', err.message);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// ─── POST /api/athlete/weekly-bilan ─── (athlete submits their weekly recap) ──
+router.post('/athlete/weekly-bilan', async (req, res) => {
+  const {
+    user_id, plan_id, week_number,
+    overall_rating, fatigue_level, motivation_level, sleep_quality,
+    pain_areas, what_went_well, what_was_hard, wishes_next_week, coach_message,
+  } = req.body;
+
+  if (!user_id || !plan_id || !week_number)
+    return res.status(400).json({ error: 'Missing user_id, plan_id or week_number' });
+
+  try {
+    // Check if a bilan already exists for this week
+    const { data: existing } = await supabase
+      .from('weekly_bilans')
+      .select('id')
+      .eq('user_id', user_id)
+      .eq('plan_id', plan_id)
+      .eq('week_number', parseInt(week_number))
+      .maybeSingle();
+
+    if (existing) return res.status(409).json({ error: 'Bilan already submitted for this week' });
+
+    const { data, error } = await supabase.from('weekly_bilans').insert({
+      user_id,
+      plan_id,
+      week_number: parseInt(week_number),
+      overall_rating:   overall_rating   ? parseInt(overall_rating)   : null,
+      fatigue_level:    fatigue_level    ? parseInt(fatigue_level)    : null,
+      motivation_level: motivation_level ? parseInt(motivation_level) : null,
+      sleep_quality:    sleep_quality    ? parseInt(sleep_quality)    : null,
+      pain_areas:       pain_areas       || null,
+      what_went_well:   what_went_well   || null,
+      what_was_hard:    what_was_hard    || null,
+      wishes_next_week: wishes_next_week || null,
+      coach_message:    coach_message    || null,
+    }).select().single();
+
+    if (error) throw error;
+    res.json({ success: true, bilan: data });
+  } catch (err) {
+    console.error('[weekly-bilan] Error:', err.message);
     res.status(500).json({ error: err.message });
   }
 });
