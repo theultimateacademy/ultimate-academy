@@ -765,13 +765,32 @@ export default function EbookDetail() {
         </div>
       </div>
       {(() => {
+        const gd = { background: 'linear-gradient(135deg,#8B2FC9,#E8237A)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text', display: 'inline' }
         const EBOOK_CTA = {
-          '10km-8sem':     { title: 'Prêt à franchir la ligne en un temps record ?', subtitle: 'Ce plan structure ta préparation — mais avec un coaching personnalisé, chaque séance est calibrée sur ta VMA réelle du moment, avec des ajustements hebdomadaires selon ta récupération et ta progression.' },
-          '10km-12sem':    { title: 'Ton prochain 10km peut être encore plus rapide', subtitle: 'Ce plan longue durée est une excellente base. En coaching, j\'adapte le volume et l\'intensité semaine par semaine selon tes données réelles — pas un programme générique.' },
-          'semi-12sem':    { title: 'Un semi réussi, ça se prépare sur-mesure', subtitle: 'Ce plan donne le cadre. Avec un coaching, chaque séance est ajustée à ta VMA du moment, ton allure cible, et tes contraintes de vie — pour arriver à la ligne en pleine forme.' },
-          'marathon-12sem':{ title: 'Le marathon, ça se prépare sérieusement', subtitle: 'Ce plan pose les fondations. En coaching, j\'adapte chaque phase — développement, spécificité, affûtage — à ta progression réelle, tes longues sorties et ton objectif de chrono.' },
-          'marathon-16sem':{ title: 'Du temps, de la méthode, et ton meilleur chrono', subtitle: 'Ce plan structure 4 mois de préparation. Avec un suivi personnalisé, je surveille ta charge semaine par semaine et j\'ajuste en temps réel selon ta forme, tes récupérations et l\'objectif visé.' },
-          'anti-blessure': { title: 'La meilleure blessure, c\'est celle qu\'on évite', subtitle: 'Ce programme pose les bases de la prévention. En coaching, je surveille tes charges d\'entraînement, tes signaux d\'alerte et t\'accompagne pour ne jamais rejouer le même scénario.' },
+          '10km-8sem':     {
+            title: <>Prêt à franchir la ligne <span style={gd}>en un temps record</span> ?</>,
+            subtitle: 'Ce plan structure ta préparation, mais avec un coaching personnalisé, chaque séance est calibrée sur ta VMA réelle du moment, avec des ajustements hebdomadaires selon ta récupération et ta progression.',
+          },
+          '10km-12sem':    {
+            title: <>Ton prochain 10km peut être <span style={gd}>encore plus rapide</span></>,
+            subtitle: 'Ce plan longue durée est une excellente base. En coaching, j\'adapte le volume et l\'intensité semaine par semaine selon tes données réelles, pas un programme générique.',
+          },
+          'semi-12sem':    {
+            title: <>Un semi réussi, ça se prépare <span style={gd}>sur-mesure</span></>,
+            subtitle: 'Ce plan donne le cadre. Avec un coaching, chaque séance est ajustée à ta VMA du moment, ton allure cible, et tes contraintes de vie, pour arriver à la ligne en pleine forme.',
+          },
+          'marathon-12sem':{
+            title: <>Le marathon, ça se prépare <span style={gd}>sérieusement</span></>,
+            subtitle: 'Ce plan pose les fondations. En coaching, j\'adapte chaque phase (développement, spécificité, affûtage) à ta progression réelle, tes longues sorties et ton objectif de chrono.',
+          },
+          'marathon-16sem':{
+            title: <>Du temps, de la méthode, et <span style={gd}>ton meilleur chrono</span></>,
+            subtitle: 'Ce plan structure 4 mois de préparation. Avec un suivi personnalisé, je surveille ta charge semaine par semaine et j\'ajuste en temps réel selon ta forme, tes récupérations et l\'objectif visé.',
+          },
+          'anti-blessure': {
+            title: <>La meilleure blessure, c'est <span style={gd}>celle qu'on évite</span></>,
+            subtitle: 'Ce programme pose les bases de la prévention. En coaching, je surveille tes charges d\'entraînement, tes signaux d\'alerte et t\'accompagne pour ne jamais rejouer le même scénario.',
+          },
         }
         const cta = EBOOK_CTA[slug]
         return <PricingCTA title={cta?.title} subtitle={cta?.subtitle} />
