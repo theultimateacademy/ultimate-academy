@@ -464,7 +464,7 @@ export default function PredictorCalculator() {
                     background: i % 2 === 0 ? '#fff' : 'rgba(139,47,201,.02)' }}>
                     <td style={{ padding: '.8rem 1.25rem', textAlign: 'center', fontWeight: 700, fontVariantNumeric: 'tabular-nums',
                       background: `linear-gradient(135deg,${C.purple},${C.pink})`,
-                      WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>{row.t10}</td>
+                      WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', whiteSpace: 'nowrap' }}>{row.t10}</td>
                     <td style={{ padding: '.8rem 1.25rem', textAlign: 'center', fontVariantNumeric: 'tabular-nums',
                       color: 'rgba(26,26,46,.7)', fontWeight: 500 }}>{row.semi}</td>
                     <td style={{ padding: '.8rem 1.25rem', textAlign: 'center', fontVariantNumeric: 'tabular-nums',

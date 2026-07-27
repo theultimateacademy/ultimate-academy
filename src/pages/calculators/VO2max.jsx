@@ -556,8 +556,8 @@ export default function VO2maxCalculator() {
                 <circle cx="170" cy="168" r="5" fill="white" stroke="#8B2FC9" strokeWidth="2"/>
                 <circle cx="290" cy="118" r="5" fill="white" stroke="#E8237A" strokeWidth="2"/>
                 <circle cx="410" cy="72" r="6" fill="url(#vog2)"/>
-                <text x="408" y="68" fontSize="10" fill="#8B2FC9" fontWeight="700" fontFamily="system-ui,sans-serif" textAnchor="end">+2,1</text>
-                <text x="408" y="80" fontSize="9" fill="rgba(26,18,48,.55)" fontFamily="system-ui,sans-serif" textAnchor="end">km/h VMA</text>
+                <text x="408" y="45" fontSize="10" fill="#8B2FC9" fontWeight="700" fontFamily="system-ui,sans-serif" textAnchor="end">+2,1</text>
+                <text x="408" y="57" fontSize="9" fill="rgba(26,18,48,.55)" fontFamily="system-ui,sans-serif" textAnchor="end">km/h VMA</text>
                 <rect x="110" y="237" width="220" height="54" rx="10" fill="rgba(139,47,201,.08)" stroke="rgba(139,47,201,.2)" strokeWidth="1"/>
                 <text x="220" y="256" textAnchor="middle" fontSize="10.5" fill="#8B2FC9" fontWeight="700" fontFamily="system-ui,sans-serif">2 séances VMA / semaine</text>
                 <text x="220" y="277" textAnchor="middle" fontSize="9.5" fill="rgba(26,18,48,.55)" fontFamily="system-ui,sans-serif">Progression mesurable en 6 à 8 semaines</text>
@@ -621,7 +621,7 @@ export default function VO2maxCalculator() {
                   ['Formule',  'VO2max ÷ 3,5 ≈ VMA',           'VMA × 3,5 ≈ VO2max'],
                 ].map((row, i) => (
                   <tr key={i} style={{ borderTop: '1px solid rgba(255,255,255,.06)' }}>
-                    <td style={{ padding: '.7rem 1.25rem', color: 'rgba(255,255,255,.55)', fontSize: '.82rem', fontWeight: 600 }}>{row[0]}</td>
+                    <td style={{ padding: '.7rem 1.25rem', color: 'rgba(255,255,255,.55)', fontSize: '.82rem', fontWeight: 600, whiteSpace: 'nowrap' }}>{row[0]}</td>
                     <td style={{ padding: '.7rem 1.25rem', color: i === 4 ? '#C084FC' : 'rgba(255,255,255,.8)', fontWeight: i === 4 ? 700 : 400 }}>{row[1]}</td>
                     <td style={{ padding: '.7rem 1.25rem', color: i === 4 ? '#C084FC' : 'rgba(255,255,255,.8)', fontWeight: i === 4 ? 700 : 400 }}>{row[2]}</td>
                   </tr>

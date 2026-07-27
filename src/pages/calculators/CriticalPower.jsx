@@ -288,7 +288,7 @@ export default function CriticalPowerCalculator() {
                   ['Professionnel','> 5.0 W/kg','WorldTour : Pogačar, Vingegaard ~ 6.2-6.8 W/kg'],
                 ].map(([n,w,d],i)=>(
                   <tr key={n} style={{ borderTop:'1px solid rgba(139,47,201,.07)', background:i%2===0?'transparent':'rgba(139,47,201,.02)' }}>
-                    <td style={{ padding:'.7rem 1rem', color:C.purple, fontWeight:700 }}>{n}</td>
+                    <td style={{ padding:'.7rem 1rem', color:C.purple, fontWeight:700, whiteSpace:'nowrap' }}>{n}</td>
                     <td style={{ padding:'.7rem 1rem', color:C.dark, fontWeight:600, fontVariantNumeric:'tabular-nums' }}>{w}</td>
                     <td style={{ padding:'.7rem 1rem', color:'rgba(26,18,48,.5)', fontSize:'.85rem' }}>{d}</td>
                   </tr>

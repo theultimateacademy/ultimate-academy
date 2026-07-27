@@ -209,15 +209,6 @@ function IllustrationRunning({ dist, kmText, kmInline, weeksLabel, price }) {
         fill="rgba(255,255,255,.35)" letterSpacing="5" textAnchor="middle">{weeksLabel} SEMAINES</text>
       <rect x="222" y={lineY} width="76" height="1.5" rx="1" fill="url(#il-g)" opacity="0.35" />
 
-      {/* Price badge — top right */}
-      {price && (
-        <>
-          <rect x="270" y="8" width="196" height="34" rx="17" fill="url(#il-g)" opacity="0.93" />
-          <text x="368" y="30" fontFamily="Poppins,sans-serif" fontSize="13" fontWeight="800"
-            fill="white" textAnchor="middle">{price}</text>
-        </>
-      )}
-
       <circle cx="46" cy="32" r="1.2" fill="white" opacity="0.14" />
       <circle cx="112" cy="20" r="1.8" fill="white" opacity="0.12" />
       <circle cx="408" cy="42" r="1.4" fill="white" opacity="0.16" />
@@ -265,13 +256,6 @@ function IllustrationAntiBlessure({ price }) {
         fill="url(#il-g)" opacity="0.88" letterSpacing="-1" textAnchor="middle">BLESSURE</text>
       <text x="320" y="178" fontFamily="Poppins,sans-serif" fontSize="10" fontWeight="700"
         fill="rgba(255,255,255,.32)" letterSpacing="3" textAnchor="middle">COURIR DURABLEMENT</text>
-      {price && (
-        <>
-          <rect x="228" y="8" width="184" height="40" rx="20" fill="url(#il-g)" opacity="0.93" />
-          <text x="320" y="33" fontFamily="Poppins,sans-serif" fontSize="14.5" fontWeight="800"
-            fill="white" textAnchor="middle">{price}</text>
-        </>
-      )}
       <circle cx="95" cy="45" r="1.5" fill="white" opacity="0.14" />
       <circle cx="545" cy="38" r="1.8" fill="#C084FC" opacity="0.20" />
       <circle cx="560" cy="210" r="1.2" fill="white" opacity="0.12" />
@@ -534,16 +518,15 @@ export default function EbookDetail() {
 
   const forWhoIsArray = Array.isArray(meta.for_who)
 
-  const priceStr = `À partir de ${((minCents || ebook.price_cents) / 100).toFixed(2).replace('.', ',')} €`
   const RUNNING_ILL_CFG = {
     '10km-12sem':     { dist: '10',       kmInline: true,  weeksLabel: '12' },
     'semi-12sem':     { dist: 'SEMI-MARATHON', kmText: '', weeksLabel: '12' },
     'marathon-12sem': { dist: 'MARATHON', kmText: '',      weeksLabel: '12' },
     'marathon-16sem': { dist: 'MARATHON', kmText: '',      weeksLabel: '16' },
   }
-  const slugIllustration = slug === '10km-8sem' ? <Illustration10km price={priceStr} />
-    : RUNNING_ILL_CFG[slug] ? <IllustrationRunning {...RUNNING_ILL_CFG[slug]} price={priceStr} />
-    : slug === 'anti-blessure' ? <IllustrationAntiBlessure price={priceStr} />
+  const slugIllustration = slug === '10km-8sem' ? <Illustration10km />
+    : RUNNING_ILL_CFG[slug] ? <IllustrationRunning {...RUNNING_ILL_CFG[slug]} />
+    : slug === 'anti-blessure' ? <IllustrationAntiBlessure />
     : null
 
   return (
@@ -783,27 +766,15 @@ export default function EbookDetail() {
       </div>
       {(() => {
         const EBOOK_CTA = {
-          '10km-8sem':     { tag: 'Envie d\'aller plus loin ?', title: 'Prêt à franchir la ligne en un temps record ?', desc: 'Ce plan structure ta préparation — mais avec un coaching personnalisé, chaque séance est calibrée sur ta VMA réelle du moment, avec des ajustements hebdomadaires selon ta récupération et ta progression.' },
-          '10km-12sem':    { tag: 'Envie d\'aller plus loin ?', title: 'Ton prochain 10km peut être encore plus rapide', desc: 'Ce plan longue durée est une excellente base. En coaching, j\'adapte le volume et l\'intensité semaine par semaine selon tes données réelles — pas un programme générique.' },
-          'semi-12sem':    { tag: 'Prêt à conquérir ton semi ?', title: 'Un semi réussi, ça se prépare sur-mesure', desc: 'Ce plan donne le cadre. Avec un coaching, chaque séance est ajustée à ta VMA du moment, ton allure cible, et tes contraintes de vie — pour arriver à la ligne en pleine forme.' },
-          'marathon-12sem':{ tag: 'Prêt pour les 42,195 km ?', title: 'Le marathon, ça se prépare sérieusement', desc: 'Ce plan pose les fondations. En coaching, j\'adapte chaque phase — développement, spécificité, affûtage — à ta progression réelle, tes longues sorties et ton objectif de chrono.' },
-          'marathon-16sem':{ tag: '16 semaines pour ton meilleur marathon', title: 'Du temps, de la méthode, et ton meilleur chrono', desc: 'Ce plan structure 4 mois de préparation. Avec un suivi personnalisé, je surveille ta charge semaine par semaine et j\'ajuste en temps réel selon ta forme, tes récupérations et l\'objectif visé.' },
-          'anti-blessure': { tag: 'Courir sans se blesser, ça s\'apprend', title: 'La meilleure blessure, c\'est celle qu\'on évite', desc: 'Ce programme pose les bases de la prévention. En coaching, je surveille tes charges d\'entraînement, tes signaux d\'alerte et t\'accompagne pour ne jamais rejouer le même scénario.' },
+          '10km-8sem':     { title: 'Prêt à franchir la ligne en un temps record ?', subtitle: 'Ce plan structure ta préparation — mais avec un coaching personnalisé, chaque séance est calibrée sur ta VMA réelle du moment, avec des ajustements hebdomadaires selon ta récupération et ta progression.' },
+          '10km-12sem':    { title: 'Ton prochain 10km peut être encore plus rapide', subtitle: 'Ce plan longue durée est une excellente base. En coaching, j\'adapte le volume et l\'intensité semaine par semaine selon tes données réelles — pas un programme générique.' },
+          'semi-12sem':    { title: 'Un semi réussi, ça se prépare sur-mesure', subtitle: 'Ce plan donne le cadre. Avec un coaching, chaque séance est ajustée à ta VMA du moment, ton allure cible, et tes contraintes de vie — pour arriver à la ligne en pleine forme.' },
+          'marathon-12sem':{ title: 'Le marathon, ça se prépare sérieusement', subtitle: 'Ce plan pose les fondations. En coaching, j\'adapte chaque phase — développement, spécificité, affûtage — à ta progression réelle, tes longues sorties et ton objectif de chrono.' },
+          'marathon-16sem':{ title: 'Du temps, de la méthode, et ton meilleur chrono', subtitle: 'Ce plan structure 4 mois de préparation. Avec un suivi personnalisé, je surveille ta charge semaine par semaine et j\'ajuste en temps réel selon ta forme, tes récupérations et l\'objectif visé.' },
+          'anti-blessure': { title: 'La meilleure blessure, c\'est celle qu\'on évite', subtitle: 'Ce programme pose les bases de la prévention. En coaching, je surveille tes charges d\'entraînement, tes signaux d\'alerte et t\'accompagne pour ne jamais rejouer le même scénario.' },
         }
         const cta = EBOOK_CTA[slug]
-        if (!cta) return <PricingCTA />
-        return (
-          <section style={{ background: 'linear-gradient(135deg,#0C0A18,#1A0A2E)', padding: '4rem 1.5rem', borderTop: '1px solid rgba(139,47,201,.12)' }}>
-            <div style={{ maxWidth: 660, margin: '0 auto', textAlign: 'center' }}>
-              <p style={{ fontSize: '.72rem', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '.18em', color: '#8B2FC9', marginBottom: '1rem' }}>{cta.tag}</p>
-              <h2 style={{ fontSize: 'clamp(1.5rem,4vw,2.1rem)', fontWeight: 900, color: '#fff', marginBottom: '1rem', lineHeight: 1.2 }}>{cta.title}</h2>
-              <p style={{ color: 'rgba(255,255,255,.6)', fontSize: '.92rem', lineHeight: 1.75, marginBottom: '2rem', textAlign: 'center' }}>{cta.desc}</p>
-              <Link to="/register" style={{ display: 'inline-block', padding: '.85rem 2.25rem', borderRadius: 50, background: 'linear-gradient(135deg,#8B2FC9,#E8237A)', color: '#fff', fontWeight: 700, fontSize: '.95rem', textDecoration: 'none', boxShadow: '0 6px 24px rgba(232,35,122,.35)' }}>
-                Commencer mon coaching
-              </Link>
-            </div>
-          </section>
-        )
+        return <PricingCTA title={cta?.title} subtitle={cta?.subtitle} />
       })()}
       <SiteFooter />
     </div>
