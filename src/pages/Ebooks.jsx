@@ -265,7 +265,7 @@ function EbookCard({ ebook }) {
             </div>
           )}
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-            <span style={{ fontWeight: 800, fontSize: '1rem', background: grad,
+            <span style={{ fontWeight: 800, fontSize: '1.35rem', background: grad,
               WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text' }}>
               {priceLabel}
             </span>
