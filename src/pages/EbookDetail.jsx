@@ -601,6 +601,12 @@ export default function EbookDetail() {
                   <strong style={{ fontWeight: 800, background: grad, WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text' }}>construire progressivement ton endurance, développer ta résistance et arriver au départ en pleine confiance</strong>
                   {' '}: chaque séance calculée depuis ta VMA réelle, chaque bloc pensé pour te faire progresser sans te casser.
                 </>
+              ) : slug === 'anti-blessure' ? (
+                <>
+                  Le guide complet pour{' '}
+                  <strong style={{ fontWeight: 800, background: grad, WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text' }}>courir durablement, sans douleurs ni interruptions forcées</strong>
+                  {' '}: prévention active, renforcement musculaire ciblé, protocoles de reprise et gestion de la charge pour ne plus jamais rater une saison à cause d'une blessure.
+                </>
               ) : (meta.full_description || ebook.description)}
             </p>
 
@@ -610,7 +616,7 @@ export default function EbookDetail() {
                 borderRadius: 16, padding: '1.25rem 1.5rem', marginBottom: '1.75rem' }}>
                 <div style={{ fontSize: '.72rem', fontWeight: 800, color: '#10B981',
                   textTransform: 'uppercase', letterSpacing: '.08em', marginBottom: '.75rem' }}>
-                  Pour qui est ce plan ?
+                  {slug === 'anti-blessure' ? 'Pour qui est ce guide ?' : 'Pour qui est ce plan ?'}
                 </div>
                 {forWhoIsArray ? (
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '.5rem' }}>
@@ -631,7 +637,7 @@ export default function EbookDetail() {
             {meta.toc && (
               <div style={{ background: 'rgba(255,255,255,.04)', border: '1px solid rgba(255,255,255,.08)',
                 borderRadius: 20, padding: '1.5rem', marginBottom: '1.75rem' }}>
-                <h3 style={{ margin: '0 0 1rem', fontSize: '1rem', fontWeight: 800 }}>📋 Contenu du plan</h3>
+                <h3 style={{ margin: '0 0 1rem', fontSize: '1rem', fontWeight: 800 }}>{slug === 'anti-blessure' ? '📋 Contenu du guide' : '📋 Contenu du plan'}</h3>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '.65rem' }}>
                   {meta.toc.map((item, i) => (
                     <div key={i} style={{ display: 'flex', gap: '.75rem', alignItems: 'flex-start' }}>

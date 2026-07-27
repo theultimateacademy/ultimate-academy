@@ -214,6 +214,7 @@ function EbookCard({ ebook }) {
     : ebook.slug === 'semi-12sem' ? 'À partir de 19,99 €'
     : ebook.slug === 'marathon-12sem' ? 'À partir de 22,99 €'
     : ebook.slug === 'marathon-16sem' ? 'À partir de 24,99 €'
+    : ebook.slug === 'anti-blessure' ? '14,99 €'
     : 'À partir de 14,99 €'
 
   return (
