@@ -925,7 +925,7 @@ function AthleteDetailPanel({ athlete, onClose, onUpdated, onAlertDismissed }) {
 
   async function loadBilans() {
     try {
-      const resp = await fetch(`/api/admin/weekly-bilans?userId=${athlete.id}`)
+      const resp = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:3001'}/api/admin/weekly-bilans?userId=${athlete.id}`)
       const body = await resp.json()
       if (!resp.ok) throw new Error(body.error || 'Erreur')
       setBilans(body.bilans || [])
@@ -949,7 +949,7 @@ function AthleteDetailPanel({ athlete, onClose, onUpdated, onAlertDismissed }) {
     if (!response) return
     setBilanSaving(s => ({ ...s, [bilanId]: true }))
     try {
-      const resp = await fetch(`/api/admin/weekly-bilans/${bilanId}/response`, {
+      const resp = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:3001'}/api/admin/weekly-bilans/${bilanId}/response`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ response }),

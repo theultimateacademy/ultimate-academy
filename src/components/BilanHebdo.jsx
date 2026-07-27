@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useAuth } from '../contexts/AuthContext'
 
+const API    = import.meta.env.VITE_API_URL || 'http://localhost:3001'
 const VIOLET = '#8B2FC9'
 const ROSE   = '#E8237A'
 
@@ -97,7 +98,7 @@ export default function BilanHebdo({ planId, weekNumber, onSubmitted }) {
     setError(null)
     setSubmitting(true)
     try {
-      const resp = await fetch('/api/athlete/weekly-bilan', {
+      const resp = await fetch(`${API}/api/athlete/weekly-bilan`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

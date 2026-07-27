@@ -234,7 +234,7 @@ router.get('/weekly-bilans', async (req, res) => {
     const { userId } = req.query;
     let query = supabase
       .from('weekly_bilans')
-      .select('*, profiles(first_name, last_name)')
+      .select('*')
       .order('submitted_at', { ascending: false });
     if (userId) query = query.eq('user_id', userId);
     const { data, error } = await query;
