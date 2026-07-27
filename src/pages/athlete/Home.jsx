@@ -359,6 +359,7 @@ export default function AthleteHome() {
   const [preRaceAnalysis,  setPreRaceAnalysis]  = useState(null)
   const [hasPostRace,      setHasPostRace]      = useState(false)
   const [bilanSubmitted,   setBilanSubmitted]   = useState(false)
+  const [bilanWeekNum,     setBilanWeekNum]     = useState(null)  // semaine dont le bilan est à remplir (semaine précédente)
   const [currentWeekNum,   setCurrentWeekNum]   = useState(null)
 
   useEffect(() => {
@@ -454,17 +455,21 @@ export default function AthleteHome() {
             setWeekProgress({ done: doneIdxs.size, total: rawSeances.length, statuses: sessionStatuses, seances: seancesWithIdx, avgRpe })
             setCurrentWeekNum(weeksElapsed)
 
-            // Check if bilan already submitted for this week
-            supabase
-              .from('weekly_bilans')
-              .select('id')
-              .eq('user_id', profile.id)
-              .eq('plan_id', plans.id)
-              .eq('week_number', weeksElapsed)
-              .maybeSingle()
-              .then(({ data: existingBilan }) => {
-                if (existingBilan) setBilanSubmitted(true)
-              })
+            // Bilan de la semaine PRÉCÉDENTE — s'affiche dès la semaine 2+, tant qu'il n'est pas rempli
+            const prevWeekNum = weeksElapsed - 1
+            if (prevWeekNum >= 1) {
+              setBilanWeekNum(prevWeekNum)
+              supabase
+                .from('weekly_bilans')
+                .select('id')
+                .eq('user_id', profile.id)
+                .eq('plan_id', plans.id)
+                .eq('week_number', prevWeekNum)
+                .maybeSingle()
+                .then(({ data: existingBilan }) => {
+                  if (existingBilan) setBilanSubmitted(true)
+                })
+            }
 
             const next = seancesWithIdx.find(s => !doneIdxs.has(s._origIdx))
             if (next) setNextSession({ ...next, weekNum: currentWeek.numero })
@@ -577,17 +582,17 @@ export default function AthleteHome() {
         </div>
       )}
 
-      {/* Bilan hebdomadaire — s'affiche quand toutes les séances sont faites et aucun bilan soumis */}
-      {plan && weekProgress.done === weekProgress.total && weekProgress.total > 0 && !bilanSubmitted && currentWeekNum && (
+      {/* Bilan hebdomadaire semaine précédente — s'affiche tant qu'il n'est pas rempli */}
+      {plan && bilanWeekNum && !bilanSubmitted && (
         <BilanHebdo
           planId={plan.id}
-          weekNumber={currentWeekNum}
+          weekNumber={bilanWeekNum}
           onSubmitted={() => setBilanSubmitted(true)}
         />
       )}
 
       {/* Confirmation bilan soumis */}
-      {plan && weekProgress.done === weekProgress.total && weekProgress.total > 0 && bilanSubmitted && (
+      {plan && bilanWeekNum && bilanSubmitted && (
         <div style={{
           background: 'rgba(16,185,129,.08)', border: '1px solid rgba(16,185,129,.25)',
           borderRadius: 14, padding: '.875rem 1.25rem', marginBottom: '1.5rem',
@@ -595,7 +600,7 @@ export default function AthleteHome() {
         }}>
           <span style={{ fontSize: '1.2rem' }}>✅</span>
           <div>
-            <div style={{ fontWeight: 700, fontSize: '.88rem', color: '#6EE7B7' }}>Bilan envoyé !</div>
+            <div style={{ fontWeight: 700, fontSize: '.88rem', color: '#6EE7B7' }}>Bilan de la semaine {bilanWeekNum} envoyé !</div>
             <div style={{ fontSize: '.78rem', color: 'rgba(255,255,255,.4)' }}>Merci pour ton retour — je l'ai bien reçu.</div>
           </div>
         </div>

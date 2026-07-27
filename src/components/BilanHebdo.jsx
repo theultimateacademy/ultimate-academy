@@ -145,7 +145,7 @@ export default function BilanHebdo({ planId, weekNumber, onSubmitted }) {
           </span>
         </div>
         <p style={{ fontSize: '.82rem', color: 'rgba(255,255,255,.45)', margin: 0, lineHeight: 1.5 }}>
-          Toutes tes séances sont terminées — prends 2 minutes pour faire le point !
+          Prends 2 minutes pour faire le point sur ta semaine passée — ton coach y a accès directement.
         </p>
       </div>
 
