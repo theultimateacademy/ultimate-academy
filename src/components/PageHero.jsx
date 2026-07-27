@@ -3,14 +3,6 @@ import { Link } from 'react-router-dom'
 
 const GRAD = 'linear-gradient(135deg, #8B2FC9, #E8237A)'
 
-const TICKER_ITEMS = [
-  'Course à pied', 'VMA', 'Endurance', 'Fractionné', 'Semi-marathon',
-  'Marathon', '10 km', 'Trail', 'Triathlon', 'Renforcement', 'Récupération',
-  'Allures', 'Progression', 'Coaching', 'Performance', 'Seuil lactique',
-  'Sortie longue', 'Côtes', 'Proprioception', 'Affûtage',
-]
-const TICKER_ROW = [...TICKER_ITEMS, ...TICKER_ITEMS]
-
 const PARTICLES = Array.from({ length: 20 }, (_, i) => ({
   id: i,
   x: 5 + (i * 4.7) % 90,
@@ -55,14 +47,6 @@ export default function PageHero({ title, subtitle, badge, children, backTo, bac
           66%  { transform: translateY(-8px) translateX(-14px) }
           100% { transform: translateY(0px) translateX(0px) }
         }
-        @keyframes tickerLTR {
-          0%   { transform: translateX(-50%) }
-          100% { transform: translateX(0%) }
-        }
-        @keyframes tickerRTL {
-          0%   { transform: translateX(0%) }
-          100% { transform: translateX(-50%) }
-        }
       `}</style>
 
       {/* Particules */}
@@ -90,36 +74,6 @@ export default function PageHero({ title, subtitle, badge, children, backTo, bac
         width: 600, height: 500, pointerEvents: 'none',
         background: 'radial-gradient(ellipse, rgba(232,35,122,.09) 0%, transparent 65%)',
       }} />
-      {/* Tickers défilants */}
-      <div style={{ position: 'absolute', bottom: 36, left: 0, right: 0, overflow: 'hidden', pointerEvents: 'none' }}>
-        {/* Ligne 1 : droite → gauche */}
-        <div style={{ display: 'flex', width: 'max-content', animation: 'tickerRTL 28s linear infinite', marginBottom: 8 }}>
-          {TICKER_ROW.map((item, i) => (
-            <span key={i} style={{ display: 'inline-flex', alignItems: 'center', gap: '.5rem',
-              padding: '.28rem .9rem', marginRight: 10,
-              borderRadius: 99, border: '1px solid rgba(255,255,255,.1)',
-              fontSize: '.68rem', fontWeight: 700, color: 'rgba(255,255,255,.38)',
-              letterSpacing: '.06em', textTransform: 'uppercase', whiteSpace: 'nowrap',
-              background: 'rgba(255,255,255,.03)' }}>
-              {item}
-            </span>
-          ))}
-        </div>
-        {/* Ligne 2 : gauche → droite */}
-        <div style={{ display: 'flex', width: 'max-content', animation: 'tickerLTR 34s linear infinite' }}>
-          {TICKER_ROW.map((item, i) => (
-            <span key={i} style={{ display: 'inline-flex', alignItems: 'center', gap: '.5rem',
-              padding: '.28rem .9rem', marginRight: 10,
-              borderRadius: 99, border: '1px solid rgba(139,47,201,.18)',
-              fontSize: '.68rem', fontWeight: 700, color: 'rgba(192,132,252,.45)',
-              letterSpacing: '.06em', textTransform: 'uppercase', whiteSpace: 'nowrap',
-              background: 'rgba(139,47,201,.04)' }}>
-              {item}
-            </span>
-          ))}
-        </div>
-      </div>
-
       {/* Ligne bas dégradé */}
       <div style={{
         position: 'absolute', bottom: 0, left: 0, right: 0,
