@@ -126,14 +126,13 @@ function exoPicto(emoji, zoneColor) {
 }
 
 // ─── CSS ─────────────────────────────────────────────────────────────────────
-// Toutes les tailles en pt. Corps: 8.5pt. Titres section: 9.5pt. PageTitle via gradText.
-// paddings réduits au strict minimum pour que tout tienne.
+// v6b : polices augmentées +1.5pt partout. Corps: 10pt. Titres: 10.5-11pt.
 const CSS = `
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800;900&display=swap');
 @page { size: A4; margin: 0; }
 html, body { margin: 0; padding: 0; background: #0C0A18; overflow: hidden; width: 210mm; }
 * { margin: 0; padding: 0; box-sizing: border-box; }
-body { font-family: 'Poppins', sans-serif; color: #fff; -webkit-print-color-adjust: exact; print-color-adjust: exact; font-size: 8.5pt; line-height: 1.55; }
+body { font-family: 'Poppins', sans-serif; color: #fff; -webkit-print-color-adjust: exact; print-color-adjust: exact; font-size: 10pt; line-height: 1.55; }
 
 /* ── page ── */
 .page {
@@ -161,85 +160,85 @@ body { font-family: 'Poppins', sans-serif; color: #fff; -webkit-print-color-adju
 .cover-inner{display:flex;flex-direction:column;align-items:center;position:relative;z-index:1;padding:0 12mm;gap:0;}
 .cover-logo{width:100px;opacity:.95;margin-bottom:14px;}
 .cover-sep{width:50px;height:2px;background:linear-gradient(90deg,#8B2FC9,#E8237A);border-radius:1px;margin:14px auto;}
-.cover-eyebrow{font-size:8.5pt;font-weight:700;letter-spacing:.2em;text-transform:uppercase;color:rgba(255,255,255,.35);}
-.cover-subtitle{font-size:12pt;font-weight:600;color:rgba(255,255,255,.7);letter-spacing:.03em;margin-top:8px;line-height:1.45;}
+.cover-eyebrow{font-size:10pt;font-weight:700;letter-spacing:.2em;text-transform:uppercase;color:rgba(255,255,255,.35);}
+.cover-subtitle{font-size:13pt;font-weight:600;color:rgba(255,255,255,.7);letter-spacing:.03em;margin-top:8px;line-height:1.45;}
 .cover-tags{display:flex;gap:7px;flex-wrap:wrap;justify-content:center;margin-top:14px;}
-.cover-tag{font-size:8.5pt;font-weight:700;border-radius:18px;padding:4px 11px;border:1px solid;}
-.cover-academy{font-size:8.5pt;font-weight:700;letter-spacing:.15em;text-transform:uppercase;color:rgba(255,255,255,.22);margin-top:24px;}
+.cover-tag{font-size:10pt;font-weight:700;border-radius:18px;padding:4px 11px;border:1px solid;}
+.cover-academy{font-size:10pt;font-weight:700;letter-spacing:.15em;text-transform:uppercase;color:rgba(255,255,255,.22);margin-top:24px;}
 
 /* ── sommaire ── */
-.som-label{font-size:9.5pt;font-weight:500;color:rgba(255,255,255,.85);flex-shrink:0;}
+.som-label{font-size:11pt;font-weight:500;color:rgba(255,255,255,.85);flex-shrink:0;}
 .som-dots{flex:1;border-bottom:1px dotted rgba(255,255,255,.15);margin:0 10px;align-self:flex-end;margin-bottom:3px;}
-.som-page{font-size:9.5pt;font-weight:800;flex-shrink:0;color:#C084FC;width:38px;}
+.som-page{font-size:11pt;font-weight:800;flex-shrink:0;color:#C084FC;width:38px;}
 
 /* ── titres de page ── */
-.page-tag{display:inline-block;font-size:8pt;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:rgba(255,255,255,.35);margin-bottom:3px;}
-.page-intro{font-size:8.5pt;color:rgba(255,255,255,.72);line-height:1.6;text-align:justify;flex-shrink:0;}
+.page-tag{display:inline-block;font-size:9pt;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:rgba(255,255,255,.35);margin-bottom:3px;}
+.page-intro{font-size:10pt;color:rgba(255,255,255,.72);line-height:1.6;text-align:justify;flex-shrink:0;}
 
 /* ── blessures ── */
 .blessure-grid{flex:1;display:grid;grid-template-columns:1fr 1fr;gap:7px;min-height:0;}
 .blessure-card{border-radius:10px;padding:8px 10px;display:flex;flex-direction:column;gap:3px;border:1px solid;overflow:hidden;min-height:0;}
 .bl-header{display:flex;align-items:center;gap:7px;flex-shrink:0;}
-.bl-icon{width:28px;height:28px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;}
-.bl-title{font-size:8.5pt;font-weight:800;line-height:1.2;}
-.bl-subtitle{font-size:7.5pt;color:rgba(255,255,255,.42);line-height:1.2;}
+.bl-icon{width:30px;height:30px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0;}
+.bl-title{font-size:10pt;font-weight:800;line-height:1.2;}
+.bl-subtitle{font-size:9pt;color:rgba(255,255,255,.42);line-height:1.2;}
 .bl-sep{height:1px;background:rgba(255,255,255,.06);flex-shrink:0;}
-.bl-section-title{font-size:7pt;font-weight:700;text-transform:uppercase;letter-spacing:.07em;margin-bottom:1px;}
-.bl-text{font-size:8pt;color:rgba(255,255,255,.78);line-height:1.5;text-align:justify;}
-.bl-tag{display:inline-flex;align-items:center;font-size:7pt;font-weight:700;border-radius:8px;padding:2px 7px;margin-top:3px;flex-shrink:0;align-self:flex-start;}
+.bl-section-title{font-size:8.5pt;font-weight:700;text-transform:uppercase;letter-spacing:.07em;margin-bottom:1px;}
+.bl-text{font-size:9.5pt;color:rgba(255,255,255,.78);line-height:1.5;text-align:justify;}
+.bl-tag{display:inline-flex;align-items:center;font-size:8.5pt;font-weight:700;border-radius:8px;padding:2px 8px;margin-top:3px;flex-shrink:0;align-self:flex-start;}
 
 /* ── exercices ── */
 .exo-list{flex:1;display:flex;flex-direction:column;gap:6px;min-height:0;}
 .exo-row{flex:1;display:flex;gap:0;align-items:stretch;border-radius:10px;overflow:hidden;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);}
 .exo-content{flex:1;padding:7px 11px;display:flex;flex-direction:column;gap:3px;}
 .exo-header{display:flex;align-items:center;gap:7px;flex-shrink:0;}
-.exo-title{font-size:9pt;font-weight:800;line-height:1.2;}
-.exo-muscle{font-size:7.5pt;color:rgba(255,255,255,.42);}
+.exo-title{font-size:10.5pt;font-weight:800;line-height:1.2;}
+.exo-muscle{font-size:9pt;color:rgba(255,255,255,.42);}
 .exo-sep{height:1px;background:rgba(255,255,255,.06);flex-shrink:0;}
 .exo-body{display:flex;gap:8px;align-items:flex-start;flex:1;}
-.exo-dose-chip{font-size:7.5pt;font-weight:700;border-radius:7px;padding:2px 8px;flex-shrink:0;white-space:nowrap;align-self:flex-start;}
-.exo-desc{font-size:8pt;color:rgba(255,255,255,.75);line-height:1.5;text-align:justify;}
-.exo-tip{font-size:7.5pt;color:rgba(255,255,255,.38);font-style:italic;margin-top:2px;}
+.exo-dose-chip{font-size:9pt;font-weight:700;border-radius:7px;padding:2px 9px;flex-shrink:0;white-space:nowrap;align-self:flex-start;}
+.exo-desc{font-size:9.5pt;color:rgba(255,255,255,.75);line-height:1.5;text-align:justify;}
+.exo-tip{font-size:9pt;color:rgba(255,255,255,.38);font-style:italic;margin-top:2px;}
 
 /* ── étirements ── */
 .etir-grid{flex:1;display:grid;grid-template-columns:1fr 1fr 1fr;gap:7px;min-height:0;}
 .etir-card{border-radius:10px;padding:8px 10px;display:flex;flex-direction:column;gap:3px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);overflow:hidden;}
 .etir-header{display:flex;align-items:center;gap:8px;flex-shrink:0;}
-.etir-icon{font-size:20px;flex-shrink:0;}
+.etir-icon{font-size:22px;flex-shrink:0;}
 .etir-title-block{display:flex;flex-direction:column;gap:1px;}
-.etir-title{font-size:8.5pt;font-weight:800;line-height:1.2;}
-.etir-muscle{font-size:7.5pt;color:rgba(255,255,255,.4);}
-.etir-dose{font-size:7.5pt;font-weight:700;color:#C084FC;flex-shrink:0;}
+.etir-title{font-size:10pt;font-weight:800;line-height:1.2;}
+.etir-muscle{font-size:9pt;color:rgba(255,255,255,.4);}
+.etir-dose{font-size:9pt;font-weight:700;color:#C084FC;flex-shrink:0;}
 .etir-sep{height:1px;background:rgba(255,255,255,.06);flex-shrink:0;}
-.etir-desc{font-size:7.5pt;color:rgba(255,255,255,.72);line-height:1.5;text-align:justify;}
+.etir-desc{font-size:9pt;color:rgba(255,255,255,.72);line-height:1.5;text-align:justify;}
 .etir-coach{margin-top:3px;padding:4px 7px;border-radius:6px;background:rgba(255,255,255,.03);border-left:2px solid rgba(192,132,252,.4);}
-.etir-coach-label{font-size:7pt;color:#C084FC;font-weight:700;margin-bottom:1px;}
-.etir-coach-text{font-size:7pt;color:rgba(255,255,255,.5);font-style:italic;line-height:1.45;}
+.etir-coach-label{font-size:8.5pt;color:#C084FC;font-weight:700;margin-bottom:1px;}
+.etir-coach-text{font-size:8.5pt;color:rgba(255,255,255,.5);font-style:italic;line-height:1.45;}
 
 /* ── charge ── */
 .charge-row{display:flex;align-items:center;gap:10px;}
-.charge-label{font-size:8pt;font-weight:600;width:130px;flex-shrink:0;line-height:1.3;}
-.charge-bar-wrap{flex:1;height:13px;background:rgba(255,255,255,.06);border-radius:7px;overflow:hidden;}
+.charge-label{font-size:9.5pt;font-weight:600;width:140px;flex-shrink:0;line-height:1.3;}
+.charge-bar-wrap{flex:1;height:14px;background:rgba(255,255,255,.06);border-radius:7px;overflow:hidden;}
 .charge-bar{height:100%;border-radius:7px;}
-.charge-val{font-size:8pt;font-weight:800;width:36px;text-align:right;flex-shrink:0;}
-.charge-note{font-size:7.5pt;color:rgba(255,255,255,.4);width:175px;text-align:right;flex-shrink:0;}
+.charge-val{font-size:9.5pt;font-weight:800;width:38px;text-align:right;flex-shrink:0;}
+.charge-note{font-size:9pt;color:rgba(255,255,255,.4);width:185px;text-align:right;flex-shrink:0;}
 
 /* ── PEACE & LOVE ── */
 .peace-grid{flex:1;display:flex;flex-direction:column;gap:5px;min-height:0;}
 .peace-row{flex:1;display:flex;align-items:stretch;border-radius:10px;overflow:hidden;}
-.peace-letter-block{width:44px;flex-shrink:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.15);}
-.peace-letter{font-size:20pt;font-weight:900;line-height:1;}
+.peace-letter-block{width:46px;flex-shrink:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.15);}
+.peace-letter{font-size:22pt;font-weight:900;line-height:1;}
 .peace-divider{width:1px;flex-shrink:0;}
 .peace-body{flex:1;padding:5px 11px;display:flex;flex-direction:column;justify-content:center;gap:1px;}
-.peace-title{font-size:8.5pt;font-weight:800;line-height:1.2;}
-.peace-desc{font-size:8pt;color:rgba(255,255,255,.72);line-height:1.5;text-align:justify;}
+.peace-title{font-size:10pt;font-weight:800;line-height:1.2;}
+.peace-desc{font-size:9.5pt;color:rgba(255,255,255,.72);line-height:1.5;text-align:justify;}
 
 /* ── chaussures ── */
 .shoe-cards{flex:1;display:flex;flex-direction:column;gap:8px;min-height:0;}
 .shoe-card{flex:1;border-radius:10px;padding:8px 13px;display:flex;gap:11px;align-items:center;border:1px solid;overflow:hidden;}
-.shoe-icon{font-size:24px;flex-shrink:0;}
-.shoe-title{font-size:9pt;font-weight:800;margin-bottom:2px;line-height:1.2;}
-.shoe-desc{font-size:8pt;color:rgba(255,255,255,.75);line-height:1.5;text-align:justify;}
+.shoe-icon{font-size:26px;flex-shrink:0;}
+.shoe-title{font-size:10.5pt;font-weight:800;margin-bottom:2px;line-height:1.2;}
+.shoe-desc{font-size:9.5pt;color:rgba(255,255,255,.75);line-height:1.5;text-align:justify;}
 `
 
 // ─── Données ─────────────────────────────────────────────────────────────────
@@ -488,30 +487,30 @@ function pageIntro() {
     </div>
     <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px;flex-shrink:0">
       ${stats.map(s=>`<div style="border-radius:9px;padding:9px 8px;text-align:center;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07)">
-        <div style="font-size:16pt;font-weight:900;background:linear-gradient(135deg,${s.color},#E8237A);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;line-height:1.1">${s.n}</div>
-        <div style="font-size:7.5pt;color:rgba(255,255,255,.58);line-height:1.4;margin-top:3px">${s.label}</div>
+        <div style="font-size:18pt;font-weight:900;background:linear-gradient(135deg,${s.color},#E8237A);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;line-height:1.1">${s.n}</div>
+        <div style="font-size:9pt;color:rgba(255,255,255,.58);line-height:1.4;margin-top:3px">${s.label}</div>
       </div>`).join('')}
     </div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;flex-shrink:0">
       ${causes.map(c=>`<div style="border-radius:9px;padding:9px 11px;background:${c.color};border:1px solid ${c.border}">
         <div style="display:flex;align-items:center;gap:7px;margin-bottom:4px">
-          <span style="font-size:16px;flex-shrink:0">${c.icon}</span>
-          <div style="font-size:8.5pt;font-weight:800">${c.title}</div>
+          <span style="font-size:17px;flex-shrink:0">${c.icon}</span>
+          <div style="font-size:10pt;font-weight:800">${c.title}</div>
         </div>
-        <div style="font-size:8pt;color:rgba(255,255,255,.75);line-height:1.5;text-align:justify">${c.desc}</div>
+        <div style="font-size:9.5pt;color:rgba(255,255,255,.75);line-height:1.5;text-align:justify">${c.desc}</div>
       </div>`).join('')}
     </div>
     <div style="background:linear-gradient(135deg,rgba(139,47,201,.12),rgba(232,35,122,.07));border:1px solid rgba(139,47,201,.22);border-radius:10px;padding:10px 13px;flex-shrink:0">
-      <div style="font-size:8pt;font-weight:700;color:#C084FC;margin-bottom:6px;text-transform:uppercase;letter-spacing:.1em">3 règles pour ne plus se blesser</div>
+      <div style="font-size:9.5pt;font-weight:700;color:#C084FC;margin-bottom:6px;text-transform:uppercase;letter-spacing:.1em">3 règles pour ne plus se blesser</div>
       <div style="display:flex;flex-direction:column;gap:5px">
         ${conseils.map(c=>`<div style="display:flex;align-items:flex-start;gap:8px">
-          <span style="font-size:14px;flex-shrink:0;line-height:1.4">${c.icon}</span>
-          <div style="font-size:8pt;color:rgba(255,255,255,.8);line-height:1.55;text-align:justify">${c.text}</div>
+          <span style="font-size:15px;flex-shrink:0;line-height:1.4">${c.icon}</span>
+          <div style="font-size:9.5pt;color:rgba(255,255,255,.8);line-height:1.55;text-align:justify">${c.text}</div>
         </div>`).join('')}
       </div>
     </div>
     <div style="background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);border-radius:10px;padding:9px 13px;flex-shrink:0">
-      <div style="font-size:8pt;color:rgba(255,255,255,.7);line-height:1.6;text-align:justify">
+      <div style="font-size:9.5pt;color:rgba(255,255,255,.7);line-height:1.6;text-align:justify">
         Ce guide est le fruit d'années d'expérience avec des coureurs de tous niveaux. Les protocoles sont issus des ${hl('dernières recherches en médecine du sport')}. Utilise-le comme référence : consulte la fiche blessure dès les premiers signaux, avant que la douleur ne s'installe.
       </div>
     </div>
@@ -641,8 +640,8 @@ function pageEtirements() {
       </div>`).join('')}
     </div>
     <div style="background:rgba(139,47,201,.08);border:1px solid rgba(139,47,201,.25);border-radius:9px;padding:8px 13px;flex-shrink:0">
-      <div style="font-size:8.5pt;font-weight:700;color:#C084FC;margin-bottom:2px">Règle d'or</div>
-      <div style="font-size:8pt;color:rgba(255,255,255,.78);line-height:1.55;text-align:justify">Ne jamais s'étirer sur une douleur aiguë. Si une zone est douloureuse, consulte un kinésithérapeute. La douleur pendant un étirement n'est ${hl('jamais normale')}.</div>
+      <div style="font-size:10pt;font-weight:700;color:#C084FC;margin-bottom:2px">Règle d'or</div>
+      <div style="font-size:9.5pt;color:rgba(255,255,255,.78);line-height:1.55;text-align:justify">Ne jamais s'étirer sur une douleur aiguë. Si une zone est douloureuse, consulte un kinésithérapeute. La douleur pendant un étirement n'est ${hl('jamais normale')}.</div>
     </div>
     ${pageNum('8')}
   </div>`
@@ -677,14 +676,14 @@ function pageCharge() {
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;flex-shrink:0">
       ${infoCards.map(c=>`<div style="border-radius:9px;padding:8px 11px;background:${c.color};border:1px solid ${c.border}">
         <div style="display:flex;align-items:center;gap:7px;margin-bottom:3px">
-          <span style="font-size:16px;flex-shrink:0">${c.icon}</span>
-          <div style="font-size:8.5pt;font-weight:800">${c.title}</div>
+          <span style="font-size:17px;flex-shrink:0">${c.icon}</span>
+          <div style="font-size:10pt;font-weight:800">${c.title}</div>
         </div>
-        <div style="font-size:8pt;color:rgba(255,255,255,.75);line-height:1.5;text-align:justify">${c.desc}</div>
+        <div style="font-size:9.5pt;color:rgba(255,255,255,.75);line-height:1.5;text-align:justify">${c.desc}</div>
       </div>`).join('')}
     </div>
     <div style="background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);border-radius:10px;padding:10px 13px;flex-shrink:0">
-      <div style="font-size:8pt;font-weight:700;color:rgba(255,255,255,.38);text-transform:uppercase;letter-spacing:.1em;margin-bottom:8px">Variables à surveiller</div>
+      <div style="font-size:9.5pt;font-weight:700;color:rgba(255,255,255,.38);text-transform:uppercase;letter-spacing:.1em;margin-bottom:8px">Variables à surveiller</div>
       <div style="display:flex;flex-direction:column;gap:7px">
         ${barData.map(b=>`<div class="charge-row">
           <div class="charge-label">${b.label}</div>
@@ -696,15 +695,15 @@ function pageCharge() {
     </div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;flex-shrink:0">
       <div style="border-radius:9px;padding:8px 11px;background:linear-gradient(135deg,rgba(139,47,201,.12),rgba(232,35,122,.08));border:1px solid rgba(139,47,201,.22)">
-        <div style="font-size:8.5pt;font-weight:800;margin-bottom:3px">Comment lire ce tableau ?</div>
-        <div style="font-size:8pt;color:rgba(255,255,255,.72);line-height:1.5;text-align:justify">Les % représentent l\'importance relative de chaque variable. ${hl('Ne modifie jamais deux variables simultanément')} : volume OU intensité, pas les deux en même temps.</div>
+        <div style="font-size:10pt;font-weight:800;margin-bottom:3px">Comment lire ce tableau ?</div>
+        <div style="font-size:9.5pt;color:rgba(255,255,255,.72);line-height:1.5;text-align:justify">Les % représentent l\'importance relative de chaque variable. ${hl('Ne modifie jamais deux variables simultanément')} : volume OU intensité, pas les deux en même temps.</div>
       </div>
       <div style="border-radius:9px;padding:8px 11px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08)">
-        <div style="font-size:8.5pt;font-weight:800;margin-bottom:4px">Le cycle idéal</div>
+        <div style="font-size:10pt;font-weight:800;margin-bottom:4px">Le cycle idéal</div>
         <div style="display:flex;flex-direction:column;gap:4px">
-          <div style="display:flex;align-items:center;gap:7px"><span style="font-size:12px">📈</span><div style="font-size:8pt;color:rgba(255,255,255,.75)"><b>Sem. 1-3</b> : charge progressive +5 à +10%</div></div>
-          <div style="display:flex;align-items:center;gap:7px"><span style="font-size:12px">📉</span><div style="font-size:8pt;color:rgba(255,255,255,.75)"><b>Sem. 4</b> : décharge −30 à −40% du volume</div></div>
-          <div style="display:flex;align-items:center;gap:7px"><span style="font-size:12px">🔁</span><div style="font-size:8pt;color:rgba(255,255,255,.75)">Répéter avec un nouveau palier supérieur</div></div>
+          <div style="display:flex;align-items:center;gap:7px"><span style="font-size:13px">📈</span><div style="font-size:9.5pt;color:rgba(255,255,255,.75)"><b>Sem. 1-3</b> : charge progressive +5 à +10%</div></div>
+          <div style="display:flex;align-items:center;gap:7px"><span style="font-size:13px">📉</span><div style="font-size:9.5pt;color:rgba(255,255,255,.75)"><b>Sem. 4</b> : décharge −30 à −40% du volume</div></div>
+          <div style="display:flex;align-items:center;gap:7px"><span style="font-size:13px">🔁</span><div style="font-size:9.5pt;color:rgba(255,255,255,.75)">Répéter avec un nouveau palier supérieur</div></div>
         </div>
       </div>
     </div>
@@ -789,46 +788,46 @@ function pageCTA() {
       <div class="page-tag">Passe à l'action</div>
       ${gradText('Prêt à courir plus intelligent ?', { sizePt:22, weight:800 })}
       ${svgDiamond()}
-      <div style="font-size:8.5pt;color:rgba(255,255,255,.62);margin-top:5px;line-height:1.55">Tu as maintenant toutes les clés. La prochaine étape : un plan structuré qui respecte tes capacités et te fait progresser sans te blesser.</div>
+      <div style="font-size:10pt;color:rgba(255,255,255,.62);margin-top:5px;line-height:1.55">Tu as maintenant toutes les clés. La prochaine étape : un plan structuré qui respecte tes capacités et te fait progresser sans te blesser.</div>
     </div>
     <div style="flex-shrink:0">
-      ${gradText('Mes plans d\'entraînement PDF', { sizePt:11, weight:700 })}
+      ${gradText('Mes plans d\'entraînement PDF', { sizePt:12, weight:700 })}
       <div style="height:7px"></div>
       <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:7px">
         ${plans.map(p=>`<div style="border-radius:10px;padding:10px 7px;background:${p.color};border:1px solid ${p.border};display:flex;flex-direction:column;gap:4px;text-align:center">
-          <div style="font-size:20px">${p.icon}</div>
-          <div style="font-size:8.5pt;font-weight:800;color:#fff;line-height:1.2">${p.name}</div>
-          <div style="font-size:8pt;color:${p.tc};font-weight:700">${p.duration}</div>
-          <div style="font-size:8pt;font-weight:800;background:linear-gradient(135deg,#8B2FC9,#E8237A);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;line-height:1.3">à partir de<br>14,99€</div>
+          <div style="font-size:22px">${p.icon}</div>
+          <div style="font-size:10pt;font-weight:800;color:#fff;line-height:1.2">${p.name}</div>
+          <div style="font-size:9.5pt;color:${p.tc};font-weight:700">${p.duration}</div>
+          <div style="font-size:9pt;font-weight:800;background:linear-gradient(135deg,#8B2FC9,#E8237A);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;line-height:1.3">à partir de<br>14,99€</div>
         </div>`).join('')}
       </div>
     </div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;flex-shrink:0">
       <div style="border-radius:12px;padding:13px;background:linear-gradient(135deg,rgba(139,47,201,.18),rgba(232,35,122,.12));border:1px solid rgba(139,47,201,.35)">
-        <div style="font-size:20px;margin-bottom:5px">🎯</div>
-        <div style="font-size:9pt;font-weight:800;margin-bottom:4px">Guide Anti-Blessure</div>
-        <div style="font-size:8pt;color:rgba(255,255,255,.7);line-height:1.5;margin-bottom:7px">Tu lis ce guide. Partage-le à un coureur qui en a besoin pour rester longtemps sur les routes.</div>
-        <div style="font-size:13pt;font-weight:900;background:linear-gradient(135deg,#8B2FC9,#E8237A);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">14,99€</div>
+        <div style="font-size:22px;margin-bottom:5px">🎯</div>
+        <div style="font-size:10.5pt;font-weight:800;margin-bottom:4px">Guide Anti-Blessure</div>
+        <div style="font-size:9.5pt;color:rgba(255,255,255,.7);line-height:1.5;margin-bottom:7px">Tu lis ce guide. Partage-le à un coureur qui en a besoin pour rester longtemps sur les routes.</div>
+        <div style="font-size:14pt;font-weight:900;background:linear-gradient(135deg,#8B2FC9,#E8237A);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">14,99€</div>
       </div>
       <div style="border-radius:12px;padding:13px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1)">
-        <div style="font-size:20px;margin-bottom:5px">🏅</div>
-        <div style="font-size:9pt;font-weight:800;margin-bottom:4px">Coaching personnalisé</div>
-        <div style="font-size:8pt;color:rgba(255,255,255,.7);line-height:1.5;margin-bottom:7px">Plan 100% sur-mesure, suivi hebdomadaire et messagerie directe avec ton coach Alexis Elie.</div>
-        <div style="font-size:13pt;font-weight:900;background:linear-gradient(135deg,#8B2FC9,#E8237A);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">à partir de 30€/mois</div>
+        <div style="font-size:22px;margin-bottom:5px">🏅</div>
+        <div style="font-size:10.5pt;font-weight:800;margin-bottom:4px">Coaching personnalisé</div>
+        <div style="font-size:9.5pt;color:rgba(255,255,255,.7);line-height:1.5;margin-bottom:7px">Plan 100% sur-mesure, suivi hebdomadaire et messagerie directe avec ton coach Alexis Elie.</div>
+        <div style="font-size:14pt;font-weight:900;background:linear-gradient(135deg,#8B2FC9,#E8237A);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">à partir de 30€/mois</div>
       </div>
     </div>
     <div style="flex-shrink:0;border-radius:12px;padding:13px 16px;background:rgba(255,255,255,.04);border:1px solid rgba(139,47,201,.28);display:flex;align-items:center;gap:14px">
-      <div style="flex-shrink:0;font-size:28px">🎽</div>
+      <div style="flex-shrink:0;font-size:30px">🎽</div>
       <div style="flex:1">
-        <div style="font-size:9.5pt;font-weight:800;margin-bottom:3px">Rejoins The Ultimate Academy</div>
-        <div style="font-size:8pt;color:rgba(255,255,255,.7);line-height:1.5">Déjà <b>70 coureurs</b> qui progressent et courent sans blessure. Retrouve tous les plans et le coaching sur :</div>
+        <div style="font-size:11pt;font-weight:800;margin-bottom:3px">Rejoins The Ultimate Academy</div>
+        <div style="font-size:9.5pt;color:rgba(255,255,255,.7);line-height:1.5">Déjà <b>70 coureurs</b> qui progressent et courent sans blessure. Retrouve tous les plans et le coaching sur :</div>
       </div>
       <div style="flex-shrink:0">
-        ${gradText('theultimateacademy.fr', { sizePt:9.5, weight:900, width:200 })}
+        ${gradText('theultimateacademy.fr', { sizePt:11, weight:900, width:200 })}
       </div>
     </div>
     <div style="flex-shrink:0;display:flex;justify-content:space-between;align-items:center">
-      <div style="font-size:8pt;color:rgba(255,255,255,.2);letter-spacing:.04em">The Ultimate Academy — Alexis ELIE</div>
+      <div style="font-size:9.5pt;color:rgba(255,255,255,.2);letter-spacing:.04em">The Ultimate Academy — Alexis ELIE</div>
       <div style="width:44px"></div>
     </div>
     ${pageNum('12')}
