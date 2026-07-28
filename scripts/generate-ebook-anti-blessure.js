@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// Génère public/ebooks/anti-blessure/guide-antiblessure.pdf — v4
+// Génère public/ebooks/anti-blessure/guide-antiblessure.pdf — v5
 const puppeteer = require('puppeteer')
 const fs  = require('fs')
 const path = require('path')
@@ -268,55 +268,75 @@ body { font-family: 'Poppins', sans-serif; color: #fff; -webkit-print-color-adju
 `
 
 // ─── Données ──────────────────────────────────────────────────────────────────
-const BLESSURES = [
+// Page 4 : 4 premières blessures
+const BLESSURES_P1 = [
   {
     icon:'🦴', color:'#06B6D4', bg:'rgba(6,182,212,.08)', border:'rgba(6,182,212,.25)',
     title:'Périostite tibiale', sub:'Syndrome de stress du tibia',
-    symptomes:'Douleur diffuse le long du tibia, aggravée à l\'effort et en début de séance.',
-    prevention:'Progression de 10% max/semaine. '+hl('Renforcement du mollet')+' et tibialis. Varier les surfaces.',
-    soins:'Repos relatif, glace 15 min x3/j. Reprise progressive sur surfaces souples.',
+    symptomes:'Douleur diffuse et brûlante le long du tibia, aggravée à l\'effort et au début de séance, qui peut irradier jusqu\'à la cheville.',
+    prevention:'Progression de 10% max/semaine. '+hl('Renforcement du tibialis anterior')+' et du mollet. Varier les surfaces, éviter le béton en début de saison.',
+    soins:'Repos relatif 2 semaines, glace 15 min × 3/j. Reprise progressive sur herbe ou piste. Kiné si persistance au-delà de 3 semaines.',
     tag:'Fréquente chez les débutants', tagColor:'rgba(6,182,212,.2)', tagBorder:'rgba(6,182,212,.4)',
   },
   {
     icon:'🦵', color:'#F97316', bg:'rgba(249,115,22,.08)', border:'rgba(249,115,22,.25)',
     title:'Tendinite d\'Achille', sub:'Tendinopathie du tendon calcanéen',
-    symptomes:'Raideur matinale au talon, douleur à la palpation, gonflement possible.',
-    prevention:hl('Montées excentriques')+' sur marche, échauffement soigneux, semelles adaptées.',
-    soins:'Repos 2 à 4 semaines, massage transverse profond, kinésithérapie précoce.',
+    symptomes:'Raideur matinale au talon, douleur à la palpation à 2-3 cm de l\'insertion, gonflement et parfois crépitement à la mobilisation.',
+    prevention:hl('Montées excentriques')+' sur marche (protocole Alfredson), échauffement soigneux 15 min, semelles adaptées. Éviter les changements soudains de chaussures.',
+    soins:'Repos relatif 2 à 4 semaines, massage transverse profond, kinésithérapie précoce. Ondes de choc si chronicité avérée.',
     tag:'Coureurs confirmés', tagColor:'rgba(249,115,22,.2)', tagBorder:'rgba(249,115,22,.4)',
   },
   {
     icon:'🔩', color:'#A855F7', bg:'rgba(168,85,247,.08)', border:'rgba(168,85,247,.25)',
     title:'Syndrome de l\'essuie-glace', sub:'Bandelette ilio-tibiale (BIT)',
-    symptomes:'Douleur vive sur la face externe du genou, surtout après 20 à 30 min d\'effort.',
-    prevention:hl('Renforcement des fessiers')+' et abducteurs. Foam roller BIT. Cadence 170-180 pas/min.',
-    soins:'Stop si douleur vive. Anti-inflammatoires, étirements spécifiques BIT.',
+    symptomes:'Douleur vive et piquante sur la face externe du genou, apparaissant toujours après 20 à 30 min d\'effort, disparaissant au repos.',
+    prevention:hl('Renforcement des fessiers')+' (moyen et grand) et abducteurs. Foam roller BIT quotidien. Augmenter la cadence vers 175-180 pas/min.',
+    soins:'Stop dès la douleur. AINS si nécessaire, étirements spécifiques BIT, kiné pour bilan biomécanique complet et correction de la foulée.',
     tag:'Longue distance', tagColor:'rgba(168,85,247,.2)', tagBorder:'rgba(168,85,247,.4)',
   },
   {
     icon:'🦶', color:'#22C55E', bg:'rgba(34,197,94,.08)', border:'rgba(34,197,94,.25)',
     title:'Fasciite plantaire', sub:'Aponévrosite plantaire',
-    symptomes:'Douleur intense sous le pied au réveil ou en début de séance, talon et voûte.',
-    prevention:hl('Renforcement intrinsèque du pied')+', billes sous le pied, semelles si besoin.',
-    soins:'Étirements du fascia et du mollet, botte de nuit, ondes de choc si chronique.',
+    symptomes:'Douleur intense sous le pied au lever du lit ou en début de séance, localisée au talon et à la voûte. S\'atténue après 10 min, réapparaît à l\'effort prolongé.',
+    prevention:hl('Renforcement intrinsèque du pied')+' (billes, serviette avec orteils), semelles si affaissement de voûte, étirements quotidiens du mollet et du fascia.',
+    soins:'Étirements du fascia et gastrocnémien, botte de nuit, infiltration corticoïde si chronique. Ondes de choc en dernier recours.',
     tag:'Route et piste', tagColor:'rgba(34,197,94,.2)', tagBorder:'rgba(34,197,94,.4)',
   },
+]
+
+// Page 5 : 4 blessures suivantes
+const BLESSURES_P2 = [
   {
     icon:'💥', color:'#EF4444', bg:'rgba(239,68,68,.08)', border:'rgba(239,68,68,.25)',
     title:'Claquage musculaire', sub:'Déchirure de fibre ou de faisceau',
-    symptomes:'Douleur brutale type "coup de couteau", contracture, hématome possible.',
-    prevention:hl('Échauffement progressif')+' 15 min minimum. Hydratation et alimentation soignées.',
-    soins:'Protocole PEACE & LOVE (p.9). Arrêt immédiat, pas de chaleur les 72 premières heures.',
+    symptomes:'Douleur brutale type "coup de couteau" en plein effort, contracture immédiate, hématome possible sous 24h. Impossibilité de continuer la séance.',
+    prevention:hl('Échauffement progressif')+' de 15 min minimum avant toute séance intense. Hydratation optimale, alimentation riche en protéines, récupération respectée.',
+    soins:'Arrêt immédiat. Protocole PEACE & LOVE (p.10). Pas de chaleur ni d\'étirements les 72 premières heures. Kiné dès J3.',
     tag:'Séances intenses', tagColor:'rgba(239,68,68,.2)', tagBorder:'rgba(239,68,68,.4)',
   },
   {
     icon:'🦿', color:'#EAB308', bg:'rgba(234,179,8,.08)', border:'rgba(234,179,8,.25)',
-    // Titre corrigé : Syndrome fémoro-patellaire en titre, "Genou du coureur" en sous-titre
     title:'Syndrome fémoro-patellaire', sub:'Genou du coureur',
-    symptomes:'Douleur sous ou autour de la rotule, en descente et en position assise prolongée.',
-    prevention:hl('Squats et fentes')+' unilatéraux, travail de la hanche, réduction du volume.',
-    soins:'Repos relatif, glace, kiné pour rééquilibrage musculaire, taping rotulien si besoin.',
+    symptomes:'Douleur sous ou autour de la rotule, aggravée en descente, en montée de marches et en position assise prolongée (genou fléchi).',
+    prevention:hl('Squats et fentes unilatéraux')+' pour renforcer le vaste médial. Travail de la hanche et du contrôle du genou. Réduction temporaire du volume.',
+    soins:'Repos relatif, glace post-effort, kiné pour rééquilibrage musculaire, taping rotulien (Mc Connell). Éviter la descente prolongée.',
     tag:'Tous niveaux', tagColor:'rgba(234,179,8,.2)', tagBorder:'rgba(234,179,8,.4)',
+  },
+  {
+    icon:'🦷', color:'#3B82F6', bg:'rgba(59,130,246,.08)', border:'rgba(59,130,246,.25)',
+    title:'Fracture de stress', sub:'Ostéopathie de contrainte',
+    symptomes:'Douleur localisée en un point précis (tibia, métatarses ou pied), aggravée à la percussion et à la palpation directe. Douleur nocturne parfois présente.',
+    prevention:hl('Apports calciques et vitamine D')+' suffisants. Augmentation de volume très progressive. Bilan osseux conseillé si douleurs persistantes sans cause évidente.',
+    soins:'Arrêt complet 6 à 12 semaines selon localisation. Imagerie (IRM ou scintigraphie) indispensable pour confirmation. Reprise sous contrôle médical strict.',
+    tag:'Kilométrage élevé', tagColor:'rgba(59,130,246,.2)', tagBorder:'rgba(59,130,246,.4)',
+  },
+  {
+    icon:'🌀', color:'#10B981', bg:'rgba(16,185,129,.08)', border:'rgba(16,185,129,.25)',
+    title:'Tendinopathie de la hanche', sub:'Syndrome du psoas ou du moyen fessier',
+    symptomes:'Douleur profonde à l\'aine ou sur la face latérale de la hanche, en montée de côte ou en début de séance. Parfois "claquement" interne à la flexion de hanche.',
+    prevention:hl('Renforcement du gainage et des fessiers')+'. Éviter les changements de dénivelé brutaux. Étirements du psoas et des rotateurs externes après chaque séance.',
+    soins:'Repos relatif, kiné pour massage et exercices excentrique/isométrique du psoas. Infiltration échoguidée si chronicité au-delà de 3 mois.',
+    tag:'Trail et côtes', tagColor:'rgba(16,185,129,.2)', tagBorder:'rgba(16,185,129,.4)',
   },
 ]
 
@@ -335,12 +355,42 @@ const EXERCICES = [
 ]
 
 const ETIREMENTS = [
-  { emoji:'🦵', color:'rgba(139,47,201,.2)', border:'rgba(139,47,201,.4)', title:'Quadriceps',       muscle:'Face avant de la cuisse',   dose:'30 sec × 3', desc:'Debout sur une jambe, saisir le pied derrière. Genou vers le bas, hanche droite, bassin neutre. Maintiens la position en respirant.' },
-  { emoji:'🔗', color:'rgba(6,182,212,.2)',  border:'rgba(6,182,212,.4)',  title:'Ischio-jambiers',  muscle:'Face arrière de la cuisse',  dose:'30 sec × 3', desc:'Assis, jambe tendue devant toi, penche le buste vers l\'avant en gardant le dos bien droit. Sens l\'étirement sous la cuisse.' },
-  { emoji:'🦶', color:'rgba(232,35,122,.2)', border:'rgba(232,35,122,.4)', title:'Mollet et Achille', muscle:'Mollet et tendon calcanéen', dose:'45 sec × 3', desc:'Main contre un mur, pied arrière à plat, genou tendu. Pousse le talon vers le sol en contractant légèrement les abdos.' },
-  { emoji:'↔️', color:'rgba(168,85,247,.2)', border:'rgba(168,85,247,.4)', title:'Bandelette IT',     muscle:'Hanche externe',            dose:'30 sec × 3', desc:'Debout, croise les jambes, penche le buste du côté opposé en appuyant la hanche vers l\'extérieur. Bras au-dessus.' },
-  { emoji:'🍑', color:'rgba(34,197,94,.2)',  border:'rgba(34,197,94,.4)',  title:'Fessier piriforme', muscle:'Fessier profond',            dose:'30 sec × 3', desc:'Allongé, cheville sur genou opposé, tire doucement la cuisse vers la poitrine. Maintiens sans forcer sur la hanche.' },
-  { emoji:'🦷', color:'rgba(249,115,22,.2)', border:'rgba(249,115,22,.4)', title:'Fascia plantaire',  muscle:'Voûte plantaire et talon',   dose:'60 sec × 2', desc:'Assis, saisir les orteils et les tirer vers le tibia. Tenir 30 sec. Masser ensuite la voûte avec une balle de tennis ou de golf.' },
+  {
+    emoji:'🦵', color:'rgba(139,47,201,.2)', border:'rgba(139,47,201,.4)',
+    title:'Quadriceps', muscle:'Face avant de la cuisse', dose:'30 sec × 3',
+    desc:'Debout sur une jambe, saisir le pied derrière et ramener le talon vers la fesse. Garde le genou pointé vers le bas et le bassin neutre. Respire lentement et ne bascule pas le buste en avant.',
+    coach:'Essentiel après les séances de fractionné ou de côtes. Négligé par la plupart des coureurs.',
+  },
+  {
+    emoji:'🔗', color:'rgba(6,182,212,.2)', border:'rgba(6,182,212,.4)',
+    title:'Ischio-jambiers', muscle:'Face arrière de la cuisse', dose:'30 sec × 3',
+    desc:'Assis au sol, jambe tendue devant toi, dos bien droit. Penche le buste vers l\'avant depuis les hanches (pas depuis le dos). Maintiens sans rebond, expire à chaque relâchement.',
+    coach:'Ne jamais faire en force. Un ischio souple = moins de risques de claquage et meilleure foulée.',
+  },
+  {
+    emoji:'🦶', color:'rgba(232,35,122,.2)', border:'rgba(232,35,122,.4)',
+    title:'Mollet et Achille', muscle:'Gastrocnémien · tendon calcanéen', dose:'45 sec × 3',
+    desc:'Main contre un mur, pied arrière à plat sur le sol, genou tendu. Pousse activement le talon vers le sol tout en maintenant la hanche et le dos droits. Fais les 2 versions : genou tendu puis genou fléchi.',
+    coach:'Priorité absolue pour les tendinites d\'Achille. À faire chaque soir, même sans blessure.',
+  },
+  {
+    emoji:'↔️', color:'rgba(168,85,247,.2)', border:'rgba(168,85,247,.4)',
+    title:'Bandelette ilio-tibiale', muscle:'Hanche externe · BIT', dose:'30 sec × 3',
+    desc:'Debout, croise la jambe à étirer derrière l\'autre. Penche le buste du côté opposé en appuyant la hanche vers l\'extérieur. Lève le bras du même côté vers le plafond pour amplifier l\'étirement.',
+    coach:'Indispensable si tu cours plus de 3 fois par semaine. Combine avec foam roller sur la BIT.',
+  },
+  {
+    emoji:'🍑', color:'rgba(34,197,94,.2)', border:'rgba(34,197,94,.4)',
+    title:'Piriforme et fessier profond', muscle:'Fessier profond · rotateurs externes', dose:'30 sec × 3',
+    desc:'Allongé sur le dos, croise la cheville droite sur le genou gauche. Saisir la cuisse gauche et tire doucement vers la poitrine. Sens l\'étirement dans la fesse droite. Respire régulièrement.',
+    coach:'Souvent la cause cachée des douleurs de sciatique chez les coureurs. Ne pas forcer.',
+  },
+  {
+    emoji:'🦷', color:'rgba(249,115,22,.2)', border:'rgba(249,115,22,.4)',
+    title:'Fascia plantaire', muscle:'Voûte plantaire · talon', dose:'60 sec × 2',
+    desc:'Assis, saisir les orteils d\'un pied et les tirer vers le tibia pour mettre le fascia sous tension. Maintenir 30 sec, relâcher. Masser ensuite la voûte circulairement avec une balle de tennis ou de golf.',
+    coach:'À faire dès le réveil, avant le premier pas au sol. Capital pour prévenir la fasciite plantaire.',
+  },
 ]
 
 const PEACE_LOVE = [
@@ -398,7 +448,7 @@ function pageCover() {
       ${gradText('ANTI-BLESSURE', { sizePt:38, weight:800 })}
       <div class="cover-subtitle">Prévenir, détecter et soigner<br>les blessures du coureur</div>
       <div class="cover-tags">
-        <span class="cover-tag" style="background:rgba(6,182,212,.1);color:#67E8F9;border-color:rgba(6,182,212,.4)">🦴 6 Blessures</span>
+        <span class="cover-tag" style="background:rgba(6,182,212,.1);color:#67E8F9;border-color:rgba(6,182,212,.4)">🦴 8 Blessures</span>
         <span class="cover-tag" style="background:rgba(139,47,201,.1);color:#C084FC;border-color:rgba(139,47,201,.4)">💪 10 Exercices</span>
         <span class="cover-tag" style="background:rgba(232,35,122,.1);color:#F9A8D4;border-color:rgba(232,35,122,.4)">🧘 Étirements</span>
         <span class="cover-tag" style="background:rgba(34,197,94,.1);color:#86EFAC;border-color:rgba(34,197,94,.4)">🏥 Protocoles</span>
@@ -410,15 +460,16 @@ function pageCover() {
 
 function pageSommaire() {
   const items = [
-    { label:'Introduction',                         page:'3' },
-    { label:'Les 6 blessures courantes',             page:'4' },
-    { label:'Programme de renforcement — Partie 1',  page:'5' },
-    { label:'Programme de renforcement — Partie 2',  page:'6' },
-    { label:'Étirements essentiels',                page:'7' },
-    { label:'Gestion de la charge d\'entraînement', page:'8' },
-    { label:'Protocole PEACE & LOVE',               page:'9' },
-    { label:'Chaussures et matériel',               page:'10' },
-    { label:'Passer à l\'action',                   page:'11' },
+    { label:'Introduction',                              page:'3' },
+    { label:'Les 8 blessures du coureur — Partie 1/2',  page:'4' },
+    { label:'Les 8 blessures du coureur — Partie 2/2',  page:'5' },
+    { label:'Programme de renforcement — Partie 1',     page:'6' },
+    { label:'Programme de renforcement — Partie 2',     page:'7' },
+    { label:'Étirements essentiels',                    page:'8' },
+    { label:'Gestion de la charge d\'entraînement',     page:'9' },
+    { label:'Protocole PEACE & LOVE',                   page:'10' },
+    { label:'Chaussures et matériel',                   page:'11' },
+    { label:'Passer à l\'action',                       page:'12' },
   ]
   return `<div class="page">
     ${blobs('A')}
@@ -447,10 +498,15 @@ function pageIntro() {
     { n:'2×', label:'plus de risques avec moins de 7h de sommeil', color:'#22C55E' },
   ]
   const causes = [
-    { icon:'📈', title:'Progression trop rapide', desc:'L\'erreur la plus fréquente. Le corps a besoin de temps pour s\'adapter : les tendons, os et articulations s\'adaptent 3 fois plus lentement que les muscles. Le corps peut sembler "en forme" alors que les structures passives sont déjà en surcharge.', color:'rgba(232,35,122,.15)', border:'rgba(232,35,122,.3)' },
-    { icon:'🔧', title:'Manque de renforcement', desc:'Un coureur qui ne fait que courir accumule des déséquilibres musculaires dangereux. Les fessiers, les tibias antérieurs et le gainage sont souvent trop faibles pour protéger efficacement les genoux, les hanches et les chevilles lors des impacts répétés.', color:'rgba(249,115,22,.15)', border:'rgba(249,115,22,.3)' },
-    { icon:'😴', title:'Récupération sous-estimée', desc:'La performance et l\'adaptation se construisent pendant le repos, pas pendant l\'effort. C\'est lors du sommeil que le corps répare les micro-lésions et renforce les tissus. Moins de 7h de sommeil par nuit multiplie par deux le risque de blessure selon les études.', color:'rgba(139,47,201,.15)', border:'rgba(139,47,201,.3)' },
-    { icon:'👟', title:'Équipement inadapté', desc:'Une chaussure usée après 800 km ou mal adaptée à ta morphologie peut créer des douleurs chroniques sur toute la chaîne cinétique : pied, cheville, genou, hanche et dos. La rotation de deux paires différentes réduit de 40% le risque de blessure.', color:'rgba(6,182,212,.15)', border:'rgba(6,182,212,.3)' },
+    { icon:'📈', title:'Progression trop rapide', desc:'L\'erreur la plus fréquente. Les tendons, os et articulations s\'adaptent 3 fois plus lentement que les muscles. Le corps peut sembler "en forme" alors que les structures passives sont déjà en surcharge. Augmente toujours ta charge par paliers.', color:'rgba(232,35,122,.15)', border:'rgba(232,35,122,.3)' },
+    { icon:'🔧', title:'Manque de renforcement', desc:'Un coureur qui ne fait que courir accumule des déséquilibres musculaires dangereux. Les fessiers, tibias antérieurs et gainage sont souvent trop faibles pour protéger genoux, hanches et chevilles lors des milliers d\'impacts par séance.', color:'rgba(249,115,22,.15)', border:'rgba(249,115,22,.3)' },
+    { icon:'😴', title:'Récupération sous-estimée', desc:'La performance se construit pendant le repos, pas l\'effort. C\'est lors du sommeil que le corps répare les micro-lésions et renforce les tissus. Moins de 7h par nuit multiplie par deux le risque de blessure selon la littérature scientifique.', color:'rgba(139,47,201,.15)', border:'rgba(139,47,201,.3)' },
+    { icon:'👟', title:'Équipement inadapté', desc:'Une chaussure usée ou mal adaptée crée des douleurs sur toute la chaîne cinétique : pied, cheville, genou, hanche et dos. La rotation de deux paires différentes réduit de 40% le risque de blessure d\'après les études récentes.', color:'rgba(6,182,212,.15)', border:'rgba(6,182,212,.3)' },
+  ]
+  const conseils = [
+    { icon:'🎯', text:hl('Écoute ton corps')+' : une douleur qui persiste plus de 3 jours n\'est jamais anodine. Mieux vaut 3 jours de repos que 3 mois d\'arrêt.' },
+    { icon:'📋', text:hl('Planifie ta récupération')+' comme une séance à part entière. Elle fait partie de l\'entraînement au même titre qu\'un fractionné.' },
+    { icon:'💪', text:hl('2 séances de renforcement par semaine')+' suffisent pour diviser par trois le risque de blessure sur la saison.' },
   ]
   return `<div class="page">
     ${blobs('B')}
@@ -460,7 +516,7 @@ function pageIntro() {
       ${svgTitleDeco()}
     </div>
     <div class="page-intro">
-      Courir, c'est l'une des activités les plus naturelles et accessibles qui soit. Pourtant, les statistiques sont sans appel : ${hl('près de 65% des coureurs se blessent chaque année')}, souvent pour des raisons qui auraient pu être évitées avec un peu de méthode.
+      Courir, c'est l'une des activités les plus naturelles et accessibles qui soit. Pourtant, les statistiques sont sans appel : ${hl('près de 65% des coureurs se blessent chaque année')}, souvent pour des raisons qui auraient pu être évitées avec un peu de méthode et de régularité dans la prévention.
     </div>
     <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;flex-shrink:0">
       ${stats.map(s=>`<div style="border-radius:11px;padding:11px 10px;text-align:center;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08)">
@@ -476,43 +532,72 @@ function pageIntro() {
       </div>`).join('')}
     </div>
     <div style="background:linear-gradient(135deg,rgba(139,47,201,.12),rgba(232,35,122,.08));border:1px solid rgba(139,47,201,.25);border-radius:12px;padding:12px 16px;flex-shrink:0">
-      <div style="font-size:10pt;color:rgba(255,255,255,.82);line-height:1.65;text-align:justify">
-        Ce guide est le fruit d'années d'expérience sur le terrain avec des coureurs de tous niveaux. Les protocoles présentés ici sont issus des ${hl('dernières recherches en médecine du sport')} et adaptés à la réalité de l'entraînement quotidien. L'objectif n'est pas de te faire peur, mais de te donner les outils concrets pour rester sur les routes le plus longtemps possible et progresser ${hl('sans interruption forcée')}.
+      <div style="font-size:10pt;font-weight:700;color:#C084FC;margin-bottom:8px;text-transform:uppercase;letter-spacing:.1em">3 règles pour ne plus se blesser</div>
+      <div style="display:flex;flex-direction:column;gap:7px">
+        ${conseils.map(c=>`<div style="display:flex;align-items:flex-start;gap:9px">
+          <span style="font-size:16px;flex-shrink:0;margin-top:1px">${c.icon}</span>
+          <div style="font-size:10pt;color:rgba(255,255,255,.82);line-height:1.6;text-align:justify">${c.text}</div>
+        </div>`).join('')}
+      </div>
+    </div>
+    <div style="background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);border-radius:12px;padding:11px 16px;flex-shrink:0">
+      <div style="font-size:10pt;color:rgba(255,255,255,.72);line-height:1.65;text-align:justify">
+        Ce guide est le fruit d'années d'expérience sur le terrain avec des coureurs de tous niveaux. Les protocoles présentés ici sont issus des ${hl('dernières recherches en médecine du sport')} et adaptés à la réalité de l'entraînement quotidien. Utilise-le comme une référence permanente : consulte la fiche de la blessure concernée dès les premiers signaux, avant que la douleur ne s'installe vraiment.
       </div>
     </div>
     ${pageNum('3')}
   </div>`
 }
 
-function pageBlessures() {
+function blessureCards(blessures) {
+  return blessures.map(b=>`<div class="blessure-card" style="background:${b.bg};border-color:${b.border}">
+    <div style="display:flex;align-items:center;gap:8px;flex-shrink:0">
+      <div style="width:34px;height:34px;border-radius:9px;background:${b.bg};border:1px solid ${b.border};display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">${b.icon}</div>
+      <div>
+        <div class="bl-title">${b.title}</div>
+        <div class="bl-subtitle">${b.sub}</div>
+      </div>
+    </div>
+    <div class="bl-sep"></div>
+    <div class="bl-section-title" style="color:${b.color}">Symptômes</div>
+    <div class="bl-text">${b.symptomes}</div>
+    <div class="bl-section-title" style="color:${b.color};margin-top:3px">Prévention</div>
+    <div class="bl-text">${b.prevention}</div>
+    <div class="bl-section-title" style="color:${b.color};margin-top:3px">Traitement</div>
+    <div class="bl-text">${b.soins}</div>
+    <span class="bl-tag" style="background:${b.tagColor};border:1px solid ${b.tagBorder};color:${b.color}">${b.tag}</span>
+  </div>`).join('')
+}
+
+function pageBlessures1() {
   return `<div class="page">
     ${blobs('A')}
     <div style="text-align:center;flex-shrink:0">
-      <div class="page-tag">Chapitre 1</div>
-      ${gradText('Les 6 blessures courantes', { sizePt:26, weight:800 })}
+      <div class="page-tag">Chapitre 1 — Partie 1/2</div>
+      ${gradText('Les 8 blessures du coureur', { sizePt:26, weight:800 })}
       ${svgTitleDeco()}
       ${svgWave()}
     </div>
     <div class="blessure-grid">
-      ${BLESSURES.map(b=>`<div class="blessure-card" style="background:${b.bg};border-color:${b.border}">
-        <div style="display:flex;align-items:center;gap:8px;flex-shrink:0">
-          <div style="width:32px;height:32px;border-radius:8px;background:${b.bg};display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0">${b.icon}</div>
-          <div>
-            <div class="bl-title">${b.title}</div>
-            <div class="bl-subtitle">${b.sub}</div>
-          </div>
-        </div>
-        <div class="bl-sep"></div>
-        <div class="bl-section-title" style="color:${b.color}">Symptômes</div>
-        <div class="bl-text">${b.symptomes}</div>
-        <div class="bl-section-title" style="color:${b.color};margin-top:3px">Prévention</div>
-        <div class="bl-text">${b.prevention}</div>
-        <div class="bl-section-title" style="color:${b.color};margin-top:3px">Traitement</div>
-        <div class="bl-text">${b.soins}</div>
-        <span class="bl-tag" style="background:${b.tagColor};border:1px solid ${b.tagBorder};color:${b.color}">${b.tag}</span>
-      </div>`).join('')}
+      ${blessureCards(BLESSURES_P1)}
     </div>
     ${pageNum('4')}
+  </div>`
+}
+
+function pageBlessures2() {
+  return `<div class="page">
+    ${blobs('B')}
+    <div style="text-align:center;flex-shrink:0">
+      <div class="page-tag">Chapitre 1 — Partie 2/2</div>
+      ${gradText('Les 8 blessures du coureur', { sizePt:26, weight:800 })}
+      ${svgTitleDeco()}
+      ${svgWave()}
+    </div>
+    <div class="blessure-grid">
+      ${blessureCards(BLESSURES_P2)}
+    </div>
+    ${pageNum('5')}
   </div>`
 }
 
@@ -572,6 +657,10 @@ function pageEtirements() {
         <div class="etir-dose">${e.dose}</div>
         <div class="etir-sep"></div>
         <div class="etir-desc">${e.desc}</div>
+        <div style="margin-top:5px;padding:5px 8px;border-radius:7px;background:rgba(255,255,255,.04);border-left:2px solid rgba(192,132,252,.5)">
+          <div style="font-size:9pt;color:#C084FC;font-weight:700;margin-bottom:2px">Note du coach</div>
+          <div style="font-size:9pt;color:rgba(255,255,255,.55);line-height:1.5;font-style:italic">${e.coach}</div>
+        </div>
       </div>`).join('')}
     </div>
     <div style="background:rgba(139,47,201,.1);border:1px solid rgba(139,47,201,.3);border-radius:12px;padding:12px 16px;flex-shrink:0">
@@ -580,7 +669,7 @@ function pageEtirements() {
         Ne jamais s'étirer sur une douleur aiguë. Si une zone est douloureuse, consulte un kinésithérapeute avant de reprendre. La douleur pendant un étirement n'est ${hl('jamais normale')} et doit alerter immédiatement.
       </div>
     </div>
-    ${pageNum('7')}
+    ${pageNum('8')}
   </div>`
 }
 
@@ -630,7 +719,21 @@ function pageCharge() {
         </div>`).join('')}
       </div>
     </div>
-    ${pageNum('8')}
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:9px;flex-shrink:0">
+      <div style="border-radius:12px;padding:12px 14px;background:linear-gradient(135deg,rgba(139,47,201,.15),rgba(232,35,122,.1));border:1px solid rgba(139,47,201,.3)">
+        <div style="font-size:11pt;font-weight:800;margin-bottom:5px">Comment lire ce tableau ?</div>
+        <div style="font-size:10pt;color:rgba(255,255,255,.78);line-height:1.6;text-align:justify">Les pourcentages représentent l\'importance relative de chaque variable dans l\'équation charge/récupération. ${hl('Ne modifie jamais deux variables simultanément')} : augmente le volume OU l\'intensité, jamais les deux en même temps sous peine de surcharge.</div>
+      </div>
+      <div style="border-radius:12px;padding:12px 14px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08)">
+        <div style="font-size:11pt;font-weight:800;margin-bottom:5px">Le cycle idéal</div>
+        <div style="display:flex;flex-direction:column;gap:5px">
+          <div style="display:flex;align-items:center;gap:8px"><span style="font-size:13px">📈</span><div style="font-size:10pt;color:rgba(255,255,255,.78);line-height:1.5"><b>Semaines 1-3</b> : charge progressive +5 à +10%</div></div>
+          <div style="display:flex;align-items:center;gap:8px"><span style="font-size:13px">📉</span><div style="font-size:10pt;color:rgba(255,255,255,.78);line-height:1.5"><b>Semaine 4</b> : décharge −30 à −40% du volume</div></div>
+          <div style="display:flex;align-items:center;gap:8px"><span style="font-size:13px">🔁</span><div style="font-size:10pt;color:rgba(255,255,255,.78);line-height:1.5">Répéter le cycle avec nouveau palier supérieur</div></div>
+        </div>
+      </div>
+    </div>
+    ${pageNum('9')}
   </div>`
 }
 
@@ -661,7 +764,7 @@ function pagePeaceLove() {
         </div>`
       }).join('')}
     </div>
-    ${pageNum('9')}
+    ${pageNum('10')}
   </div>`
 }
 
@@ -693,17 +796,17 @@ function pageChaussures() {
         </div>
       </div>`).join('')}
     </div>
-    ${pageNum('10')}
+    ${pageNum('11')}
   </div>`
 }
 
 function pageCTA() {
   const plans = [
-    { icon:'🏃', name:'Plan 10 km',     duration:'8 semaines',  price:'14,99€', color:'rgba(6,182,212,.15)',  border:'rgba(6,182,212,.35)',  tc:'#67E8F9' },
-    { icon:'🏃', name:'Plan 10 km',     duration:'12 semaines', price:'17,99€', color:'rgba(6,182,212,.1)',   border:'rgba(6,182,212,.25)',  tc:'#67E8F9' },
-    { icon:'🏅', name:'Semi-Marathon',  duration:'12 semaines', price:'19,99€', color:'rgba(139,47,201,.15)', border:'rgba(139,47,201,.35)', tc:'#C084FC' },
-    { icon:'🏆', name:'Marathon',       duration:'12 semaines', price:'22,99€', color:'rgba(232,35,122,.15)', border:'rgba(232,35,122,.35)', tc:'#F9A8D4' },
-    { icon:'🏆', name:'Marathon',       duration:'16 semaines', price:'24,99€', color:'rgba(232,35,122,.1)',  border:'rgba(232,35,122,.25)', tc:'#F9A8D4' },
+    { icon:'🏃', name:'Plan 10 km',     duration:'8 semaines',  price:'à partir de 14,99€', color:'rgba(6,182,212,.15)',  border:'rgba(6,182,212,.35)',  tc:'#67E8F9' },
+    { icon:'🏃', name:'Plan 10 km',     duration:'12 semaines', price:'à partir de 14,99€', color:'rgba(6,182,212,.1)',   border:'rgba(6,182,212,.25)',  tc:'#67E8F9' },
+    { icon:'🏅', name:'Semi-Marathon',  duration:'12 semaines', price:'à partir de 19,99€', color:'rgba(139,47,201,.15)', border:'rgba(139,47,201,.35)', tc:'#C084FC' },
+    { icon:'🏆', name:'Marathon',       duration:'12 semaines', price:'à partir de 22,99€', color:'rgba(232,35,122,.15)', border:'rgba(232,35,122,.35)', tc:'#F9A8D4' },
+    { icon:'🏆', name:'Marathon',       duration:'16 semaines', price:'à partir de 22,99€', color:'rgba(232,35,122,.1)',  border:'rgba(232,35,122,.25)', tc:'#F9A8D4' },
   ]
   return `<div class="page cta-page">
     ${blobs('B')}
@@ -714,44 +817,46 @@ function pageCTA() {
       <div style="font-size:10pt;color:rgba(255,255,255,.65);margin-top:6px;line-height:1.6">Tu as maintenant toutes les clés. La prochaine étape : un plan structuré qui respecte tes capacités et te fait progresser sans te blesser.</div>
     </div>
     <div style="flex-shrink:0">
-      ${gradText('Nos plans d\'entraînement PDF', { sizePt:13, weight:700 })}
+      ${gradText('Mes plans d\'entraînement PDF', { sizePt:13, weight:700 })}
       <div style="height:8px"></div>
       <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:8px">
         ${plans.map(p=>`<div style="border-radius:12px;padding:11px 9px;background:${p.color};border:1px solid ${p.border};display:flex;flex-direction:column;gap:5px;text-align:center">
           <div style="font-size:22px">${p.icon}</div>
           <div style="font-size:10pt;font-weight:800;color:#fff;line-height:1.2">${p.name}</div>
-          <div style="font-size:10pt;color:${p.tc};font-weight:700">${p.duration}</div>
-          <div style="font-size:16pt;font-weight:900;background:linear-gradient(135deg,#8B2FC9,#E8237A);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-top:3px">${p.price}</div>
+          <div style="font-size:9pt;color:${p.tc};font-weight:700">${p.duration}</div>
+          <div style="font-size:9pt;font-weight:800;background:linear-gradient(135deg,#8B2FC9,#E8237A);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-top:3px;line-height:1.3">${p.price}</div>
         </div>`).join('')}
       </div>
     </div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;flex-shrink:0">
-      <div style="border-radius:14px;padding:16px;background:linear-gradient(135deg,rgba(139,47,201,.2),rgba(232,35,122,.15));border:1px solid rgba(139,47,201,.4)">
+      <div style="border-radius:14px;padding:15px;background:linear-gradient(135deg,rgba(139,47,201,.2),rgba(232,35,122,.15));border:1px solid rgba(139,47,201,.4)">
         <div style="font-size:22px;margin-bottom:6px">🎯</div>
         <div style="font-size:11pt;font-weight:800;margin-bottom:5px">Guide Anti-Blessure</div>
-        <div style="font-size:10pt;color:rgba(255,255,255,.72);line-height:1.55;margin-bottom:8px">Tu lis ce guide. Partage-le à un coureur qui en a besoin pour courir plus longtemps.</div>
-        <div style="font-size:16pt;font-weight:900;background:linear-gradient(135deg,#8B2FC9,#E8237A);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">14,99€</div>
+        <div style="font-size:10pt;color:rgba(255,255,255,.72);line-height:1.55;margin-bottom:8px">Tu lis ce guide. Partage-le à un coureur qui en a besoin pour rester sur les routes le plus longtemps possible.</div>
+        <div style="font-size:14pt;font-weight:900;background:linear-gradient(135deg,#8B2FC9,#E8237A);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">14,99€</div>
       </div>
-      <div style="border-radius:14px;padding:16px;background:linear-gradient(135deg,rgba(234,179,8,.15),rgba(249,115,22,.1));border:1px solid rgba(234,179,8,.35)">
-        <div style="font-size:22px;margin-bottom:6px">🏆</div>
+      <div style="border-radius:14px;padding:15px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1)">
+        <div style="font-size:22px;margin-bottom:6px">🏅</div>
         <div style="font-size:11pt;font-weight:800;margin-bottom:5px">Coaching personnalisé</div>
-        <div style="font-size:10pt;color:rgba(255,255,255,.72);line-height:1.55;margin-bottom:8px">Plan 100% sur-mesure, suivi hebdomadaire et messagerie directe avec ton coach Alexis.</div>
-        <div style="font-size:10pt;font-weight:700;color:#FDE047">Disponible sur theultimateacademy.fr</div>
+        <div style="font-size:10pt;color:rgba(255,255,255,.72);line-height:1.55;margin-bottom:8px">Plan 100% sur-mesure, suivi hebdomadaire et messagerie directe avec ton coach Alexis Elie.</div>
+        <div style="font-size:14pt;font-weight:900;background:linear-gradient(135deg,#8B2FC9,#E8237A);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">à partir de 30€/mois</div>
       </div>
     </div>
-    <div style="flex-shrink:0;border-radius:16px;padding:18px 22px;background:linear-gradient(135deg,#8B2FC9,#E8237A);text-align:center;position:relative;overflow:hidden">
-      <div style="position:absolute;top:-30px;right:-30px;width:120px;height:120px;border-radius:50%;background:rgba(255,255,255,.08)"></div>
-      <div style="position:absolute;bottom:-20px;left:-20px;width:80px;height:80px;border-radius:50%;background:rgba(0,0,0,.1)"></div>
-      <div style="position:relative;z-index:1">
-        <div style="font-size:14pt;font-weight:900;color:white;margin-bottom:5px">Rejoins The Ultimate Academy</div>
-        <div style="font-size:10pt;color:rgba(255,255,255,.9);line-height:1.6;margin-bottom:10px">Des centaines de coureurs ont déjà transformé leur entraînement.<br>C'est ton tour de courir plus loin, plus vite et sans blessure.</div>
-        <div style="font-size:14pt;font-weight:900;color:white;letter-spacing:.06em">theultimateacademy.fr</div>
+    <div style="flex-shrink:0;border-radius:14px;padding:16px 20px;background:rgba(255,255,255,.04);border:1px solid rgba(139,47,201,.3);display:flex;align-items:center;gap:18px">
+      <div style="flex-shrink:0;width:48px;height:48px;border-radius:12px;background:linear-gradient(135deg,rgba(139,47,201,.3),rgba(232,35,122,.2));display:flex;align-items:center;justify-content:center;font-size:26px">🎽</div>
+      <div style="flex:1">
+        <div style="font-size:12pt;font-weight:800;margin-bottom:4px">Rejoins The Ultimate Academy</div>
+        <div style="font-size:10pt;color:rgba(255,255,255,.72);line-height:1.6">Déjà <b>70 coureurs</b> qui progressent et courent sans blessure. Retrouve tous les plans, le coaching et les ressources sur :</div>
+      </div>
+      <div style="flex-shrink:0;text-align:center">
+        ${gradText('theultimateacademy.fr', { sizePt:11, weight:900, width:220 })}
       </div>
     </div>
-    <div style="flex-shrink:0;text-align:center;font-size:10pt;color:rgba(255,255,255,.25);letter-spacing:.06em">
-      © The Ultimate Academy — Alexis Élie, Coach Athlétisme
+    <div style="flex-shrink:0;display:flex;justify-content:space-between;align-items:center">
+      <div style="font-size:10pt;color:rgba(255,255,255,.22);letter-spacing:.04em">The Ultimate Academy — Alexis ELIE</div>
+      <div style="width:44px"></div>
     </div>
-    ${pageNum('11')}
+    ${pageNum('12')}
   </div>`
 }
 
@@ -769,9 +874,10 @@ function buildHtml() {
 ${pageCover()}
 ${pageSommaire()}
 ${pageIntro()}
-${pageBlessures()}
-${pageRenforcement(EXERCICES.slice(0,5), 5, 1)}
-${pageRenforcement(EXERCICES.slice(5,10), 6, 2)}
+${pageBlessures1()}
+${pageBlessures2()}
+${pageRenforcement(EXERCICES.slice(0,5), 6, 1)}
+${pageRenforcement(EXERCICES.slice(5,10), 7, 2)}
 ${pageEtirements()}
 ${pageCharge()}
 ${pagePeaceLove()}
@@ -792,5 +898,5 @@ ${pageCTA()}
   await page.pdf({ path: outPath, format: 'A4', printBackground: true, preferCSSPageSize: true })
   await browser.close()
   const size = fs.statSync(outPath).size
-  console.log(`PDF généré : ${outPath} (${Math.round(size/1024)} KB, 11 pages)`)
+  console.log(`PDF généré : ${outPath} (${Math.round(size/1024)} KB, 12 pages)`)
 })()
