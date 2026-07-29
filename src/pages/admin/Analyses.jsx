@@ -2,21 +2,7 @@ import { useState, useEffect } from 'react'
 import { supabase } from '../../lib/supabase'
 import LoadingSpinner from '../../components/UI/LoadingSpinner'
 import { SESSION_TYPE_COLORS } from '../../lib/utils'
-
-const API          = import.meta.env.VITE_API_URL || 'http://localhost:3001'
-const ADMIN_SECRET = import.meta.env.VITE_ADMIN_SECRET || ''
-
-async function adminFetch(path, options = {}) {
-  const res = await fetch(`${API}${path}`, {
-    ...options,
-    headers: { 'Content-Type': 'application/json', 'X-Admin-Secret': ADMIN_SECRET, ...(options.headers || {}) },
-  })
-  if (!res.ok) {
-    const err = await res.json().catch(() => ({ error: `HTTP ${res.status}` }))
-    throw new Error(err.error || `HTTP ${res.status}`)
-  }
-  return res.json()
-}
+import { adminFetch } from '../../lib/adminFetch'
 
 function lastMonthLabel() {
   const d = new Date()

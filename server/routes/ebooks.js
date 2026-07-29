@@ -8,12 +8,26 @@ const router  = express.Router();
 const stripe  = new Stripe(process.env.STRIPE_SECRET_KEY);
 const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_KEY);
 
-function requireAdmin(req, res, next) {
+async function requireAdmin(req, res, next) {
+  // Secret statique (crons/internes)
   const secret = req.headers['x-admin-secret'];
-  if (!secret || secret !== process.env.ADMIN_SECRET) {
-    return res.status(401).json({ error: 'Non autorisé' });
+  if (secret && secret === process.env.ADMIN_SECRET) return next();
+
+  // JWT Supabase
+  const auth  = req.headers['authorization'];
+  const token = auth?.startsWith('Bearer ') ? auth.slice(7) : null;
+  if (token) {
+    try {
+      const { data: { user }, error } = await supabase.auth.getUser(token);
+      if (!error && user) {
+        const { data: profile } = await supabase.from('profiles').select('role').eq('id', user.id).single();
+        if (profile?.role === 'coach') return next();
+      }
+    } catch (_) {}
   }
-  next();
+
+  console.warn(`[SECURITY] Accès ebooks admin refusé — IP: ${req.ip} — Route: ${req.method} ${req.originalUrl}`);
+  return res.status(401).json({ error: 'Non autorisé' });
 }
 
 const _rawClientUrl = process.env.CLIENT_URL || 'https://theultimateacademy.fr';

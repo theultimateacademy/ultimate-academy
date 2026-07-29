@@ -7,11 +7,29 @@ const client   = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
 const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_KEY);
 
 // ─── Middleware admin (routes réservées au coach ou aux CRONs internes) ─────
-// Accepte soit le header X-Admin-Secret, soit le flag _internal dans le body
-function requireAdminOrInternal(req, res, next) {
-  const secret   = req.headers['x-admin-secret'];
-  const internal = req.body?._internal === true;
-  if (internal || (secret && secret === process.env.ADMIN_SECRET)) return next();
+// Accepte : flag _internal, X-Admin-Secret statique, ou JWT Supabase d'un coach
+async function requireAdminOrInternal(req, res, next) {
+  // Appels internes (crons, appels serveur-à-serveur)
+  if (req.body?._internal === true) return next();
+
+  // Secret statique (crons externes)
+  const secret = req.headers['x-admin-secret'];
+  if (secret && secret === process.env.ADMIN_SECRET) return next();
+
+  // JWT Supabase
+  const auth  = req.headers['authorization'];
+  const token = auth?.startsWith('Bearer ') ? auth.slice(7) : null;
+  if (token) {
+    try {
+      const { data: { user }, error } = await supabase.auth.getUser(token);
+      if (!error && user) {
+        const { data: profile } = await supabase.from('profiles').select('role').eq('id', user.id).single();
+        if (profile?.role === 'coach') return next();
+      }
+    } catch (_) {}
+  }
+
+  console.warn(`[SECURITY] Accès refusé — IP: ${req.ip} — Route: ${req.method} ${req.originalUrl}`);
   return res.status(401).json({ error: 'Non autorisé' });
 }
 

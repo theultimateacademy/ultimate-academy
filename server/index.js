@@ -26,6 +26,7 @@ if (missing.length) {
 
 const express    = require('express');
 const cors       = require('cors');
+const helmet     = require('helmet');
 const cron       = require('node-cron');
 const { createClient } = require('@supabase/supabase-js');
 const Anthropic  = require('@anthropic-ai/sdk');
@@ -43,6 +44,22 @@ const ebookRoutes     = require('./routes/ebooks');
 
 const app  = express();
 const PORT = process.env.PORT || 3001;
+
+// ─── Headers de sécurité HTTP ─────────────────────────────────────────────────
+app.use(helmet({
+  contentSecurityPolicy: {
+    directives: {
+      defaultSrc:  ["'self'"],
+      scriptSrc:   ["'self'", 'https://js.stripe.com'],
+      frameSrc:    ["'self'", 'https://js.stripe.com', 'https://hooks.stripe.com'],
+      connectSrc:  ["'self'", 'https://api.stripe.com'],
+      imgSrc:      ["'self'", 'data:', 'https:'],
+      styleSrc:    ["'self'", "'unsafe-inline'"],
+      fontSrc:     ["'self'", 'data:'],
+    },
+  },
+  crossOriginEmbedderPolicy: false, // évite de bloquer les ressources tierces
+}));
 
 // Stripe webhooks need raw body — register before JSON parser
 app.use('/api/stripe/webhook',  express.raw({ type: 'application/json' }));

@@ -1,6 +1,8 @@
 const express    = require('express');
 const { createClient } = require('@supabase/supabase-js');
 
+const supabaseAdmin = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_KEY);
+
 const LEVEL_VMA = { debutant: 10, intermediaire: 14, confirme: 17, expert: 20 };
 
 function resolveVma(profile) {
@@ -59,13 +61,29 @@ const supabase = createClient(
 );
 
 // ─── Middleware d'authentification coach ────────────────────────────────────
-// Toutes les routes /api/admin nécessitent le header X-Admin-Secret
-function requireAdmin(req, res, next) {
+// Accepte soit :
+//   1. Header Authorization: Bearer <supabase_jwt>  (utilisé par le frontend coach)
+//   2. Header X-Admin-Secret: <secret>              (utilisé par les crons internes)
+async function requireAdmin(req, res, next) {
+  // Fallback secret statique pour les appels internes/cron
   const secret = req.headers['x-admin-secret'];
-  if (!secret || secret !== process.env.ADMIN_SECRET) {
-    return res.status(401).json({ error: 'Non autorisé' });
+  if (secret && secret === process.env.ADMIN_SECRET) return next();
+
+  // Vérification JWT Supabase
+  const auth = req.headers['authorization'];
+  const token = auth?.startsWith('Bearer ') ? auth.slice(7) : null;
+  if (token) {
+    try {
+      const { data: { user }, error } = await supabaseAdmin.auth.getUser(token);
+      if (!error && user) {
+        const { data: profile } = await supabaseAdmin.from('profiles').select('role').eq('id', user.id).single();
+        if (profile?.role === 'coach') return next();
+      }
+    } catch (_) {}
   }
-  next();
+
+  console.warn(`[SECURITY] Accès admin refusé — IP: ${req.ip} — Route: ${req.method} ${req.originalUrl}`);
+  return res.status(401).json({ error: 'Non autorisé' });
 }
 
 router.use(requireAdmin);

@@ -1,30 +1,5 @@
 import { useState, useEffect } from 'react'
-
-const API          = import.meta.env.VITE_API_URL || 'http://localhost:3001'
-const ADMIN_SECRET = import.meta.env.VITE_ADMIN_SECRET || ''
-
-async function adminFetch(path, options = {}) {
-  const res = await fetch(`${API}${path}`, {
-    ...options,
-    headers: { 'Content-Type': 'application/json', 'X-Admin-Secret': ADMIN_SECRET, ...(options.headers || {}) },
-  })
-  if (!res.ok) {
-    const err = await res.json().catch(() => ({ error: `HTTP ${res.status}` }))
-    throw new Error(err.error || `HTTP ${res.status}`)
-  }
-  return res.json()
-}
-
-// Ouvre un PDF protégé via fetch blob (window.open ne peut pas envoyer de headers)
-async function openAdminPdf(path) {
-  const res = await fetch(`${API}${path}`, {
-    headers: { 'X-Admin-Secret': ADMIN_SECRET },
-  })
-  if (!res.ok) { alert('PDF introuvable'); return }
-  const blob = await res.blob()
-  const url  = URL.createObjectURL(blob)
-  window.open(url, '_blank')
-}
+import { adminFetch, openAdminPdf } from '../../lib/adminFetch'
 
 const STATUS_LABELS = { pending: 'En attente', paid: 'Payé', sent: 'Envoyé' }
 const STATUS_COLORS = { pending: '#F59E0B', paid: '#06B6D4', sent: '#10B981' }

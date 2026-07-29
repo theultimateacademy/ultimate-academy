@@ -1,5 +1,6 @@
-const API_URL      = import.meta.env.VITE_API_URL      || 'http://localhost:3001'
-const ADMIN_SECRET = import.meta.env.VITE_ADMIN_SECRET || ''
+import { supabase } from './supabase'
+
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001'
 
 async function request(path, options = {}) {
   const res = await fetch(`${API_URL}${path}`, {
@@ -14,11 +15,13 @@ async function request(path, options = {}) {
   return res.json()
 }
 
-// Requête authentifiée coach — ajoute le header X-Admin-Secret
-function adminRequest(path, options = {}) {
+// Requête authentifiée coach — envoie le JWT Supabase de la session active
+async function adminRequest(path, options = {}) {
+  const { data: { session } } = await supabase.auth.getSession()
+  const token = session?.access_token || ''
   return request(path, {
     ...options,
-    headers: { 'X-Admin-Secret': ADMIN_SECRET, ...options.headers },
+    headers: { 'Authorization': `Bearer ${token}`, ...options.headers },
   })
 }
 

@@ -2,22 +2,8 @@ import { useState, useEffect } from 'react'
 import { supabase } from '../../lib/supabase'
 import { OBJECTIVE_LABELS, LEVEL_LABELS, SESSION_TYPE_COLORS } from '../../lib/utils'
 import { api } from '../../lib/api'
+import { adminFetch } from '../../lib/adminFetch'
 import LoadingSpinner from '../../components/UI/LoadingSpinner'
-
-const ADMIN_SECRET = import.meta.env.VITE_ADMIN_SECRET || ''
-const API_BASE     = import.meta.env.VITE_API_URL || 'http://localhost:3001'
-
-async function adminFetch(path, options = {}) {
-  const res = await fetch(`${API_BASE}${path}`, {
-    ...options,
-    headers: { 'Content-Type': 'application/json', 'X-Admin-Secret': ADMIN_SECRET, ...(options.headers || {}) },
-  })
-  if (!res.ok) {
-    const err = await res.json().catch(() => ({ error: `HTTP ${res.status}` }))
-    throw new Error(err.error || `HTTP ${res.status}`)
-  }
-  return res.json()
-}
 
 // ─── Coach Plan View — isolated component so crashes don't black the whole panel ──
 function PlanView({ plan, completions, coachWeekIdx, setCoachWeekIdx, currentWeekNum, onSessionClick, onDeleteSession, onRescheduleSession, objective }) {

@@ -2,20 +2,8 @@ import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { supabase } from '../../lib/supabase'
 import { SESSION_TYPE_COLORS } from '../../lib/utils'
+import { adminFetch } from '../../lib/adminFetch'
 import LoadingSpinner from '../../components/UI/LoadingSpinner'
-
-const ADMIN_SECRET = import.meta.env.VITE_ADMIN_SECRET || ''
-const API_BASE     = import.meta.env.VITE_API_URL || 'http://localhost:3001'
-
-async function adminFetch(path, options = {}) {
-  const res = await fetch(`${API_BASE}${path}`, {
-    ...options,
-    headers: { 'Content-Type': 'application/json', 'X-Admin-Secret': ADMIN_SECRET, ...(options.headers || {}) },
-  })
-  const body = await res.json().catch(() => ({}))
-  if (!res.ok) throw new Error(body.error || `HTTP ${res.status}`)
-  return body
-}
 
 const SESSION_TYPES_PLANS = [
   'Endurance fondamentale','Footing progressif','Sortie longue','Fractionné court','Fractionné long',
