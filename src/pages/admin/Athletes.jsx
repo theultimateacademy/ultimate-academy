@@ -2572,7 +2572,7 @@ export default function AdminAthletes() {
                   </td>
                   <td>{OBJECTIVE_LABELS[a.objective] || '—'}</td>
                   <td>{LEVEL_LABELS[a.level] || '—'}</td>
-                  <td><span className={`badge ${a.subscription_status === 'active' ? 'badge-success' : 'badge-warning'}`}>{a.subscription_status === 'active' ? 'Actif' : a.subscription_status || 'Inactif'}</span></td>
+                  <td><span className={`badge ${a.subscription_status === 'active' ? 'badge-success' : 'badge-warning'}`}>{({ active: 'Actif', trialing: 'Essai', cancelling: 'Résiliation en cours', canceled: 'Annulé' }[a.subscription_status] || a.subscription_status || 'Inactif')}</span></td>
                   <td style={{ color:'var(--text-muted)', fontSize:'.875rem' }}>{new Date(a.created_at).toLocaleDateString('fr-FR')}</td>
                   <td>
                     <div style={{ display:'flex', gap:'.4rem' }}>

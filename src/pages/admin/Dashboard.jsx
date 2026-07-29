@@ -563,7 +563,7 @@ export default function AdminDashboard() {
                   </div>
                 </div>
                 <span className={`badge ${a.subscription_status === 'active' ? 'badge-success' : 'badge-warning'}`}>
-                  {a.subscription_status === 'active' ? 'Actif' : a.subscription_status}
+                  {({ active: 'Actif', trialing: 'Essai', cancelling: 'Résiliation en cours', canceled: 'Annulé' }[a.subscription_status] || a.subscription_status || 'Inactif')}
                 </span>
               </div>
             ))}
