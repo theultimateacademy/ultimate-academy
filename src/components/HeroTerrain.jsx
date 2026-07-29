@@ -55,9 +55,9 @@ export default function HeroTerrain() {
     const H = mountRef.current.clientHeight
 
     // ── Scène ──────────────────────────────────────────────────────────────
-    const scene    = new THREE.Scene()
-    scene.fog      = new THREE.FogExp2(0x0a0a0a, 0.018)
-    scene.background = new THREE.Color(0x0a0a0a)
+    const scene = new THREE.Scene()
+    scene.fog   = new THREE.FogExp2(0x000000, 0.018)
+    // Pas de scene.background → le dégradé CSS du hero est visible
 
     const camera = new THREE.PerspectiveCamera(60, W / H, 0.1, 1000)
     camera.position.set(0, 30, 60)
