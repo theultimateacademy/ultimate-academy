@@ -1,8 +1,9 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 
 const grad = 'linear-gradient(135deg,#8B2FC9,#E8237A)'
 const gText = { background: grad, WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text' }
+const API   = import.meta.env.VITE_API_URL || 'http://localhost:3001'
 
 const FEATURES_RUNNING_TRAIL = [
   "Plan d'entraînement 100% personnalisé",
@@ -28,8 +29,19 @@ function Check() {
 export default function SportSelect() {
   const navigate = useNavigate()
   const [showSubChoice, setShowSubChoice] = useState(false)
+  const [quotaFull,     setQuotaFull]     = useState(false)
+  const [quotaLoading,  setQuotaLoading]  = useState(true)
+
+  useEffect(() => {
+    fetch(`${API}/api/admin/quota`)
+      .then(r => r.json())
+      .then(d => setQuotaFull(d.full === true))
+      .catch(() => {})
+      .finally(() => setQuotaLoading(false))
+  }, [])
 
   const handleSport = (sport) => {
+    if (quotaFull) return
     localStorage.setItem('sport_type', sport)
     navigate(`/register?sport=${sport}`)
   }
@@ -53,6 +65,36 @@ export default function SportSelect() {
       </header>
 
       <main style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '2rem 1.5rem' }}>
+
+        {/* ── Quota complet ── */}
+        {!quotaLoading && quotaFull && (
+          <div style={{ maxWidth: 520, width: '100%', textAlign: 'center' }}>
+            <div style={{ fontSize: '3.5rem', marginBottom: '1.25rem' }}>🙏</div>
+            <h1 style={{ fontSize: 'clamp(1.6rem,4vw,2.2rem)', fontWeight: 800, letterSpacing: '-0.03em', marginBottom: '1rem', lineHeight: 1.2 }}>
+              Je suis désolé, j'ai atteint<br /><span style={gText}>mon quota d'athlètes</span>
+            </h1>
+            <p style={{ color: 'rgba(255,255,255,.6)', fontSize: '1rem', lineHeight: 1.7, marginBottom: '1.5rem' }}>
+              Pour garantir un suivi de qualité à chaque athlète, je limite le nombre de personnes que j'accompagne simultanément. Les places se libèrent régulièrement — n'hésite pas à revenir consulter cette page.
+            </p>
+            <div style={{ background: 'rgba(139,47,201,.12)', border: '1px solid rgba(139,47,201,.35)', borderRadius: 16, padding: '1.25rem 1.5rem', marginBottom: '2rem' }}>
+              <p style={{ margin: 0, fontSize: '.95rem', color: 'rgba(255,255,255,.75)', lineHeight: 1.6 }}>
+                📸 Suis-moi sur Instagram <strong style={{ color: '#fff' }}>@alexis_ultimate_academy</strong> — je publie dès qu'une nouvelle place se libère.
+              </p>
+            </div>
+            <p style={{ color: 'rgba(255,255,255,.5)', fontSize: '.9rem', marginBottom: '1.5rem' }}>
+              En attendant, prépare-toi avec un plan optimisé grâce à mes ebooks :
+            </p>
+            <Link
+              to="/ebooks"
+              style={{ display: 'inline-block', padding: '.85rem 2rem', borderRadius: 12, background: grad, color: '#fff', fontWeight: 700, fontSize: '1rem', textDecoration: 'none', boxShadow: '0 6px 20px rgba(232,35,122,.3)' }}
+            >
+              Découvrir les ebooks →
+            </Link>
+          </div>
+        )}
+
+        {/* ── Contenu normal (chargement ou quota non atteint) ── */}
+        {!quotaFull && <>
         <p style={{ fontSize: '.78rem', fontWeight: 700, letterSpacing: '.12em', textTransform: 'uppercase', color: 'rgba(255,255,255,.4)', marginBottom: '.75rem' }}>
           Étape 1 sur 2
         </p>
@@ -178,6 +220,7 @@ export default function SportSelect() {
         <p style={{ marginTop: '2.5rem', fontSize: '.78rem', color: 'rgba(255,255,255,.3)', textAlign: 'center' }}>
           Carte requise · aucun débit pendant 14 jours · annulable avant la fin de l'essai
         </p>
+        </>}
       </main>
 
       <footer style={{ padding: '1.5rem', textAlign: 'center' }}>

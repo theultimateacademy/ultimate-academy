@@ -86,6 +86,22 @@ async function requireAdmin(req, res, next) {
   return res.status(401).json({ error: 'Non autorisé' });
 }
 
+// ─── Route publique — quota athlètes (pas de protection, pas de données sensibles) ──
+const ATHLETE_QUOTA = 20;
+router.get('/quota', async (req, res) => {
+  try {
+    const { count, error } = await supabaseAdmin
+      .from('profiles')
+      .select('id', { count: 'exact', head: true })
+      .eq('role', 'athlete')
+      .in('subscription_status', ['active', 'trialing']);
+    if (error) throw error;
+    res.json({ quota: ATHLETE_QUOTA, current: count || 0, full: (count || 0) >= ATHLETE_QUOTA });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 router.use(requireAdmin);
 // ────────────────────────────────────────────────────────────────────────────
 
