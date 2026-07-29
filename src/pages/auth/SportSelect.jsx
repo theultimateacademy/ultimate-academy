@@ -74,11 +74,11 @@ export default function SportSelect() {
               Je suis désolé, j'ai atteint<br /><span style={gText}>mon quota d'athlètes</span>
             </h1>
             <p style={{ color: 'rgba(255,255,255,.6)', fontSize: '1rem', lineHeight: 1.7, marginBottom: '1.5rem' }}>
-              Pour garantir un suivi de qualité à chaque athlète, je limite le nombre de personnes que j'accompagne simultanément. Les places se libèrent régulièrement — n'hésite pas à revenir consulter cette page.
+              Pour garantir un suivi de qualité à chaque athlète, je limite le nombre de personnes que j'accompagne simultanément. Les places se libèrent régulièrement, n'hésite pas à revenir consulter cette page.
             </p>
             <div style={{ background: 'rgba(139,47,201,.12)', border: '1px solid rgba(139,47,201,.35)', borderRadius: 16, padding: '1.25rem 1.5rem', marginBottom: '2rem' }}>
               <p style={{ margin: 0, fontSize: '.95rem', color: 'rgba(255,255,255,.75)', lineHeight: 1.6 }}>
-                📸 Suis-moi sur Instagram <strong style={{ color: '#fff' }}>@alexis_ultimate_academy</strong> — je publie dès qu'une nouvelle place se libère.
+                📸 Suis-moi sur Instagram <strong style={{ color: '#fff' }}>@theultimateacademy</strong> et je publie dès qu'une nouvelle place se libère.
               </p>
             </div>
             <p style={{ color: 'rgba(255,255,255,.5)', fontSize: '.9rem', marginBottom: '1.5rem' }}>
