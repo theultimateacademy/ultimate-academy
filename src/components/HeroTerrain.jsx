@@ -44,7 +44,6 @@ export default function HeroTerrain() {
     const el = mountRef.current
     let W = el.clientWidth, H = el.clientHeight
 
-    // ── Renderer ──────────────────────────────────────────────────────────
     const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true })
     renderer.setSize(W, H)
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
@@ -52,123 +51,104 @@ export default function HeroTerrain() {
     el.appendChild(renderer.domElement)
 
     const scene  = new THREE.Scene()
-    scene.fog    = new THREE.FogExp2(0x000000, 0.014)
+    scene.fog    = new THREE.FogExp2(0x000000, 0.010)
 
     const camera = new THREE.PerspectiveCamera(55, W / H, 0.1, 800)
-    camera.position.set(0, 38, 100)
+    camera.position.set(0, 42, 110)
     camera.lookAt(0, 0, 0)
 
-    // ── Terrain fil-de-fer monochrome ─────────────────────────────────────
-    const SEG  = 100
-    const SIZE = 160
+    // ── Terrain avec vertex colors dégradé violet → rose ─────────────────
+    const SEG  = 110
+    const SIZE = 180
     const geo  = new THREE.PlaneGeometry(SIZE, SIZE, SEG, SEG)
     geo.rotateX(-Math.PI / 2)
 
-    const pos = geo.attributes.position
+    const pos     = geo.attributes.position
+    const colArr  = []
     const heights = []
+
+    const colorLow  = new THREE.Color(0x1a0030)   // fond sombre violet profond
+    const colorMid  = new THREE.Color(0x8B2FC9)   // violet vif
+    const colorHigh = new THREE.Color(0xFF2D78)   // rose vif
+
+    const col = new THREE.Color()
 
     for (let i = 0; i < pos.count; i++) {
       const x = pos.getX(i) / SIZE
       const z = pos.getZ(i) / SIZE
-      const h = fbm(x * 3.2 + 1.1, z * 3.2 + 0.9, 6) * 32
-             + fbm(x * 7.5 + 2.3, z * 7.5 + 1.8, 3) * 7
+      const h = fbm(x * 3.2 + 1.1, z * 3.2 + 0.9, 6) * 34
+             + fbm(x * 7.5 + 2.3, z * 7.5 + 1.8, 3) * 8
       pos.setY(i, h)
       heights.push(h)
+
+      // Dégradé en 2 étapes : bas→violet, violet→rose
+      const tNorm = THREE.MathUtils.clamp((h + 2) / 36, 0, 1)
+      if (tNorm < 0.45) {
+        col.lerpColors(colorLow, colorMid, tNorm / 0.45)
+      } else {
+        col.lerpColors(colorMid, colorHigh, (tNorm - 0.45) / 0.55)
+      }
+      colArr.push(col.r, col.g, col.b)
     }
+
+    geo.setAttribute('color', new THREE.Float32BufferAttribute(colArr, 3))
     geo.computeVertexNormals()
 
-    // Matériau wireframe blanc très transparent
-    const terrainMat = new THREE.MeshBasicMaterial({
-      color: 0xffffff,
-      wireframe: true,
-      transparent: true,
-      opacity: 0.07,
+    // Surface pleine avec vertex colors
+    const terrainMat = new THREE.MeshPhongMaterial({
+      vertexColors: true,
+      shininess: 35,
+      specular: new THREE.Color(0xffffff),
     })
     const terrain = new THREE.Mesh(geo, terrainMat)
     scene.add(terrain)
 
-    // ── Même terrain, surface pleine sombre pour effet de profondeur ───────
-    const solidMat = new THREE.MeshPhongMaterial({
-      color: 0x0a0a12,
-      shininess: 0,
-      side: THREE.FrontSide,
+    // Wireframe par-dessus — blanc très léger pour accentuer les arêtes
+    const wireMat = new THREE.MeshBasicMaterial({
+      color: 0xffffff,
+      wireframe: true,
+      transparent: true,
+      opacity: 0.04,
     })
-    const solid = new THREE.Mesh(geo, solidMat)
-    solid.position.y = -0.1
-    scene.add(solid)
-
-    // ── Lignes de niveau (isolignes) style topo ────────────────────────────
-    // On trace des lignes horizontales pour chaque seuil d'altitude
-    const LEVELS = [2, 6, 10, 14, 18, 22, 26]
-    const isoGroup = new THREE.Group()
-
-    LEVELS.forEach((level, li) => {
-      const t     = li / (LEVELS.length - 1)
-      const color = new THREE.Color().lerpColors(
-        new THREE.Color(0x5522aa),
-        new THREE.Color(0xdd2277),
-        t
-      )
-      const verts = []
-      // Parcourir chaque quad du terrain
-      for (let row = 0; row < SEG; row++) {
-        for (let col = 0; col < SEG; col++) {
-          const idx = (v, r, c) => {
-            const ii = (r * (SEG + 1) + c)
-            return {
-              x: pos.getX(ii), y: pos.getY(ii), z: pos.getZ(ii), h: heights[ii],
-            }
-          }
-          const a = idx(0, row,   col),   b = idx(0, row,   col+1)
-          const c2 = idx(0, row+1, col), d = idx(0, row+1, col+1)
-          const edges = [
-            [a, b], [b, d], [d, c2], [c2, a],
-          ]
-          edges.forEach(([p1, p2]) => {
-            if ((p1.h - level) * (p2.h - level) < 0) {
-              const frac = (level - p1.h) / (p2.h - p1.h)
-              verts.push(
-                p1.x + frac * (p2.x - p1.x),
-                level + 0.15,
-                p1.z + frac * (p2.z - p1.z)
-              )
-            }
-          })
-        }
-      }
-      if (verts.length === 0) return
-      const isoGeo = new THREE.BufferGeometry()
-      isoGeo.setAttribute('position', new THREE.BufferAttribute(new Float32Array(verts), 3))
-      const isoMat = new THREE.LineBasicMaterial({
-        color, transparent: true,
-        opacity: 0.28 + t * 0.18,
-      })
-      isoGroup.add(new THREE.LineSegments(isoGeo, isoMat))
-    })
-    scene.add(isoGroup)
+    const wire = new THREE.Mesh(geo, wireMat)
+    wire.position.y = 0.08
+    scene.add(wire)
 
     // ── Lumières ──────────────────────────────────────────────────────────
-    const keyLight = new THREE.DirectionalLight(0xffffff, 0.9)
-    keyLight.position.set(30, 80, 40)
+    // Lumière principale depuis le haut
+    const keyLight = new THREE.DirectionalLight(0xffffff, 1.4)
+    keyLight.position.set(20, 90, 40)
     scene.add(keyLight)
-    scene.add(new THREE.PointLight(0x8B2FC9, 1.2, 250))
-    const fillLight = new THREE.PointLight(0xE8237A, 0.5, 180)
-    fillLight.position.set(-40, 20, -20)
-    scene.add(fillLight)
-    scene.add(new THREE.AmbientLight(0x0a0818, 1.2))
 
-    // ── Particules très légères ────────────────────────────────────────────
-    const STARS = 160
+    // Lumière rose latérale pour accentuer les reliefs
+    const pinkLight = new THREE.PointLight(0xFF2D78, 2.5, 280)
+    pinkLight.position.set(-60, 30, -40)
+    scene.add(pinkLight)
+
+    // Lumière violette de remplissage
+    const purpleLight = new THREE.PointLight(0x8B2FC9, 2.0, 260)
+    purpleLight.position.set(60, 40, 20)
+    scene.add(purpleLight)
+
+    // Lumière froide légère par dessous pour les vallées
+    const bottomLight = new THREE.PointLight(0x220044, 1.0, 200)
+    bottomLight.position.set(0, -20, 0)
+    scene.add(bottomLight)
+
+    scene.add(new THREE.AmbientLight(0x110022, 1.5))
+
+    // ── Particules légères ────────────────────────────────────────────────
+    const STARS = 140
     const stGeo = new THREE.BufferGeometry()
     const stPos = new Float32Array(STARS * 3)
     for (let i = 0; i < STARS; i++) {
-      stPos[i*3]   = (Math.random() - 0.5) * SIZE * 1.4
-      stPos[i*3+1] = 10 + Math.random() * 60
-      stPos[i*3+2] = (Math.random() - 0.5) * SIZE * 1.4
+      stPos[i*3]   = (Math.random() - 0.5) * SIZE * 1.5
+      stPos[i*3+1] = 12 + Math.random() * 70
+      stPos[i*3+2] = (Math.random() - 0.5) * SIZE * 1.5
     }
     stGeo.setAttribute('position', new THREE.BufferAttribute(stPos, 3))
     scene.add(new THREE.Points(stGeo,
-      new THREE.PointsMaterial({ color: 0xffffff, size: 0.5, transparent: true, opacity: 0.18, sizeAttenuation: true })
+      new THREE.PointsMaterial({ color: 0xffffff, size: 0.55, transparent: true, opacity: 0.22, sizeAttenuation: true })
     ))
 
     // ── Scroll / Souris ────────────────────────────────────────────────────
@@ -201,24 +181,25 @@ export default function HeroTerrain() {
     let raf, t = 0
     const animate = () => {
       raf = requestAnimationFrame(animate)
-      t += 0.005
+      t += 0.004
 
-      // Rotation lente du terrain
-      terrain.rotation.y += 0.0005
-      solid.rotation.y    = terrain.rotation.y
-      isoGroup.rotation.y = terrain.rotation.y
+      // Rotation lente
+      terrain.rotation.y += 0.0004
+      wire.rotation.y     = terrain.rotation.y
 
-      // Caméra : réaction souris douce
-      camX += (mx * 10 - camX) * 0.03
-      camY += (-my * 6  - camY) * 0.03
+      // Caméra suit souris
+      camX += (mx * 10 - camX) * 0.028
+      camY += (-my * 6  - camY) * 0.028
       camera.position.x = camX
-      camera.position.y = 38 + camY
-      camera.position.z = 100 - scrollY * 0.012
-      camera.lookAt(camX * 0.06, camY * 0.06, 0)
+      camera.position.y = 42 + camY
+      camera.position.z = 110 - scrollY * 0.012
+      camera.lookAt(camX * 0.05, camY * 0.05, 0)
 
-      // Lumière fill qui tourne
-      fillLight.position.x = Math.cos(t * 0.4) * 50
-      fillLight.position.z = Math.sin(t * 0.4) * 50
+      // Lumières tournent lentement autour du terrain
+      pinkLight.position.x   = Math.cos(t * 0.35) * 70
+      pinkLight.position.z   = Math.sin(t * 0.35) * 60
+      purpleLight.position.x = Math.cos(t * 0.35 + Math.PI) * 70
+      purpleLight.position.z = Math.sin(t * 0.35 + Math.PI) * 60
 
       renderer.render(scene, camera)
     }
