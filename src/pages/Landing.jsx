@@ -3,7 +3,6 @@ import { useState, useEffect, useRef } from 'react'
 import { useAuth } from '../contexts/AuthContext'
 import Nav from '../components/Nav'
 import SiteFooter from '../components/SiteFooter'
-import HeroTerrain from '../components/HeroTerrain'
 
 const TOOLS = [
   { label: 'Temps de passage',        path: '/calculateur' },
@@ -303,11 +302,8 @@ export default function Landing() {
         minHeight: '100dvh', display: 'flex', flexDirection: 'column',
         alignItems: 'center', justifyContent: 'center', textAlign: 'center',
         padding: '7rem 1.5rem 4rem', position: 'relative', overflow: 'hidden',
-        background: 'radial-gradient(ellipse at 50% 60%, #1a0828 0%, #0d0010 45%, #000000 100%)',
+        background: '#000',
       }}>
-        {/* Terrain 3D Three.js */}
-        <HeroTerrain />
-
         {/* Particules CSS */}
         {PARTICLES.map(p => (
           <div key={p.id} style={{
