@@ -303,7 +303,7 @@ export default function Landing() {
         minHeight: '100dvh', display: 'flex', flexDirection: 'column',
         alignItems: 'center', justifyContent: 'center', textAlign: 'center',
         padding: '7rem 1.5rem 4rem', position: 'relative', overflow: 'hidden',
-        background: '#0a0a0a',
+        background: 'radial-gradient(ellipse at 50% 60%, #1a0828 0%, #0d0010 45%, #000000 100%)',
       }}>
         {/* Terrain 3D Three.js */}
         <HeroTerrain />
@@ -319,11 +319,11 @@ export default function Landing() {
           }} />
         ))}
 
-        {/* Glow rose */}
+        {/* Glow violet centre */}
         <div style={{
-          position: 'absolute', top: '60%', left: '65%', transform: 'translate(-50%,-50%)',
-          width: 600, height: 500, pointerEvents: 'none',
-          background: 'radial-gradient(ellipse, rgba(232,35,122,.09) 0%, transparent 65%)',
+          position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%,-50%)',
+          width: 900, height: 700, pointerEvents: 'none',
+          background: 'radial-gradient(ellipse, rgba(139,47,201,.13) 0%, rgba(232,35,122,.06) 40%, transparent 70%)',
         }} />
 
         {/* Contenu hero */}
