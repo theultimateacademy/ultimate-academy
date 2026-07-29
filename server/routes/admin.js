@@ -381,4 +381,21 @@ router.post('/monthly-analysis', async (req, res) => {
   }
 });
 
+// POST /api/admin/athletes/:id/free-activate — activer un athlète gratuitement (coach uniquement)
+router.post('/athletes/:id/free-activate', async (req, res) => {
+  const { id } = req.params;
+  if (!id) return res.status(400).json({ error: 'Missing athlete id' });
+  try {
+    const { error } = await supabaseAdmin
+      .from('profiles')
+      .update({ subscription_status: 'active' })
+      .eq('id', id);
+    if (error) throw error;
+    console.log(`[Admin] Athlète ${id} activé gratuitement par le coach`);
+    res.json({ ok: true });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 module.exports = router;

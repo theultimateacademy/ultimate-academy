@@ -900,8 +900,24 @@ function AthleteDetailPanel({ athlete, onClose, onUpdated, onAlertDismissed }) {
     setSaveToast({ text, ok })
     setTimeout(() => setSaveToast(null), 3000)
   }
-  const [sessionSaving, setSessionSaving] = useState(false)
-  const [openSession,   setOpenSession]   = useState(null)
+
+  async function freeActivate() {
+    if (!window.confirm(`Activer gratuitement ${local.first_name} ${local.last_name} ?`)) return
+    setFreeActivating(true)
+    try {
+      await adminFetch(`/api/admin/athletes/${local.id}/free-activate`, { method: 'POST' })
+      setLocal(prev => ({ ...prev, subscription_status: 'active' }))
+      showSaveToast(`${local.first_name} activé(e) gratuitement`)
+    } catch (err) {
+      showSaveToast('Erreur : ' + err.message, false)
+    } finally {
+      setFreeActivating(false)
+    }
+  }
+
+  const [sessionSaving,    setSessionSaving]    = useState(false)
+  const [openSession,      setOpenSession]      = useState(null)
+  const [freeActivating,   setFreeActivating]   = useState(false)
   const [openRetour,    setOpenRetour]    = useState(null)
   const [coachWeekIdx, setCoachWeekIdx]  = useState(0)  // active week tab in plan view
   const [retourWeek,   setRetourWeek]    = useState(null) // selected week in retours tab
@@ -1214,10 +1230,20 @@ function AthleteDetailPanel({ athlete, onClose, onUpdated, onAlertDismissed }) {
             {local.email} · {OBJECTIVE_LABELS[local.objective] || '—'} · {LEVEL_LABELS[local.level] || '—'}
           </div>
         </div>
-        <div className="coach-panel-badges" style={{ display:'flex', gap:'.4rem', flexShrink:0, flexWrap:'wrap' }}>
+        <div className="coach-panel-badges" style={{ display:'flex', gap:'.4rem', flexShrink:0, flexWrap:'wrap', alignItems:'center' }}>
           <span className={`badge ${local.subscription_status === 'active' ? 'badge-success' : 'badge-warning'}`}>
             {local.subscription_status === 'active' ? '✓ Actif' : 'Inactif'}
           </span>
+          {local.subscription_status !== 'active' && (
+            <button
+              onClick={freeActivate}
+              disabled={freeActivating}
+              style={{ padding:'.3rem .75rem', borderRadius:8, border:'1px solid rgba(16,185,129,.4)',
+                background:'rgba(16,185,129,.1)', color:'#10B981', fontWeight:600, fontSize:'.75rem',
+                cursor:'pointer', fontFamily:'inherit', whiteSpace:'nowrap' }}>
+              {freeActivating ? '…' : '🎁 Activer gratuitement'}
+            </button>
+          )}
           {plan && <span className={`badge ${plan.status === 'active' ? 'badge-success' : 'badge-warning'}`}>
             Plan {plan.status === 'active' ? 'actif' : 'en attente'}
           </span>}
