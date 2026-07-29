@@ -176,8 +176,8 @@ body { font-family: 'Poppins', sans-serif; color: #fff; -webkit-print-color-adju
 .page-intro{font-size:10pt;color:rgba(255,255,255,.72);line-height:1.6;text-align:justify;flex-shrink:0;}
 
 /* ── blessures ── */
-.blessure-grid{flex:1;display:grid;grid-template-columns:1fr 1fr;gap:7px;min-height:0;}
-.blessure-card{border-radius:10px;padding:8px 10px;display:flex;flex-direction:column;gap:3px;border:1px solid;overflow:hidden;min-height:0;}
+.blessure-grid{display:grid;grid-template-columns:1fr 1fr;gap:7px;align-content:start;}
+.blessure-card{border-radius:10px;padding:8px 10px;display:flex;flex-direction:column;gap:3px;border:1px solid;overflow:hidden;}
 .bl-header{display:flex;align-items:center;gap:7px;flex-shrink:0;}
 .bl-icon{width:30px;height:30px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0;}
 .bl-title{font-size:10pt;font-weight:800;line-height:1.2;}
@@ -201,7 +201,7 @@ body { font-family: 'Poppins', sans-serif; color: #fff; -webkit-print-color-adju
 .exo-tip{font-size:9pt;color:rgba(255,255,255,.38);font-style:italic;margin-top:2px;}
 
 /* ── étirements ── */
-.etir-grid{flex:1;display:grid;grid-template-columns:1fr 1fr 1fr;gap:7px;min-height:0;}
+.etir-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:7px;align-content:start;}
 .etir-card{border-radius:10px;padding:8px 10px;display:flex;flex-direction:column;gap:3px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);overflow:hidden;}
 .etir-header{display:flex;align-items:center;gap:8px;flex-shrink:0;}
 .etir-icon{font-size:22px;flex-shrink:0;}
