@@ -72,7 +72,7 @@ app.use('/api/dev',     devRoutes);
 app.use('/api/admin',  adminRoutes);
 app.use('/api/blog',   blogRoutes);
 app.use('/api/ebooks', ebookRoutes);
-app.use('/public/ebooks', express.static(require('path').join(__dirname, '../public/ebooks')));
+// Les PDFs ebooks ne sont PAS servis en statique — ils sont envoyés uniquement par email après paiement.
 
 app.get('/health', (req, res) => res.json({ status: 'ok' }));
 

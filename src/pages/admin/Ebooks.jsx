@@ -1,6 +1,30 @@
 import { useState, useEffect } from 'react'
 
-const API = import.meta.env.VITE_API_URL || 'http://localhost:3001'
+const API          = import.meta.env.VITE_API_URL || 'http://localhost:3001'
+const ADMIN_SECRET = import.meta.env.VITE_ADMIN_SECRET || ''
+
+async function adminFetch(path, options = {}) {
+  const res = await fetch(`${API}${path}`, {
+    ...options,
+    headers: { 'Content-Type': 'application/json', 'X-Admin-Secret': ADMIN_SECRET, ...(options.headers || {}) },
+  })
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({ error: `HTTP ${res.status}` }))
+    throw new Error(err.error || `HTTP ${res.status}`)
+  }
+  return res.json()
+}
+
+// Ouvre un PDF protégé via fetch blob (window.open ne peut pas envoyer de headers)
+async function openAdminPdf(path) {
+  const res = await fetch(`${API}${path}`, {
+    headers: { 'X-Admin-Secret': ADMIN_SECRET },
+  })
+  if (!res.ok) { alert('PDF introuvable'); return }
+  const blob = await res.blob()
+  const url  = URL.createObjectURL(blob)
+  window.open(url, '_blank')
+}
 
 const STATUS_LABELS = { pending: 'En attente', paid: 'Payé', sent: 'Envoyé' }
 const STATUS_COLORS = { pending: '#F59E0B', paid: '#06B6D4', sent: '#10B981' }
@@ -32,7 +56,7 @@ const SEANCES_OPTIONS = [3, 4, 5, 6]
 
 // Ebook à PDF unique (pas de variante VMA/séances)
 function SimpleEbookCard({ slug, label, icon }) {
-  const handleOpen = () => window.open(`${API}/api/ebooks/admin/pdf/${slug}`, '_blank')
+  const handleOpen = () => openAdminPdf(`/api/ebooks/admin/pdf/${slug}`)
   return (
     <div className="card" style={{ padding: '1.25rem', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: '.6rem' }}>
@@ -54,10 +78,7 @@ function EbookCard({ slug, label, icon }) {
   const [vma, setVma] = useState('14.0')
   const [seances, setSeances] = useState(4)
 
-  const handleOpen = () => {
-    const url = `${API}/api/ebooks/admin/pdf/${slug}/${vma}/${seances}`
-    window.open(url, '_blank')
-  }
+  const handleOpen = () => openAdminPdf(`/api/ebooks/admin/pdf/${slug}/${vma}/${seances}`)
 
   return (
     <div className="card" style={{ padding: '1.25rem', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
@@ -109,8 +130,8 @@ export default function AdminEbooks() {
     setLoading(true)
     try {
       const [s, p] = await Promise.all([
-        fetch(`${API}/api/ebooks/admin/stats`).then(r => r.json()),
-        fetch(`${API}/api/ebooks/admin/purchases`).then(r => r.json()),
+        adminFetch('/api/ebooks/admin/stats'),
+        adminFetch('/api/ebooks/admin/purchases'),
       ])
       setStats(s)
       setPurchases(p.purchases || [])
@@ -122,7 +143,7 @@ export default function AdminEbooks() {
   async function toggleActive(id) {
     setToggling(id)
     try {
-      await fetch(`${API}/api/ebooks/admin/${id}/toggle`, { method: 'PATCH' })
+      await adminFetch(`/api/ebooks/admin/${id}/toggle`, { method: 'PATCH' })
       await load()
     } finally {
       setToggling(null)
@@ -133,7 +154,7 @@ export default function AdminEbooks() {
     if (!confirm('Supprimer cet achat ?')) return
     setDeleting(id)
     try {
-      await fetch(`${API}/api/ebooks/admin/purchases/${id}`, { method: 'DELETE' })
+      await adminFetch(`/api/ebooks/admin/purchases/${id}`, { method: 'DELETE' })
       setPurchases(prev => prev.filter(p => p.id !== id))
     } finally {
       setDeleting(null)

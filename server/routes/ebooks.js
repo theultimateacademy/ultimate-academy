@@ -8,6 +8,14 @@ const router  = express.Router();
 const stripe  = new Stripe(process.env.STRIPE_SECRET_KEY);
 const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_KEY);
 
+function requireAdmin(req, res, next) {
+  const secret = req.headers['x-admin-secret'];
+  if (!secret || secret !== process.env.ADMIN_SECRET) {
+    return res.status(401).json({ error: 'Non autorisé' });
+  }
+  next();
+}
+
 const _rawClientUrl = process.env.CLIENT_URL || 'https://theultimateacademy.fr';
 const CLIENT_URL = _rawClientUrl.startsWith('http') ? _rawClientUrl.replace(/\/$/, '') : `https://${_rawClientUrl.replace(/\/$/, '')}`;
 if (!CLIENT_URL.startsWith('https://')) console.warn('[Ebooks] CLIENT_URL ne commence pas par https://', CLIENT_URL);
@@ -114,7 +122,7 @@ router.get('/', async (req, res) => {
 
 // ─── GET /api/ebooks/admin/pdf/:slug — accès PDF coach (ebook simple, pas de variante) ──
 
-router.get('/admin/pdf/:slug', async (req, res) => {
+router.get('/admin/pdf/:slug', requireAdmin, async (req, res) => {
   const { slug } = req.params;
   // Ebooks sans variante : chercher le pdf_path en DB
   const { data: ebook } = await supabase.from('ebooks').select('pdf_path').eq('slug', slug).single();
@@ -128,7 +136,7 @@ router.get('/admin/pdf/:slug', async (req, res) => {
 
 // ─── GET /api/ebooks/admin/pdf/:slug/:vma/:seances — accès PDF coach (variantes) ──────
 
-router.get('/admin/pdf/:slug/:vma/:seances', (req, res) => {
+router.get('/admin/pdf/:slug/:vma/:seances', requireAdmin, (req, res) => {
   const { slug, vma, seances } = req.params;
   const pdfPath = variantPdfPath(slug, vma, seances);
   if (!fs.existsSync(pdfPath)) return res.status(404).json({ error: 'PDF introuvable' });
@@ -262,7 +270,7 @@ router.post('/webhook', async (req, res) => {
 
 // ─── Admin routes ──────────────────────────────────────────────────────────────
 
-router.get('/admin/purchases', async (req, res) => {
+router.get('/admin/purchases', requireAdmin, async (req, res) => {
   try {
     const { data, error } = await supabase
       .from('ebook_purchases')
@@ -275,7 +283,7 @@ router.get('/admin/purchases', async (req, res) => {
   }
 });
 
-router.get('/admin/stats', async (req, res) => {
+router.get('/admin/stats', requireAdmin, async (req, res) => {
   try {
     const { data: ebooks } = await supabase.from('ebooks').select('id, title, slug, price_cents, active');
     const { data: purchases } = await supabase.from('ebook_purchases').select('ebook_id, status');
@@ -292,7 +300,7 @@ router.get('/admin/stats', async (req, res) => {
   }
 });
 
-router.delete('/admin/purchases/:id', async (req, res) => {
+router.delete('/admin/purchases/:id', requireAdmin, async (req, res) => {
   try {
     const { error } = await supabase.from('ebook_purchases').delete().eq('id', req.params.id);
     if (error) throw error;
@@ -302,7 +310,7 @@ router.delete('/admin/purchases/:id', async (req, res) => {
   }
 });
 
-router.patch('/admin/:id/toggle', async (req, res) => {
+router.patch('/admin/:id/toggle', requireAdmin, async (req, res) => {
   try {
     const { data: current } = await supabase.from('ebooks').select('active').eq('id', req.params.id).single();
     const { data, error } = await supabase.from('ebooks').update({ active: !current?.active }).eq('id', req.params.id).select().single();
