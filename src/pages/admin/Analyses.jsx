@@ -3,7 +3,20 @@ import { supabase } from '../../lib/supabase'
 import LoadingSpinner from '../../components/UI/LoadingSpinner'
 import { SESSION_TYPE_COLORS } from '../../lib/utils'
 
-const API = import.meta.env.VITE_API_URL || 'http://localhost:3001'
+const API          = import.meta.env.VITE_API_URL || 'http://localhost:3001'
+const ADMIN_SECRET = import.meta.env.VITE_ADMIN_SECRET || ''
+
+async function adminFetch(path, options = {}) {
+  const res = await fetch(`${API}${path}`, {
+    ...options,
+    headers: { 'Content-Type': 'application/json', 'X-Admin-Secret': ADMIN_SECRET, ...(options.headers || {}) },
+  })
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({ error: `HTTP ${res.status}` }))
+    throw new Error(err.error || `HTTP ${res.status}`)
+  }
+  return res.json()
+}
 
 function lastMonthLabel() {
   const d = new Date()
@@ -489,13 +502,10 @@ export default function AdminAnalyses() {
     if (!monthSelectedAthlete) return
     setMonthCreating(true)
     try {
-      const res = await fetch(`${API}/api/admin/monthly-analysis`, {
+      const json = await adminFetch('/api/admin/monthly-analysis', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ user_id: monthSelectedAthlete, month_label: monthLabel }),
       })
-      const json = await res.json()
-      if (json.error) throw new Error(json.error)
       setShowMonthForm(false)
       setMonthSelectedAthlete('')
       loadAnalyses()

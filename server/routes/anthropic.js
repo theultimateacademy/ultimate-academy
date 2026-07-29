@@ -6,6 +6,15 @@ const router   = express.Router();
 const client   = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
 const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_KEY);
 
+// ─── Middleware admin (routes réservées au coach ou aux CRONs internes) ─────
+// Accepte soit le header X-Admin-Secret, soit le flag _internal dans le body
+function requireAdminOrInternal(req, res, next) {
+  const secret   = req.headers['x-admin-secret'];
+  const internal = req.body?._internal === true;
+  if (internal || (secret && secret === process.env.ADMIN_SECRET)) return next();
+  return res.status(401).json({ error: 'Non autorisé' });
+}
+
 // ─── Helpers ────────────────────────────────────────────────────────────────
 
 // Plans always start on a Monday. If created on Thu May 28, week 1 begins Mon Jun 1.
@@ -942,7 +951,7 @@ function buildSystemPrompt(libraryText) {
 
 // ─── POST /api/plans/generate ────────────────────────────────────────────────
 
-router.post('/plans/generate', async (req, res) => {
+router.post('/plans/generate', requireAdminOrInternal, async (req, res) => {
   const { userId, profile: clientProfile, clientDate } = req.body;
   if (!userId || !clientProfile) return res.status(400).json({ error: 'Missing data' });
 
@@ -2026,7 +2035,7 @@ Format JSON :
 
 // ─── POST /api/analyses/run-weekly  (cron trigger) ──────────────────────────
 
-router.post('/analyses/run-weekly', async (req, res) => {
+router.post('/analyses/run-weekly', requireAdminOrInternal, async (req, res) => {
   try {
     const { data: athletes } = await supabase
       .from('profiles')
@@ -2344,7 +2353,7 @@ Réponds en JSON strict (aucun texte autour) :
 
 // ─── POST /api/analyses/pre-race/run (cron) ─────────────────────────────────
 
-router.post('/analyses/pre-race/run', async (req, res) => {
+router.post('/analyses/pre-race/run', requireAdminOrInternal, async (req, res) => {
   try {
     const target = new Date();
     target.setDate(target.getDate() + 7);
@@ -2380,7 +2389,7 @@ router.post('/analyses/pre-race/run', async (req, res) => {
 
 // ─── POST /api/analyses/intermediate-post/run  (cron — J+2 after intermediate race) ─
 
-router.post('/analyses/intermediate-post/run', async (req, res) => {
+router.post('/analyses/intermediate-post/run', requireAdminOrInternal, async (req, res) => {
   try {
     const target = new Date();
     target.setDate(target.getDate() - 2);
@@ -2558,7 +2567,7 @@ router.get('/analyses/post-race/:userId', async (req, res) => {
 
 // ─── POST /api/messages/generate-response ───────────────────────────────────
 
-router.post('/messages/generate-response', async (req, res) => {
+router.post('/messages/generate-response', requireAdminOrInternal, async (req, res) => {
   const { athleteId, lastMessages } = req.body;
   if (!athleteId) return res.status(400).json({ error: 'Missing athleteId' });
 
@@ -2663,7 +2672,7 @@ router.post('/profile/update', async (req, res) => {
 // ─── POST /api/plans/generate-monthly ───────────────────────────────────────
 // Called by cron: generates pending plans for all active athletes who don't have one yet
 
-router.post('/plans/generate-monthly', async (req, res) => {
+router.post('/plans/generate-monthly', requireAdminOrInternal, async (req, res) => {
   console.log('[generate-monthly] Starting monthly plan generation…');
   res.json({ accepted: true }); // respond immediately so cron doesn't time out
 
@@ -2766,7 +2775,7 @@ router.post('/plans/schedule-regen', async (req, res) => {
 // ─── POST /api/plans/check-regen ─────────────────────────────────────────────
 // Called by cron every 15 min — regenerates plans for athletes who modified key fields
 
-router.post('/plans/check-regen', async (req, res) => {
+router.post('/plans/check-regen', requireAdminOrInternal, async (req, res) => {
   // Auto-regen disabled — coach generates plans manually
   return res.json({ processed: 0, disabled: true });
   try {

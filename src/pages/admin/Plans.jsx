@@ -4,6 +4,19 @@ import { supabase } from '../../lib/supabase'
 import { SESSION_TYPE_COLORS } from '../../lib/utils'
 import LoadingSpinner from '../../components/UI/LoadingSpinner'
 
+const ADMIN_SECRET = import.meta.env.VITE_ADMIN_SECRET || ''
+const API_BASE     = import.meta.env.VITE_API_URL || 'http://localhost:3001'
+
+async function adminFetch(path, options = {}) {
+  const res = await fetch(`${API_BASE}${path}`, {
+    ...options,
+    headers: { 'Content-Type': 'application/json', 'X-Admin-Secret': ADMIN_SECRET, ...(options.headers || {}) },
+  })
+  const body = await res.json().catch(() => ({}))
+  if (!res.ok) throw new Error(body.error || `HTTP ${res.status}`)
+  return body
+}
+
 const SESSION_TYPES_PLANS = [
   'Endurance fondamentale','Footing progressif','Sortie longue','Fractionné court','Fractionné long',
   'Tempo / Seuil','Côtes','Spécifique','Récupération active','Natation','Natation endurance',
@@ -36,12 +49,10 @@ function PlanModal({ plan, athlete, onClose, onActivate }) {
   async function saveSession(weekIdx, sessionIdx, updatedSession) {
     setSaving(true)
     try {
-      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/admin/plans/${plan.id}/session`, {
+      const body = await adminFetch(`/api/admin/plans/${plan.id}/session`, {
         method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ weekIdx, sessionIdx, updatedSession }),
       })
-      const body = await res.json()
       if (body.plan_data) setPlanData(body.plan_data)
       setEditTarget(null)
     } finally { setSaving(false) }
@@ -50,12 +61,10 @@ function PlanModal({ plan, athlete, onClose, onActivate }) {
   async function deleteSession(weekIdx, sessionIdx) {
     const ok = window.confirm('Supprimer cette séance ?')
     if (!ok) return
-    const res = await fetch(`${import.meta.env.VITE_API_URL}/api/admin/plans/${plan.id}/session`, {
+    const body = await adminFetch(`/api/admin/plans/${plan.id}/session`, {
       method: 'DELETE',
-      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ weekIdx, sessionIdx }),
     })
-    const body = await res.json()
     if (body.plan_data) setPlanData(body.plan_data)
     setEditTarget(null)
   }
@@ -386,13 +395,10 @@ export default function AdminPlans() {
     if (!athlete) return
     setGenerating(athlete.id)
     try {
-      const res  = await fetch('/api/plans/generate', {
+      const body = await adminFetch('/api/plans/generate', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ userId: athlete.id, profile: athlete })
+        body: JSON.stringify({ userId: athlete.id, profile: athlete }),
       })
-      const body = await res.json()
-      if (!res.ok) throw new Error(body.error)
       setShowGenForm(false)
       setSelectedAthlete('')
       await loadPlans()

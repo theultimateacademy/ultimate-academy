@@ -58,6 +58,19 @@ const supabase = createClient(
   { auth: { autoRefreshToken: false, persistSession: false } }
 );
 
+// ─── Middleware d'authentification coach ────────────────────────────────────
+// Toutes les routes /api/admin nécessitent le header X-Admin-Secret
+function requireAdmin(req, res, next) {
+  const secret = req.headers['x-admin-secret'];
+  if (!secret || secret !== process.env.ADMIN_SECRET) {
+    return res.status(401).json({ error: 'Non autorisé' });
+  }
+  next();
+}
+
+router.use(requireAdmin);
+// ────────────────────────────────────────────────────────────────────────────
+
 // PATCH /api/admin/profile/:id — coach updates athlete profile (bypasses RLS via service key)
 router.patch('/profile/:id', async (req, res) => {
   const { id } = req.params;

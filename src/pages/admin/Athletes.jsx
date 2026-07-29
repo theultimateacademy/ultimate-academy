@@ -4,6 +4,21 @@ import { OBJECTIVE_LABELS, LEVEL_LABELS, SESSION_TYPE_COLORS } from '../../lib/u
 import { api } from '../../lib/api'
 import LoadingSpinner from '../../components/UI/LoadingSpinner'
 
+const ADMIN_SECRET = import.meta.env.VITE_ADMIN_SECRET || ''
+const API_BASE     = import.meta.env.VITE_API_URL || 'http://localhost:3001'
+
+async function adminFetch(path, options = {}) {
+  const res = await fetch(`${API_BASE}${path}`, {
+    ...options,
+    headers: { 'Content-Type': 'application/json', 'X-Admin-Secret': ADMIN_SECRET, ...(options.headers || {}) },
+  })
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({ error: `HTTP ${res.status}` }))
+    throw new Error(err.error || `HTTP ${res.status}`)
+  }
+  return res.json()
+}
+
 // ─── Coach Plan View — isolated component so crashes don't black the whole panel ──
 function PlanView({ plan, completions, coachWeekIdx, setCoachWeekIdx, currentWeekNum, onSessionClick, onDeleteSession, onRescheduleSession, objective }) {
   const DAY_NAMES  = ['Lundi','Mardi','Mercredi','Jeudi','Vendredi','Samedi','Dimanche']
@@ -928,9 +943,8 @@ function AthleteDetailPanel({ athlete, onClose, onUpdated, onAlertDismissed }) {
 
   async function loadBilans() {
     try {
-      const resp = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:3001'}/api/admin/weekly-bilans?userId=${athlete.id}`)
-      const body = await resp.json()
-      if (!resp.ok) throw new Error(body.error || 'Erreur')
+      const body = await adminFetch(`/api/admin/weekly-bilans?userId=${athlete.id}`)
+      if (!body) throw new Error('Erreur')
       setBilans(body.bilans || [])
       // Pre-fill responses
       const resps = {}
@@ -952,13 +966,11 @@ function AthleteDetailPanel({ athlete, onClose, onUpdated, onAlertDismissed }) {
     if (!response) return
     setBilanSaving(s => ({ ...s, [bilanId]: true }))
     try {
-      const resp = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:3001'}/api/admin/weekly-bilans/${bilanId}/response`, {
+      const body = await adminFetch(`/api/admin/weekly-bilans/${bilanId}/response`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ response }),
       })
-      const body = await resp.json()
-      if (!resp.ok) throw new Error(body.error || 'Erreur')
+      if (!body) throw new Error('Erreur')
       setBilans(bs => bs.map(b => b.id === bilanId ? { ...b, coach_response: response, coach_responded_at: new Date().toISOString() } : b))
       showSaveToast('Réponse envoyée')
     } catch (err) {
@@ -1013,12 +1025,11 @@ function AthleteDetailPanel({ athlete, onClose, onUpdated, onAlertDismissed }) {
   async function generatePlan() {
     setGenerating(true); setGenerateMsg('')
     try {
-      const res = await fetch('/api/plans/generate', {
-        method:'POST', headers:{'Content-Type':'application/json'},
+      const body = await adminFetch('/api/plans/generate', {
+        method: 'POST',
         body: JSON.stringify({ userId: athlete.id, profile: local, clientDate: new Date().toISOString().split('T')[0] }),
       })
-      const body = await res.json()
-      if (!res.ok) throw new Error(body.error || 'Erreur')
+      if (!body) throw new Error('Erreur')
       setGenerateMsg('Plan généré. Valide-le dans l\'onglet Plans.')
       await loadDetail()
     } catch (err) {
@@ -1094,12 +1105,10 @@ function AthleteDetailPanel({ athlete, onClose, onUpdated, onAlertDismissed }) {
   async function deleteSessionFromPlan(weekIdx, sessionIdx, titre) {
     if (!window.confirm(`Supprimer "${titre}" ?`)) return
     try {
-      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/admin/plans/${plan.id}/session`, {
+      const body = await adminFetch(`/api/admin/plans/${plan.id}/session`, {
         method: 'DELETE',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ weekIdx, sessionIdx }),
       })
-      const body = await res.json()
       if (body.plan_data) setPlan(p => ({ ...p, plan_data: body.plan_data }))
     } catch (err) {
       alert('Erreur suppression : ' + err.message)
@@ -2459,8 +2468,7 @@ export default function AdminAthletes() {
   async function deleteAthlete(a) {
     setDeleting(true)
     try {
-      const res = await fetch(`/api/admin/athlete/${a.id}`, { method:'DELETE' })
-      if (!res.ok) throw new Error((await res.json()).error)
+      await adminFetch(`/api/admin/athlete/${a.id}`, { method: 'DELETE' })
       setConfirmDel(null)
       await loadAthletes()
     } catch (err) {

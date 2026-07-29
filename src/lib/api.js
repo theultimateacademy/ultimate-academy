@@ -1,4 +1,5 @@
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001'
+const API_URL      = import.meta.env.VITE_API_URL      || 'http://localhost:3001'
+const ADMIN_SECRET = import.meta.env.VITE_ADMIN_SECRET || ''
 
 async function request(path, options = {}) {
   const res = await fetch(`${API_URL}${path}`, {
@@ -13,41 +14,52 @@ async function request(path, options = {}) {
   return res.json()
 }
 
+// Requête authentifiée coach — ajoute le header X-Admin-Secret
+function adminRequest(path, options = {}) {
+  return request(path, {
+    ...options,
+    headers: { 'X-Admin-Secret': ADMIN_SECRET, ...options.headers },
+  })
+}
+
 export const api = {
+  // ── Routes publiques (athlètes + visiteurs) ───────────────────────────────
   health:             ()       => request('/health'),
   createCheckout:     (body)   => request('/api/stripe/create-checkout',      { method: 'POST', body }),
   freeActivate:       (body)   => request('/api/stripe/free-activate',        { method: 'POST', body }),
   cancelSubscription: (body)   => request('/api/stripe/cancel-subscription',  { method: 'POST', body }),
   generatePlan:       (body)   => request('/api/plans/generate',              { method: 'POST', body }),
   generateAnalysis:   (body)   => request('/api/analyses/generate',           { method: 'POST', body }),
-  fatigueAdapt:       (body)   => request('/api/plans/fatigue-adapt',          { method: 'POST', body }),
-  generateResponse:   (body)   => request('/api/messages/generate-response',  { method: 'POST', body }),
-  periodAlert:        (body)   => request('/api/admin/period-alert',          { method: 'POST', body }),
-  weeklyFeedback:     (body)   => request('/api/admin/weekly-feedback',        { method: 'POST', body }),
-  adminUpdateProfile: (id, patch) => request(`/api/admin/profile/${id}`,      { method: 'PATCH', body: patch }),
-  revenue:            ()       => request('/api/stripe/revenue'),
-  runWeekly:          ()       => request('/api/analyses/run-weekly',           { method: 'POST', body: {} }),
-  stravaConnect:      (userId) => `${API_URL}/auth/strava?userId=${userId}`,
-  stravaImport:       (body)   => request('/api/strava/import',               { method: 'POST', body }),
-  stravaDisconnect:   (body)   => request('/api/strava/disconnect',           { method: 'POST', body }),
-  suuntoConnect:        (userId) => `${API_URL}/auth/suunto?userId=${userId}`,
-  suuntoDisconnect:     (body)   => request('/api/suunto/disconnect',           { method: 'POST', body }),
-  suuntoSendWorkout:    (body)   => request('/api/suunto/send-workout',         { method: 'POST', body }),
-  garminConnect:        (userId) => `${API_URL}/auth/garmin?userId=${userId}`,
-  garminDisconnect:     (body)   => request('/api/garmin/disconnect',           { method: 'POST', body }),
-  garminSendWorkout:    (body)   => request('/api/garmin/send-workout',         { method: 'POST', body }),
-  garminFetchActivity:  (body)   => request('/api/garmin/fetch-activity',       { method: 'POST', body }),
-  getPreRaceAnalysis:      (userId) => request(`/api/analyses/pre-race/${userId}`),
-  generatePreRaceAnalysis: (body)   => request('/api/analyses/pre-race/generate',  { method: 'POST', body }),
-  submitRaceResult:        (body)   => request('/api/races/submit-result',          { method: 'POST', body }),
-  generatePostRaceAnalysis:(body)   => request('/api/analyses/post-race/generate', { method: 'POST', body }),
-  getPostRaceAnalysis:     (userId) => request(`/api/analyses/post-race/${userId}`),
-  recalculateVma:          (body)   => request('/api/plans/recalculate-vma',          { method: 'POST', body }),
-  adjustHeat:              (body)   => request('/api/plans/adjust-heat',               { method: 'POST', body }),
-  adaptInjury:             (body)   => request('/api/plans/adapt-injury',              { method: 'POST', body }),
-  restoreWeek:             (body)   => request('/api/plans/restore-week',              { method: 'POST', body }),
-  rescheduleSession:       (body)   => request('/api/plans/reschedule-session',        { method: 'POST', body }),
-  scheduleRegen:           (body)   => request('/api/plans/schedule-regen',            { method: 'POST', body }),
-  getProfile:              (userId) => request(`/api/profile/${userId}`),
-  updateProfile:           (body)   => request('/api/profile/update',                  { method: 'POST', body }),
+  fatigueAdapt:       (body)   => request('/api/plans/fatigue-adapt',         { method: 'POST', body }),
+  adjustHeat:         (body)   => request('/api/plans/adjust-heat',           { method: 'POST', body }),
+  adaptInjury:        (body)   => request('/api/plans/adapt-injury',          { method: 'POST', body }),
+  restoreWeek:        (body)   => request('/api/plans/restore-week',          { method: 'POST', body }),
+  rescheduleSession:  (body)   => request('/api/plans/reschedule-session',    { method: 'POST', body }),
+  scheduleRegen:      (body)   => request('/api/plans/schedule-regen',        { method: 'POST', body }),
+  recalculateVma:     (body)   => request('/api/plans/recalculate-vma',       { method: 'POST', body }),
+  getPreRaceAnalysis:       (userId) => request(`/api/analyses/pre-race/${userId}`),
+  generatePreRaceAnalysis:  (body)   => request('/api/analyses/pre-race/generate',  { method: 'POST', body }),
+  submitRaceResult:         (body)   => request('/api/races/submit-result',          { method: 'POST', body }),
+  generatePostRaceAnalysis: (body)   => request('/api/analyses/post-race/generate', { method: 'POST', body }),
+  getPostRaceAnalysis:      (userId) => request(`/api/analyses/post-race/${userId}`),
+  getProfile:               (userId) => request(`/api/profile/${userId}`),
+  updateProfile:            (body)   => request('/api/profile/update',               { method: 'POST', body }),
+  weeklyFeedback:    (body)   => request('/api/admin/weekly-feedback',        { method: 'POST', body }),
+  periodAlert:       (body)   => request('/api/admin/period-alert',           { method: 'POST', body }),
+  stravaConnect:     (userId) => `${API_URL}/auth/strava?userId=${userId}`,
+  stravaImport:      (body)   => request('/api/strava/import',                { method: 'POST', body }),
+  stravaDisconnect:  (body)   => request('/api/strava/disconnect',            { method: 'POST', body }),
+  suuntoConnect:     (userId) => `${API_URL}/auth/suunto?userId=${userId}`,
+  suuntoDisconnect:  (body)   => request('/api/suunto/disconnect',            { method: 'POST', body }),
+  suuntoSendWorkout: (body)   => request('/api/suunto/send-workout',          { method: 'POST', body }),
+  garminConnect:     (userId) => `${API_URL}/auth/garmin?userId=${userId}`,
+  garminDisconnect:  (body)   => request('/api/garmin/disconnect',            { method: 'POST', body }),
+  garminSendWorkout: (body)   => request('/api/garmin/send-workout',          { method: 'POST', body }),
+  garminFetchActivity:(body)  => request('/api/garmin/fetch-activity',        { method: 'POST', body }),
+
+  // ── Routes protégées coach (nécessitent ADMIN_SECRET) ─────────────────────
+  adminUpdateProfile: (id, patch) => adminRequest(`/api/admin/profile/${id}`, { method: 'PATCH', body: patch }),
+  revenue:            ()          => adminRequest('/api/stripe/revenue'),
+  runWeekly:          ()          => adminRequest('/api/analyses/run-weekly',      { method: 'POST', body: {} }),
+  generateResponse:   (body)      => adminRequest('/api/messages/generate-response', { method: 'POST', body }),
 }
