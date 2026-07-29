@@ -29,6 +29,7 @@ const cors       = require('cors');
 const cron       = require('node-cron');
 const { createClient } = require('@supabase/supabase-js');
 const Anthropic  = require('@anthropic-ai/sdk');
+const rateLimit  = require('express-rate-limit');
 
 const stripeRoutes    = require('./routes/stripe');
 const anthropicRoutes = require('./routes/anthropic');
@@ -59,6 +60,40 @@ app.use(cors({
   credentials: true
 }));
 app.use(express.json());
+
+// ─── Rate limiting ────────────────────────────────────────────────────────────
+// Paiements & webhooks : 20 requêtes / 15 min par IP
+const checkoutLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 20,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { error: 'Trop de tentatives, réessaie dans 15 minutes.' },
+});
+// Auth / inscription : 10 requêtes / 15 min par IP
+const authLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 10,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { error: 'Trop de tentatives, réessaie dans 15 minutes.' },
+});
+// Génération IA : 30 requêtes / heure par IP
+const aiLimiter = rateLimit({
+  windowMs: 60 * 60 * 1000,
+  max: 30,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { error: 'Limite de génération atteinte, réessaie dans 1 heure.' },
+});
+
+app.use('/api/ebooks/checkout',       checkoutLimiter);
+app.use('/api/stripe/create-checkout', checkoutLimiter);
+app.use('/api/plans/generate',         aiLimiter);
+app.use('/api/analyses/run-weekly',    aiLimiter);
+app.use('/api/analyses/pre-race/run',  aiLimiter);
+app.use('/api/analyses/intermediate-post/run', aiLimiter);
+app.use('/api/messages/generate-response',     aiLimiter);
 
 app.use('/api/stripe',  stripeRoutes);
 app.use('/api',         anthropicRoutes);
