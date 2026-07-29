@@ -30,13 +30,17 @@ const ROAD_OPTIONS = [
 ]
 
 const TRAIL_OPTIONS = [
-  { v: 'trail_20k',  e: '🏕️', l: 'Trail 20K',  desc: 'Un premier objectif trail accessible' },
+  { v: 'trail_10k',  e: '🌿', l: 'Trail 10K',  desc: 'Découverte du trail — accessible et fun' },
+  { v: 'trail_15k',  e: '🏕️', l: 'Trail 15K',  desc: 'Un premier objectif trail engagé' },
+  { v: 'trail_20k',  e: '🏕️', l: 'Trail 20K',  desc: 'Distance phare du trail découverte' },
+  { v: 'trail_30k',  e: '⛰️', l: 'Trail 30K',  desc: 'Défi intermédiaire avec dénivelé' },
   { v: 'trail_50k',  e: '⛰️', l: 'Trail 50K',  desc: 'Défi technique et engagé' },
+  { v: 'trail_80k',  e: '🏔️', l: 'Trail 80K',  desc: 'Ultra trail — engagement total' },
   { v: 'trail_100k', e: '🏔️', l: 'Trail 100K', desc: "L'ultra long — une épreuve de fond" },
   { v: 'trail_100m', e: '🌋', l: 'Trail 100M', desc: "160km — l'épreuve ultime de l'endurance" },
 ]
 
-const TRAIL_VALUES     = new Set(['trail_20k', 'trail_50k', 'trail_100k', 'trail_100m'])
+const TRAIL_VALUES     = new Set(['trail_10k', 'trail_15k', 'trail_20k', 'trail_30k', 'trail_50k', 'trail_80k', 'trail_100k', 'trail_100m'])
 const TRIATHLON_VALUES = new Set(['tri_sprint', 'tri_olympic', 'tri_half', 'tri_ironman'])
 
 const TRIATHLON_OPTIONS = [
@@ -51,8 +55,12 @@ const OBJECTIVE_MAP = {
   '10km':      '10km',
   'semi':      'semi',
   'marathon':  'marathon',
+  trail_10k:   'trail_10k',
+  trail_15k:   'trail_15k',
   trail_20k:   'trail_20k',
+  trail_30k:   'trail_30k',
   trail_50k:   'trail_50k',
+  trail_80k:   'trail_80k',
   trail_100k:  'trail_100k',
   trail_100m:  'trail_100m',
   tri_sprint:  'tri_sprint',
@@ -666,7 +674,7 @@ export default function ProfileWizard() {
             {[
               { key: 'tri_swim_sessions', label: '🏊 Natation', min: 1, max: 4, emoji: '🏊' },
               { key: 'tri_bike_sessions', label: '🚴 Vélo',     min: 1, max: 4, emoji: '🚴' },
-              { key: 'tri_run_sessions',  label: '🏃 Course',   min: 1, max: 3, emoji: '🏃' },
+              { key: 'tri_run_sessions',  label: '🏃 Course',   min: 1, max: 6, emoji: '🏃' },
             ].map(({ key, label, min, max }) => (
               <div key={key} style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1rem', background: 'rgba(255,255,255,.05)', borderRadius: 14, padding: '.875rem 1.1rem' }}>
                 <span style={{ fontSize: '1.5rem', flexShrink: 0 }}>{label.split(' ')[0]}</span>

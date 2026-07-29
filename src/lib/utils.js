@@ -81,8 +81,12 @@ export const OBJECTIVE_LABELS = {
   'semi':       'Semi-marathon',
   'marathon':   'Marathon',
   // Trail
+  'trail_10k':  'Trail 10K',
+  'trail_15k':  'Trail 15K',
   'trail_20k':  'Trail 20K',
+  'trail_30k':  'Trail 30K',
   'trail_50k':  'Trail 50K',
+  'trail_80k':  'Trail 80K',
   'trail_100k': 'Trail 100K',
   'trail_100m': 'Trail 100M',
   // Triathlon

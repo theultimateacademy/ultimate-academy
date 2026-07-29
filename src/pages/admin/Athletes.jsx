@@ -369,6 +369,9 @@ const PROFILE_FIELDS = [
     show: v => v ? `${v} jour(s)` : '—' },
   { lbl: 'Meilleur chrono',    key: 'best_recent_time',       type: 'text',
     show: v => v || '—' },
+  { lbl: 'Montre GPS',         key: 'gps_watch',              type: 'select',
+    opts: [['','—'],['garmin','Garmin'],['coros','Coros'],['suunto','Suunto'],['autre','Autre'],['aucune','Téléphone']],
+    show: v => ({garmin:'🟢 Garmin',coros:'⚡ Coros',suunto:'🔴 Suunto',autre:'⌚ Autre',aucune:'📱 Téléphone'})[v] || '—' },
 ]
 
 function getCurrentWeekNum(plan) {
@@ -1281,7 +1284,7 @@ function AthleteDetailPanel({ athlete, onClose, onUpdated, onAlertDismissed }) {
                 {/* ── helpers ── */}
                 {(() => {
                   const isTri   = ['tri_sprint','tri_olympic','tri_half','tri_ironman'].includes(local.objective)
-                  const isTrail = ['trail_20k','trail_50k','trail_100k','trail_100m'].includes(local.objective)
+                  const isTrail = ['trail_10k','trail_15k','trail_20k','trail_30k','trail_50k','trail_80k','trail_100k','trail_100m'].includes(local.objective)
 
                   const sectionHdr = { fontSize:'.68rem', fontWeight:800, textTransform:'uppercase',
                     letterSpacing:'.1em', color:'var(--text-muted)', padding:'.625rem 0',
@@ -1492,9 +1495,13 @@ function AthleteDetailPanel({ athlete, onClose, onUpdated, onAlertDismissed }) {
                           show={v => v ? `${v} séance(s)` : '—'} />
                         <FieldRow field="tri_bike_sessions" label="🚴 Vélo / sem." type="number"
                           show={v => v ? `${v} séance(s)` : '—'} />
-                        <FieldRow field="tri_run_sessions" label="🏃 Course / sem." type="number"
+                        <FieldRow field="tri_run_sessions" label="🏃 Course / sem." type="number" max={6}
                           show={v => v ? `${v} séance(s)` : '—'} />
                       </>)}
+
+                      <FieldRow field="gps_watch" label="⌚ Montre GPS" type="select"
+                        opts={[['','—'],['garmin','Garmin'],['coros','Coros'],['suunto','Suunto'],['autre','Autre'],['aucune','Téléphone']]}
+                        show={v => ({garmin:'🟢 Garmin',coros:'⚡ Coros',suunto:'🔴 Suunto',autre:'⌚ Autre',aucune:'📱 Téléphone'})[v] || '—'} />
 
                       </div>{/* end s3 */}
                       {/* ── Section 4 : Trail (conditionnel) ── */}
