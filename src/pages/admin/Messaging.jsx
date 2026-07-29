@@ -3,12 +3,13 @@ import { supabase } from '../../lib/supabase'
 import { api } from '../../lib/api'
 import LoadingSpinner from '../../components/UI/LoadingSpinner'
 
-function Conversation({ athlete, onBack }) {
+function Conversation({ athlete, onBack, onDelete }) {
   const [messages,   setMessages]   = useState([])
   const [input,      setInput]      = useState('')
   const [sending,    setSending]    = useState(false)
   const [generating, setGenerating] = useState(false)
   const [suggestion, setSuggestion] = useState('')
+  const [deleting,   setDeleting]   = useState(false)
   const bottomRef = useRef(null)
 
   useEffect(() => {
@@ -55,6 +56,18 @@ function Conversation({ athlete, onBack }) {
     }
   }
 
+  async function deleteConversation() {
+    if (!window.confirm(`Supprimer toute la conversation avec ${athlete.first_name} ${athlete.last_name} ?`)) return
+    setDeleting(true)
+    try {
+      await supabase.from('messages').delete().eq('user_id', athlete.id)
+      onDelete(athlete.id)
+    } catch (err) {
+      alert('Erreur : ' + err.message)
+      setDeleting(false)
+    }
+  }
+
   async function send(e) {
     e.preventDefault()
     if (!input.trim() || sending) return
@@ -87,9 +100,16 @@ function Conversation({ athlete, onBack }) {
           <div style={{ fontWeight: 700, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{athlete.first_name} {athlete.last_name}</div>
           <div style={{ fontSize: '.75rem', color: 'var(--text-muted)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{athlete.email}</div>
         </div>
-        <div style={{ flexShrink: 0 }}>
+        <div style={{ flexShrink: 0, display: 'flex', gap: '.5rem' }}>
           <button className="btn btn-secondary btn-sm" disabled={generating} onClick={generateSuggestion}>
             {generating ? <><div className="spinner spinner-sm" /> <span className="suggest-btn-label">Génération…</span></> : <>✨ <span className="suggest-btn-label">Suggérer une réponse</span></>}
+          </button>
+          <button
+            className="btn btn-sm"
+            disabled={deleting}
+            onClick={deleteConversation}
+            style={{ background: 'rgba(239,68,68,.12)', color: '#FCA5A5', border: '1px solid rgba(239,68,68,.25)' }}>
+            {deleting ? '…' : '🗑️'}
           </button>
         </div>
       </div>
@@ -272,6 +292,10 @@ export default function AdminMessaging() {
           <Conversation
             athlete={selected}
             onBack={() => { setSelected(null); loadConversations() }}
+            onDelete={(id) => {
+              setAthletes(prev => prev.filter(a => a.id !== id))
+              setSelected(null)
+            }}
           />
         ) : (
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%' }}>
