@@ -1,6 +1,40 @@
 import { useEffect, useRef } from 'react'
 import * as THREE from 'three'
 
+// Bruit de Perlin 2D
+function fade(t) { return t * t * t * (t * (t * 6 - 15) + 10) }
+function lerpN(t, a, b) { return a + t * (b - a) }
+function grad(hash, x, y) {
+  const h = hash & 3
+  return ((h & 1) ? -x : x) + ((h & 2) ? -y : y)
+}
+const PERM = (() => {
+  const p = Array.from({ length: 256 }, (_, i) => i)
+  for (let i = 255; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [p[i], p[j]] = [p[j], p[i]]
+  }
+  return [...p, ...p]
+})()
+function noise(x, y) {
+  const X = Math.floor(x) & 255, Y = Math.floor(y) & 255
+  x -= Math.floor(x); y -= Math.floor(y)
+  const u = fade(x), v = fade(y)
+  const a = PERM[X] + Y, b = PERM[X + 1] + Y
+  return lerpN(v,
+    lerpN(u, grad(PERM[a], x, y), grad(PERM[b], x - 1, y)),
+    lerpN(u, grad(PERM[a + 1], x, y - 1), grad(PERM[b + 1], x - 1, y - 1))
+  )
+}
+function fbm(x, y, oct = 5) {
+  let val = 0, amp = 0.5, freq = 1, max = 0
+  for (let i = 0; i < oct; i++) {
+    val += noise(x * freq, y * freq) * amp
+    max += amp; amp *= 0.5; freq *= 2.1
+  }
+  return val / max
+}
+
 export default function HeroTerrain() {
   const mountRef = useRef(null)
 
@@ -8,8 +42,7 @@ export default function HeroTerrain() {
     if (window.innerWidth < 768) return
 
     const el = mountRef.current
-    let W = el.clientWidth
-    let H = el.clientHeight
+    let W = el.clientWidth, H = el.clientHeight
 
     // ── Renderer ──────────────────────────────────────────────────────────
     const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true })
@@ -19,74 +52,124 @@ export default function HeroTerrain() {
     el.appendChild(renderer.domElement)
 
     const scene  = new THREE.Scene()
-    const camera = new THREE.PerspectiveCamera(60, W / H, 0.1, 600)
-    camera.position.set(0, 28, 90)
+    scene.fog    = new THREE.FogExp2(0x000000, 0.014)
+
+    const camera = new THREE.PerspectiveCamera(55, W / H, 0.1, 800)
+    camera.position.set(0, 38, 100)
     camera.lookAt(0, 0, 0)
 
-    // ── Anneaux concentriques (vortex en perspective) ─────────────────────
-    const RING_COUNT = 28
-    const rings = []
+    // ── Terrain fil-de-fer monochrome ─────────────────────────────────────
+    const SEG  = 100
+    const SIZE = 160
+    const geo  = new THREE.PlaneGeometry(SIZE, SIZE, SEG, SEG)
+    geo.rotateX(-Math.PI / 2)
 
-    for (let i = 0; i < RING_COUNT; i++) {
-      const t      = i / RING_COUNT
-      const radius = 4 + i * 5.5
-      const seg    = Math.max(48, Math.floor(radius * 3.5))
-      const geo    = new THREE.RingGeometry(radius, radius + 0.55, seg)
-      const col    = new THREE.Color().lerpColors(new THREE.Color(0x8B2FC9), new THREE.Color(0xE8237A), t)
-      const opacity = 0.06 + (1 - t) * 0.22
-      const mat = new THREE.MeshBasicMaterial({
-        color: col, transparent: true, opacity, side: THREE.DoubleSide,
+    const pos = geo.attributes.position
+    const heights = []
+
+    for (let i = 0; i < pos.count; i++) {
+      const x = pos.getX(i) / SIZE
+      const z = pos.getZ(i) / SIZE
+      const h = fbm(x * 3.2 + 1.1, z * 3.2 + 0.9, 6) * 32
+             + fbm(x * 7.5 + 2.3, z * 7.5 + 1.8, 3) * 7
+      pos.setY(i, h)
+      heights.push(h)
+    }
+    geo.computeVertexNormals()
+
+    // Matériau wireframe blanc très transparent
+    const terrainMat = new THREE.MeshBasicMaterial({
+      color: 0xffffff,
+      wireframe: true,
+      transparent: true,
+      opacity: 0.07,
+    })
+    const terrain = new THREE.Mesh(geo, terrainMat)
+    scene.add(terrain)
+
+    // ── Même terrain, surface pleine sombre pour effet de profondeur ───────
+    const solidMat = new THREE.MeshPhongMaterial({
+      color: 0x0a0a12,
+      shininess: 0,
+      side: THREE.FrontSide,
+    })
+    const solid = new THREE.Mesh(geo, solidMat)
+    solid.position.y = -0.1
+    scene.add(solid)
+
+    // ── Lignes de niveau (isolignes) style topo ────────────────────────────
+    // On trace des lignes horizontales pour chaque seuil d'altitude
+    const LEVELS = [2, 6, 10, 14, 18, 22, 26]
+    const isoGroup = new THREE.Group()
+
+    LEVELS.forEach((level, li) => {
+      const t     = li / (LEVELS.length - 1)
+      const color = new THREE.Color().lerpColors(
+        new THREE.Color(0x5522aa),
+        new THREE.Color(0xdd2277),
+        t
+      )
+      const verts = []
+      // Parcourir chaque quad du terrain
+      for (let row = 0; row < SEG; row++) {
+        for (let col = 0; col < SEG; col++) {
+          const idx = (v, r, c) => {
+            const ii = (r * (SEG + 1) + c)
+            return {
+              x: pos.getX(ii), y: pos.getY(ii), z: pos.getZ(ii), h: heights[ii],
+            }
+          }
+          const a = idx(0, row,   col),   b = idx(0, row,   col+1)
+          const c2 = idx(0, row+1, col), d = idx(0, row+1, col+1)
+          const edges = [
+            [a, b], [b, d], [d, c2], [c2, a],
+          ]
+          edges.forEach(([p1, p2]) => {
+            if ((p1.h - level) * (p2.h - level) < 0) {
+              const frac = (level - p1.h) / (p2.h - p1.h)
+              verts.push(
+                p1.x + frac * (p2.x - p1.x),
+                level + 0.15,
+                p1.z + frac * (p2.z - p1.z)
+              )
+            }
+          })
+        }
+      }
+      if (verts.length === 0) return
+      const isoGeo = new THREE.BufferGeometry()
+      isoGeo.setAttribute('position', new THREE.BufferAttribute(new Float32Array(verts), 3))
+      const isoMat = new THREE.LineBasicMaterial({
+        color, transparent: true,
+        opacity: 0.28 + t * 0.18,
       })
-      const mesh = new THREE.Mesh(geo, mat)
-      mesh.rotation.x = -Math.PI / 2.1
-      mesh.position.z = -i * 3.2
-      mesh.position.y = -i * 0.8
-      scene.add(mesh)
-      rings.push({ mesh, mat, baseOpacity: opacity })
+      isoGroup.add(new THREE.LineSegments(isoGeo, isoMat))
+    })
+    scene.add(isoGroup)
+
+    // ── Lumières ──────────────────────────────────────────────────────────
+    const keyLight = new THREE.DirectionalLight(0xffffff, 0.9)
+    keyLight.position.set(30, 80, 40)
+    scene.add(keyLight)
+    scene.add(new THREE.PointLight(0x8B2FC9, 1.2, 250))
+    const fillLight = new THREE.PointLight(0xE8237A, 0.5, 180)
+    fillLight.position.set(-40, 20, -20)
+    scene.add(fillLight)
+    scene.add(new THREE.AmbientLight(0x0a0818, 1.2))
+
+    // ── Particules très légères ────────────────────────────────────────────
+    const STARS = 160
+    const stGeo = new THREE.BufferGeometry()
+    const stPos = new Float32Array(STARS * 3)
+    for (let i = 0; i < STARS; i++) {
+      stPos[i*3]   = (Math.random() - 0.5) * SIZE * 1.4
+      stPos[i*3+1] = 10 + Math.random() * 60
+      stPos[i*3+2] = (Math.random() - 0.5) * SIZE * 1.4
     }
-
-    // ── Lignes radiales ────────────────────────────────────────────────────
-    const SPOKE_COUNT = 12
-    for (let s = 0; s < SPOKE_COUNT; s++) {
-      const angle = (s / SPOKE_COUNT) * Math.PI * 2
-      const maxR  = 4 + (RING_COUNT - 1) * 5.5 + 0.6
-      const verts = new Float32Array([
-        Math.cos(angle) * 4,   Math.sin(angle) * 4,   0,
-        Math.cos(angle) * maxR, Math.sin(angle) * maxR, 0,
-      ])
-      const geo = new THREE.BufferGeometry()
-      geo.setAttribute('position', new THREE.BufferAttribute(verts, 3))
-      const mat  = new THREE.LineBasicMaterial({ color: 0x9940E0, transparent: true, opacity: 0.09 })
-      const line = new THREE.Line(geo, mat)
-      line.rotation.x = -Math.PI / 2.1
-      scene.add(line)
-    }
-
-    // ── Étoiles lointaines ─────────────────────────────────────────────────
-    const STAR_COUNT = 200
-    const starGeo = new THREE.BufferGeometry()
-    const starPos = new Float32Array(STAR_COUNT * 3)
-    for (let i = 0; i < STAR_COUNT; i++) {
-      starPos[i*3]   = (Math.random() - 0.5) * 340
-      starPos[i*3+1] = (Math.random() - 0.5) * 220
-      starPos[i*3+2] = (Math.random() - 0.5) * 280 - 40
-    }
-    starGeo.setAttribute('position', new THREE.BufferAttribute(starPos, 3))
-    const starMat = new THREE.PointsMaterial({ color: 0xffffff, size: 0.85, transparent: true, opacity: 0.16, sizeAttenuation: true })
-    scene.add(new THREE.Points(starGeo, starMat))
-
-    // ── Orbe central ──────────────────────────────────────────────────────
-    const coreGeo = new THREE.SphereGeometry(1.4, 16, 16)
-    const coreMat = new THREE.MeshBasicMaterial({ color: 0xC060FF, transparent: true, opacity: 0.9 })
-    const core    = new THREE.Mesh(coreGeo, coreMat)
-    scene.add(core)
-
-    const haloGeo = new THREE.SphereGeometry(6, 16, 16)
-    const haloMat = new THREE.MeshBasicMaterial({ color: 0x8B2FC9, transparent: true, opacity: 0.055, side: THREE.BackSide })
-    scene.add(new THREE.Mesh(haloGeo, haloMat))
-
-    scene.add(new THREE.PointLight(0x8B2FC9, 2.5, 200))
-    scene.add(new THREE.AmbientLight(0x080818, 1))
+    stGeo.setAttribute('position', new THREE.BufferAttribute(stPos, 3))
+    scene.add(new THREE.Points(stGeo,
+      new THREE.PointsMaterial({ color: 0xffffff, size: 0.5, transparent: true, opacity: 0.18, sizeAttenuation: true })
+    ))
 
     // ── Scroll / Souris ────────────────────────────────────────────────────
     let scrollY = 0, mx = 0, my = 0, camX = 0, camY = 0
@@ -110,34 +193,32 @@ export default function HeroTerrain() {
       camera.updateProjectionMatrix()
       renderer.setSize(W, H)
     }
-    window.addEventListener('scroll',   onScroll, { passive: true })
+    window.addEventListener('scroll',    onScroll, { passive: true })
     window.addEventListener('mousemove', onMouse)
     window.addEventListener('resize',    onResize)
 
-    // ── Boucle ────────────────────────────────────────────────────────────
+    // ── Animation ─────────────────────────────────────────────────────────
     let raf, t = 0
     const animate = () => {
       raf = requestAnimationFrame(animate)
-      t += 0.006
+      t += 0.005
 
-      scene.rotation.z = t * 0.04
+      // Rotation lente du terrain
+      terrain.rotation.y += 0.0005
+      solid.rotation.y    = terrain.rotation.y
+      isoGroup.rotation.y = terrain.rotation.y
 
-      camX += (mx * 12 - camX) * 0.028
-      camY += (-my * 7  - camY) * 0.028
+      // Caméra : réaction souris douce
+      camX += (mx * 10 - camX) * 0.03
+      camY += (-my * 6  - camY) * 0.03
       camera.position.x = camX
-      camera.position.y = 28 + camY
-      camera.position.z = 90 - scrollY * 0.01
-      camera.lookAt(camX * 0.05, camY * 0.05, 0)
+      camera.position.y = 38 + camY
+      camera.position.z = 100 - scrollY * 0.012
+      camera.lookAt(camX * 0.06, camY * 0.06, 0)
 
-      // Vague d'opacité sur les anneaux
-      rings.forEach(({ mat, baseOpacity }, i) => {
-        const wave = Math.sin(t * 1.2 - i * 0.35) * 0.5 + 0.5
-        mat.opacity = baseOpacity * (0.55 + wave * 0.65)
-      })
-
-      // Pulse orbe central
-      coreMat.opacity = (0.75 + Math.sin(t * 2.2) * 0.25) * 0.92
-      core.scale.setScalar(0.9 + Math.sin(t * 1.8) * 0.2)
+      // Lumière fill qui tourne
+      fillLight.position.x = Math.cos(t * 0.4) * 50
+      fillLight.position.z = Math.sin(t * 0.4) * 50
 
       renderer.render(scene, camera)
     }
@@ -145,7 +226,7 @@ export default function HeroTerrain() {
 
     return () => {
       cancelAnimationFrame(raf)
-      window.removeEventListener('scroll',   onScroll)
+      window.removeEventListener('scroll',    onScroll)
       window.removeEventListener('mousemove', onMouse)
       window.removeEventListener('resize',    onResize)
       renderer.dispose()
