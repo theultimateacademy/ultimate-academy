@@ -3,6 +3,7 @@ import { useState, useEffect, useRef } from 'react'
 import { useAuth } from '../contexts/AuthContext'
 import Nav from '../components/Nav'
 import SiteFooter from '../components/SiteFooter'
+import HeroTerrain from '../components/HeroTerrain'
 
 const TOOLS = [
   { label: 'Temps de passage',        path: '/calculateur' },
@@ -226,10 +227,11 @@ export default function Landing() {
         minHeight: '100dvh', display: 'flex', flexDirection: 'column',
         alignItems: 'center', justifyContent: 'center', textAlign: 'center',
         padding: '7rem 1.5rem 4rem', position: 'relative', overflow: 'hidden',
-        background: 'linear-gradient(-45deg, #0a0a0a, #1a0a2e, #2d0a4e, #8B2FC9, #5a1fa0, #1a0a2e, #0a0a0a)',
-        backgroundSize: '400% 400%',
-        animation: 'gradientShift 8s ease 1 forwards',
+        background: '#0a0a0a',
       }}>
+        {/* Terrain 3D Three.js */}
+        <HeroTerrain />
+
         {/* Particules */}
         {PARTICLES.map(p => (
           <div key={p.id} style={{
@@ -249,7 +251,7 @@ export default function Landing() {
         }} />
 
         {/* Contenu hero */}
-        <div style={{ position: 'relative', zIndex: 1, maxWidth: 900 }}>
+        <div className="hero-content-3d" style={{ position: 'relative', zIndex: 1, maxWidth: 900, transformStyle: 'preserve-3d' }}>
           <h1 style={{ fontSize: 'clamp(3.5rem, 10vw, 7rem)', fontWeight: 800, letterSpacing: '-0.04em', lineHeight: 1.05, marginBottom: '1.75rem' }}>
             <span style={{
               display: 'block',
@@ -301,7 +303,12 @@ export default function Landing() {
           </div>
         </div>
 
-        {/* Ligne de course */}
+        {/* Overlay dégradé bas du hero pour lisibilité */}
+        <div style={{
+          position: 'absolute', bottom: 0, left: 0, right: 0, height: '180px',
+          background: 'linear-gradient(to bottom, transparent, #0a0a0a)',
+          zIndex: 1, pointerEvents: 'none',
+        }} />
 
         {/* Scroll indicator */}
         {!scrolled && (
@@ -356,18 +363,50 @@ export default function Landing() {
           </div>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '1rem' }}>
             {FEATURES.map(f => (
-              <div key={f.title} style={{
-                padding: '1.5rem',
-                borderRadius: 18, background: 'rgba(255,255,255,.04)',
-                border: '1px solid rgba(255,255,255,.08)',
-                backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)',
-                transition: 'border-color .2s',
-              }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '.75rem', marginBottom: '.5rem' }}>
+              <div key={f.title}
+                style={{
+                  padding: '1.5rem', borderRadius: 18,
+                  background: 'rgba(255,255,255,.04)',
+                  border: '1px solid rgba(255,255,255,.08)',
+                  backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)',
+                  transition: 'transform 0.15s ease, border-color .2s',
+                  transformStyle: 'preserve-3d',
+                  position: 'relative', overflow: 'hidden',
+                  cursor: 'default',
+                }}
+                onMouseMove={e => {
+                  const card = e.currentTarget
+                  const rect = card.getBoundingClientRect()
+                  const x    = (e.clientX - rect.left) / rect.width
+                  const y    = (e.clientY - rect.top)  / rect.height
+                  const rx   = (y - 0.5) * -18
+                  const ry   = (x - 0.5) *  18
+                  card.style.transform = `perspective(1000px) rotateX(${rx}deg) rotateY(${ry}deg) translateZ(10px)`
+                  const shine = card.querySelector('.card-shine')
+                  if (shine) {
+                    shine.style.setProperty('--mx', x * 100 + '%')
+                    shine.style.setProperty('--my', y * 100 + '%')
+                    shine.style.opacity = '1'
+                  }
+                }}
+                onMouseLeave={e => {
+                  const card = e.currentTarget
+                  card.style.transform = 'perspective(1000px) rotateX(0) rotateY(0) translateZ(0)'
+                  const shine = card.querySelector('.card-shine')
+                  if (shine) shine.style.opacity = '0'
+                }}
+              >
+                {/* Reflet lumineux */}
+                <div className="card-shine" style={{
+                  position: 'absolute', inset: 0, borderRadius: 'inherit', pointerEvents: 'none',
+                  background: 'radial-gradient(circle at var(--mx, 50%) var(--my, 50%), rgba(255,255,255,0.13), transparent 60%)',
+                  opacity: 0, transition: 'opacity .2s',
+                }} />
+                <div style={{ display: 'flex', alignItems: 'center', gap: '.75rem', marginBottom: '.5rem', position: 'relative', zIndex: 1 }}>
                   <div style={{ fontSize: '1.75rem', lineHeight: 1, flexShrink: 0 }}>{f.icon}</div>
                   <div style={{ fontWeight: 700, fontSize: '.95rem', color: '#fff' }}>{f.title}</div>
                 </div>
-                <div style={{ fontSize: '.84rem', color: 'rgba(255,255,255,.5)', lineHeight: 1.7, textAlign: 'justify' }}>{f.desc}</div>
+                <div style={{ fontSize: '.84rem', color: 'rgba(255,255,255,.5)', lineHeight: 1.7, textAlign: 'justify', position: 'relative', zIndex: 1 }}>{f.desc}</div>
               </div>
             ))}
           </div>
