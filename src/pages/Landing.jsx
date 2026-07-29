@@ -48,7 +48,6 @@ const FAQ = [
   { q: "La connexion Strava est-elle obligatoire ?",         a: "Non, elle n'est pas obligatoire. Si tu n'utilises pas Strava, tu peux simplement me partager tes données manuellement via la messagerie. L'important c'est l'information, pas l'outil." },
 ]
 
-
 const PARTICLES = Array.from({ length: 20 }, (_, i) => ({
   id: i,
   x: 5 + (i * 4.7) % 90,
@@ -106,11 +105,63 @@ const ANIMATIONS = `
   0%, 100% { opacity: 1 }
   50%       { opacity: 0.65 }
 }
+/* ── Reveal 3D : les sections arrivent depuis la profondeur ── */
+.reveal-3d {
+  opacity: 0;
+  transform: perspective(1200px) translateZ(-60px) translateY(40px);
+  transition: opacity 0.85s cubic-bezier(0.22,1,0.36,1),
+              transform 0.85s cubic-bezier(0.22,1,0.36,1);
+  will-change: opacity, transform;
+}
+.reveal-3d.visible {
+  opacity: 1;
+  transform: perspective(1200px) translateZ(0px) translateY(0px);
+}
+/* Variante : arrive de la gauche en profondeur */
+.reveal-3d-left {
+  opacity: 0;
+  transform: perspective(1200px) translateZ(-50px) translateX(-50px) rotateY(8deg);
+  transition: opacity 0.9s cubic-bezier(0.22,1,0.36,1),
+              transform 0.9s cubic-bezier(0.22,1,0.36,1);
+  will-change: opacity, transform;
+}
+.reveal-3d-left.visible {
+  opacity: 1;
+  transform: perspective(1200px) translateZ(0px) translateX(0px) rotateY(0deg);
+}
+/* Variante : arrive de la droite en profondeur */
+.reveal-3d-right {
+  opacity: 0;
+  transform: perspective(1200px) translateZ(-50px) translateX(50px) rotateY(-8deg);
+  transition: opacity 0.9s cubic-bezier(0.22,1,0.36,1),
+              transform 0.9s cubic-bezier(0.22,1,0.36,1);
+  will-change: opacity, transform;
+}
+.reveal-3d-right.visible {
+  opacity: 1;
+  transform: perspective(1200px) translateZ(0px) translateX(0px) rotateY(0deg);
+}
+/* Feature cards staggered */
+.feat-card {
+  opacity: 0;
+  transform: perspective(900px) translateZ(-40px) translateY(30px);
+  transition: opacity 0.7s cubic-bezier(0.22,1,0.36,1),
+              transform 0.7s cubic-bezier(0.22,1,0.36,1);
+  will-change: opacity, transform;
+}
+.feat-card.visible {
+  opacity: 1;
+  transform: perspective(900px) translateZ(0px) translateY(0px);
+}
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
+  }
+  .reveal-3d, .reveal-3d-left, .reveal-3d-right, .feat-card {
+    opacity: 1 !important;
+    transform: none !important;
   }
 }
 `
@@ -125,6 +176,29 @@ function useOnScreen(ref, threshold = 0.2) {
     return () => obs.disconnect()
   }, [])
   return visible
+}
+
+// Hook de révélation 3D via IntersectionObserver sur une classe CSS
+function useReveal3D(selector = '.reveal-3d', threshold = 0.15) {
+  useEffect(() => {
+    const obs = new IntersectionObserver((entries) => {
+      entries.forEach(e => {
+        if (e.isIntersecting) {
+          e.target.classList.add('visible')
+          obs.unobserve(e.target)
+        }
+      })
+    }, { threshold })
+
+    // Observer tous les éléments correspondants dans le DOM
+    const attach = () => {
+      document.querySelectorAll(`${selector}, .reveal-3d-left, .reveal-3d-right, .feat-card`)
+        .forEach(el => { if (!el.classList.contains('visible')) obs.observe(el) })
+    }
+    // Attendre que le DOM soit rendu
+    const timer = setTimeout(attach, 100)
+    return () => { clearTimeout(timer); obs.disconnect() }
+  }, [])
 }
 
 function animateCounter(from, to, duration, onUpdate) {
@@ -158,6 +232,9 @@ export default function Landing() {
   const featVisible  = useOnScreen(featRef, 0.1)
   const coachVisible = useOnScreen(coachRef, 0.15)
 
+  // Révélation 3D globale sur toute la page
+  useReveal3D()
+
   useEffect(() => { setTimeout(() => setHeroIn(true), 80) }, [])
 
   useEffect(() => {
@@ -178,7 +255,7 @@ export default function Landing() {
   useEffect(() => {
     if (!featVisible) return
     FEATURES.forEach((_, i) => {
-      setTimeout(() => setVisibleFeatures(prev => new Set([...prev, i])), i * 100)
+      setTimeout(() => setVisibleFeatures(prev => new Set([...prev, i])), i * 80)
     })
   }, [featVisible])
 
@@ -198,7 +275,6 @@ export default function Landing() {
     ro.observe(el)
     return () => ro.disconnect()
   }, [])
-
 
   const handleCTA = () => {
     if (!user) { navigate('/choisir-sport'); return }
@@ -232,7 +308,7 @@ export default function Landing() {
         {/* Terrain 3D Three.js */}
         <HeroTerrain />
 
-        {/* Particules */}
+        {/* Particules CSS */}
         {PARTICLES.map(p => (
           <div key={p.id} style={{
             position: 'absolute', left: `${p.x}%`, top: `${p.y}%`,
@@ -303,7 +379,7 @@ export default function Landing() {
           </div>
         </div>
 
-        {/* Overlay dégradé bas du hero pour lisibilité */}
+        {/* Overlay dégradé bas du hero */}
         <div style={{
           position: 'absolute', bottom: 0, left: 0, right: 0, height: '180px',
           background: 'linear-gradient(to bottom, transparent, #0a0a0a)',
@@ -333,7 +409,7 @@ export default function Landing() {
         background: '#0A0A0A', padding: '3rem 1.5rem',
         borderTop: '1px solid rgba(255,255,255,.06)', borderBottom: '1px solid rgba(255,255,255,.06)',
       }}>
-        <div style={{ maxWidth: 900, margin: '0 auto', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))', gap: '1.5rem', textAlign: 'center' }}>
+        <div className="reveal-3d" style={{ maxWidth: 900, margin: '0 auto', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))', gap: '1.5rem', textAlign: 'center' }}>
           {statItems.map(({ val, suffix, label, pct }) => (
             <div key={label}>
               <div style={{ fontSize: 'clamp(1.8rem,4vw,2.5rem)', fontWeight: 800, letterSpacing: '-0.02em', ...gd() }}>
@@ -355,21 +431,22 @@ export default function Landing() {
       {/* ── FEATURES ─────────────────────────────────────────── */}
       <section id="features" ref={featRef} style={{ padding: '6rem 1.5rem', background: '#000', borderTop: '1px solid rgba(255,255,255,.06)' }}>
         <div className="container">
-          <div style={{ textAlign: 'center', marginBottom: '3.5rem' }}>
+          <div className="reveal-3d" style={{ textAlign: 'center', marginBottom: '3.5rem' }}>
             <h2 style={{ fontSize: 'clamp(2rem,5vw,3rem)', fontWeight: 800, letterSpacing: '-0.02em', marginBottom: '.75rem' }}>
               Ce que je <span style={gd()}>t'apporte</span>
             </h2>
             <p style={{ color: 'rgba(255,255,255,.4)', fontSize: '1rem' }}>Un accompagnement complet pour progresser intelligemment</p>
           </div>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '1rem' }}>
-            {FEATURES.map(f => (
+            {FEATURES.map((f, idx) => (
               <div key={f.title}
+                className={`feat-card${visibleFeatures.has(idx) ? ' visible' : ''}`}
                 style={{
                   padding: '1.5rem', borderRadius: 18,
                   background: 'rgba(255,255,255,.04)',
                   border: '1px solid rgba(255,255,255,.08)',
                   backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)',
-                  transition: 'transform 0.15s ease, border-color .2s',
+                  transition: `opacity 0.7s ${idx * 0.06}s cubic-bezier(0.22,1,0.36,1), transform 0.7s ${idx * 0.06}s cubic-bezier(0.22,1,0.36,1), border-color .2s`,
                   transformStyle: 'preserve-3d',
                   position: 'relative', overflow: 'hidden',
                   cursor: 'default',
@@ -391,12 +468,11 @@ export default function Landing() {
                 }}
                 onMouseLeave={e => {
                   const card = e.currentTarget
-                  card.style.transform = 'perspective(1000px) rotateX(0) rotateY(0) translateZ(0)'
+                  card.style.transform = ''
                   const shine = card.querySelector('.card-shine')
                   if (shine) shine.style.opacity = '0'
                 }}
               >
-                {/* Reflet lumineux */}
                 <div className="card-shine" style={{
                   position: 'absolute', inset: 0, borderRadius: 'inherit', pointerEvents: 'none',
                   background: 'radial-gradient(circle at var(--mx, 50%) var(--my, 50%), rgba(255,255,255,0.13), transparent 60%)',
@@ -417,13 +493,10 @@ export default function Landing() {
       <section id="coach" ref={coachRef} style={{ padding: '6rem 1.5rem', background: '#0A0A0A', borderTop: '1px solid rgba(255,255,255,.06)' }}>
         <div className="container" style={{ maxWidth: 960 }}>
           <div style={{ display: 'flex', gap: '4rem', alignItems: 'center', flexWrap: 'wrap' }}>
-            <div style={{
+            {/* Photo coach — arrive de gauche */}
+            <div className="reveal-3d-left" style={{
               flexShrink: 0, width: 'min(100%, 300px)',
               marginTop: '3rem',
-              opacity: coachIn ? 1 : 0,
-              transform: coachIn ? 'translateX(0)' : 'translateX(-40px)',
-              transition: 'opacity 0.8s ease, transform 0.8s ease',
-              willChange: 'transform, opacity',
             }}>
               <div style={{
                 borderRadius: 28, overflow: 'hidden', position: 'relative',
@@ -434,7 +507,8 @@ export default function Landing() {
                 <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: 3, background: grad }} />
               </div>
             </div>
-            <div style={{ flex: 1, minWidth: 260 }}>
+            {/* Texte coach — arrive de droite */}
+            <div className="reveal-3d-right" style={{ flex: 1, minWidth: 260 }}>
               <div style={{ display: 'inline-flex', alignItems: 'center', gap: '.5rem', padding: '.35rem 1rem',
                 borderRadius: 99, background: 'rgba(139,47,201,.18)', border: '1px solid rgba(139,47,201,.35)',
                 fontSize: '.8rem', fontWeight: 600, color: '#C084FC', marginBottom: '1.25rem' }}>
@@ -462,16 +536,16 @@ export default function Landing() {
       {/* ── PRICING ──────────────────────────────────────────── */}
       <section id="tarifs" style={{ padding: '6rem 1.5rem', background: '#000', borderTop: '1px solid rgba(255,255,255,.06)' }}>
         <div className="container" style={{ maxWidth: 1160 }}>
-          <div style={{ textAlign: 'center', marginBottom: '3rem' }}>
+          <div className="reveal-3d" style={{ textAlign: 'center', marginBottom: '3rem' }}>
             <h2 style={{ fontSize: 'clamp(2rem,5vw,3rem)', fontWeight: 800, letterSpacing: '-0.02em', marginBottom: '.6rem' }}>
               Choisis ton <span style={gd()}>niveau d'accompagnement</span>
             </h2>
             <p style={{ color: 'rgba(255,255,255,.4)', fontSize: '1rem' }}>Coaching complet ou ressources pour progresser à ton rythme.</p>
           </div>
 
-          <div className="pricing-grid" ref={pricingRef}>
+          <div className="pricing-grid reveal-3d" ref={pricingRef}>
 
-            {/* ── LEFT : Ebook card ── */}
+            {/* ── Ebook card ── */}
             <div className="pricing-card" style={{
               padding: '2.5rem 2rem 9rem',
               display: 'flex', flexDirection: 'column',
@@ -520,7 +594,7 @@ export default function Landing() {
               </p>
             </div>
 
-            {/* ── MIDDLE : Coaching Course à pied · Trail (Populaire) ── */}
+            {/* ── Coaching Course à pied · Trail (Populaire) ── */}
             <div className="pricing-card pricing-card--featured" style={{
               padding: '2.5rem 2rem 9rem',
               animation: 'pricePulse 3s ease-in-out infinite',
@@ -580,7 +654,7 @@ export default function Landing() {
               </p>
             </div>
 
-            {/* ── RIGHT : Coaching Triathlon ── */}
+            {/* ── Coaching Triathlon ── */}
             <div className="pricing-card" style={{
               padding: '2.5rem 2rem 9rem',
               display: 'flex', flexDirection: 'column',
@@ -636,7 +710,7 @@ export default function Landing() {
 
       {/* ── TESTIMONIALS ─────────────────────────────────────── */}
       <section id="resultats" style={{ padding: '5rem 0', background: '#0A0A0A', overflow: 'hidden', borderTop: '1px solid rgba(255,255,255,.06)' }}>
-        <div style={{ textAlign: 'center', marginBottom: '2.5rem', padding: '0 1.5rem' }}>
+        <div className="reveal-3d" style={{ textAlign: 'center', marginBottom: '2.5rem', padding: '0 1.5rem' }}>
           <h2 style={{ fontSize: 'clamp(1.8rem,4vw,2.8rem)', fontWeight: 800, letterSpacing: '-0.02em', marginBottom: '.5rem' }}>
             Ils l'ont <span style={gd()}>fait</span>
           </h2>
@@ -663,14 +737,14 @@ export default function Landing() {
       {/* ── FAQ ──────────────────────────────────────────────── */}
       <section id="faq" style={{ padding: '6rem 1.5rem', background: '#000', borderTop: '1px solid rgba(255,255,255,.06)' }}>
         <div className="container" style={{ maxWidth: 760 }}>
-          <div style={{ textAlign: 'center', marginBottom: '3.5rem' }}>
+          <div className="reveal-3d" style={{ textAlign: 'center', marginBottom: '3.5rem' }}>
             <h2 style={{ fontSize: 'clamp(2rem,5vw,3rem)', fontWeight: 800, letterSpacing: '-0.02em', marginBottom: '.6rem' }}>
               Questions <span style={gd()}>fréquentes</span>
             </h2>
             <p style={{ color: 'rgba(255,255,255,.4)', fontSize: '1rem' }}>Tout ce que tu veux savoir avant de commencer</p>
           </div>
 
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '.75rem' }}>
+          <div className="reveal-3d" style={{ display: 'flex', flexDirection: 'column', gap: '.75rem' }}>
             {FAQ.map((item, i) => {
               const open = openFaq === i
               return (
@@ -704,7 +778,7 @@ export default function Landing() {
             })}
           </div>
 
-          <div style={{ textAlign: 'center', marginTop: '3rem' }}>
+          <div className="reveal-3d" style={{ textAlign: 'center', marginTop: '3rem' }}>
             <p style={{ color: 'rgba(255,255,255,.35)', fontSize: '.9rem', marginBottom: '1.25rem' }}>
               Tu as une autre question ?
             </p>
