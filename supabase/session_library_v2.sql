@@ -4,13 +4,42 @@
 -- À exécuter dans le Supabase SQL editor
 -- ============================================================
 
--- ── Nettoyage ────────────────────────────────────────────────
-DELETE FROM public.session_library;
+-- ── Recréation complète de la table (propre) ─────────────────
+DROP TABLE IF EXISTS public.session_library;
 
--- ── Colonnes sport / triathlon (si pas encore en place) ──────
-ALTER TABLE public.session_library ADD COLUMN IF NOT EXISTS sport TEXT DEFAULT 'running';
-ALTER TABLE public.session_library ADD COLUMN IF NOT EXISTS montagne_only BOOLEAN DEFAULT FALSE;
-ALTER TABLE public.session_library ADD COLUMN IF NOT EXISTS triathlon_disciplines TEXT[];
+CREATE TABLE public.session_library (
+  code                   TEXT PRIMARY KEY,
+  type                   TEXT NOT NULL,
+  category               TEXT NOT NULL,
+  name                   TEXT NOT NULL,
+  duration_min           INTEGER NOT NULL,
+  intensity_rpe          INTEGER NOT NULL CHECK (intensity_rpe BETWEEN 1 AND 10),
+  warmup                 TEXT,
+  main_set               TEXT NOT NULL,
+  recovery               TEXT,
+  cooldown               TEXT,
+  coach_notes            TEXT,
+  compatible_goals       TEXT[],
+  sport                  TEXT DEFAULT 'running',
+  montagne_only          BOOLEAN DEFAULT FALSE,
+  triathlon_disciplines  TEXT[]
+);
+
+-- ── RLS ──────────────────────────────────────────────────────
+ALTER TABLE public.session_library ENABLE ROW LEVEL SECURITY;
+
+DROP POLICY IF EXISTS "Authenticated read session_library" ON public.session_library;
+DROP POLICY IF EXISTS "Coach write session_library"        ON public.session_library;
+
+CREATE POLICY "Authenticated read session_library"
+  ON public.session_library FOR SELECT
+  USING (auth.role() = 'authenticated');
+
+CREATE POLICY "Coach write session_library"
+  ON public.session_library FOR ALL
+  USING (
+    EXISTS (SELECT 1 FROM public.profiles p WHERE p.id = auth.uid() AND p.role = 'coach')
+  );
 
 
 -- ============================================================
