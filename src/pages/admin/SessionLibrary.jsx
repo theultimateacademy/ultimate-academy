@@ -11,37 +11,21 @@ const SPORT_LABELS = {
 }
 
 const TYPE_LABELS = {
-  endurance_fondamentale: 'EF',
-  recuperation_active:    'Récup Active',
   footing_recuperation:   'Footing Récup',
+  recuperation_active:    'Footing Récup',   // alias unifié
+  endurance_fondamentale: 'EF',
   footing_progressif:     'FP',
   tempo_seuil:            'Tempo',
   fractionne_court:       'Frac Court',
   fractionne_long:        'Frac Long',
-  sortie_longue:          'SL',
   cotes:                  'Côtes',
   specifique:             'Spécif',
+  sortie_longue:          'SL',
   renforcement:           'Renfo',
-  natation_endurance:     'Endurance',
-  natation_vitesse:       'Vitesse',
-  natation_seuil:         'Seuil',
-  natation_tempo:         'Tempo',
-  natation_technique:     'Technique',
-  natation_test:          'Test',
-  natation_recuperation:  'Récup',
-  velo_endurance:         'Endurance',
-  velo_tempo:             'Tempo',
-  velo_intervalles:       'Intervalles',
-  velo_test:              'Test FTP',
-  velo_cotes:             'Côtes',
-  velo_recuperation:      'Récup',
+  natation:               'Natation',
+  velo:                   'Vélo',
   brique:                 'Brique',
-  trail_endurance:        'Endurance',
-  trail_technique:        'Technique',
-  trail_cotes:            'Côtes',
-  trail_fractionne:       'Fractionné',
-  trail_simulation:       'Simulation',
-  trail_montagne:         'Montagne',
+  trail:                  'Trail',
 }
 
 const RPE_COLOR = rpe =>
@@ -154,36 +138,32 @@ export default function SessionLibrary() {
         if (!data) { setLoading(false); return }
         // Ordre des catégories par sport puis par type logique
         const TYPE_ORDER = {
-          // Running
-          footing_recuperation: 0,
-          recuperation_active: 1,
-          endurance_fondamentale: 2,
-          footing_progressif: 3,
-          tempo_seuil: 4,
-          fractionne_court: 5,
-          fractionne_long: 6,
-          cotes: 7,
-          specifique: 8,
-          sortie_longue: 9,
-          renforcement: 10,
-          // Natation
-          natation: 11,
-          // Vélo
-          velo: 12,
-          // Brique
-          brique: 13,
-          // Trail
-          trail: 14,
-        }
-        const numFromCode = code => {
-          const m = code.match(/(\d+)$/)
-          return m ? parseInt(m[1], 10) : 0
+          // Running — ordre logique de la semaine d'entraînement
+          footing_recuperation:   0,
+          recuperation_active:    0,  // alias — même groupe
+          endurance_fondamentale: 1,
+          footing_progressif:     2,
+          tempo_seuil:            3,
+          fractionne_court:       4,
+          fractionne_long:        5,
+          cotes:                  6,
+          specifique:             7,
+          sortie_longue:          8,
+          renforcement:           9,
+          // Autres sports
+          natation:               10,
+          velo:                   11,
+          brique:                 12,
+          trail:                  13,
         }
         const sorted = [...data].sort((a, b) => {
           const tA = TYPE_ORDER[a.type] ?? 99
           const tB = TYPE_ORDER[b.type] ?? 99
           if (tA !== tB) return tA - tB
-          return numFromCode(a.code) - numFromCode(b.code)
+          // Au sein d'une même catégorie : tri par durée croissante
+          if (a.duration_min !== b.duration_min) return a.duration_min - b.duration_min
+          // Ensuite par RPE croissant (séances de même durée)
+          return (a.intensity_rpe || 0) - (b.intensity_rpe || 0)
         })
         setSessions(sorted)
         setLoading(false)
