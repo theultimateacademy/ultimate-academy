@@ -160,10 +160,11 @@ export default function SessionLibrary() {
           const tA = TYPE_ORDER[a.type] ?? 99
           const tB = TYPE_ORDER[b.type] ?? 99
           if (tA !== tB) return tA - tB
-          // Au sein d'une même catégorie : tri par durée croissante
-          if (a.duration_min !== b.duration_min) return a.duration_min - b.duration_min
-          // Ensuite par RPE croissant (séances de même durée)
-          return (a.intensity_rpe || 0) - (b.intensity_rpe || 0)
+          // Au sein d'une catégorie : sort_order défini en DB (précis), sinon durée
+          const sA = a.sort_order ?? 999
+          const sB = b.sort_order ?? 999
+          if (sA !== sB) return sA - sB
+          return a.duration_min - b.duration_min
         })
         setSessions(sorted)
         setLoading(false)
