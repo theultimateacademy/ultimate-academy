@@ -27,7 +27,7 @@ export default function PageHero({ title, subtitle, badge, children, backTo, bac
   return (
     <div style={{
       background: '#000',
-      minHeight: '42vh',
+      minHeight: '100vh',
       display: 'flex',
       flexDirection: 'column',
       justifyContent: 'center',
