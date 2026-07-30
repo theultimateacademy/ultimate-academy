@@ -3,6 +3,16 @@ import { Link } from 'react-router-dom'
 
 const GRAD = 'linear-gradient(135deg, #8B2FC9, #E8237A)'
 
+const PARTICLES = Array.from({ length: 20 }, (_, i) => ({
+  id: i,
+  x: 5 + (i * 4.7) % 90,
+  y: 5 + (i * 7.3) % 85,
+  size: 2 + (i % 3),
+  opacity: 0.2 + (i % 5) * 0.07,
+  duration: 8 + (i % 8),
+  delay: -(i % 6),
+}))
+
 export const gradText = {
   background: GRAD,
   WebkitBackgroundClip: 'text',
@@ -17,12 +27,13 @@ export default function PageHero({ title, subtitle, badge, children, backTo, bac
   return (
     <div style={{
       background: '#000',
+      minHeight: '42vh',
       display: 'flex',
       flexDirection: 'column',
       justifyContent: 'center',
       alignItems: 'center',
       textAlign: 'center',
-      padding: '7rem 1.5rem 3.5rem',
+      padding: '8rem 1.5rem 4rem',
       borderBottom: '1px solid rgba(255,255,255,.08)',
       position: 'relative',
       overflow: 'hidden',
@@ -35,6 +46,17 @@ export default function PageHero({ title, subtitle, badge, children, backTo, bac
           100% { transform: translateY(0px) translateX(0px) }
         }
       `}</style>
+
+      {/* Particules blanches */}
+      {PARTICLES.map(p => (
+        <div key={p.id} style={{
+          position: 'absolute', left: `${p.x}%`, top: `${p.y}%`,
+          width: p.size, height: p.size, borderRadius: '50%',
+          background: '#fff', opacity: p.opacity, pointerEvents: 'none',
+          willChange: 'transform',
+          animation: `floatParticle ${p.duration}s ${p.delay}s ease-in-out infinite`,
+        }} />
+      ))}
 
       {/* Ligne bas dégradé */}
       <div style={{
