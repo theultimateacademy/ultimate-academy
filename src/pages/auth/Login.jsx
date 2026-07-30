@@ -231,11 +231,6 @@ export default function Login() {
                   <button type="submit" className="btn btn-primary btn-lg btn-full" disabled={loading || creating} style={{ marginTop: '.25rem' }}>
                     {loading ? <><div className="spinner spinner-sm" /> Connexion…</> : 'Accéder à mon espace'}
                   </button>
-                  <button type="button" className="btn btn-lg btn-full" disabled={loading || creating}
-                    onClick={handleCreateCoach}
-                    style={{ background: 'transparent', color: 'var(--text-muted)', border: '1px solid rgba(139,47,201,.2)', fontSize: '.83rem' }}>
-                    {creating ? <><div className="spinner spinner-sm" /> Création…</> : 'Première fois ? Créer mon compte coach'}
-                  </button>
                 </form>
                 {resetSent
                   ? <p style={{ textAlign: 'center', color: '#4ade80', fontSize: '.85rem', marginTop: '1rem' }}>✅ Email envoyé à {COACH_EMAIL}</p>
