@@ -6,7 +6,7 @@ import PageHero, { gradText } from '../../components/PageHero'
 import PricingCTA from '../../components/PricingCTA'
 
 // ── Design ────────────────────────────────────────────────────
-const C = { purple: '#8B2FC9', pink: '#E8237A', dark: '#fff', light: '#0C0A18' }
+const C = { purple: '#8B2FC9', pink: '#E8237A', dark: '#1a1230', light: '#F8F5FF' }
 const grad = 'linear-gradient(135deg,#8B2FC9,#E8237A)'
 const inputSt = {
   background: '#fff', border: '1px solid rgba(139,47,201,.25)',
@@ -213,7 +213,7 @@ export default function TrailCalculator() {
       </PageHero>
 
       {/* ── Calculateur (fond clair) ── */}
-      <section id="trail-calc" style={{ background: '#000', padding: '5rem 1.5rem' }}>
+      <section id="trail-calc" style={{ background: C.light, padding: '5rem 1.5rem' }}>
         <div style={{ maxWidth: 920, margin: '0 auto' }}>
 
           {/* Titre intro */}
@@ -233,7 +233,7 @@ export default function TrailCalculator() {
           </div>
 
           {/* Carte blanche : terrain + inputs + résultats */}
-          <div style={{ background: 'rgba(255,255,255,.05)', borderRadius: 20, padding: '2.5rem', boxShadow: '0 8px 40px rgba(139,47,201,.1)' }}>
+          <div style={{ background: '#fff', borderRadius: 20, padding: '2.5rem', boxShadow: '0 8px 40px rgba(139,47,201,.1)' }}>
 
             {/* Terrain */}
             <div style={{ marginBottom: '2rem' }}>
@@ -245,7 +245,7 @@ export default function TrailCalculator() {
                   </Chip>
                 ))}
               </div>
-              <div style={{ fontSize: '.78rem', color: 'rgba(255,255,255,.4)', marginTop: '.5rem' }}>
+              <div style={{ fontSize: '.78rem', color: 'rgba(26,18,48,.4)', marginTop: '.5rem' }}>
                 {t.desc}
               </div>
             </div>
@@ -278,13 +278,13 @@ export default function TrailCalculator() {
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr auto 1fr', gap: '.35rem', alignItems: 'center' }}>
                   <input type="number" min="0" max="20" placeholder="min"
                     value={paceMin} onChange={e => setPaceMin(e.target.value)} style={inputSt}/>
-                  <span style={{ color: 'rgba(255,255,255,.35)', textAlign: 'center', fontWeight: 700 }}>:</span>
+                  <span style={{ color: 'rgba(26,18,48,.35)', textAlign: 'center', fontWeight: 700 }}>:</span>
                   <input type="number" min="0" max="59" placeholder="sec"
                     value={paceSec} onChange={e => setPaceSec(e.target.value)} style={inputSt}/>
                 </div>
               </div>
             </div>
-            <div style={{ fontSize: '.7rem', color: 'rgba(255,255,255,.35)', marginBottom: '1.5rem', textAlign: 'right' }}>
+            <div style={{ fontSize: '.7rem', color: 'rgba(26,18,48,.35)', marginBottom: '1.5rem', textAlign: 'right' }}>
               Utilise ton allure sur 10km sur route plate
             </div>
 
@@ -296,15 +296,15 @@ export default function TrailCalculator() {
                 {/* Temps principal */}
                 <div style={{
                   textAlign: 'center', padding: '1.75rem',
-                  background: 'rgba(255,255,255,.04)', borderRadius: 16, marginBottom: '1.5rem',
+                  background: C.light, borderRadius: 16, marginBottom: '1.5rem',
                 }}>
-                  <div style={{ fontSize: '.72rem', fontWeight: 700, color: 'rgba(255,255,255,.4)', textTransform: 'uppercase', letterSpacing: '.1em', marginBottom: '.4rem' }}>
+                  <div style={{ fontSize: '.72rem', fontWeight: 700, color: 'rgba(26,18,48,.4)', textTransform: 'uppercase', letterSpacing: '.1em', marginBottom: '.4rem' }}>
                     Temps estimé
                   </div>
                   <div style={{ fontSize: 'clamp(2.5rem, 8vw, 3.5rem)', fontWeight: 900, background: grad, WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text', lineHeight: 1 }}>
                     {fmtTime(total)}
                   </div>
-                  <div style={{ fontSize: '.85rem', color: 'rgba(255,255,255,.5)', marginTop: '.5rem' }}>
+                  <div style={{ fontSize: '.85rem', color: 'rgba(26,18,48,.5)', marginTop: '.5rem' }}>
                     {(distN / total * 3600).toFixed(1)} km/h &nbsp;·&nbsp; allure effective {fmtPace(adjPace)}
                   </div>
                 </div>
@@ -319,26 +319,26 @@ export default function TrailCalculator() {
                     { label: 'Temps D+', value: fmtTime(extraDp * adjPace) },
                     { label: 'Temps D-', value: fmtTime(extraDm * adjPace) },
                   ].map((s, i) => (
-                    <div key={i} style={{ background: 'rgba(255,255,255,.04)', borderRadius: 12, padding: '.9rem', textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
-                      <div style={{ fontSize: '.6rem', color: 'rgba(255,255,255,.4)', textTransform: 'uppercase', letterSpacing: '.07em', marginBottom: '.3rem', minHeight: '2.4rem', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>{s.label}</div>
+                    <div key={i} style={{ background: C.light, borderRadius: 12, padding: '.9rem', textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
+                      <div style={{ fontSize: '.6rem', color: 'rgba(26,18,48,.4)', textTransform: 'uppercase', letterSpacing: '.07em', marginBottom: '.3rem', minHeight: '2.4rem', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>{s.label}</div>
                       <div style={{ fontSize: '1.1rem', fontWeight: 800, color: s.color || C.dark }}>{s.value || '--'}</div>
                     </div>
                   ))}
                 </div>
               </>
             ) : (
-              <div style={{ textAlign: 'center', padding: '2rem 1rem', color: 'rgba(255,255,255,.3)', fontSize: '.9rem' }}>
+              <div style={{ textAlign: 'center', padding: '2rem 1rem', color: 'rgba(26,18,48,.3)', fontSize: '.9rem' }}>
                 Remplis les champs pour voir ton estimation ↑
               </div>
             )}
           </div>
 
           {/* Illustration + légende après le calculateur */}
-          <div style={{ marginTop: '3.5rem', background: 'rgba(255,255,255,.05)', borderRadius: 20, padding: '2.5rem', boxShadow: '0 8px 40px rgba(139,47,201,.08)' }}>
+          <div style={{ marginTop: '3.5rem', background: '#fff', borderRadius: 20, padding: '2.5rem', boxShadow: '0 8px 40px rgba(139,47,201,.08)' }}>
             <h2 style={{ fontSize: 'clamp(1.4rem, 3vw, 1.9rem)', fontWeight: 900, color: C.dark, marginBottom: '.4rem', textAlign: 'center' }}>
               Comment le calcul <span style={{ background: grad, WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text' }}>fonctionne</span> ?
             </h2>
-            <p style={{ color: 'rgba(255,255,255,.5)', fontSize: '.88rem', marginBottom: '2rem', lineHeight: 1.6, textAlign: 'center' }}>
+            <p style={{ color: 'rgba(26,18,48,.5)', fontSize: '.88rem', marginBottom: '2rem', lineHeight: 1.6, textAlign: 'center' }}>
               Le schéma ci-dessous représente le profil altimétrique d'un trail. Chaque élément du dessin correspond à une donnée que tu as saisie.
             </p>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '2.5rem', alignItems: 'center' }}>
@@ -370,7 +370,7 @@ export default function TrailCalculator() {
                     <div style={{ width: 12, height: 12, borderRadius: '50%', background: item.color, flexShrink: 0, marginTop: '.2rem' }}/>
                     <div>
                       <div style={{ fontWeight: 700, color: C.dark, fontSize: '.85rem', marginBottom: '.2rem' }}>{item.title}</div>
-                      <div style={{ color: 'rgba(255,255,255,.55)', fontSize: '.8rem', lineHeight: 1.65, textAlign: 'justify' }}>{item.desc}</div>
+                      <div style={{ color: 'rgba(26,18,48,.55)', fontSize: '.8rem', lineHeight: 1.65, textAlign: 'justify' }}>{item.desc}</div>
                     </div>
                   </div>
                 ))}
@@ -379,7 +379,7 @@ export default function TrailCalculator() {
           </div>
 
           <div style={{ textAlign: 'center', marginTop: '2rem' }}>
-            <Link to="/calculateur" style={{ color: 'rgba(255,255,255,.4)', textDecoration: 'none', fontSize: '.85rem' }}>
+            <Link to="/calculateur" style={{ color: 'rgba(26,18,48,.4)', textDecoration: 'none', fontSize: '.85rem' }}>
               ← Tous les calculateurs
             </Link>
           </div>
@@ -425,7 +425,7 @@ export default function TrailCalculator() {
       </section>
 
       {/* ── FAQ (fond clair) ── */}
-      <section style={{ background: '#000', padding: '5rem 1.5rem' }}>
+      <section style={{ background: C.light, padding: '5rem 1.5rem' }}>
         <div style={{ maxWidth: 720, margin: '0 auto' }}>
           <h2 style={{ fontSize: 'clamp(1.4rem, 3vw, 1.9rem)', fontWeight: 900, color: C.dark, marginBottom: '2rem', textAlign: 'center' }}>
             Questions <span style={{ background: grad, WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text' }}>fréquentes</span>
@@ -448,7 +448,7 @@ export default function TrailCalculator() {
                 }}>+</span>
               </button>
               {openFaq === i && (
-                <div style={{ paddingBottom: '1.1rem', fontSize: '.875rem', color: 'rgba(255,255,255,.6)', lineHeight: 1.8, textAlign: 'justify' }}>
+                <div style={{ paddingBottom: '1.1rem', fontSize: '.875rem', color: 'rgba(26,18,48,.6)', lineHeight: 1.8, textAlign: 'justify' }}>
                   {item.a}
                 </div>
               )}

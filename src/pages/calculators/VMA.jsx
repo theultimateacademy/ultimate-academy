@@ -34,9 +34,9 @@ const FAQ = [
   { q:"Combien de fois par semaine travailler la VMA ?", a:"1 à 2 séances de VMA par semaine est la dose optimale pour la majorité des coureurs. Au-delà, le risque de blessure et de surentraînement augmente. Ces séances doivent représenter 10-15% du volume total d'entraînement. Le reste du temps doit être consacré à l'endurance fondamentale (65-75% VMA), base indispensable de toute progression durable." },
 ]
 
-const C = { purple:'#8B2FC9', pink:'#E8237A', dark:'#fff', light:'#0C0A18' }
-const inputSt = { background:'rgba(255,255,255,.07)', border:'1px solid rgba(139,47,201,.25)', borderRadius:10, padding:'.55rem .75rem', color:C.dark, fontSize:'.9rem', outline:'none' }
-const labelSt = { display:'block', fontSize:'.72rem', color:'rgba(255,255,255,.45)', textTransform:'uppercase', letterSpacing:'.08em', marginBottom:'.4rem' }
+const C = { purple:'#8B2FC9', pink:'#E8237A', dark:'#1a1230', light:'#F8F5FF' }
+const inputSt = { background:'#fff', border:'1px solid rgba(139,47,201,.25)', borderRadius:10, padding:'.55rem .75rem', color:C.dark, fontSize:'.9rem', outline:'none' }
+const labelSt = { display:'block', fontSize:'.72rem', color:'rgba(26,18,48,.45)', textTransform:'uppercase', letterSpacing:'.08em', marginBottom:'.4rem' }
 
 function Chip({ active, onClick, children }) {
   return <button onClick={onClick} style={{ padding:'.4rem .9rem', borderRadius:50, cursor:'pointer', fontSize:'.84rem', border:`1px solid ${active?'transparent':'rgba(139,47,201,.25)'}`, background:active?`linear-gradient(135deg,${C.purple},${C.pink})`:'#fff', color:active?'#fff':C.purple, fontWeight:active?600:400 }}>{children}</button>
@@ -87,51 +87,51 @@ export default function VMACalculator() {
       </PageHero>
 
       {/* CALCULATOR */}
-      <section ref={calcRef} id="outil" style={{ background:'#000', padding:'5rem 1.5rem' }}>
+      <section ref={calcRef} id="outil" style={{ background:C.light, padding:'5rem 1.5rem' }}>
         <Inner max={780}>
           <div style={{ textAlign:'center', marginBottom:'2.5rem' }}>
             <SectionTag>Calculateur de VMA</SectionTag>
             <h2 style={{ fontSize:'clamp(1.5rem,3vw,2rem)', fontWeight:900, color:C.dark, marginBottom:'.5rem' }}>3 <span style={gradText}>méthodes</span> au choix</h2>
-            <p style={{ color:'rgba(255,255,255,.55)', fontSize:'.95rem' }}>Utilise celle qui correspond à ton niveau et tes ressources</p>
+            <p style={{ color:'rgba(26,18,48,.55)', fontSize:'.95rem' }}>Utilise celle qui correspond à ton niveau et tes ressources</p>
           </div>
           <div style={{ display:'flex', flexDirection:'column', gap:'1.25rem' }}>
 
             {/* Cooper */}
-            <div style={{ background:'rgba(255,255,255,.05)', borderRadius:20, padding:'2rem', boxShadow:'0 4px 24px rgba(139,47,201,.08)', border:'1px solid rgba(139,47,201,.1)' }}>
+            <div style={{ background:'#fff', borderRadius:20, padding:'2rem', boxShadow:'0 4px 24px rgba(139,47,201,.08)', border:'1px solid rgba(139,47,201,.1)' }}>
               <div style={{ display:'flex', alignItems:'flex-start', justifyContent:'space-between', flexWrap:'wrap', gap:'1rem', marginBottom:'1.25rem' }}>
                 <div>
                   <p style={{ fontWeight:800, color:C.dark, marginBottom:'.2rem', fontSize:'1.05rem' }}>🏃 Test Cooper · 12 minutes</p>
-                  <p style={{ color:'rgba(255,255,255,.5)', fontSize:'.85rem', margin:0 }}>Course en continu le plus loin possible pendant 12 minutes</p>
+                  <p style={{ color:'rgba(26,18,48,.5)', fontSize:'.85rem', margin:0 }}>Course en continu le plus loin possible pendant 12 minutes</p>
                 </div>
                 {vmaC>0&&<div style={{ padding:'.5rem 1rem', borderRadius:10, background:`linear-gradient(135deg,${C.purple},${C.pink})`, color:'#fff', textAlign:'right' }}><p style={{ margin:0, fontSize:'.72rem', opacity:.8 }}>VMA estimée</p><p style={{ margin:0, fontSize:'1.4rem', fontWeight:900 }}>{vmaC.toFixed(1)} km/h</p></div>}
               </div>
               <div style={{ display:'flex', alignItems:'center', gap:'.75rem', flexWrap:'wrap' }}>
-                <div><label style={labelSt}>Distance parcourue</label><div style={{ display:'flex', alignItems:'center', gap:'.5rem' }}><input type="number" min="0" step="50" placeholder="Ex : 2800" value={cooperDist} onChange={e=>setCooperDist(e.target.value)} style={{ ...inputSt, width:150 }}/><span style={{ color:'rgba(255,255,255,.45)', fontSize:'.85rem' }}>mètres</span></div></div>
-                <p style={{ color:'rgba(255,255,255,.4)', fontSize:'.82rem', margin:0 }}>Ex : 2800m → VMA <strong>14 km/h</strong></p>
+                <div><label style={labelSt}>Distance parcourue</label><div style={{ display:'flex', alignItems:'center', gap:'.5rem' }}><input type="number" min="0" step="50" placeholder="Ex : 2800" value={cooperDist} onChange={e=>setCooperDist(e.target.value)} style={{ ...inputSt, width:150 }}/><span style={{ color:'rgba(26,18,48,.45)', fontSize:'.85rem' }}>mètres</span></div></div>
+                <p style={{ color:'rgba(26,18,48,.4)', fontSize:'.82rem', margin:0 }}>Ex : 2800m → VMA <strong>14 km/h</strong></p>
               </div>
             </div>
 
             {/* 6 min */}
-            <div style={{ background:'rgba(255,255,255,.05)', borderRadius:20, padding:'2rem', boxShadow:'0 4px 24px rgba(139,47,201,.08)', border:'1px solid rgba(139,47,201,.1)' }}>
+            <div style={{ background:'#fff', borderRadius:20, padding:'2rem', boxShadow:'0 4px 24px rgba(139,47,201,.08)', border:'1px solid rgba(139,47,201,.1)' }}>
               <div style={{ display:'flex', alignItems:'flex-start', justifyContent:'space-between', flexWrap:'wrap', gap:'1rem', marginBottom:'1.25rem' }}>
                 <div>
                   <p style={{ fontWeight:800, color:C.dark, marginBottom:'.2rem', fontSize:'1.05rem' }}>⚡ Test 6 minutes</p>
-                  <p style={{ color:'rgba(255,255,255,.5)', fontSize:'.85rem', margin:0 }}>Plus court, tout aussi précis pour les coureurs réguliers</p>
+                  <p style={{ color:'rgba(26,18,48,.5)', fontSize:'.85rem', margin:0 }}>Plus court, tout aussi précis pour les coureurs réguliers</p>
                 </div>
                 {vmaS>0&&<div style={{ padding:'.5rem 1rem', borderRadius:10, background:`linear-gradient(135deg,${C.purple},${C.pink})`, color:'#fff', textAlign:'right' }}><p style={{ margin:0, fontSize:'.72rem', opacity:.8 }}>VMA estimée</p><p style={{ margin:0, fontSize:'1.4rem', fontWeight:900 }}>{vmaS.toFixed(1)} km/h</p></div>}
               </div>
               <div style={{ display:'flex', alignItems:'center', gap:'.75rem', flexWrap:'wrap' }}>
-                <div><label style={labelSt}>Distance parcourue</label><div style={{ display:'flex', alignItems:'center', gap:'.5rem' }}><input type="number" min="0" step="25" placeholder="Ex : 1500" value={sixDist} onChange={e=>setSixDist(e.target.value)} style={{ ...inputSt, width:150 }}/><span style={{ color:'rgba(255,255,255,.45)', fontSize:'.85rem' }}>mètres</span></div></div>
-                <p style={{ color:'rgba(255,255,255,.4)', fontSize:'.82rem', margin:0 }}>Ex : 1500m → VMA <strong>~15,8 km/h</strong></p>
+                <div><label style={labelSt}>Distance parcourue</label><div style={{ display:'flex', alignItems:'center', gap:'.5rem' }}><input type="number" min="0" step="25" placeholder="Ex : 1500" value={sixDist} onChange={e=>setSixDist(e.target.value)} style={{ ...inputSt, width:150 }}/><span style={{ color:'rgba(26,18,48,.45)', fontSize:'.85rem' }}>mètres</span></div></div>
+                <p style={{ color:'rgba(26,18,48,.4)', fontSize:'.82rem', margin:0 }}>Ex : 1500m → VMA <strong>~15,8 km/h</strong></p>
               </div>
             </div>
 
             {/* Chrono */}
-            <div style={{ background:'rgba(255,255,255,.05)', borderRadius:20, padding:'2rem', boxShadow:'0 4px 24px rgba(139,47,201,.08)', border:'1px solid rgba(139,47,201,.1)' }}>
+            <div style={{ background:'#fff', borderRadius:20, padding:'2rem', boxShadow:'0 4px 24px rgba(139,47,201,.08)', border:'1px solid rgba(139,47,201,.1)' }}>
               <div style={{ display:'flex', alignItems:'flex-start', justifyContent:'space-between', flexWrap:'wrap', gap:'1rem', marginBottom:'1.25rem' }}>
                 <div>
                   <p style={{ fontWeight:800, color:C.dark, marginBottom:'.2rem', fontSize:'1.05rem' }}>🎯 Depuis un chrono récent</p>
-                  <p style={{ color:'rgba(255,255,255,.5)', fontSize:'.85rem', margin:0 }}>Estime ta VMA depuis ta dernière compétition ou sortie chronométrée</p>
+                  <p style={{ color:'rgba(26,18,48,.5)', fontSize:'.85rem', margin:0 }}>Estime ta VMA depuis ta dernière compétition ou sortie chronométrée</p>
                 </div>
                 {vmaR>0&&<div style={{ padding:'.5rem 1rem', borderRadius:10, background:`linear-gradient(135deg,${C.purple},${C.pink})`, color:'#fff', textAlign:'right' }}><p style={{ margin:0, fontSize:'.72rem', opacity:.8 }}>VMA estimée</p><p style={{ margin:0, fontSize:'1.4rem', fontWeight:900 }}>{vmaR.toFixed(1)} km/h</p></div>}
               </div>
@@ -148,17 +148,17 @@ export default function VMACalculator() {
 
           {/* Results */}
           {vma>0&&(
-            <div style={{ marginTop:'2rem', background:'rgba(255,255,255,.05)', borderRadius:20, padding:'2rem', boxShadow:'0 8px 40px rgba(139,47,201,.12)', border:`2px solid rgba(139,47,201,.2)` }}>
+            <div style={{ marginTop:'2rem', background:'#fff', borderRadius:20, padding:'2rem', boxShadow:'0 8px 40px rgba(139,47,201,.12)', border:`2px solid rgba(139,47,201,.2)` }}>
               <div style={{ display:'flex', alignItems:'flex-start', justifyContent:'space-between', flexWrap:'wrap', gap:'1.5rem', marginBottom:'1.75rem' }}>
                 <div>
-                  <p style={{ margin:0, fontSize:'.75rem', color:'rgba(255,255,255,.4)', textTransform:'uppercase', letterSpacing:'.08em', marginBottom:'.3rem' }}>Ta VMA estimée</p>
+                  <p style={{ margin:0, fontSize:'.75rem', color:'rgba(26,18,48,.4)', textTransform:'uppercase', letterSpacing:'.08em', marginBottom:'.3rem' }}>Ta VMA estimée</p>
                   <p style={{ margin:0, fontSize:'3rem', fontWeight:900, color:C.purple, lineHeight:1 }}>{vma.toFixed(1)}<span style={{ fontSize:'1rem', fontWeight:400, marginLeft:'.25rem' }}>km/h</span></p>
-                  <p style={{ margin:'.3rem 0 0', color:'rgba(255,255,255,.5)', fontSize:'.85rem' }}>Allure VMA : {kmhToPace(vma)}/km</p>
+                  <p style={{ margin:'.3rem 0 0', color:'rgba(26,18,48,.5)', fontSize:'.85rem' }}>Allure VMA : {kmhToPace(vma)}/km</p>
                 </div>
                 {lvl&&(
                   <div style={{ padding:'1rem 1.5rem', borderRadius:14, background:lvl.bg, textAlign:'left' }}>
                     <p style={{ margin:0, fontWeight:800, color:lvl.color, fontSize:'1.1rem' }}>{lvl.label}</p>
-                    <p style={{ margin:'.35rem 0 0', fontSize:'.82rem', color:'rgba(255,255,255,.6)', maxWidth:220 }}>{lvl.desc}</p>
+                    <p style={{ margin:'.35rem 0 0', fontSize:'.82rem', color:'rgba(26,18,48,.6)', maxWidth:220 }}>{lvl.desc}</p>
                   </div>
                 )}
               </div>
@@ -174,7 +174,7 @@ export default function VMACalculator() {
                       return <tr key={z.n} style={{ borderTop:'1px solid rgba(139,47,201,.07)' }}>
                         <td style={{ padding:'.6rem .85rem' }}><span style={{ display:'inline-flex', alignItems:'center', justifyContent:'center', width:24, height:24, borderRadius:'50%', background:z.color+'25', color:z.color, fontSize:'.8rem', fontWeight:700 }}>{z.n}</span></td>
                         <td style={{ padding:'.6rem .85rem', color:z.color, fontWeight:600 }}>{z.name}</td>
-                        <td style={{ padding:'.6rem .85rem', color:'rgba(255,255,255,.45)', fontVariantNumeric:'tabular-nums' }}>{Math.round(z.pct[0]*100)}–{Math.round(z.pct[1]*100)}%</td>
+                        <td style={{ padding:'.6rem .85rem', color:'rgba(26,18,48,.45)', fontVariantNumeric:'tabular-nums' }}>{Math.round(z.pct[0]*100)}–{Math.round(z.pct[1]*100)}%</td>
                         <td style={{ padding:'.6rem .85rem', color:C.dark, fontVariantNumeric:'tabular-nums' }}>{lo.toFixed(1)}–{hi.toFixed(1)} km/h</td>
                         <td style={{ padding:'.6rem .85rem', color:C.dark, fontVariantNumeric:'tabular-nums' }}>{kmhToPace(hi)} – {kmhToPace(lo)}</td>
                       </tr>
@@ -193,7 +193,7 @@ export default function VMACalculator() {
       </section>
 
       {/* COMMENT ÇA FONCTIONNE */}
-      <section style={{ background:'#0C0A18', padding:'5rem 1.5rem' }}>
+      <section style={{ background:'#fff', padding:'5rem 1.5rem' }}>
         <Inner>
           <div style={{ display:'flex', gap:'3rem', alignItems:'center', flexWrap:'wrap' }}>
             <div style={{ flex:'1 1 380px', borderRadius:20, overflow:'hidden', maxHeight:440 }}>
@@ -237,7 +237,7 @@ export default function VMACalculator() {
                   { n:'⚡', t:'Définition simple', d:"La VMA (Vitesse Maximale Aérobie) est la vitesse à laquelle ton corps consomme le maximum d'oxygène possible. C'est ton moteur : plus il est puissant, plus tu es rapide et endurant sur toutes les distances." },
                   { n:'📈', t:"L'indicateur de progression", d:"En connaissant ta VMA, tu peux calculer avec précision toutes tes allures d'entraînement et te fixer des objectifs réalistes. Chaque progression de 0,5 km/h de VMA se traduit par 3-5 minutes gagnées sur un marathon." },
                   { n:'🎯', t:'La base de chaque séance', d:"Endurance fondamentale, seuil, fractionné : tout se calcule en pourcentage de VMA. Courir dans les bonnes zones évite le surentraînement et maximise les adaptations physiologiques." },
-                ].map(p=><div key={p.n} style={{ display:'flex', gap:'.85rem', alignItems:'flex-start' }}><span style={{ fontSize:'1.5rem', flexShrink:0 }}>{p.n}</span><div><p style={{ fontWeight:700, color:C.dark, marginBottom:'.2rem', fontSize:'.95rem' }}>{p.t}</p><p style={{ color:'rgba(255,255,255,.6)', fontSize:'.88rem', lineHeight:1.65, margin:0, textAlign:'justify' }}>{p.d}</p></div></div>)}
+                ].map(p=><div key={p.n} style={{ display:'flex', gap:'.85rem', alignItems:'flex-start' }}><span style={{ fontSize:'1.5rem', flexShrink:0 }}>{p.n}</span><div><p style={{ fontWeight:700, color:C.dark, marginBottom:'.2rem', fontSize:'.95rem' }}>{p.t}</p><p style={{ color:'rgba(26,18,48,.6)', fontSize:'.88rem', lineHeight:1.65, margin:0, textAlign:'justify' }}>{p.d}</p></div></div>)}
               </div>
               <button onClick={handleCTA} style={{ padding:'.85rem 2rem', borderRadius:50, border:'none', background:`linear-gradient(135deg,${C.purple},${C.pink})`, color:'#fff', fontWeight:700, cursor:'pointer', fontSize:'.95rem', boxShadow:'0 6px 24px rgba(232,35,122,.4)' }}>Je rejoins The Ultimate Academy</button>
             </div>
@@ -320,7 +320,7 @@ export default function VMACalculator() {
       </section>
 
       {/* TÉMOIGNAGES */}
-      <section style={{ background:'#000', padding:'5rem 1.5rem' }}>
+      <section style={{ background:C.light, padding:'5rem 1.5rem' }}>
         <Inner>
           <div style={{ textAlign:'center', marginBottom:'2.5rem' }}><SectionTag>Témoignages</SectionTag><H2L>Ce que disent nos <span style={gradText}>athlètes</span></H2L></div>
         </Inner>
@@ -333,7 +333,7 @@ export default function VMACalculator() {
       />
 
       {/* FAQ */}
-      <section style={{ background:'#0C0A18', padding:'5rem 1.5rem' }}>
+      <section style={{ background:'#fff', padding:'5rem 1.5rem' }}>
         <Inner max={720}>
           <div style={{ textAlign:'center', marginBottom:'2.5rem' }}><SectionTag>Questions fréquentes</SectionTag><H2L>Tout ce que tu dois savoir sur la <span style={gradText}>VMA</span></H2L></div>
           {FAQ.map((item,i)=>(
@@ -342,7 +342,7 @@ export default function VMACalculator() {
                 {item.q}
                 <svg width="14" height="14" viewBox="0 0 12 12" fill="none" style={{ flexShrink:0, transition:'transform .2s', transform:openFaq===i?'rotate(180deg)':'none' }}><path d="M1 4l5 5 5-5" stroke={C.purple} strokeWidth="2" strokeLinecap="round"/></svg>
               </button>
-              {openFaq===i&&<p style={{ margin:'0 0 1.25rem', color:'rgba(255,255,255,.65)', fontSize:'.9rem', lineHeight:1.75, textAlign:'justify' }}>{item.a}</p>}
+              {openFaq===i&&<p style={{ margin:'0 0 1.25rem', color:'rgba(26,18,48,.65)', fontSize:'.9rem', lineHeight:1.75, textAlign:'justify' }}>{item.a}</p>}
             </div>
           ))}
         </Inner>

@@ -88,12 +88,12 @@ function getSplitTime(km, avgPace, distKm, negSplit) {
 }
 
 // ── Shared atoms (light bg) ────────────────────────────────
-const C = { purple:'#8B2FC9', pink:'#E8237A', dark:'#fff', light:'#0C0A18' }
-const inputSt = { background:'rgba(255,255,255,.07)', border:'1px solid rgba(139,47,201,.35)', borderRadius:10, padding:'.55rem .75rem', color:'#fff', fontSize:'.9rem', outline:'none', width:80 }
-const labelSt = { display:'block', fontSize:'.72rem', color:'rgba(255,255,255,.45)', textTransform:'uppercase', letterSpacing:'.08em', marginBottom:'.4rem' }
+const C = { purple:'#8B2FC9', pink:'#E8237A', dark:'#1a1230', light:'#F8F5FF' }
+const inputSt = { background:'#fff', border:'1px solid rgba(139,47,201,.25)', borderRadius:10, padding:'.55rem .75rem', color:C.dark, fontSize:'.9rem', outline:'none', width:80 }
+const labelSt = { display:'block', fontSize:'.72rem', color:'rgba(26,18,48,.45)', textTransform:'uppercase', letterSpacing:'.08em', marginBottom:'.4rem' }
 
 function Chip({ active, onClick, children, small }) {
-  return <button onClick={onClick} style={{ padding:small?'.28rem .65rem':'.42rem .95rem', borderRadius:50, cursor:'pointer', fontSize:small?'.78rem':'.84rem', border:`1px solid ${active?'transparent':'rgba(139,47,201,.35)'}`, background:active?`linear-gradient(135deg,${C.purple},${C.pink})`:'rgba(255,255,255,.07)', color:active?'#fff':C.purple, fontWeight:active?600:400, transition:'all .15s', whiteSpace:'nowrap' }}>{children}</button>
+  return <button onClick={onClick} style={{ padding:small?'.28rem .65rem':'.42rem .95rem', borderRadius:50, cursor:'pointer', fontSize:small?'.78rem':'.84rem', border:`1px solid ${active?'transparent':'rgba(139,47,201,.25)'}`, background:active?`linear-gradient(135deg,${C.purple},${C.pink})`:'#fff', color:active?'#fff':C.purple, fontWeight:active?600:400, transition:'all .15s', whiteSpace:'nowrap' }}>{children}</button>
 }
 function TimeInput({ label, value, onChange, max }) {
   return <div><label style={labelSt}>{label}</label><input type="number" min="0" max={max} value={value} onChange={e=>onChange(e.target.value)} placeholder="00" style={inputSt}/></div>
@@ -101,7 +101,7 @@ function TimeInput({ label, value, onChange, max }) {
 function Stars({ n }) {
   return <div style={{ color:'#F59E0B', fontSize:'1rem', marginBottom:'.5rem' }}>{'★'.repeat(n)}</div>
 }
-function Section({ bg='#0C0A18', pad='5rem 1.5rem', children, id }) {
+function Section({ bg='#fff', pad='5rem 1.5rem', children, id }) {
   return <section id={id} style={{ background:bg, padding:pad }}>{children}</section>
 }
 function Inner({ max=1000, children, style }) {
@@ -111,7 +111,7 @@ function SectionTag({ children }) {
   return <p style={{ fontSize:'.75rem', letterSpacing:'.18em', textTransform:'uppercase', color:C.purple, marginBottom:'.75rem', fontWeight:600 }}>{children}</p>
 }
 function H2Light({ children }) {
-  return <h2 style={{ fontSize:'clamp(1.6rem,3.5vw,2.4rem)', fontWeight:900, color:'#fff', lineHeight:1.15, marginBottom:'1.25rem' }}>{children}</h2>
+  return <h2 style={{ fontSize:'clamp(1.6rem,3.5vw,2.4rem)', fontWeight:900, color:C.dark, lineHeight:1.15, marginBottom:'1.25rem' }}>{children}</h2>
 }
 function H2Dark({ children }) {
   return <h2 style={{ fontSize:'clamp(1.6rem,3.5vw,2.4rem)', fontWeight:900, color:'#fff', lineHeight:1.15, marginBottom:'1.25rem' }}>{children}</h2>
@@ -186,20 +186,20 @@ export default function Calculator() {
       </PageHero>
 
       {/* ── CALCULATOR ─────────────────────────────────────────── */}
-      <section ref={calcRef} id="outil" style={{ background:'#000', padding:'5rem 1.5rem' }}>
+      <section ref={calcRef} id="outil" style={{ background:C.light, padding:'5rem 1.5rem' }}>
         <Inner max={780}>
           <div style={{ textAlign:'center', marginBottom:'2.5rem' }}>
             <SectionTag>Calculateur interactif</SectionTag>
-            <h2 style={{ fontSize:'clamp(1.5rem,3vw,2rem)', fontWeight:900, color:'#fff', marginBottom:'.5rem' }}>Tes temps de passage en temps réel</h2>
-            <p style={{ color:'rgba(255,255,255,.55)', fontSize:'.95rem' }}>Résultats instantanés, aucune inscription requise</p>
+            <h2 style={{ fontSize:'clamp(1.5rem,3vw,2rem)', fontWeight:900, color:C.dark, marginBottom:'.5rem' }}>Tes temps de passage en temps réel</h2>
+            <p style={{ color:'rgba(26,18,48,.55)', fontSize:'.95rem' }}>Résultats instantanés, aucune inscription requise</p>
           </div>
-          <div style={{ background:'rgba(255,255,255,.04)', borderRadius:20, padding:'2rem', border:'1px solid rgba(139,47,201,.22)' }}>
+          <div style={{ background:'#fff', borderRadius:20, padding:'2rem', boxShadow:'0 8px 40px rgba(139,47,201,.1)', border:'1px solid rgba(139,47,201,.12)' }}>
 
             {/* Step 1 */}
             <div style={{ marginBottom:'1.75rem' }}>
               <div style={{ display:'flex', alignItems:'center', gap:'.6rem', marginBottom:'.85rem' }}>
                 <span style={{ display:'inline-flex', alignItems:'center', justifyContent:'center', width:24, height:24, borderRadius:'50%', background:`linear-gradient(135deg,${C.purple},${C.pink})`, fontSize:'.72rem', fontWeight:800, color:'#fff' }}>1</span>
-                <span style={{ fontWeight:700, color:'#fff', fontSize:'.95rem' }}>Choisis ta distance</span>
+                <span style={{ fontWeight:700, color:C.dark, fontSize:'.95rem' }}>Choisis ta distance</span>
               </div>
               <div style={{ display:'flex', flexWrap:'wrap', gap:'.5rem', marginBottom:distKey==='custom'?'.75rem':0 }}>
                 {DISTANCES.map(d=><Chip key={d.key} active={distKey===d.key} onClick={()=>setDistKey(d.key)}>{d.label}</Chip>)}
@@ -212,7 +212,7 @@ export default function Calculator() {
             <div style={{ marginBottom:'1.75rem' }}>
               <div style={{ display:'flex', alignItems:'center', gap:'.6rem', marginBottom:'.85rem' }}>
                 <span style={{ display:'inline-flex', alignItems:'center', justifyContent:'center', width:24, height:24, borderRadius:'50%', background:`linear-gradient(135deg,${C.purple},${C.pink})`, fontSize:'.72rem', fontWeight:800, color:'#fff' }}>2</span>
-                <span style={{ fontWeight:700, color:'#fff', fontSize:'.95rem' }}>Ton chrono objectif</span>
+                <span style={{ fontWeight:700, color:C.dark, fontSize:'.95rem' }}>Ton chrono objectif</span>
               </div>
               <div style={{ display:'flex', gap:'.75rem', flexWrap:'wrap' }}>
                 <TimeInput label="Heures"   value={hours}   onChange={setHours}   max={9}/>
@@ -225,14 +225,14 @@ export default function Calculator() {
             <div style={{ marginBottom:'1.75rem' }}>
               <div style={{ display:'flex', alignItems:'center', gap:'.6rem', marginBottom:'.85rem' }}>
                 <span style={{ display:'inline-flex', alignItems:'center', justifyContent:'center', width:24, height:24, borderRadius:'50%', background:`linear-gradient(135deg,${C.purple},${C.pink})`, fontSize:'.72rem', fontWeight:800, color:'#fff' }}>3</span>
-                <span style={{ fontWeight:700, color:'#fff', fontSize:'.95rem' }}>Fréquence des passages</span>
+                <span style={{ fontWeight:700, color:C.dark, fontSize:'.95rem' }}>Fréquence des passages</span>
               </div>
               <div style={{ display:'flex', flexWrap:'wrap', gap:'.5rem', marginBottom:'1rem' }}>
                 {FREQS.map(f=><Chip key={f.key} active={freq===f.key} onClick={()=>setFreq(f.key)}>{f.label}</Chip>)}
               </div>
               <label style={{ display:'flex', alignItems:'center', gap:'.6rem', cursor:'pointer' }}>
                 <input type="checkbox" checked={negSplit} onChange={e=>setNegSplit(e.target.checked)} style={{ accentColor:C.purple, width:16, height:16 }}/>
-                <span style={{ fontSize:'.875rem', color:'rgba(255,255,255,.7)' }}>Stratégie négatif split : départ 3% plus lent, arrivée 3% plus rapide</span>
+                <span style={{ fontSize:'.875rem', color:'rgba(26,18,48,.7)' }}>Stratégie négatif split : départ 3% plus lent, arrivée 3% plus rapide</span>
               </label>
             </div>
 
@@ -243,7 +243,7 @@ export default function Calculator() {
                 <div style={{ overflowX:'auto', borderRadius:12, border:'1px solid rgba(139,47,201,.12)' }}>
                   <table style={{ width:'100%', borderCollapse:'collapse', fontSize:'.875rem' }}>
                     <thead><tr style={{ background:'rgba(139,47,201,.06)' }}>
-                      {['Kilomètre','Temps de passage','Allure'].map(h=><th key={h} style={{ padding:'.65rem .85rem', textAlign:'left', color:'rgba(255,255,255,.4)', fontWeight:500, fontSize:'.72rem', textTransform:'uppercase', letterSpacing:'.08em' }}>{h}</th>)}
+                      {['Kilomètre','Temps de passage','Allure'].map(h=><th key={h} style={{ padding:'.65rem .85rem', textAlign:'left', color:'rgba(26,18,48,.4)', fontWeight:500, fontSize:'.72rem', textTransform:'uppercase', letterSpacing:'.08em' }}>{h}</th>)}
                     </tr></thead>
                     <tbody>
                       {splits.map((km,i)=>{
@@ -254,28 +254,28 @@ export default function Calculator() {
                         return <tr key={i} style={{ borderTop:'1px solid rgba(139,47,201,.07)', background:isFinish?'rgba(139,47,201,.07)':isHalf?'rgba(139,47,201,.03)':'transparent' }}>
                           <td style={{ padding:'.6rem .85rem', color:isFinish?C.purple:C.dark, fontWeight:isFinish?700:400 }}>{kmLabel(km,distKm)}</td>
                           <td style={{ padding:'.6rem .85rem', color:isFinish?C.purple:C.dark, fontWeight:isFinish?700:400, fontVariantNumeric:'tabular-nums' }}>{fmtHMS(t)}</td>
-                          <td style={{ padding:'.6rem .85rem', color:'rgba(255,255,255,.45)', fontVariantNumeric:'tabular-nums' }}>{fmtPace(pace)}/km</td>
+                          <td style={{ padding:'.6rem .85rem', color:'rgba(26,18,48,.45)', fontVariantNumeric:'tabular-nums' }}>{fmtPace(pace)}/km</td>
                         </tr>
                       })}
                     </tbody>
                   </table>
                 </div>
                 <div style={{ marginTop:'1.25rem', display:'flex', alignItems:'center', justifyContent:'space-between', flexWrap:'wrap', gap:'.75rem' }}>
-                  <p style={{ margin:0, fontSize:'.88rem', color:'rgba(255,255,255,.6)' }}>Allure moyenne : <strong style={{ color:C.purple, fontVariantNumeric:'tabular-nums' }}>{fmtPace(avgPace)}/km</strong></p>
+                  <p style={{ margin:0, fontSize:'.88rem', color:'rgba(26,18,48,.6)' }}>Allure moyenne : <strong style={{ color:C.purple, fontVariantNumeric:'tabular-nums' }}>{fmtPace(avgPace)}/km</strong></p>
                   <button onClick={copyResults} style={{ padding:'.4rem 1rem', borderRadius:8, cursor:'pointer', fontSize:'.82rem', border:`1px solid ${copied?C.purple:'rgba(139,47,201,.2)'}`, background:copied?'rgba(139,47,201,.08)':'transparent', color:copied?C.purple:'rgba(26,18,48,.5)', transition:'all .2s' }}>{copied?'✓ Copié !':'Copier les temps de passage'}</button>
                 </div>
               </>
             ):(
               <div style={{ padding:'2.5rem', textAlign:'center', borderRadius:12, background:'rgba(139,47,201,.04)', border:'1px dashed rgba(139,47,201,.15)' }}>
-                <p style={{ color:'rgba(255,255,255,.35)', margin:0, fontSize:'.9rem' }}>Entre ton chrono objectif pour voir tes temps de passage</p>
+                <p style={{ color:'rgba(26,18,48,.35)', margin:0, fontSize:'.9rem' }}>Entre ton chrono objectif pour voir tes temps de passage</p>
               </div>
             )}
 
             {/* Inverse */}
             <div style={{ marginTop:'2rem', paddingTop:'2rem', borderTop:'1px solid rgba(139,47,201,.1)' }}>
-              <p style={{ fontWeight:700, color:'#fff', marginBottom:'1rem' }}>Tu connais ton allure ? → Calcule ton chrono</p>
+              <p style={{ fontWeight:700, color:C.dark, marginBottom:'1rem' }}>Tu connais ton allure ? → Calcule ton chrono</p>
               <div style={{ display:'flex', gap:'1rem', flexWrap:'wrap', alignItems:'flex-end' }}>
-                <div><label style={labelSt}>Allure (min/km)</label><div style={{ display:'flex', alignItems:'center', gap:'.4rem' }}><input type="text" placeholder="4:30" value={invPace} onChange={e=>setInvPace(e.target.value)} style={{ ...inputSt, width:90 }}/><span style={{ color:'rgba(255,255,255,.4)', fontSize:'.82rem' }}>min/km</span></div></div>
+                <div><label style={labelSt}>Allure (min/km)</label><div style={{ display:'flex', alignItems:'center', gap:'.4rem' }}><input type="text" placeholder="4:30" value={invPace} onChange={e=>setInvPace(e.target.value)} style={{ ...inputSt, width:90 }}/><span style={{ color:'rgba(26,18,48,.4)', fontSize:'.82rem' }}>min/km</span></div></div>
                 <div><label style={labelSt}>Distance</label><div style={{ display:'flex', gap:'.4rem', flexWrap:'wrap' }}>{DISTANCES.map(d=><Chip key={d.key} active={invDist===d.key} onClick={()=>setInvDist(d.key)} small>{d.label}</Chip>)}</div></div>
                 {invTotal&&<div style={{ padding:'.65rem 1.25rem', borderRadius:10, background:`linear-gradient(135deg,${C.purple},${C.pink})`, color:'#fff' }}><p style={{ margin:0, fontSize:'.75rem', opacity:.8 }}>Chrono estimé</p><p style={{ margin:0, fontSize:'1.4rem', fontWeight:900, fontVariantNumeric:'tabular-nums' }}>{fmtHMS(invTotal)}</p></div>}
               </div>
@@ -328,7 +328,7 @@ export default function Calculator() {
                   { n:'🎯', t:'Définis ton objectif', d:"Entre ta distance et ton chrono cible. Le calculateur convertit immédiatement en allure et en temps de passage kilomètre par kilomètre." },
                   { n:'📊', t:'Visualise ta course', d:"Obtiens un tableau complet de tes repères. Active le négatif split pour une stratégie scientifiquement prouvée : partir légèrement plus lent pour finir plus fort." },
                   { n:'🏃', t:'Exécute en confiance', d:"Le jour de course, coche chaque borne avec ton tableau de bord. Plus de décision à prendre à chaud : tu suis juste ton plan." },
-                ].map(p=><div key={p.n} style={{ display:'flex', gap:'.85rem', alignItems:'flex-start' }}><span style={{ fontSize:'1.5rem', flexShrink:0, marginTop:'.1rem' }}>{p.n}</span><div><p style={{ fontWeight:700, color:'#fff', marginBottom:'.25rem', fontSize:'.95rem' }}>{p.t}</p><p style={{ color:'rgba(255,255,255,.6)', fontSize:'.88rem', lineHeight:1.65, margin:0, textAlign:'justify' }}>{p.d}</p></div></div>)}
+                ].map(p=><div key={p.n} style={{ display:'flex', gap:'.85rem', alignItems:'flex-start' }}><span style={{ fontSize:'1.5rem', flexShrink:0, marginTop:'.1rem' }}>{p.n}</span><div><p style={{ fontWeight:700, color:C.dark, marginBottom:'.25rem', fontSize:'.95rem' }}>{p.t}</p><p style={{ color:'rgba(26,18,48,.6)', fontSize:'.88rem', lineHeight:1.65, margin:0, textAlign:'justify' }}>{p.d}</p></div></div>)}
               </div>
               <button onClick={handleCTA} style={{ padding:'.85rem 2rem', borderRadius:50, border:'none', background:`linear-gradient(135deg,${C.purple},${C.pink})`, color:'#fff', fontWeight:700, cursor:'pointer', fontSize:'.95rem', boxShadow:'0 6px 24px rgba(232,35,122,.4)' }}>Je rejoins The Ultimate Academy</button>
             </div>
@@ -384,27 +384,27 @@ export default function Calculator() {
       </Section>
 
       {/* ── RAVITAILLEMENT ─────────────────────────────────────── */}
-      <Section bg="#0C0A18">
+      <Section bg="#fff">
         <Inner>
           <div style={{ textAlign:'center', marginBottom:'2.5rem' }}>
             <SectionTag>Nutrition course</SectionTag>
             <H2Light>Où placer tes ravitaillements ?</H2Light>
-            <p style={{ color:'rgba(255,255,255,.55)', maxWidth:540, margin:'0 auto' }}>La stratégie nutritionnelle se prépare avant le départ, pas au 25ème kilomètre quand tu commences à flancher.</p>
+            <p style={{ color:'rgba(26,18,48,.55)', maxWidth:540, margin:'0 auto' }}>La stratégie nutritionnelle se prépare avant le départ, pas au 25ème kilomètre quand tu commences à flancher.</p>
           </div>
           <div style={{ display:'flex', gap:'.5rem', flexWrap:'wrap', justifyContent:'center', marginBottom:'2rem' }}>
             {['10k','semi','marathon'].map(k=><Chip key={k} active={fuelDist===k} onClick={()=>setFuelDist(k)}>{FUEL_PLAN[k].label}</Chip>)}
           </div>
           <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fill,minmax(200px,1fr))', gap:'1rem', marginBottom:'2rem' }}>
             {fuel.points.map(p=>(
-              <div key={p.km} style={{ background:'rgba(255,255,255,.05)', borderRadius:14, padding:'1.25rem', border:`1px solid rgba(139,47,201,.22)` }}>
+              <div key={p.km} style={{ background:C.light, borderRadius:14, padding:'1.25rem', border:`2px solid rgba(139,47,201,.12)` }}>
                 <p style={{ fontWeight:800, color:C.purple, fontSize:'1.1rem', margin:'0 0 .6rem' }}>km {p.km}</p>
-                <p style={{ fontSize:'.75rem', color:'rgba(255,255,255,.4)', margin:'0 0 .75rem', textTransform:'uppercase', letterSpacing:'.06em' }}>{p.label}</p>
-                {p.items.map(it=><div key={it.name} style={{ display:'flex', alignItems:'center', gap:'.5rem', marginBottom:'.35rem', fontSize:'.875rem', color:'#fff' }}><span style={{ fontSize:'1.1rem' }}>{it.icon}</span>{it.name}</div>)}
+                <p style={{ fontSize:'.75rem', color:'rgba(26,18,48,.4)', margin:'0 0 .75rem', textTransform:'uppercase', letterSpacing:'.06em' }}>{p.label}</p>
+                {p.items.map(it=><div key={it.name} style={{ display:'flex', alignItems:'center', gap:'.5rem', marginBottom:'.35rem', fontSize:'.875rem', color:C.dark }}><span style={{ fontSize:'1.1rem' }}>{it.icon}</span>{it.name}</div>)}
               </div>
             ))}
           </div>
           <div style={{ background:`linear-gradient(135deg,rgba(139,47,201,.08),rgba(232,35,122,.06))`, borderRadius:16, padding:'1.5rem', border:'1px solid rgba(139,47,201,.15)' }}>
-            <p style={{ margin:0, fontSize:'.92rem', color:'#fff', lineHeight:1.7, textAlign:'justify' }}>
+            <p style={{ margin:0, fontSize:'.92rem', color:C.dark, lineHeight:1.7, textAlign:'justify' }}>
               <strong style={{ color:C.purple }}>💬 Mon conseil coach :</strong> « {fuel.tip} »
             </p>
           </div>
@@ -412,7 +412,7 @@ export default function Calculator() {
       </Section>
 
       {/* ── TÉMOIGNAGES ────────────────────────────────────────── */}
-      <Section bg="#000">
+      <Section bg={C.light}>
         <Inner>
           <div style={{ textAlign:'center', marginBottom:'2.5rem' }}>
             <SectionTag>Témoignages</SectionTag>
@@ -428,7 +428,7 @@ export default function Calculator() {
       />
 
       {/* ── FAQ ────────────────────────────────────────────────── */}
-      <Section bg="#0C0A18">
+      <Section bg="#fff">
         <Inner max={720}>
           <div style={{ textAlign:'center', marginBottom:'2.5rem' }}>
             <SectionTag>Questions fréquentes</SectionTag>
@@ -436,11 +436,11 @@ export default function Calculator() {
           </div>
           {FAQ.map((item,i)=>(
             <div key={i} style={{ borderBottom:'1px solid rgba(139,47,201,.1)' }}>
-              <button onClick={()=>setOpenFaq(openFaq===i?null:i)} style={{ width:'100%', display:'flex', justifyContent:'space-between', alignItems:'center', padding:'1.1rem 0', background:'none', border:'none', cursor:'pointer', color:'#fff', fontSize:'.95rem', fontWeight:600, textAlign:'left', gap:'1rem' }}>
+              <button onClick={()=>setOpenFaq(openFaq===i?null:i)} style={{ width:'100%', display:'flex', justifyContent:'space-between', alignItems:'center', padding:'1.1rem 0', background:'none', border:'none', cursor:'pointer', color:C.dark, fontSize:'.95rem', fontWeight:600, textAlign:'left', gap:'1rem' }}>
                 {item.q}
                 <svg width="14" height="14" viewBox="0 0 12 12" fill="none" style={{ flexShrink:0, transition:'transform .2s', transform:openFaq===i?'rotate(180deg)':'none' }}><path d="M1 4l5 5 5-5" stroke={C.purple} strokeWidth="2" strokeLinecap="round"/></svg>
               </button>
-              {openFaq===i&&<p style={{ margin:'0 0 1.25rem', color:'rgba(255,255,255,.65)', fontSize:'.9rem', lineHeight:1.75, textAlign:'justify' }}>{item.a}</p>}
+              {openFaq===i&&<p style={{ margin:'0 0 1.25rem', color:'rgba(26,18,48,.65)', fontSize:'.9rem', lineHeight:1.75, textAlign:'justify' }}>{item.a}</p>}
             </div>
           ))}
         </Inner>
