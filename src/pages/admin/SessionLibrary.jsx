@@ -150,8 +150,44 @@ export default function SessionLibrary() {
     supabase
       .from('session_library')
       .select('*')
-      .order('code')
-      .then(({ data }) => { setSessions(data || []); setLoading(false) })
+      .then(({ data }) => {
+        if (!data) { setLoading(false); return }
+        // Ordre des catégories par sport puis par type logique
+        const TYPE_ORDER = {
+          // Running
+          footing_recuperation: 0,
+          recuperation_active: 1,
+          endurance_fondamentale: 2,
+          footing_progressif: 3,
+          tempo_seuil: 4,
+          fractionne_court: 5,
+          fractionne_long: 6,
+          cotes: 7,
+          specifique: 8,
+          sortie_longue: 9,
+          renforcement: 10,
+          // Natation
+          natation: 11,
+          // Vélo
+          velo: 12,
+          // Brique
+          brique: 13,
+          // Trail
+          trail: 14,
+        }
+        const numFromCode = code => {
+          const m = code.match(/(\d+)$/)
+          return m ? parseInt(m[1], 10) : 0
+        }
+        const sorted = [...data].sort((a, b) => {
+          const tA = TYPE_ORDER[a.type] ?? 99
+          const tB = TYPE_ORDER[b.type] ?? 99
+          if (tA !== tB) return tA - tB
+          return numFromCode(a.code) - numFromCode(b.code)
+        })
+        setSessions(sorted)
+        setLoading(false)
+      })
   }, [])
 
   const sports = ['all', ...Object.keys(SPORT_LABELS)]
