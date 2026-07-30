@@ -805,7 +805,7 @@ INSERT INTO public.session_library (code, type, category, name, duration_min, in
  NULL,
  '100m retour au calme crawl lent',
  'Séance de base. Tu dois sentir ton allure dès les premiers 200m. Si tu souffles au bord à 300m, c''est que tu pars trop vite.',
- ARRAY['sprint', 'olympique', '70.3', 'ironman'], 'triathlon', ARRAY['natation']),
+ ARRAY['sprint', 'olympique', '70.3', 'ironman'], 'natation', ARRAY['natation']),
 
 ('NAT-02', 'natation', 'natation', 'Endurance natation — 1500m continu', 45, 5,
  '200m nage libre lente, 100m dos crawlé',
@@ -813,7 +813,7 @@ INSERT INTO public.session_library (code, type, category, name, duration_min, in
  NULL,
  '100m retour au calme crawl lent',
  'Ton 1500m de référence. Pars conservateur — l''erreur classique est de vouloir nager vite d''emblée.',
- ARRAY['olympique', '70.3', 'ironman'], 'triathlon', ARRAY['natation']),
+ ARRAY['olympique', '70.3', 'ironman'], 'natation', ARRAY['natation']),
 
 ('NAT-03', 'natation', 'natation', 'Endurance natation — 2000m continu', 55, 6,
  '300m nage libre lente, 100m dos crawlé',
@@ -821,7 +821,7 @@ INSERT INTO public.session_library (code, type, category, name, duration_min, in
  NULL,
  '100m retour au calme',
  'Deux kilomètres sans s''arrêter. La fatigue arrive vers 1200-1400m — c''est normal. Concentre-toi sur ta technique à ce moment-là.',
- ARRAY['70.3', 'ironman'], 'triathlon', ARRAY['natation']),
+ ARRAY['70.3', 'ironman'], 'natation', ARRAY['natation']),
 
 ('NAT-04', 'natation', 'natation', 'Fractionné court natation — 10x100m', 45, 7,
  '400m échauffement varié (nage libre, dos, battements)',
@@ -829,7 +829,7 @@ INSERT INTO public.session_library (code, type, category, name, duration_min, in
  '20'' bord entre chaque répétition',
  '200m retour au calme',
  'Séance classique de fractionné. Chaque 100m doit être régulier. La récup courte oblige à être économique. Ne te jette pas sur les premiers.',
- ARRAY['sprint', 'olympique', '70.3', 'ironman'], 'triathlon', ARRAY['natation']),
+ ARRAY['sprint', 'olympique', '70.3', 'ironman'], 'natation', ARRAY['natation']),
 
 ('NAT-05', 'natation', 'natation', 'Fractionné court natation — 8x100m vitesse', 40, 8,
  '400m échauffement varié',
@@ -837,7 +837,7 @@ INSERT INTO public.session_library (code, type, category, name, duration_min, in
  '30'' bord entre chaque',
  '200m retour au calme',
  'Effort plus intense que NAT-04. Les 30'' de récup te permettent de maintenir l''allure. Concentre-toi sur la finition de chaque longueur.',
- ARRAY['sprint', 'olympique'], 'triathlon', ARRAY['natation']),
+ ARRAY['sprint', 'olympique'], 'natation', ARRAY['natation']),
 
 ('NAT-06', 'natation', 'natation', 'Fractionné long natation — 5x200m', 50, 7,
  '400m échauffement varié',
@@ -845,7 +845,7 @@ INSERT INTO public.session_library (code, type, category, name, duration_min, in
  '30'' bord entre chaque',
  '200m retour au calme',
  'Le 200m en natation demande une gestion fine de l''effort. Ne pars pas trop vite — les 50 derniers mètres doivent être aussi rapides que les 50 premiers.',
- ARRAY['olympique', '70.3'], 'triathlon', ARRAY['natation']),
+ ARRAY['olympique', '70.3'], 'natation', ARRAY['natation']),
 
 ('NAT-07', 'natation', 'natation', 'Fractionné long natation — 4x400m', 55, 7,
  '400m échauffement varié',
@@ -853,7 +853,7 @@ INSERT INTO public.session_library (code, type, category, name, duration_min, in
  '45'' bord entre chaque',
  '200m retour au calme',
  'Séance clé pour Ironman 70.3. Le 400m en piscine simule un effort de 8-9 minutes. Régularité sur les 4 répétitions.',
- ARRAY['70.3', 'ironman'], 'triathlon', ARRAY['natation']),
+ ARRAY['70.3', 'ironman'], 'natation', ARRAY['natation']),
 
 ('NAT-08', 'natation', 'natation', 'Pyramide natation — 100-200-400-200-100m', 50, 7,
  '400m échauffement varié',
@@ -861,7 +861,7 @@ INSERT INTO public.session_library (code, type, category, name, duration_min, in
  'Variable : 20'', 30'', 40'' selon la distance',
  '200m retour au calme',
  'Séance pyramide — tu montes en distance puis tu redescends. La gestion de l''allure est la clé : chaque distance a son intensité propre. Original et très formateur.',
- ARRAY['sprint', 'olympique', '70.3'], 'triathlon', ARRAY['natation']),
+ ARRAY['sprint', 'olympique', '70.3'], 'natation', ARRAY['natation']),
 
 ('NAT-09', 'natation', 'natation', 'Natation technique — 10x50m focus', 40, 5,
  '400m nage libre lente',
@@ -869,7 +869,7 @@ INSERT INTO public.session_library (code, type, category, name, duration_min, in
  '15'' entre chaque longueur',
  '100m retour au calme',
  'Séance technique pure. Concentre-toi sur chaque élément. La technique en natation rapporte plus que la condition physique seule.',
- ARRAY['sprint', 'olympique', '70.3', 'ironman'], 'triathlon', ARRAY['natation']),
+ ARRAY['sprint', 'olympique', '70.3', 'ironman'], 'natation', ARRAY['natation']),
 
 ('NAT-10', 'natation', 'natation', 'Natation eau vive — Simulation départ masse', 45, 8,
  '400m nage libre lente',
@@ -877,7 +877,7 @@ INSERT INTO public.session_library (code, type, category, name, duration_min, in
  'Récup passive jusqu''au top de départ suivant',
  '200m retour au calme',
  'Simuler un départ de triathlon : tu dois aller vite dès le début. La récup est chronométrée — peu importe que tu sois fatigué, le départ part.',
- ARRAY['sprint', 'olympique', '70.3'], 'triathlon', ARRAY['natation']),
+ ARRAY['sprint', 'olympique', '70.3'], 'natation', ARRAY['natation']),
 
 ('NAT-11', 'natation', 'natation', 'Volume endurance natation — 3000m avec blocs', 70, 6,
  '300m nage libre lente',
@@ -885,7 +885,7 @@ INSERT INTO public.session_library (code, type, category, name, duration_min, in
  'Variable selon les blocs',
  '200m retour au calme',
  'Grosse séance d''endurance de volume. Trois mille mètres au total avec des blocs de qualité intercalés. Pour les préparations Ironman. Hydrate-toi en bord de bassin.',
- ARRAY['ironman'], 'triathlon', ARRAY['natation']),
+ ARRAY['ironman'], 'natation', ARRAY['natation']),
 
 ('NAT-12', 'natation', 'natation', 'Tempo natation — 3x600m seuil', 55, 8,
  '400m échauffement varié',
@@ -893,7 +893,7 @@ INSERT INTO public.session_library (code, type, category, name, duration_min, in
  '1min bord entre chaque',
  '200m retour au calme',
  'Trois blocs de 600m au seuil — l''équivalent natation du tempo running. La régularité entre les 3 blocs est la clé. Évite de partir fort sur le 1er.',
- ARRAY['olympique', '70.3', 'ironman'], 'triathlon', ARRAY['natation']);
+ ARRAY['olympique', '70.3', 'ironman'], 'natation', ARRAY['natation']);
 
 -- ============================================================
 -- VÉLO (VEL)
@@ -906,7 +906,7 @@ INSERT INTO public.session_library (code, type, category, name, duration_min, in
  NULL,
  '5 min pédalage très lent',
  'Séance de base vélo. La cadence doit rester autour de 90 rpm — si tu pousses des gros braquets lentement, tu fatigues les jambes pour rien.',
- ARRAY['sprint', 'olympique', '70.3', 'ironman'], 'triathlon', ARRAY['velo']),
+ ARRAY['sprint', 'olympique', '70.3', 'ironman'], 'velo', ARRAY['velo']),
 
 ('VEL-02', 'velo', 'velo', 'Endurance vélo — 1h30 fondamentale', 90, 5,
  '10 min pédalage lent zone 1',
@@ -914,7 +914,7 @@ INSERT INTO public.session_library (code, type, category, name, duration_min, in
  NULL,
  '5 min pédalage très lent',
  'Heure et demie de vélo. Bonne sortie pour construire l''endurance de base. Mange si tu es parti depuis plus de 60min.',
- ARRAY['olympique', '70.3', 'ironman'], 'triathlon', ARRAY['velo']),
+ ARRAY['olympique', '70.3', 'ironman'], 'velo', ARRAY['velo']),
 
 ('VEL-03', 'velo', 'velo', 'Endurance vélo — 2h fondamentale', 120, 6,
  '15 min pédalage lent zone 1',
@@ -922,7 +922,7 @@ INSERT INTO public.session_library (code, type, category, name, duration_min, in
  NULL,
  '5 min pédalage très lent',
  'Deux heures de selle. Ravitaillement obligatoire : gel toutes les 45min + eau régulière. Gère l''allure sur le premier tiers.',
- ARRAY['70.3', 'ironman'], 'triathlon', ARRAY['velo']),
+ ARRAY['70.3', 'ironman'], 'velo', ARRAY['velo']),
 
 ('VEL-04', 'velo', 'velo', 'Intervalles vélo — 5x5min zone 4', 70, 8,
  '15 min progressif zone 1-2',
@@ -930,7 +930,7 @@ INSERT INTO public.session_library (code, type, category, name, duration_min, in
  '3min zone 1-2 entre chaque intervalle',
  '10 min pédalage très lent',
  'Séance de seuil vélo. Cinq minutes à effort fort — ça brûle mais ça construit. La récup de 3min est volontairement courte.',
- ARRAY['sprint', 'olympique', '70.3'], 'triathlon', ARRAY['velo']),
+ ARRAY['sprint', 'olympique', '70.3'], 'velo', ARRAY['velo']),
 
 ('VEL-05', 'velo', 'velo', 'Intervalles vélo — 4x8min zone 4', 75, 8,
  '15 min progressif zone 1-2',
@@ -938,7 +938,7 @@ INSERT INTO public.session_library (code, type, category, name, duration_min, in
  '4min zone 1-2 entre chaque',
  '10 min pédalage très lent',
  'Huit minutes au seuil — l''effort doit être stable du début à la fin. Si tu exploses sur le 3ème bloc, tu es parti trop fort.',
- ARRAY['olympique', '70.3'], 'triathlon', ARRAY['velo']),
+ ARRAY['olympique', '70.3'], 'velo', ARRAY['velo']),
 
 ('VEL-06', 'velo', 'velo', 'Tempo vélo — 2x20min zone 3-4', 80, 7,
  '15 min progressif zone 1-2',
@@ -946,7 +946,7 @@ INSERT INTO public.session_library (code, type, category, name, duration_min, in
  '5min zone 1-2 entre les 2 blocs',
  '10 min pédalage très lent',
  'Deux blocs de 20min au tempo — l''équivalent vélo du tempo running. La régularité entre les blocs est la clé. Garde la même puissance du début à la fin.',
- ARRAY['olympique', '70.3', 'ironman'], 'triathlon', ARRAY['velo']),
+ ARRAY['olympique', '70.3', 'ironman'], 'velo', ARRAY['velo']),
 
 ('VEL-07', 'velo', 'velo', 'Tempo vélo — 40min continu zone 3', 70, 7,
  '15 min progressif zone 1-2',
@@ -954,7 +954,7 @@ INSERT INTO public.session_library (code, type, category, name, duration_min, in
  NULL,
  '10 min pédalage très lent',
  'Quarante minutes au tempo en continu. L''allure est moins intense que le seuil mais la durée est plus longue. Très spécifique Ironman.',
- ARRAY['70.3', 'ironman'], 'triathlon', ARRAY['velo']),
+ ARRAY['70.3', 'ironman'], 'velo', ARRAY['velo']),
 
 ('VEL-08', 'velo', 'velo', 'Sprint vélo — 8x30sec explosifs', 60, 9,
  '20 min progressif avec accélérations',
@@ -962,7 +962,7 @@ INSERT INTO public.session_library (code, type, category, name, duration_min, in
  '3min zone 1 entre chaque sprint',
  '10 min pédalage très lent',
  'Travail neuromusculaire vélo. Les 30 secondes doivent être maximales. La récup de 3min permet de maintenir la qualité. Tu dois avoir peur du prochain sprint.',
- ARRAY['sprint', 'olympique'], 'triathlon', ARRAY['velo']),
+ ARRAY['sprint', 'olympique'], 'velo', ARRAY['velo']),
 
 ('VEL-09', 'velo', 'velo', 'Travail de cadence — 6x3min haute cadence', 60, 6,
  '15 min progressif zone 1-2',
@@ -970,7 +970,7 @@ INSERT INTO public.session_library (code, type, category, name, duration_min, in
  '2min cadence normale zone 1 entre chaque',
  '10 min pédalage très lent',
  'Séance technique pure. La haute cadence force ton système cardiovasculaire et améliore ton efficacité neuromusculaire. C''est inconfortable au début — persiste.',
- ARRAY['sprint', 'olympique', '70.3', 'ironman'], 'triathlon', ARRAY['velo']),
+ ARRAY['sprint', 'olympique', '70.3', 'ironman'], 'velo', ARRAY['velo']),
 
 ('VEL-10', 'velo', 'velo', 'Vélo colline — 5x3min côtes zone 4-5', 70, 9,
  '15 min progressif zone 1-2',
@@ -978,7 +978,7 @@ INSERT INTO public.session_library (code, type, category, name, duration_min, in
  'Descente lente récup zone 1 entre chaque',
  '10 min pédalage très lent',
  'Les côtes en vélo développent la force et la puissance. Reste assis si possible, la puissance vient des jambes. Si tu dois danser, monte ton braquet.',
- ARRAY['olympique', '70.3', 'ironman'], 'triathlon', ARRAY['velo']),
+ ARRAY['olympique', '70.3', 'ironman'], 'velo', ARRAY['velo']),
 
 ('VEL-11', 'velo', 'velo', 'Simulation course vélo — 2h30 avec blocs', 150, 7,
  '15 min progressif zone 1-2',
@@ -986,7 +986,7 @@ INSERT INTO public.session_library (code, type, category, name, duration_min, in
  NULL,
  '5 min pédalage très lent',
  'Simulation de la partie vélo Ironman. Tu montes en régime sur la fin — comme en course. Ravitaillement : gel toutes les 40min, eau toutes les 20min.',
- ARRAY['ironman'], 'triathlon', ARRAY['velo']),
+ ARRAY['ironman'], 'velo', ARRAY['velo']),
 
 ('VEL-12', 'velo', 'velo', 'Blocs puissance — 3x(3min fort + 2min tempo)', 65, 8,
  '15 min progressif zone 1-2',
@@ -994,7 +994,7 @@ INSERT INTO public.session_library (code, type, category, name, duration_min, in
  '4min zone 1 entre les 3 blocs',
  '10 min pédalage très lent',
  'L''effort fort suivi sans récup d''un tempo — tu apprends à récupérer en roulant. Très spécifique triathlon où tu ne t''arrêtes jamais vraiment.',
- ARRAY['olympique', '70.3'], 'triathlon', ARRAY['velo']);
+ ARRAY['olympique', '70.3'], 'velo', ARRAY['velo']);
 
 -- ============================================================
 -- BRIQUE (BRI)
@@ -1006,49 +1006,49 @@ INSERT INTO public.session_library (code, type, category, name, duration_min, in
  'Vélo : 25min à 70-75% FTP (zone 2-3) — transition rapide → Course : 15min à 65-70% VMA (allure endurance)',
  NULL, NULL,
  'Première brique ? Bienvenue dans la zone de l''étrange. Les jambes vont sembler faites en béton au départ de la course. C''est normal — ça disparaît entre 5 et 10min. Ne ralentis pas, laisse ton corps s''adapter.',
- ARRAY['sprint', 'olympique'], 'triathlon', ARRAY['velo', 'course']),
+ ARRAY['sprint', 'olympique'], 'brique', ARRAY['velo', 'course']),
 
 ('BRI-02', 'brique', 'brique', 'Brique courte — Vélo 45min + Course 20min', 75, 7,
  '5 min vélo lent zone 1',
  'Vélo : 40min à 72-80% FTP → transition rapide → Course : 20min à 65-72% VMA',
  NULL, NULL,
  'La transition vélo-course est un art. Prépare tout avant de partir : chaussures, casquette, gel. Chaque seconde perdue en transition est une seconde donnée aux autres.',
- ARRAY['sprint', 'olympique'], 'triathlon', ARRAY['velo', 'course']),
+ ARRAY['sprint', 'olympique'], 'brique', ARRAY['velo', 'course']),
 
 ('BRI-03', 'brique', 'brique', 'Brique simulation sprint — Vélo 20min + Course 5km', 65, 8,
  '10 min vélo progressif zone 1-2',
  'Vélo : 20min à 80-88% FTP (effort course sprint) → transition rapide → Course : 5km à allure objectif course',
  NULL, NULL,
  'Simulation de distance sprint. L''intensité vélo est élevée — tu arrives en course avec les jambes chargées. C''est exactement les conditions de la compétition. Gère ton allure course dès le premier kilomètre.',
- ARRAY['sprint'], 'triathlon', ARRAY['velo', 'course']),
+ ARRAY['sprint'], 'brique', ARRAY['velo', 'course']),
 
 ('BRI-04', 'brique', 'brique', 'Brique simulation olympique — Vélo 40km + Course 10km', 140, 7,
  '10 min vélo progressif zone 1-2',
  'Vélo : 40km à 75-82% FTP → transition rapide → Course : 10km à 70-80% VMA',
  NULL, NULL,
  'Répétition générale distance olympique. Le 10km en course après 40km de vélo c''est différent d''un 10km seul. Tes allures seront différentes — adapte-toi et ne te bats pas contre le verdict de tes jambes.',
- ARRAY['olympique'], 'triathlon', ARRAY['velo', 'course']),
+ ARRAY['olympique'], 'brique', ARRAY['velo', 'course']),
 
 ('BRI-05', 'brique', 'brique', 'Brique longue — Vélo 1h30 + Course 30min', 115, 7,
  '10 min vélo progressif zone 1-2',
  'Vélo : 1h20 à 70-78% FTP → transition rapide → Course : 30min à 65-72% VMA',
  NULL, NULL,
  'Brique longue pour Ironman 70.3. Trente minutes de course après 1h20 de vélo — tes jambes vont te surprendre (pas toujours agréablement). L''adaptation vient avec la répétition de ce type de séance.',
- ARRAY['70.3'], 'triathlon', ARRAY['velo', 'course']),
+ ARRAY['70.3'], 'brique', ARRAY['velo', 'course']),
 
 ('BRI-06', 'brique', 'brique', 'Brique 70.3 — Vélo 2h + Course 45min', 165, 7,
  '10 min vélo progressif zone 1-2',
  'Vélo : 1h50 à 68-75% FTP → transition rapide → Course : 45min à 65-72% VMA',
  NULL, NULL,
  'Simulation 70.3. Ne va pas chercher l''intensité — l''objectif est l''adaptation à l''enchaînement. Ravitaillement vélo : gel toutes les 35-40min. Course : gel ou eau au départ de la transition.',
- ARRAY['70.3'], 'triathlon', ARRAY['velo', 'course']),
+ ARRAY['70.3'], 'brique', ARRAY['velo', 'course']),
 
 ('BRI-07', 'brique', 'brique', 'Brique Ironman — Vélo 3h + Course 40min', 225, 6,
  '10 min vélo progressif zone 1-2',
  'Vélo : 2h45 à 65-72% FTP → transition rapide → Course : 40min à 60-68% VMA (allure récupération-endurance)',
  NULL, NULL,
  'Séance phare de préparation Ironman. Trois heures de vélo suivi d''une course — ton corps va apprendre à se réinitialiser. L''allure course doit rester gérée même si tu as envie d''aller plus vite. Journée de ravitaillement structuré.',
- ARRAY['ironman'], 'triathlon', ARRAY['velo', 'course']),
+ ARRAY['ironman'], 'brique', ARRAY['velo', 'course']),
 
 ('BRI-08', 'brique', 'brique', 'Brique fractionnée — 3x(15min vélo fort + 5min course)', 80, 8,
  '10 min vélo progressif zone 1-2',
@@ -1056,21 +1056,21 @@ INSERT INTO public.session_library (code, type, category, name, duration_min, in
  '3min vélo lent zone 1 entre chaque série',
  '5 min vélo lent',
  'Brique en intervalles — tu répètes la transition plusieurs fois dans la même séance. Chaque transition doit être plus rapide que la précédente. Excellent pour les débutants en triathlon.',
- ARRAY['sprint', 'olympique'], 'triathlon', ARRAY['velo', 'course']),
+ ARRAY['sprint', 'olympique'], 'brique', ARRAY['velo', 'course']),
 
 ('BRI-09', 'brique', 'brique', 'Brique natation-vélo — Nage 1500m + Vélo 45min', 85, 7,
  NULL,
  'Natation : 1500m à 70-75% CSS → transition T1 → Vélo : 45min à 70-78% FTP',
  NULL, NULL,
  'Simulation T1 — la transition nage-vélo est souvent négligée à l''entraînement. Ton corps sort de l''eau les bras fatigués et doit gérer les jambes sur le vélo. Prépare ta transition T1 avant de nager.',
- ARRAY['olympique', '70.3'], 'triathlon', ARRAY['natation', 'velo']),
+ ARRAY['olympique', '70.3'], 'brique', ARRAY['natation', 'velo']),
 
 ('BRI-10', 'brique', 'brique', 'Brique complète triathlon sprint', 90, 8,
  NULL,
  'Nage : 750m à allure objectif → T1 rapide → Vélo : 20km à 80-85% FTP → T2 rapide → Course : 5km à allure objectif',
  NULL, NULL,
  'Répétition générale sprint. Reproduis exactement les conditions de course : équipement, alimentation, allures. C''est en faisant qu''on apprend — ne te souviens pas de cette séance comme d''un entraînement, souviens-t''en comme de ta première course.',
- ARRAY['sprint'], 'triathlon', ARRAY['natation', 'velo', 'course']);
+ ARRAY['sprint'], 'brique', ARRAY['natation', 'velo', 'course']);
 
 -- ============================================================
 -- TRAIL (TRAIL)

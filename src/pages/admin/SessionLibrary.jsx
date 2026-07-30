@@ -47,7 +47,7 @@ const RPE_COLOR = rpe =>
   rpe <= 3 ? '#10B981' : rpe <= 5 ? '#06B6D4' : rpe <= 7 ? '#F59E0B' : rpe <= 8 ? '#F97316' : '#EF4444'
 
 function SessionCard({ s, expanded, onToggle }) {
-  const sport = SPORT_LABELS[s.sport || 'running']
+  const sport = SPORT_LABELS[s.sport || 'running'] || { label: s.sport, icon: '•', color: '#8B2FC9' }
   const typeLabel = TYPE_LABELS[s.type] || s.type
 
   return (
