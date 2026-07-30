@@ -26,7 +26,7 @@ export default function PageHero({ title, subtitle, badge, children, backTo, bac
 
   return (
     <div style={{
-      background: '#000',
+      background: '#fff',
       minHeight: '100vh',
       display: 'flex',
       flexDirection: 'column',
@@ -34,7 +34,7 @@ export default function PageHero({ title, subtitle, badge, children, backTo, bac
       alignItems: 'center',
       textAlign: 'center',
       padding: '8rem 1.5rem 4rem',
-      borderBottom: '1px solid rgba(255,255,255,.08)',
+      borderBottom: '1px solid rgba(0,0,0,.08)',
       position: 'relative',
       overflow: 'hidden',
     }}>
@@ -52,7 +52,7 @@ export default function PageHero({ title, subtitle, badge, children, backTo, bac
         <div key={p.id} style={{
           position: 'absolute', left: `${p.x}%`, top: `${p.y}%`,
           width: p.size, height: p.size, borderRadius: '50%',
-          background: '#fff', opacity: p.opacity, pointerEvents: 'none',
+          background: '#000', opacity: p.opacity, pointerEvents: 'none',
           willChange: 'transform',
           animation: `floatParticle ${p.duration}s ${p.delay}s ease-in-out infinite`,
         }} />
@@ -69,11 +69,11 @@ export default function PageHero({ title, subtitle, badge, children, backTo, bac
         <Link to={backTo} style={{
           position: 'absolute', top: '5.5rem', left: '1.5rem',
           zIndex: 2, display: 'inline-flex', alignItems: 'center', gap: '.35rem',
-          color: 'rgba(255,255,255,.5)', textDecoration: 'none', fontSize: '.82rem', fontWeight: 500,
+          color: 'rgba(0,0,0,.45)', textDecoration: 'none', fontSize: '.82rem', fontWeight: 500,
           transition: 'color .2s',
         }}
-          onMouseEnter={e => e.currentTarget.style.color = 'rgba(255,255,255,.9)'}
-          onMouseLeave={e => e.currentTarget.style.color = 'rgba(255,255,255,.5)'}
+          onMouseEnter={e => e.currentTarget.style.color = 'rgba(0,0,0,.9)'}
+          onMouseLeave={e => e.currentTarget.style.color = 'rgba(0,0,0,.45)'}
         >
           ← {backLabel || 'Retour'}
         </Link>
@@ -95,7 +95,7 @@ export default function PageHero({ title, subtitle, badge, children, backTo, bac
         )}
         <h1 style={{
           fontSize: 'clamp(2rem,5vw,3.2rem)', fontWeight: 800,
-          letterSpacing: '-0.02em', color: '#fff', margin: 0,
+          letterSpacing: '-0.02em', color: '#1a1230', margin: 0,
           marginBottom: subtitle ? '.6rem' : 0,
           opacity: inView ? 1 : 0,
           transform: inView ? 'translateY(0)' : 'translateY(32px)',
@@ -103,7 +103,7 @@ export default function PageHero({ title, subtitle, badge, children, backTo, bac
         }}>{title}</h1>
         {subtitle && (
           <p style={{
-            color: 'rgba(255,255,255,.5)', fontSize: '1rem', margin: 0,
+            color: 'rgba(26,18,48,.5)', fontSize: '1rem', margin: 0,
             marginBottom: children ? '2rem' : 0,
             opacity: inView ? 1 : 0,
             transform: inView ? 'translateY(0)' : 'translateY(24px)',
