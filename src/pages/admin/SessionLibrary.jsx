@@ -12,7 +12,8 @@ const SPORT_LABELS = {
 
 const TYPE_LABELS = {
   endurance_fondamentale: 'EF',
-  recuperation_active:    'Récup',
+  recuperation_active:    'Récup Active',
+  footing_recuperation:   'Footing Récup',
   footing_progressif:     'FP',
   tempo_seuil:            'Tempo',
   fractionne_court:       'Frac Court',
