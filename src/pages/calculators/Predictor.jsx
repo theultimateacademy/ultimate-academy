@@ -8,7 +8,7 @@ import { fmtHMS, DIST_PRESETS } from '../../lib/runCalc'
 import { TESTIMONIALS_PREDICTOR, FUEL_PLAN, EQUIV_TABLE } from '../../lib/toolsContent'
 import TestimonialsCarousel from '../../components/TestimonialsCarousel'
 
-const C = { purple: '#8B2FC9', pink: '#E8237A', dark: '#0C0A18', light: '#F8F5FF' }
+const C = { purple: '#8B2FC9', pink: '#E8237A', dark: '#0C0A18', light: '#0C0A18' }
 
 function riegelPredict(t1Secs, d1Km, d2Km) {
   if (!t1Secs || !d1Km || !d2Km || t1Secs <= 0 || d1Km <= 0 || d2Km <= 0) return 0
@@ -55,7 +55,7 @@ function ChipBtn({ active, onClick, children }) {
 function TimeInputs({ h, m, s, onH, onM, onS }) {
   const inputSt = {
     width: 72, padding: '.55rem .65rem', borderRadius: 10, fontSize: '.95rem', fontWeight: 600,
-    border: `2px solid rgba(139,47,201,.18)`, background: '#fff', color: '#1a1a2e',
+    border: `2px solid rgba(139,47,201,.18)`, background: '#000', color: '#fff',
     textAlign: 'center', outline: 'none', transition: 'border-color .15s',
   }
   const labelSt = { display: 'block', fontSize: '.7rem', textTransform: 'uppercase',
@@ -109,7 +109,7 @@ export default function PredictorCalculator() {
   const fuel = FUEL_PLAN[fuelTab]
 
   return (
-    <div style={{ background: '#fff', color: '#1a1a2e', overflowX: 'hidden', minHeight: '100vh' }}>
+    <div style={{ background: '#000', color: '#fff', overflowX: 'hidden', minHeight: '100vh' }}>
       <Nav />
 
       <PageHero
@@ -125,7 +125,7 @@ export default function PredictorCalculator() {
       </PageHero>
 
       {/* ── CALCULATOR ─────────────────────────────────── */}
-      <section id="predictor-tool" style={{ background: C.light, padding: '5rem 1.5rem' }}>
+      <section id="predictor-tool" style={{ background: '#000', padding: '5rem 1.5rem' }}>
         <div style={{ maxWidth: 800, margin: '0 auto' }}>
           <div style={{ textAlign: 'center', marginBottom: '2.5rem' }}>
             <h2 style={{ fontSize: 'clamp(1.6rem,4vw,2.4rem)', fontWeight: 900, letterSpacing: '-0.02em', marginBottom: '.6rem', color: C.dark }}>
@@ -136,7 +136,7 @@ export default function PredictorCalculator() {
             </p>
           </div>
 
-          <div style={{ background: '#fff', borderRadius: 24, padding: '2.25rem',
+          <div style={{ background: 'rgba(255,255,255,.05)', borderRadius: 24, padding: '2.25rem',
             boxShadow: `0 8px 48px rgba(139,47,201,.12)` }}>
 
             {/* Row 1 — source distance + time */}
@@ -273,7 +273,7 @@ export default function PredictorCalculator() {
                           {' '}· {fmtHMS(predicted - targetSecs)} à gagner
                         </p>
                         {improvLabel && (
-                          <p style={{ margin: '0 0 .3rem', fontWeight: 700, color: '#1a1a2e' }}>
+                          <p style={{ margin: '0 0 .3rem', fontWeight: 700, color: '#fff' }}>
                             Durée estimée :{' '}
                             <span style={{ background: `linear-gradient(135deg,${C.purple},${C.pink})`,
                               WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
@@ -296,7 +296,7 @@ export default function PredictorCalculator() {
       </section>
 
       {/* ── COMMENT ÇA FONCTIONNE ──────────────────────── */}
-      <section style={{ background: '#fff', padding: '5rem 1.5rem' }}>
+      <section style={{ background: '#0C0A18', padding: '5rem 1.5rem' }}>
         <div style={{ maxWidth: 1040, margin: '0 auto', display: 'flex', gap: '4rem', alignItems: 'center', flexWrap: 'wrap' }}>
           <div style={{ flex: '0 0 auto', width: 'min(100%, 420px)', borderRadius: 24, overflow: 'hidden',
             boxShadow: `0 20px 60px rgba(139,47,201,.18)` }}>
@@ -437,7 +437,7 @@ export default function PredictorCalculator() {
       </section>
 
       {/* ── TABLE D'ÉQUIVALENCES ────────────────────────── */}
-      <section style={{ background: C.light, padding: '5rem 1.5rem' }}>
+      <section style={{ background: '#000', padding: '5rem 1.5rem' }}>
         <div style={{ maxWidth: 700, margin: '0 auto' }}>
           <div style={{ textAlign: 'center', marginBottom: '2.5rem' }}>
             <h2 style={{ fontSize: 'clamp(1.6rem,4vw,2.4rem)', fontWeight: 900, letterSpacing: '-0.02em', marginBottom: '.6rem', color: C.dark }}>
@@ -447,7 +447,7 @@ export default function PredictorCalculator() {
               Correspondances indicatives entre 10km, semi et marathon
             </p>
           </div>
-          <div style={{ background: '#fff', borderRadius: 20, overflow: 'hidden', overflowX: 'auto',
+          <div style={{ background: 'rgba(255,255,255,.05)', borderRadius: 20, overflow: 'hidden', overflowX: 'auto',
             boxShadow: '0 4px 32px rgba(139,47,201,.08)', border: '1px solid rgba(139,47,201,.1)' }}>
             <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '.9rem', minWidth: 340 }}>
               <thead>
@@ -461,7 +461,7 @@ export default function PredictorCalculator() {
               <tbody>
                 {EQUIV_TABLE.map((row, i) => (
                   <tr key={i} style={{ borderTop: '1px solid rgba(139,47,201,.07)',
-                    background: i % 2 === 0 ? '#fff' : 'rgba(139,47,201,.02)' }}>
+                    background: i % 2 === 0 ? 'rgba(255,255,255,.04)' : 'rgba(139,47,201,.04)' }}>
                     <td style={{ padding: '.8rem 1.25rem', textAlign: 'center', fontWeight: 700, fontVariantNumeric: 'tabular-nums',
                       background: `linear-gradient(135deg,${C.purple},${C.pink})`,
                       WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', whiteSpace: 'nowrap' }}>{row.t10}</td>
@@ -481,7 +481,7 @@ export default function PredictorCalculator() {
       </section>
 
       {/* ── RAVITAILLEMENT ──────────────────────────────── */}
-      <section style={{ background: '#fff', padding: '5rem 1.5rem' }}>
+      <section style={{ background: '#0C0A18', padding: '5rem 1.5rem' }}>
         <div style={{ maxWidth: 800, margin: '0 auto' }}>
           <div style={{ textAlign: 'center', marginBottom: '2.5rem' }}>
             <h2 style={{ fontSize: 'clamp(1.6rem,4vw,2.4rem)', fontWeight: 900, letterSpacing: '-0.02em', marginBottom: '.6rem', color: C.dark }}>
@@ -503,14 +503,14 @@ export default function PredictorCalculator() {
             border: `1px solid rgba(139,47,201,.15)`, marginBottom: '1.75rem', display: 'flex', gap: '.75rem', alignItems: 'flex-start' }}>
             <span style={{ fontSize: '1.3rem', flexShrink: 0 }}>💡</span>
             <p style={{ margin: 0, fontSize: '.88rem', color: 'rgba(26,26,46,.7)', lineHeight: 1.7, textAlign: 'justify' }}>
-              <strong style={{ color: '#1a1a2e' }}>Mon conseil :</strong> {fuel.tip}
+              <strong style={{ color: '#fff' }}>Mon conseil :</strong> {fuel.tip}
             </p>
           </div>
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: '.75rem' }}>
             {fuel.points.map((pt) => (
               <div key={pt.km} style={{ display: 'flex', gap: '1.25rem', alignItems: 'center',
-                background: '#fff', borderRadius: 14, padding: '.85rem 1.25rem',
+                background: 'rgba(255,255,255,.05)', borderRadius: 14, padding: '.85rem 1.25rem',
                 border: '1px solid rgba(139,47,201,.1)', boxShadow: '0 2px 12px rgba(139,47,201,.06)' }}>
                 <div style={{ flexShrink: 0, minWidth: 60, textAlign: 'center' }}>
                   <div style={{ fontSize: '1.1rem', fontWeight: 900,
@@ -538,7 +538,7 @@ export default function PredictorCalculator() {
       </section>
 
       {/* ── TÉMOIGNAGES ─────────────────────────────────── */}
-      <section style={{ background: C.light, padding: '5rem 1.5rem' }}>
+      <section style={{ background: '#000', padding: '5rem 1.5rem' }}>
         <div style={{ maxWidth: 1000, margin: '0 auto', textAlign: 'center', marginBottom: '2.5rem' }}>
           <h2 style={{ fontSize: 'clamp(1.6rem,4vw,2.4rem)', fontWeight: 900, letterSpacing: '-0.02em', marginBottom: '.6rem', color: C.dark }}>
             Ils ont atteint leur <span style={gradText}>chrono cible</span>
@@ -554,7 +554,7 @@ export default function PredictorCalculator() {
       />
 
       {/* ── FAQ ─────────────────────────────────────────── */}
-      <section style={{ background: '#fff', padding: '5rem 1.5rem' }}>
+      <section style={{ background: '#0C0A18', padding: '5rem 1.5rem' }}>
         <div style={{ maxWidth: 720, margin: '0 auto' }}>
           <div style={{ textAlign: 'center', marginBottom: '2.5rem' }}>
             <h2 style={{ fontSize: 'clamp(1.6rem,4vw,2.4rem)', fontWeight: 900, letterSpacing: '-0.02em', marginBottom: '.6rem', color: C.dark }}>
@@ -569,7 +569,7 @@ export default function PredictorCalculator() {
               <button onClick={() => setOpenFaq(openFaq === i ? null : i)}
                 style={{ width: '100%', display: 'flex', justifyContent: 'space-between', alignItems: 'center',
                   padding: '1.1rem 0', background: 'none', border: 'none', cursor: 'pointer',
-                  color: '#1a1a2e', fontSize: '.95rem', fontWeight: 600, textAlign: 'left', gap: '1rem' }}>
+                  color: '#fff', fontSize: '.95rem', fontWeight: 600, textAlign: 'left', gap: '1rem' }}>
                 {item.q}
                 <svg width="12" height="12" viewBox="0 0 12 12" fill="currentColor"
                   style={{ flexShrink: 0, color: C.purple, transition: 'transform .2s',

@@ -5,7 +5,7 @@ import SiteFooter from '../../components/SiteFooter'
 import PageHero, { gradText } from '../../components/PageHero'
 import PricingCTA from '../../components/PricingCTA'
 
-const C = { purple: '#8B2FC9', pink: '#E8237A', dark: '#1a1230', light: '#F8F5FF' }
+const C = { purple: '#8B2FC9', pink: '#E8237A', dark: '#fff', light: '#0C0A18' }
 const grad = `linear-gradient(135deg,${C.purple},${C.pink})`
 
 const PRESETS = [
@@ -68,7 +68,7 @@ const inputSt = {
   width: 72, textAlign: 'center', fontVariantNumeric: 'tabular-nums',
 }
 const labelSt = {
-  display: 'block', fontSize: '.72rem', fontWeight: 700, color: 'rgba(26,18,48,.4)',
+  display: 'block', fontSize: '.72rem', fontWeight: 700, color: 'rgba(255,255,255,.4)',
   textTransform: 'uppercase', letterSpacing: '.07em', marginBottom: '.3rem',
 }
 
@@ -78,19 +78,19 @@ function TimeInput({ label, h, m, s, setH, setM, setS }) {
       <label style={labelSt}>{label}</label>
       <div style={{ display: 'flex', gap: '.4rem', alignItems: 'center' }}>
         <div>
-          <div style={{ fontSize: '.65rem', color: 'rgba(26,18,48,.35)', textAlign: 'center', marginBottom: '.15rem' }}>h</div>
+          <div style={{ fontSize: '.65rem', color: 'rgba(255,255,255,.35)', textAlign: 'center', marginBottom: '.15rem' }}>h</div>
           <input type="number" min="0" max="9" placeholder="0" value={h}
             onChange={e => setH(e.target.value)} style={inputSt} />
         </div>
-        <span style={{ color: 'rgba(26,18,48,.3)', fontWeight: 700, marginTop: '1rem' }}>:</span>
+        <span style={{ color: 'rgba(255,255,255,.3)', fontWeight: 700, marginTop: '1rem' }}>:</span>
         <div>
-          <div style={{ fontSize: '.65rem', color: 'rgba(26,18,48,.35)', textAlign: 'center', marginBottom: '.15rem' }}>min</div>
+          <div style={{ fontSize: '.65rem', color: 'rgba(255,255,255,.35)', textAlign: 'center', marginBottom: '.15rem' }}>min</div>
           <input type="number" min="0" max="59" placeholder="00" value={m}
             onChange={e => setM(e.target.value)} style={inputSt} />
         </div>
-        <span style={{ color: 'rgba(26,18,48,.3)', fontWeight: 700, marginTop: '1rem' }}>:</span>
+        <span style={{ color: 'rgba(255,255,255,.3)', fontWeight: 700, marginTop: '1rem' }}>:</span>
         <div>
-          <div style={{ fontSize: '.65rem', color: 'rgba(26,18,48,.35)', textAlign: 'center', marginBottom: '.15rem' }}>sec</div>
+          <div style={{ fontSize: '.65rem', color: 'rgba(255,255,255,.35)', textAlign: 'center', marginBottom: '.15rem' }}>sec</div>
           <input type="number" min="0" max="59" placeholder="00" value={s}
             onChange={e => setS(e.target.value)} style={inputSt} />
         </div>
@@ -107,7 +107,7 @@ function DistInput({ label, value, setValue, unit, placeholder }) {
         <input type="number" min="0" step="any" placeholder={placeholder}
           value={value} onChange={e => setValue(e.target.value)}
           style={{ ...inputSt, width: 100 }} />
-        <span style={{ color: 'rgba(26,18,48,.45)', fontSize: '.85rem' }}>{unit}</span>
+        <span style={{ color: 'rgba(255,255,255,.45)', fontSize: '.85rem' }}>{unit}</span>
       </div>
     </div>
   )
@@ -244,7 +244,7 @@ export default function Triathlon() {
       </PageHero>
 
       {/* ── CALCULATOR ────────────────────────────────────── */}
-      <section ref={calcRef} style={{ background: C.light, padding: '5rem 1.5rem' }}>
+      <section ref={calcRef} style={{ background: '#000', padding: '5rem 1.5rem' }}>
         <div style={{ maxWidth: 820, margin: '0 auto' }}>
           <div style={{ textAlign: 'center', marginBottom: '2.5rem' }}>
             <div style={{ display: 'inline-block', background: grad, borderRadius: 50, padding: '.3rem 1rem', fontSize: '.75rem', fontWeight: 700, color: '#fff', textTransform: 'uppercase', letterSpacing: '.07em', marginBottom: '.85rem' }}>
@@ -253,7 +253,7 @@ export default function Triathlon() {
             <h2 style={{ fontSize: 'clamp(1.5rem,3vw,2rem)', fontWeight: 900, color: C.dark, marginBottom: '.5rem' }}>
               Choisis ta <span style={gradText}>distance</span> ou saisis tes valeurs
             </h2>
-            <p style={{ color: 'rgba(26,18,48,.5)', fontSize: '.95rem', margin: 0 }}>
+            <p style={{ color: 'rgba(255,255,255,.5)', fontSize: '.95rem', margin: 0 }}>
               Applique un format prédéfini ou personnalise chaque discipline librement
             </p>
           </div>
@@ -270,13 +270,13 @@ export default function Triathlon() {
           <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
 
             {/* ── NATATION ── */}
-            <div style={{ background: '#fff', borderRadius: 20, padding: '2rem', boxShadow: '0 4px 24px rgba(139,47,201,.08)', border: '1px solid rgba(139,47,201,.1)' }}>
+            <div style={{ background: 'rgba(255,255,255,.05)', borderRadius: 20, padding: '2rem', boxShadow: '0 4px 24px rgba(139,47,201,.08)', border: '1px solid rgba(139,47,201,.1)' }}>
               <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', flexWrap: 'wrap', gap: '1rem', marginBottom: '1.5rem' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
                   <SwimIllustration />
                   <div>
                     <p style={{ fontWeight: 800, color: C.dark, marginBottom: '.2rem', fontSize: '1.1rem' }}>🏊 Natation</p>
-                    <p style={{ color: 'rgba(26,18,48,.45)', fontSize: '.85rem', margin: 0 }}>Allure calculée en min/100m</p>
+                    <p style={{ color: 'rgba(255,255,255,.45)', fontSize: '.85rem', margin: 0 }}>Allure calculée en min/100m</p>
                   </div>
                 </div>
                 {swimResult && <ResultBadge label="Allure" value={swimResult} />}
@@ -286,20 +286,20 @@ export default function Triathlon() {
                 <TimeInput label="Temps visé" h={swimH} m={swimM} s={swimS} setH={setSwimH} setM={setSwimM} setS={setSwimS} />
               </div>
               {swimResult && (
-                <div style={{ marginTop: '1rem', padding: '.65rem 1rem', background: 'rgba(139,47,201,.06)', borderRadius: 10, fontSize: '.82rem', color: 'rgba(26,18,48,.55)' }}>
+                <div style={{ marginTop: '1rem', padding: '.65rem 1rem', background: 'rgba(139,47,201,.06)', borderRadius: 10, fontSize: '.82rem', color: 'rgba(255,255,255,.55)' }}>
                   💡 Pour nager {swimDist}m en {fmtTime(swimSec)}, tu dois maintenir une allure de <strong style={{ color: C.purple }}>{swimResult}</strong>
                 </div>
               )}
             </div>
 
             {/* ── VÉLO ── */}
-            <div style={{ background: '#fff', borderRadius: 20, padding: '2rem', boxShadow: '0 4px 24px rgba(139,47,201,.08)', border: '1px solid rgba(139,47,201,.1)' }}>
+            <div style={{ background: 'rgba(255,255,255,.05)', borderRadius: 20, padding: '2rem', boxShadow: '0 4px 24px rgba(139,47,201,.08)', border: '1px solid rgba(139,47,201,.1)' }}>
               <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', flexWrap: 'wrap', gap: '1rem', marginBottom: '1.5rem' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
                   <BikeIllustration />
                   <div>
                     <p style={{ fontWeight: 800, color: C.dark, marginBottom: '.2rem', fontSize: '1.1rem' }}>🚴 Vélo</p>
-                    <p style={{ color: 'rgba(26,18,48,.45)', fontSize: '.85rem', margin: 0 }}>Vitesse calculée en km/h</p>
+                    <p style={{ color: 'rgba(255,255,255,.45)', fontSize: '.85rem', margin: 0 }}>Vitesse calculée en km/h</p>
                   </div>
                 </div>
                 {bikeResult && <ResultBadge label="Vitesse" value={`${bikeResult} km/h`} />}
@@ -309,20 +309,20 @@ export default function Triathlon() {
                 <TimeInput label="Temps visé" h={bikeH} m={bikeM} s={bikeS} setH={setBikeH} setM={setBikeM} setS={setBikeS} />
               </div>
               {bikeResult && (
-                <div style={{ marginTop: '1rem', padding: '.65rem 1rem', background: 'rgba(139,47,201,.06)', borderRadius: 10, fontSize: '.82rem', color: 'rgba(26,18,48,.55)' }}>
+                <div style={{ marginTop: '1rem', padding: '.65rem 1rem', background: 'rgba(139,47,201,.06)', borderRadius: 10, fontSize: '.82rem', color: 'rgba(255,255,255,.55)' }}>
                   💡 Pour parcourir {bikeDist}km en {fmtTime(bikeSec)}, tu dois rouler à <strong style={{ color: C.purple }}>{bikeResult} km/h</strong> de moyenne
                 </div>
               )}
             </div>
 
             {/* ── COURSE ── */}
-            <div style={{ background: '#fff', borderRadius: 20, padding: '2rem', boxShadow: '0 4px 24px rgba(139,47,201,.08)', border: '1px solid rgba(139,47,201,.1)' }}>
+            <div style={{ background: 'rgba(255,255,255,.05)', borderRadius: 20, padding: '2rem', boxShadow: '0 4px 24px rgba(139,47,201,.08)', border: '1px solid rgba(139,47,201,.1)' }}>
               <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', flexWrap: 'wrap', gap: '1rem', marginBottom: '1.5rem' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
                   <RunIllustration />
                   <div>
                     <p style={{ fontWeight: 800, color: C.dark, marginBottom: '.2rem', fontSize: '1.1rem' }}>🏃 Course à pied</p>
-                    <p style={{ color: 'rgba(26,18,48,.45)', fontSize: '.85rem', margin: 0 }}>Allure calculée en min/km</p>
+                    <p style={{ color: 'rgba(255,255,255,.45)', fontSize: '.85rem', margin: 0 }}>Allure calculée en min/km</p>
                   </div>
                 </div>
                 {runResult && <ResultBadge label="Allure" value={runResult} />}
@@ -332,7 +332,7 @@ export default function Triathlon() {
                 <TimeInput label="Temps visé" h={runH} m={runM} s={runS} setH={setRunH} setM={setRunM} setS={setRunS} />
               </div>
               {runResult && (
-                <div style={{ marginTop: '1rem', padding: '.65rem 1rem', background: 'rgba(139,47,201,.06)', borderRadius: 10, fontSize: '.82rem', color: 'rgba(26,18,48,.55)' }}>
+                <div style={{ marginTop: '1rem', padding: '.65rem 1rem', background: 'rgba(139,47,201,.06)', borderRadius: 10, fontSize: '.82rem', color: 'rgba(255,255,255,.55)' }}>
                   💡 Pour courir {runDist}km en {fmtTime(runSec)}, tu dois maintenir <strong style={{ color: C.purple }}>{runResult}</strong>
                 </div>
               )}
@@ -341,35 +341,35 @@ export default function Triathlon() {
 
           {/* ── TOTAL ── */}
           {hasAny && totalSec > 0 && (
-            <div style={{ marginTop: '2rem', background: '#fff', borderRadius: 20, padding: '2rem', boxShadow: '0 8px 40px rgba(139,47,201,.14)', border: `2px solid rgba(139,47,201,.2)` }}>
+            <div style={{ marginTop: '2rem', background: 'rgba(255,255,255,.05)', borderRadius: 20, padding: '2rem', boxShadow: '0 8px 40px rgba(139,47,201,.14)', border: `2px solid rgba(139,47,201,.2)` }}>
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '1.5rem' }}>
                 <div>
-                  <p style={{ margin: 0, fontSize: '.72rem', color: 'rgba(26,18,48,.4)', textTransform: 'uppercase', letterSpacing: '.08em', marginBottom: '.3rem' }}>
+                  <p style={{ margin: 0, fontSize: '.72rem', color: 'rgba(255,255,255,.4)', textTransform: 'uppercase', letterSpacing: '.08em', marginBottom: '.3rem' }}>
                     Temps total estimé
                   </p>
                   <p style={{ margin: 0, fontSize: '2.8rem', fontWeight: 900, background: grad, WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text', lineHeight: 1 }}>
                     {fmtTime(totalSec)}
                   </p>
-                  <p style={{ margin: '.4rem 0 0', fontSize: '.8rem', color: 'rgba(26,18,48,.4)', fontStyle: 'italic' }}>
+                  <p style={{ margin: '.4rem 0 0', fontSize: '.8rem', color: 'rgba(255,255,255,.4)', fontStyle: 'italic' }}>
                     ⚠️ Hors transitions T1 et T2
                   </p>
                 </div>
                 <div style={{ display: 'flex', gap: '.75rem', flexWrap: 'wrap' }}>
                   {swimResult && (
                     <div style={{ textAlign: 'center', padding: '.75rem 1rem', background: 'rgba(139,47,201,.06)', borderRadius: 12 }}>
-                      <div style={{ fontSize: '.65rem', color: 'rgba(26,18,48,.4)', textTransform: 'uppercase', letterSpacing: '.06em', marginBottom: '.25rem' }}>Nage</div>
+                      <div style={{ fontSize: '.65rem', color: 'rgba(255,255,255,.4)', textTransform: 'uppercase', letterSpacing: '.06em', marginBottom: '.25rem' }}>Nage</div>
                       <div style={{ fontWeight: 800, color: C.purple, fontSize: '.9rem' }}>{swimResult}</div>
                     </div>
                   )}
                   {bikeResult && (
                     <div style={{ textAlign: 'center', padding: '.75rem 1rem', background: 'rgba(139,47,201,.06)', borderRadius: 12 }}>
-                      <div style={{ fontSize: '.65rem', color: 'rgba(26,18,48,.4)', textTransform: 'uppercase', letterSpacing: '.06em', marginBottom: '.25rem' }}>Vélo</div>
+                      <div style={{ fontSize: '.65rem', color: 'rgba(255,255,255,.4)', textTransform: 'uppercase', letterSpacing: '.06em', marginBottom: '.25rem' }}>Vélo</div>
                       <div style={{ fontWeight: 800, color: C.purple, fontSize: '.9rem' }}>{bikeResult} km/h</div>
                     </div>
                   )}
                   {runResult && (
                     <div style={{ textAlign: 'center', padding: '.75rem 1rem', background: 'rgba(139,47,201,.06)', borderRadius: 12 }}>
-                      <div style={{ fontSize: '.65rem', color: 'rgba(26,18,48,.4)', textTransform: 'uppercase', letterSpacing: '.06em', marginBottom: '.25rem' }}>Course</div>
+                      <div style={{ fontSize: '.65rem', color: 'rgba(255,255,255,.4)', textTransform: 'uppercase', letterSpacing: '.06em', marginBottom: '.25rem' }}>Course</div>
                       <div style={{ fontWeight: 800, color: C.purple, fontSize: '.9rem' }}>{runResult}</div>
                     </div>
                   )}

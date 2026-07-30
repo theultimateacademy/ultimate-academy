@@ -4,9 +4,9 @@ import SiteFooter from '../../components/SiteFooter'
 import PageHero, { gradText } from '../../components/PageHero'
 import PricingCTA from '../../components/PricingCTA'
 
-const C = { purple:'#8B2FC9', pink:'#E8237A', dark:'#1a1230', light:'#F8F5FF' }
-const inputSt = { background:'#fff', border:'1px solid rgba(139,47,201,.25)', borderRadius:10, padding:'.55rem .75rem', color:C.dark, fontSize:'.9rem', outline:'none', width:100 }
-const labelSt = { display:'block', fontSize:'.72rem', color:'rgba(26,18,48,.45)', textTransform:'uppercase', letterSpacing:'.08em', marginBottom:'.35rem' }
+const C = { purple:'#8B2FC9', pink:'#E8237A', dark:'#fff', light:'#0C0A18' }
+const inputSt = { background:'rgba(255,255,255,.07)', border:'1px solid rgba(139,47,201,.25)', borderRadius:10, padding:'.55rem .75rem', color:C.dark, fontSize:'.9rem', outline:'none', width:100 }
+const labelSt = { display:'block', fontSize:'.72rem', color:'rgba(255,255,255,.45)', textTransform:'uppercase', letterSpacing:'.08em', marginBottom:'.35rem' }
 function Inner({ max=1000, children, style }) { return <div style={{ maxWidth:max, margin:'0 auto', ...style }}>{children}</div> }
 function SectionTag({ children, dark }) { return <p style={{ fontSize:'.75rem', letterSpacing:'.18em', textTransform:'uppercase', color:dark?'rgba(255,255,255,.6)':C.purple, marginBottom:'.75rem', fontWeight:600 }}>{children}</p> }
 function H2L({ children }) { return <h2 style={{ fontSize:'clamp(1.6rem,3.5vw,2.4rem)', fontWeight:900, color:C.dark, lineHeight:1.15, marginBottom:'1.25rem' }}>{children}</h2> }
@@ -102,15 +102,15 @@ export default function CriticalPowerCalculator() {
       </PageHero>
 
       {/* CALCULATOR */}
-      <section ref={calcRef} id="outil" style={{ background:C.light, padding:'5rem 1.5rem' }}>
+      <section ref={calcRef} id="outil" style={{ background:'#000', padding:'5rem 1.5rem' }}>
         <Inner max={800}>
           <div style={{ textAlign:'center', marginBottom:'2.5rem' }}>
             <SectionTag>Calculateur de puissance</SectionTag>
             <h2 style={{ fontSize:'clamp(1.5rem,3vw,2rem)', fontWeight:900, color:C.dark, marginBottom:'.5rem' }}>Tes zones de puissance <span style={gradText}>personnalisées</span></h2>
-            <p style={{ color:'rgba(26,18,48,.5)', fontSize:'.9rem' }}>Renseigne ta puissance maximale soutenue sur 5 et 20 minutes. Le test à 12 min est optionnel mais améliore la précision.</p>
+            <p style={{ color:'rgba(255,255,255,.5)', fontSize:'.9rem' }}>Renseigne ta puissance maximale soutenue sur 5 et 20 minutes. Le test à 12 min est optionnel mais améliore la précision.</p>
           </div>
 
-          <div style={{ background:'#fff', borderRadius:20, padding:'2rem', boxShadow:'0 8px 40px rgba(139,47,201,.1)', border:'1px solid rgba(139,47,201,.12)' }}>
+          <div style={{ background:'rgba(255,255,255,.05)', borderRadius:20, padding:'2rem', boxShadow:'0 8px 40px rgba(139,47,201,.1)', border:'1px solid rgba(139,47,201,.12)' }}>
             <div style={{ display:'flex', gap:'1.5rem', flexWrap:'wrap', marginBottom:'1.5rem', alignItems:'flex-end' }}>
               <div>
                 <label style={labelSt}>Puissance max 5 min (W) *</label>
@@ -129,7 +129,7 @@ export default function CriticalPowerCalculator() {
                 <input type="number" min="40" max="150" step=".1" placeholder="Ex : 70" value={poids} onChange={e=>setPoids(e.target.value)} style={inputSt}/>
               </div>
             </div>
-            <p style={{ fontSize:'.78rem', color:'rgba(26,18,48,.35)', marginBottom:'1.5rem' }}>* Tests réalisés à effort maximal soutenable, séparés d'au moins 24h de récupération</p>
+            <p style={{ fontSize:'.78rem', color:'rgba(255,255,255,.35)', marginBottom:'1.5rem' }}>* Tests réalisés à effort maximal soutenable, séparés d'au moins 24h de récupération</p>
 
             {result ? (
               <>
@@ -144,7 +144,7 @@ export default function CriticalPowerCalculator() {
                     <div key={r.label} style={{ flex:'1 1 160px', background:r.highlight?`linear-gradient(135deg,rgba(139,47,201,.12),rgba(232,35,122,.08))`:'rgba(139,47,201,.04)', borderRadius:14, padding:'1.1rem 1.25rem', border:r.highlight?'1px solid rgba(139,47,201,.25)':'1px solid rgba(139,47,201,.1)' }}>
                       <p style={{ fontSize:'.72rem', color:r.highlight?C.purple:'rgba(26,18,48,.45)', textTransform:'uppercase', letterSpacing:'.08em', marginBottom:'.3rem' }}>{r.label}</p>
                       <p style={{ fontSize:'1.6rem', fontWeight:900, color:C.dark, margin:0, fontVariantNumeric:'tabular-nums' }}>{r.value}</p>
-                      {r.sub && <p style={{ fontSize:'.8rem', color:'rgba(26,18,48,.5)', margin:'.2rem 0 0' }}>{r.sub}</p>}
+                      {r.sub && <p style={{ fontSize:'.8rem', color:'rgba(255,255,255,.5)', margin:'.2rem 0 0' }}>{r.sub}</p>}
                     </div>
                   ))}
                 </div>
@@ -172,20 +172,20 @@ export default function CriticalPowerCalculator() {
                           <td key="z" style={{ padding:'.6rem .75rem' }}><span style={{ display:'inline-flex', alignItems:'center', justifyContent:'center', width:24, height:24, borderRadius:'50%', background:z.color+'25', color:z.color, fontSize:'.8rem', fontWeight:700 }}>{z.n}</span></td>,
                           <td key="n" style={{ padding:'.6rem .75rem', color:z.color, fontWeight:600, fontSize:'.85rem' }}>{z.name}</td>,
                           <td key="w" style={{ padding:'.6rem .75rem', color:C.dark, fontVariantNumeric:'tabular-nums', fontWeight:600, fontSize:'.85rem' }}>{wRange}</td>,
-                          <td key="p" style={{ padding:'.6rem .75rem', color:'rgba(26,18,48,.45)', fontVariantNumeric:'tabular-nums' }}>{pctRange}</td>,
-                          poidsVal>0 && <td key="kg" style={{ padding:'.6rem .75rem', color:'rgba(26,18,48,.55)', fontVariantNumeric:'tabular-nums', fontSize:'.85rem' }}>{kgRange}</td>,
-                          <td key="d" style={{ padding:'.6rem .75rem', color:'rgba(26,18,48,.4)', fontSize:'.82rem' }}>{durMax}</td>,
+                          <td key="p" style={{ padding:'.6rem .75rem', color:'rgba(255,255,255,.45)', fontVariantNumeric:'tabular-nums' }}>{pctRange}</td>,
+                          poidsVal>0 && <td key="kg" style={{ padding:'.6rem .75rem', color:'rgba(255,255,255,.55)', fontVariantNumeric:'tabular-nums', fontSize:'.85rem' }}>{kgRange}</td>,
+                          <td key="d" style={{ padding:'.6rem .75rem', color:'rgba(255,255,255,.4)', fontSize:'.82rem' }}>{durMax}</td>,
                         ].filter(Boolean)
                         return <tr key={z.n} style={{ borderTop:'1px solid rgba(139,47,201,.07)' }}>{cols}</tr>
                       })}
                     </tbody>
                   </table>
                 </div>
-                <p style={{ fontSize:'.75rem', color:'rgba(26,18,48,.35)', marginTop:'.75rem' }}>La durée max pour les zones 5-7 correspond au temps théorique avant épuisement de la réserve W' (W' / Puissance excédant CP)</p>
+                <p style={{ fontSize:'.75rem', color:'rgba(255,255,255,.35)', marginTop:'.75rem' }}>La durée max pour les zones 5-7 correspond au temps théorique avant épuisement de la réserve W' (W' / Puissance excédant CP)</p>
               </>
             ) : (
               <div style={{ padding:'2.5rem', textAlign:'center', borderRadius:12, background:'rgba(139,47,201,.04)', border:'1px dashed rgba(139,47,201,.15)' }}>
-                <p style={{ color:'rgba(26,18,48,.35)', margin:0 }}>Entre ta puissance sur 5 min et 20 min pour calculer ta CP</p>
+                <p style={{ color:'rgba(255,255,255,.35)', margin:0 }}>Entre ta puissance sur 5 min et 20 min pour calculer ta CP</p>
               </div>
             )}
           </div>
@@ -193,39 +193,39 @@ export default function CriticalPowerCalculator() {
       </section>
 
       {/* SCIENCE */}
-      <section style={{ background:'#fff', padding:'5rem 1.5rem' }}>
+      <section style={{ background:'#0C0A18', padding:'5rem 1.5rem' }}>
         <Inner>
           <div style={{ display:'flex', gap:'3rem', alignItems:'flex-start', flexWrap:'wrap' }}>
             <div style={{ flex:'1 1 320px' }}>
-              <div style={{ background:C.light, borderRadius:20, padding:'2rem', border:'1px solid rgba(139,47,201,.12)' }}>
+              <div style={{ background:'rgba(255,255,255,.04)', borderRadius:20, padding:'2rem', border:'1px solid rgba(139,47,201,.12)' }}>
                 <p style={{ fontWeight:800, color:C.dark, fontSize:'1rem', marginBottom:'1.25rem' }}>Le modèle Monod & Scherrer</p>
-                <div style={{ background:'#fff', borderRadius:14, padding:'1.5rem', textAlign:'center', marginBottom:'1.25rem', border:'1px solid rgba(139,47,201,.1)' }}>
+                <div style={{ background:'rgba(255,255,255,.05)', borderRadius:14, padding:'1.5rem', textAlign:'center', marginBottom:'1.25rem', border:'1px solid rgba(139,47,201,.1)' }}>
                   <p style={{ fontSize:'1.35rem', fontWeight:900, color:C.dark, margin:0, fontFamily:'Georgia,serif', letterSpacing:'.02em' }}>
                     P(t) = CP + W' / t
                   </p>
-                  <p style={{ color:'rgba(26,18,48,.4)', fontSize:'.78rem', margin:'.4rem 0 0' }}>puissance (W) en fonction de la durée (s)</p>
+                  <p style={{ color:'rgba(255,255,255,.4)', fontSize:'.78rem', margin:'.4rem 0 0' }}>puissance (W) en fonction de la durée (s)</p>
                 </div>
                 <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:'.75rem', marginBottom:'1rem' }}>
                   <div style={{ background:'rgba(139,47,201,.06)', borderRadius:10, padding:'.9rem', border:'1px solid rgba(139,47,201,.12)' }}>
                     <p style={{ fontWeight:700, color:C.purple, marginBottom:'.3rem', fontSize:'.85rem' }}>CP</p>
-                    <p style={{ color:'rgba(26,18,48,.6)', fontSize:'.8rem', lineHeight:1.55, margin:0 }}>Puissance critique : seuil aérobie maximal, théoriquement indéfiniment tenable</p>
+                    <p style={{ color:'rgba(255,255,255,.6)', fontSize:'.8rem', lineHeight:1.55, margin:0 }}>Puissance critique : seuil aérobie maximal, théoriquement indéfiniment tenable</p>
                   </div>
                   <div style={{ background:'rgba(232,35,122,.06)', borderRadius:10, padding:'.9rem', border:'1px solid rgba(232,35,122,.12)' }}>
                     <p style={{ fontWeight:700, color:'#E8237A', marginBottom:'.3rem', fontSize:'.85rem' }}>W'</p>
-                    <p style={{ color:'rgba(26,18,48,.6)', fontSize:'.8rem', lineHeight:1.55, margin:0 }}>Réserve anaérobie en joules, disponible au-dessus de la CP</p>
+                    <p style={{ color:'rgba(255,255,255,.6)', fontSize:'.8rem', lineHeight:1.55, margin:0 }}>Réserve anaérobie en joules, disponible au-dessus de la CP</p>
                   </div>
                 </div>
                 <div style={{ background:'rgba(249,115,22,.06)', borderRadius:10, padding:'.9rem', border:'1px solid rgba(249,115,22,.12)', marginBottom:'1rem' }}>
                   <p style={{ fontWeight:700, color:'#F97316', marginBottom:'.3rem', fontSize:'.85rem' }}>FTP ≈ 95% × P<sub>20min</sub></p>
-                  <p style={{ color:'rgba(26,18,48,.6)', fontSize:'.8rem', lineHeight:1.55, margin:0 }}>Approximation pratique, légèrement inférieure à la CP réelle</p>
+                  <p style={{ color:'rgba(255,255,255,.6)', fontSize:'.8rem', lineHeight:1.55, margin:0 }}>Approximation pratique, légèrement inférieure à la CP réelle</p>
                 </div>
-                <p style={{ color:'rgba(26,18,48,.3)', fontSize:'.72rem', margin:0, textAlign:'center', fontStyle:'italic' }}>Monod H. & Scherrer J., Ergonomics, 1965</p>
+                <p style={{ color:'rgba(255,255,255,.3)', fontSize:'.72rem', margin:0, textAlign:'center', fontStyle:'italic' }}>Monod H. & Scherrer J., Ergonomics, 1965</p>
               </div>
             </div>
             <div style={{ flex:'1 1 320px' }}>
               <SectionTag>La science derrière la CP</SectionTag>
               <H2L>Pourquoi la CP est <span style={gradText}>supérieure</span> à la FTP ?</H2L>
-              <div style={{ color:'rgba(26,18,48,.65)', fontSize:'.9rem', lineHeight:1.8, display:'flex', flexDirection:'column', gap:'1rem' }}>
+              <div style={{ color:'rgba(255,255,255,.65)', fontSize:'.9rem', lineHeight:1.8, display:'flex', flexDirection:'column', gap:'1rem' }}>
                 <p style={{ textAlign:'justify' }}>La <strong style={{ color:C.dark }}>Puissance Critique (CP)</strong> est définie par le modèle de <strong style={{ color:C.dark }}>Monod & Scherrer (1965)</strong> (<em>Ergonomics</em>) comme la valeur asymptotique de la relation puissance–durée : la puissance que tu pourrais théoriquement maintenir indéfiniment, sans puiser dans ta réserve anaérobie.</p>
                 <p style={{ textAlign:'justify' }}>La <strong style={{ color:C.dark }}>W' (W prime)</strong> est ta réserve d'énergie anaérobie en joules. Au-dessus de ta CP, cette réserve se vide à un rythme dépendant de l'excès de puissance. Dès que tu repasses sous la CP, elle se reconstitue progressivement. <strong style={{ color:C.dark }}>Jones et al. (2010)</strong> (<em>Journal of Applied Physiology</em>) ont montré que ce modèle prédit avec précision la tolérance à l'effort intense.</p>
                 <p style={{ textAlign:'justify' }}>Contrairement à la FTP (95% de la puissance sur 20 min), la CP est issue d'une <strong style={{ color:C.dark }}>régression multidurée</strong> : plus tu fournis de tests (5 min, 12 min, 20 min), plus l'estimation est robuste et individualisée.</p>
@@ -267,7 +267,7 @@ export default function CriticalPowerCalculator() {
       </section>
 
       {/* W/kg CONTEXT */}
-      <section style={{ background:'#fff', padding:'5rem 1.5rem' }}>
+      <section style={{ background:'#0C0A18', padding:'5rem 1.5rem' }}>
         <Inner max={900}>
           <div style={{ textAlign:'center', marginBottom:'3rem' }}>
             <SectionTag>Niveaux de performance</SectionTag>
@@ -290,13 +290,13 @@ export default function CriticalPowerCalculator() {
                   <tr key={n} style={{ borderTop:'1px solid rgba(139,47,201,.07)', background:i%2===0?'transparent':'rgba(139,47,201,.02)' }}>
                     <td style={{ padding:'.7rem 1rem', color:C.purple, fontWeight:700, whiteSpace:'nowrap' }}>{n}</td>
                     <td style={{ padding:'.7rem 1rem', color:C.dark, fontWeight:600, fontVariantNumeric:'tabular-nums' }}>{w}</td>
-                    <td style={{ padding:'.7rem 1rem', color:'rgba(26,18,48,.5)', fontSize:'.85rem' }}>{d}</td>
+                    <td style={{ padding:'.7rem 1rem', color:'rgba(255,255,255,.5)', fontSize:'.85rem' }}>{d}</td>
                   </tr>
                 ))}
               </tbody>
             </table>
           </div>
-          <p style={{ fontSize:'.78rem', color:'rgba(26,18,48,.35)', marginTop:'.75rem', textAlign:'center' }}>Valeurs basées sur FTP (pas CP). Source : Coggan A. (2010), Training and Racing with a Power Meter</p>
+          <p style={{ fontSize:'.78rem', color:'rgba(255,255,255,.35)', marginTop:'.75rem', textAlign:'center' }}>Valeurs basées sur FTP (pas CP). Source : Coggan A. (2010), Training and Racing with a Power Meter</p>
         </Inner>
       </section>
 
@@ -306,7 +306,7 @@ export default function CriticalPowerCalculator() {
       />
 
       {/* FAQ */}
-      <section style={{ background:'#fff', padding:'5rem 1.5rem', borderTop:'1px solid rgba(139,47,201,.08)' }}>
+      <section style={{ background:'#0C0A18', padding:'5rem 1.5rem', borderTop:'1px solid rgba(139,47,201,.08)' }}>
         <Inner max={720}>
           <div style={{ textAlign:'center', marginBottom:'2.5rem' }}>
             <SectionTag>FAQ</SectionTag>
@@ -318,7 +318,7 @@ export default function CriticalPowerCalculator() {
                 {item.q}
                 <svg width="14" height="14" viewBox="0 0 12 12" fill="none" style={{ flexShrink:0, transition:'transform .2s', transform:openFaq===i?'rotate(180deg)':'none' }}><path d="M1 4l5 5 5-5" stroke={C.purple} strokeWidth="2" strokeLinecap="round"/></svg>
               </button>
-              {openFaq===i&&<p style={{ margin:'0 0 1.25rem', color:'rgba(26,18,48,.65)', fontSize:'.9rem', lineHeight:1.75, textAlign:'justify' }}>{item.a}</p>}
+              {openFaq===i&&<p style={{ margin:'0 0 1.25rem', color:'rgba(255,255,255,.65)', fontSize:'.9rem', lineHeight:1.75, textAlign:'justify' }}>{item.a}</p>}
             </div>
           ))}
         </Inner>

@@ -35,9 +35,9 @@ const FAQ = [
   { q:"Pourquoi courir lentement aide à progresser ?", a:"L'entraînement en endurance fondamentale développe des adaptations impossibles à obtenir en courant vite : augmentation des mitochondries, développement des capillaires, amélioration de l'utilisation des graisses comme carburant. Ces adaptations prennent du temps mais sont fondamentales. Les coureurs qui n'améliorent pas leurs performances courent souvent dans la zone grise : ni assez lent pour récupérer, ni assez vite pour progresser." },
 ]
 
-const C = { purple:'#8B2FC9', pink:'#E8237A', dark:'#1a1230', light:'#F8F5FF' }
-const inputSt = { background:'#fff', border:'1px solid rgba(139,47,201,.25)', borderRadius:10, padding:'.55rem .75rem', color:C.dark, fontSize:'.9rem', outline:'none' }
-const labelSt = { display:'block', fontSize:'.72rem', color:'rgba(26,18,48,.45)', textTransform:'uppercase', letterSpacing:'.08em', marginBottom:'.4rem' }
+const C = { purple:'#8B2FC9', pink:'#E8237A', dark:'#fff', light:'#0C0A18' }
+const inputSt = { background:'rgba(255,255,255,.07)', border:'1px solid rgba(139,47,201,.25)', borderRadius:10, padding:'.55rem .75rem', color:C.dark, fontSize:'.9rem', outline:'none' }
+const labelSt = { display:'block', fontSize:'.72rem', color:'rgba(255,255,255,.45)', textTransform:'uppercase', letterSpacing:'.08em', marginBottom:'.4rem' }
 function Chip({ active, onClick, children }) {
   return <button onClick={onClick} style={{ padding:'.4rem .9rem', borderRadius:50, cursor:'pointer', fontSize:'.84rem', border:`1px solid ${active?'transparent':'rgba(139,47,201,.25)'}`, background:active?`linear-gradient(135deg,${C.purple},${C.pink})`:'#fff', color:active?'#fff':C.purple, fontWeight:active?600:400 }}>{children}</button>
 }
@@ -90,7 +90,7 @@ export default function AlluresCalculator() {
       </PageHero>
 
       {/* CALCULATOR */}
-      <section ref={calcRef} id="outil" style={{ background:C.light, padding:'5rem 1.5rem' }}>
+      <section ref={calcRef} id="outil" style={{ background:'#000', padding:'5rem 1.5rem' }}>
         <Inner max={780}>
           <div style={{ textAlign:'center', marginBottom:'2.5rem' }}>
             <SectionTag>Calculateur d'allures</SectionTag>
@@ -101,13 +101,13 @@ export default function AlluresCalculator() {
             </div>
           </div>
 
-          <div style={{ background:'#fff', borderRadius:20, padding:'2rem', boxShadow:'0 8px 40px rgba(139,47,201,.1)', border:'1px solid rgba(139,47,201,.12)' }}>
+          <div style={{ background:'rgba(255,255,255,.05)', borderRadius:20, padding:'2rem', boxShadow:'0 8px 40px rgba(139,47,201,.1)', border:'1px solid rgba(139,47,201,.12)' }}>
             {mode==='vma' ? (
               <>
                 <p style={{ fontWeight:700, color:C.dark, marginBottom:'1rem', fontSize:'.95rem' }}>Ta VMA (km/h)</p>
                 <div style={{ display:'flex', alignItems:'center', gap:'.75rem', marginBottom:'1.5rem', flexWrap:'wrap' }}>
                   <input type="number" min="8" max="30" step=".1" placeholder="Ex : 15" value={vma} onChange={e=>setVma(e.target.value)} style={{ ...inputSt, width:110 }}/>
-                  <span style={{ color:'rgba(26,18,48,.45)', fontSize:'.85rem' }}>km/h</span>
+                  <span style={{ color:'rgba(255,255,255,.45)', fontSize:'.85rem' }}>km/h</span>
                   <Link to="/calculateur/vma" style={{ color:C.purple, fontSize:'.82rem', textDecoration:'none' }}>Je ne connais pas ma VMA →</Link>
                 </div>
                 {vmaVal>0 ? (
@@ -123,10 +123,10 @@ export default function AlluresCalculator() {
                           return <tr key={z.n} style={{ borderTop:'1px solid rgba(139,47,201,.07)' }}>
                             <td style={{ padding:'.6rem .75rem' }}><span style={{ display:'inline-flex', alignItems:'center', justifyContent:'center', width:24, height:24, borderRadius:'50%', background:z.color+'25', color:z.color, fontSize:'.8rem', fontWeight:700 }}>{z.n}</span></td>
                             <td style={{ padding:'.6rem .75rem', color:z.color, fontWeight:600, fontSize:'.85rem' }}>{z.name}</td>
-                            <td style={{ padding:'.6rem .75rem', color:'rgba(26,18,48,.4)', fontVariantNumeric:'tabular-nums' }}>{Math.round(z.pct[0]*100)}–{Math.round(z.pct[1]*100)}%</td>
+                            <td style={{ padding:'.6rem .75rem', color:'rgba(255,255,255,.4)', fontVariantNumeric:'tabular-nums' }}>{Math.round(z.pct[0]*100)}–{Math.round(z.pct[1]*100)}%</td>
                             <td style={{ padding:'.6rem .75rem', color:C.dark, fontVariantNumeric:'tabular-nums', fontSize:'.85rem' }}>{lo.toFixed(1)}–{hi.toFixed(1)}</td>
                             <td style={{ padding:'.6rem .75rem', color:C.dark, fontVariantNumeric:'tabular-nums', fontSize:'.85rem' }}>{kmhToPace(hi)}–{kmhToPace(lo)}</td>
-                            <td style={{ padding:'.6rem .75rem', color:'rgba(26,18,48,.45)', fontSize:'.8rem' }}>{descs[z.n-1]}</td>
+                            <td style={{ padding:'.6rem .75rem', color:'rgba(255,255,255,.45)', fontSize:'.8rem' }}>{descs[z.n-1]}</td>
                           </tr>
                         })}
                       </tbody>
@@ -134,7 +134,7 @@ export default function AlluresCalculator() {
                   </div>
                 ):(
                   <div style={{ padding:'2.5rem', textAlign:'center', borderRadius:12, background:'rgba(139,47,201,.04)', border:'1px dashed rgba(139,47,201,.15)' }}>
-                    <p style={{ color:'rgba(26,18,48,.35)', margin:0 }}>Entre ta VMA pour voir tes zones d'entraînement</p>
+                    <p style={{ color:'rgba(255,255,255,.35)', margin:0 }}>Entre ta VMA pour voir tes zones d'entraînement</p>
                   </div>
                 )}
               </>
@@ -143,7 +143,7 @@ export default function AlluresCalculator() {
                 <p style={{ fontWeight:700, color:C.dark, marginBottom:'1rem', fontSize:'.95rem' }}>Fréquence cardiaque maximale</p>
                 <div style={{ display:'flex', gap:'1.5rem', flexWrap:'wrap', marginBottom:'1.5rem', alignItems:'flex-end' }}>
                   <div><label style={labelSt}>FC max connue (bpm)</label><input type="number" min="100" max="230" placeholder="Ex : 185" value={fcMax} onChange={e=>{setFcMax(e.target.value);setUseAge(false)}} disabled={useAge} style={{ ...inputSt, width:110, opacity:useAge?.4:1 }}/></div>
-                  <div><label style={labelSt}>Ou estimer par l'âge</label><div style={{ display:'flex', gap:'.5rem', alignItems:'center' }}><input type="number" min="15" max="80" placeholder="Âge" value={age} onChange={e=>{setAge(e.target.value);setUseAge(true)}} style={{ ...inputSt, width:90 }}/><span style={{ color:'rgba(26,18,48,.45)', fontSize:'.82rem' }}>ans → {useAge&&age?`FC max ~${fcEstimated} bpm`:''}</span></div></div>
+                  <div><label style={labelSt}>Ou estimer par l'âge</label><div style={{ display:'flex', gap:'.5rem', alignItems:'center' }}><input type="number" min="15" max="80" placeholder="Âge" value={age} onChange={e=>{setAge(e.target.value);setUseAge(true)}} style={{ ...inputSt, width:90 }}/><span style={{ color:'rgba(255,255,255,.45)', fontSize:'.82rem' }}>ans → {useAge&&age?`FC max ~${fcEstimated} bpm`:''}</span></div></div>
                 </div>
                 {fcVal>0 ? (
                   <div style={{ overflow:'hidden', overflowX:'auto', borderRadius:12, border:'1px solid rgba(139,47,201,.12)' }}>
@@ -157,9 +157,9 @@ export default function AlluresCalculator() {
                           return <tr key={z.n} style={{ borderTop:'1px solid rgba(139,47,201,.07)' }}>
                             <td style={{ padding:'.6rem .85rem' }}><span style={{ display:'inline-flex', alignItems:'center', justifyContent:'center', width:24, height:24, borderRadius:'50%', background:z.color+'25', color:z.color, fontSize:'.8rem', fontWeight:700 }}>{z.n}</span></td>
                             <td style={{ padding:'.6rem .85rem', color:z.color, fontWeight:600 }}>{z.name}</td>
-                            <td style={{ padding:'.6rem .85rem', color:'rgba(26,18,48,.45)', fontVariantNumeric:'tabular-nums' }}>{Math.round(z.pct[0]*100)}–{Math.round(z.pct[1]*100)}%</td>
+                            <td style={{ padding:'.6rem .85rem', color:'rgba(255,255,255,.45)', fontVariantNumeric:'tabular-nums' }}>{Math.round(z.pct[0]*100)}–{Math.round(z.pct[1]*100)}%</td>
                             <td style={{ padding:'.6rem .85rem', color:C.dark, fontVariantNumeric:'tabular-nums', fontWeight:600 }}>{lo}–{hi}</td>
-                            <td style={{ padding:'.6rem .85rem', color:'rgba(26,18,48,.5)', fontSize:'.82rem' }}>{z.desc}</td>
+                            <td style={{ padding:'.6rem .85rem', color:'rgba(255,255,255,.5)', fontSize:'.82rem' }}>{z.desc}</td>
                           </tr>
                         })}
                       </tbody>
@@ -167,7 +167,7 @@ export default function AlluresCalculator() {
                   </div>
                 ):(
                   <div style={{ padding:'2.5rem', textAlign:'center', borderRadius:12, background:'rgba(139,47,201,.04)', border:'1px dashed rgba(139,47,201,.15)' }}>
-                    <p style={{ color:'rgba(26,18,48,.35)', margin:0 }}>Entre ta FC max ou ton âge pour voir tes zones cardiaques</p>
+                    <p style={{ color:'rgba(255,255,255,.35)', margin:0 }}>Entre ta FC max ou ton âge pour voir tes zones cardiaques</p>
                   </div>
                 )}
               </>
@@ -176,9 +176,9 @@ export default function AlluresCalculator() {
 
           {/* Tableau temps VMA par distance */}
           {vmaVal>0 && (
-            <div style={{ marginTop:'2rem', background:'#fff', borderRadius:20, padding:'2rem', boxShadow:'0 4px 24px rgba(139,47,201,.08)', border:'1px solid rgba(139,47,201,.1)' }}>
+            <div style={{ marginTop:'2rem', background:'rgba(255,255,255,.05)', borderRadius:20, padding:'2rem', boxShadow:'0 4px 24px rgba(139,47,201,.08)', border:'1px solid rgba(139,47,201,.1)' }}>
               <p style={{ fontWeight:800, color:C.dark, marginBottom:'.4rem', fontSize:'1.05rem' }}>Tes temps exacts pour chaque distance</p>
-              <p style={{ color:'rgba(26,18,48,.5)', fontSize:'.85rem', marginBottom:'1.25rem' }}>Basé sur ta VMA de {vmaVal} km/h — temps pour chaque distance en min/km selon l'intensité</p>
+              <p style={{ color:'rgba(255,255,255,.5)', fontSize:'.85rem', marginBottom:'1.25rem' }}>Basé sur ta VMA de {vmaVal} km/h — temps pour chaque distance en min/km selon l'intensité</p>
               <div style={{ overflow:'hidden', overflowX:'auto', borderRadius:12, border:'1px solid rgba(139,47,201,.1)' }}>
                 <table style={{ width:'100%', borderCollapse:'collapse', fontSize:'.78rem', minWidth:720 }}>
                   <thead>
@@ -223,14 +223,14 @@ export default function AlluresCalculator() {
                   </tbody>
                 </table>
               </div>
-              <p style={{ color:'rgba(26,18,48,.35)', fontSize:'.75rem', marginTop:'.75rem', textAlign:'center' }}>La colonne 100% correspond à ton allure VMA · Les pourcentages inférieurs à 65% = endurance fondamentale</p>
+              <p style={{ color:'rgba(255,255,255,.35)', fontSize:'.75rem', marginTop:'.75rem', textAlign:'center' }}>La colonne 100% correspond à ton allure VMA · Les pourcentages inférieurs à 65% = endurance fondamentale</p>
             </div>
           )}
 
           {/* Allure selon objectif */}
-          <div style={{ marginTop:'2rem', background:'#fff', borderRadius:20, padding:'2rem', boxShadow:'0 4px 24px rgba(139,47,201,.08)', border:'1px solid rgba(139,47,201,.1)' }}>
+          <div style={{ marginTop:'2rem', background:'rgba(255,255,255,.05)', borderRadius:20, padding:'2rem', boxShadow:'0 4px 24px rgba(139,47,201,.08)', border:'1px solid rgba(139,47,201,.1)' }}>
             <p style={{ fontWeight:800, color:C.dark, marginBottom:'.4rem', fontSize:'1.05rem' }}>Quelle allure selon ton objectif chrono ?</p>
-            <p style={{ color:'rgba(26,18,48,.5)', fontSize:'.85rem', marginBottom:'1.25rem' }}>Repères pour chaque objectif courant</p>
+            <p style={{ color:'rgba(255,255,255,.5)', fontSize:'.85rem', marginBottom:'1.25rem' }}>Repères pour chaque objectif courant</p>
             <div style={{ overflow:'hidden', overflowX:'auto', borderRadius:12, border:'1px solid rgba(139,47,201,.1)' }}>
               <table style={{ width:'100%', borderCollapse:'collapse', fontSize:'.875rem', minWidth:420 }}>
                 <thead><tr style={{ background:'#1a1230' }}>
@@ -242,7 +242,7 @@ export default function AlluresCalculator() {
                       <td style={{ padding:'.6rem .85rem', color:C.purple, fontWeight:600, whiteSpace:'nowrap' }}>{row.dist}</td>
                       <td style={{ padding:'.6rem .85rem', color:C.dark, fontWeight:600, fontVariantNumeric:'tabular-nums', whiteSpace:'nowrap' }}>{row.chrono}</td>
                       <td style={{ padding:'.6rem .85rem', color:C.dark, fontVariantNumeric:'tabular-nums', whiteSpace:'nowrap' }}>{row.allure}</td>
-                      <td style={{ padding:'.6rem .85rem', color:'rgba(26,18,48,.45)', fontSize:'.82rem', whiteSpace:'nowrap' }}>{row.note}</td>
+                      <td style={{ padding:'.6rem .85rem', color:'rgba(255,255,255,.45)', fontSize:'.82rem', whiteSpace:'nowrap' }}>{row.note}</td>
                     </tr>
                   ))}
                 </tbody>
@@ -253,7 +253,7 @@ export default function AlluresCalculator() {
       </section>
 
       {/* POURQUOI S'ENTRAÎNER PAR ZONES */}
-      <section style={{ background:'#fff', padding:'5rem 1.5rem' }}>
+      <section style={{ background:'#0C0A18', padding:'5rem 1.5rem' }}>
         <Inner>
           <div style={{ display:'flex', gap:'3rem', alignItems:'center', flexWrap:'wrap' }}>
             <div style={{ flex:'1 1 380px', borderRadius:20, overflow:'hidden', maxHeight:440 }}>
@@ -289,7 +289,7 @@ export default function AlluresCalculator() {
             <div style={{ flex:'1 1 300px' }}>
               <SectionTag>S'entraîner intelligemment</SectionTag>
               <H2L>Pourquoi s'entraîner par <span style={gradText}>zones</span> ?</H2L>
-              <div style={{ display:'flex', flexDirection:'column', gap:'1.25rem', marginBottom:'2rem', color:'rgba(26,18,48,.7)', fontSize:'.9rem', lineHeight:1.7 }}>
+              <div style={{ display:'flex', flexDirection:'column', gap:'1.25rem', marginBottom:'2rem', color:'rgba(255,255,255,.7)', fontSize:'.9rem', lineHeight:1.7 }}>
                 <p style={{ margin:0, textAlign:'justify' }}>L'erreur la plus courante chez les coureurs amateurs : courir <strong style={{ color:C.dark }}>trop vite en endurance et trop lentement en fractionné</strong>. Résultat : fatigue chronique, stagnation des chronos, risque de blessure accru.</p>
                 <p style={{ margin:0, textAlign:'justify' }}>La règle des <strong style={{ color:C.dark }}>80/20</strong> est prouvée par la science du sport : 80% du volume à basse intensité (zones 1-2), 20% à haute intensité (zones 4-5). C'est la répartition des meilleurs coureurs mondiaux, des récréatifs aux élites.</p>
                 <p style={{ margin:0, textAlign:'justify' }}>En connaissant précisément tes zones, tu <strong style={{ color:C.dark }}>optimises chaque séance</strong> : les sorties longues reconstituent les réserves, les séances de seuil repoussent tes limites, le fractionné développe ta puissance maximale.</p>
@@ -353,7 +353,7 @@ export default function AlluresCalculator() {
       </section>
 
       {/* TÉMOIGNAGES */}
-      <section style={{ background:C.light, padding:'5rem 1.5rem' }}>
+      <section style={{ background:'#000', padding:'5rem 1.5rem' }}>
         <Inner>
           <div style={{ textAlign:'center', marginBottom:'2.5rem' }}><SectionTag>Témoignages</SectionTag><H2L>Ce que disent nos <span style={gradText}>athlètes</span></H2L></div>
         </Inner>
@@ -366,7 +366,7 @@ export default function AlluresCalculator() {
       />
 
       {/* FAQ */}
-      <section style={{ background:'#fff', padding:'5rem 1.5rem' }}>
+      <section style={{ background:'#0C0A18', padding:'5rem 1.5rem' }}>
         <Inner max={720}>
           <div style={{ textAlign:'center', marginBottom:'2.5rem' }}><SectionTag>Questions fréquentes</SectionTag><H2L>Tout ce que tu dois savoir sur les <span style={gradText}>allures</span></H2L></div>
           {FAQ.map((item,i)=>(
@@ -375,7 +375,7 @@ export default function AlluresCalculator() {
                 {item.q}
                 <svg width="14" height="14" viewBox="0 0 12 12" fill="none" style={{ flexShrink:0, transition:'transform .2s', transform:openFaq===i?'rotate(180deg)':'none' }}><path d="M1 4l5 5 5-5" stroke={C.purple} strokeWidth="2" strokeLinecap="round"/></svg>
               </button>
-              {openFaq===i&&<p style={{ margin:'0 0 1.25rem', color:'rgba(26,18,48,.65)', fontSize:'.9rem', lineHeight:1.75, textAlign:'justify' }}>{item.a}</p>}
+              {openFaq===i&&<p style={{ margin:'0 0 1.25rem', color:'rgba(255,255,255,.65)', fontSize:'.9rem', lineHeight:1.75, textAlign:'justify' }}>{item.a}</p>}
             </div>
           ))}
         </Inner>
