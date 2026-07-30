@@ -1082,21 +1082,21 @@ INSERT INTO public.session_library (code, type, category, name, duration_min, in
  '60 min trail à effort endurance (65-72% VMA ressenti) — marche dans les montées raides si nécessaire, course sur le plat et en descente',
  NULL, NULL,
  'Le trail c''est l''effort ressenti qui guide, pas l''allure. Marcher en montée n''est pas une faiblesse — c''est une stratégie. Économise-toi dans les montées pour courir dans les descentes.',
- ARRAY['trail_court', 'trail_long', 'ultra'], 'running', true),
+ ARRAY['trail_court', 'trail_long', 'ultra'], 'trail', true),
 
 ('TRAIL-02', 'trail', 'trail', 'Sortie trail endurance — 1h30 terrain varié', 90, 6,
  NULL,
  '90 min trail à effort endurance — marche active en montée, course sur plat et descente',
  NULL, NULL,
  'Heure et demie de trail. La fatigue s''installe — la marche en montée devient une alliée, pas un aveu. Ravitaille-toi si tu as des réserves sur toi.',
- ARRAY['trail_court', 'trail_long', 'ultra'], 'running', true),
+ ARRAY['trail_court', 'trail_long', 'ultra'], 'trail', true),
 
 ('TRAIL-03', 'trail', 'trail', 'Sortie trail endurance — 2h terrain montagneux', 120, 6,
  NULL,
  '2h trail en terrain montagneux — alternance course, marche rapide, descente technique',
  NULL, NULL,
  'Deux heures en montagne. Les bâtons sont autorisés si tu en as. Ravitaillement : eau + gel toutes les 45min. Descends prudemment — les genoux se souviennent de tout.',
- ARRAY['trail_long', 'ultra'], 'running', true),
+ ARRAY['trail_long', 'ultra'], 'trail', true),
 
 ('TRAIL-04', 'trail', 'trail', 'Fractionné trail — 6x4min montée soutenue', 65, 8,
  '20 min footing progressif avec 4 accélérations courtes',
@@ -1104,7 +1104,7 @@ INSERT INTO public.session_library (code, type, category, name, duration_min, in
  'Descente lente 2min entre chaque montée',
  '10 min footing lent en descente',
  'Six montées de 4 minutes — ton cœur et tes fessiers vont en voir de toutes les couleurs. Concentre-toi sur la technique de montée : gainage, appui efficace, bras actifs.',
- ARRAY['trail_court', 'trail_long', 'ultra'], 'running', true),
+ ARRAY['trail_court', 'trail_long', 'ultra'], 'trail', true),
 
 ('TRAIL-05', 'trail', 'trail', 'Fractionné trail — 4x6min montée longue', 70, 8,
  '20 min footing progressif',
@@ -1112,14 +1112,14 @@ INSERT INTO public.session_library (code, type, category, name, duration_min, in
  'Descente lente 3min entre chaque montée',
  '10 min footing lent',
  'Six minutes de montée, c''est long. L''effort doit être géré — tu ne peux pas partir à fond sans exploser. Cherche ton rythme de croisière en montée.',
- ARRAY['trail_long', 'ultra'], 'running', true),
+ ARRAY['trail_long', 'ultra'], 'trail', true),
 
 ('TRAIL-06', 'trail', 'trail', 'Marche rapide technique — 1h dénivelé accumulé', 60, 5,
  NULL,
  '1h de marche rapide en terrain montagneux — objectif : accumuler 400-600m de D+ selon ton terrain, marche nordique si tu as des bâtons',
  NULL, NULL,
  'Séance de marche rapide uniquement. La marche en compétition trail est une technique — entraîne-toi spécifiquement. Bâtons bienvenus. Pousse fort derrière à chaque pas.',
- ARRAY['trail_long', 'ultra'], 'running', true),
+ ARRAY['trail_long', 'ultra'], 'trail', true),
 
 ('TRAIL-07', 'trail', 'trail', 'Descente technique — 40min descentes répétées', 65, 7,
  '15 min footing lent pour montée initiale',
@@ -1127,28 +1127,28 @@ INSERT INTO public.session_library (code, type, category, name, duration_min, in
  'Montée lente entre chaque descente',
  '5 min footing lent',
  'La descente trail s''apprend. Regard 5-10m devant, bras légèrement écartés pour l''équilibre, centre de gravité bas, ne freine pas avec les talons. Les premières descentes seront hésitantes — c''est normal.',
- ARRAY['trail_court', 'trail_long', 'ultra'], 'running', true),
+ ARRAY['trail_court', 'trail_long', 'ultra'], 'trail', true),
 
 ('TRAIL-08', 'trail', 'trail', 'Trail spécifique — Simulation course 2h30', 150, 7,
  NULL,
  '2h30 trail en terrain proche de ta course objectif — reproduis le profil de la course : même D+, mêmes surfaces',
  NULL, NULL,
  'Répétition générale trail. Utilise le même équipement qu''en course (chaussures, sac, alimentation). Teste tout ce que tu vas utiliser le jour J. Ne découvre rien en compétition.',
- ARRAY['trail_long', 'ultra'], 'running', true),
+ ARRAY['trail_long', 'ultra'], 'trail', true),
 
 ('TRAIL-09', 'trail', 'trail', 'Trail long — 3h+ endurance ultra', 180, 6,
  NULL,
  '3h à 3h30 trail à allure ultra (60-65% VMA ressenti) — marche systématique en montée, course sur plat/descente',
  NULL, NULL,
  'Séance ultra. L''allure doit être très conservatrice — si tu penses que tu vas trop lentement, c''est probablement la bonne allure. Alimentation toutes les 30-40min. Cette séance prépare ton corps à l''ultra autant mentalement que physiquement.',
- ARRAY['ultra'], 'running', true),
+ ARRAY['ultra'], 'trail', true),
 
 ('TRAIL-10', 'trail', 'trail', 'Trail nuit — 1h30 lampe frontale', 90, 6,
  NULL,
  '1h30 trail de nuit avec lampe frontale — allure très conservatrice, terrain connu, technique de course nocturne',
  NULL, NULL,
  'Course de nuit : réduis ta foulée, baisse ton regard, accepte d''aller plus lentement. La nuit trompe la perception du terrain. Si ta course a une partie nocturne, cette séance est obligatoire.',
- ARRAY['trail_long', 'ultra'], 'running', true),
+ ARRAY['trail_long', 'ultra'], 'trail', true),
 
 ('TRAIL-11', 'trail', 'trail', 'Fractionné trail mixte — 4x(3min montée + descente + 2min plat)', 65, 8,
  '20 min footing progressif',
@@ -1156,7 +1156,7 @@ INSERT INTO public.session_library (code, type, category, name, duration_min, in
  '2min footing lent entre chaque bloc complet',
  '10 min footing lent',
  'Tu enchaînes montée, descente et relance sur plat sans vraiment récupérer. Simule le profil ondulé de la plupart des trails. La relance sur plat après la descente est l''élément le plus formateur.',
- ARRAY['trail_court', 'trail_long'], 'running', true),
+ ARRAY['trail_court', 'trail_long'], 'trail', true),
 
 ('TRAIL-12', 'trail', 'trail', 'Trail cadence — 30min terrain plat, cadence élevée', 55, 6,
  '10 min footing lent',
@@ -1164,7 +1164,7 @@ INSERT INTO public.session_library (code, type, category, name, duration_min, in
  NULL,
  '10 min footing lent',
  'Améliore ta cadence — en trail, une cadence élevée réduit les chocs et la fatigue musculaire. Compte tes foulées sur 30 secondes (objectif : 45 foulées d''un pied = 90 total). Utilise un métronome si besoin.',
- ARRAY['trail_court', 'trail_long', 'ultra'], 'running', false);
+ ARRAY['trail_court', 'trail_long', 'ultra'], 'trail', false);
 
 -- ── Mise à jour sport pour les séances de running déjà présentes ─
 UPDATE public.session_library SET sport = 'running' WHERE sport IS NULL;
