@@ -488,7 +488,7 @@ INSERT INTO public.session_library (code, type, category, name, duration_min, in
 -- ============================================================
 -- SÉANCES DE CÔTES (CO)
 -- ============================================================
-INSERT INTO public.session_library (code, type, category, name, duration_min, intensity_rpe, warmup, main_set, recovery, cooldown, coach_notes, compatible_goals, sport) VALUES
+INSERT INTO public.session_library (code, type, category, name, duration_min, intensity_rpe, warmup, main_set, recovery, cooldown, coach_notes, compatible_goals, sport, montagne_only) VALUES
 
 -- ── Côtes courtes ─────────────────────────────────────────────
 ('CO-01', 'cotes', 'cotes', 'Côtes courtes 8x60m — Puissance explosive', 55, 9,
@@ -497,7 +497,7 @@ INSERT INTO public.session_library (code, type, category, name, duration_min, in
  'Descente en marchant doucement — récupération complète',
  '10 min footing très lent à 60-63% VMA',
  'La côte courte, c''est du neuromusculaire pur. Monte en attaquant le sol, bras actifs, genoux hauts. Laisse-toi le temps de souffler en descente.',
- ARRAY['5km', '10km', 'semi', 'marathon'], 'running'),
+ ARRAY['5km', '10km', 'semi', 'marathon'], 'running', false),
 
 ('CO-02', 'cotes', 'cotes', 'Côtes courtes 10x80m — Puissance neuromusculaire', 60, 9,
  '25 min progressif à 65-72% VMA, terminer par 4 lignes droites 80m',
@@ -505,7 +505,7 @@ INSERT INTO public.session_library (code, type, category, name, duration_min, in
  'Descente en marchant doucement — récupération complète',
  '10 min footing très lent à 60-63% VMA',
  'Dix montées — l''effort augmente répétition après répétition. La foulée doit rester propre jusqu''au bout. Si tu te contorsionne sur les dernières, ralentis.',
- ARRAY['5km', '10km', 'semi', 'marathon'], 'running'),
+ ARRAY['5km', '10km', 'semi', 'marathon'], 'running', false),
 
 ('CO-03', 'cotes', 'cotes', 'Côtes courtes 12x80m — Volume explosivité', 65, 9,
  '25 min progressif à 65-72% VMA, terminer par 4 lignes droites 80m',
@@ -513,7 +513,7 @@ INSERT INTO public.session_library (code, type, category, name, duration_min, in
  'Descente en marchant — récupération complète',
  '10 min footing très lent à 60-63% VMA',
  'Varie les stimulations : 6 montées à vitesse maximale, 6 montées avec exagération de la foulée (levée de genoux, gainage actif). Double bénéfice neuromusculaire.',
- ARRAY['5km', '10km', 'semi'], 'running'),
+ ARRAY['5km', '10km', 'semi'], 'running', false),
 
 -- ── Côtes longues ─────────────────────────────────────────────
 ('CO-04', 'cotes', 'cotes', 'Côtes longues 6x150m — Résistance montée', 60, 8,
@@ -522,7 +522,7 @@ INSERT INTO public.session_library (code, type, category, name, duration_min, in
  'Descente en trottinant très lentement — récupération active',
  '10 min footing très lent à 60-63% VMA',
  'Les côtes longues développent la résistance spécifique et la force musculaire. Maintiens l''effort sur les 150m entiers sans accélérer ni décélérer.',
- ARRAY['5km', '10km', 'semi', 'marathon'], 'running'),
+ ARRAY['5km', '10km', 'semi', 'marathon'], 'running', false),
 
 ('CO-05', 'cotes', 'cotes', 'Côtes longues 8x200m — Force endurance', 65, 8,
  '25 min progressif à 65-72% VMA, terminer par 4 lignes droites 80m',
@@ -530,7 +530,7 @@ INSERT INTO public.session_library (code, type, category, name, duration_min, in
  'Descente en trottinant très lentement — récupération active',
  '10 min footing très lent à 60-63% VMA',
  'Huit fois 200m en montée, c''est une vraie séance de force-endurance. Ton appui doit rester actif jusqu''en haut. Ne laisse pas les bras mourir.',
- ARRAY['10km', 'semi', 'marathon'], 'running'),
+ ARRAY['10km', 'semi', 'marathon'], 'running', false),
 
 ('CO-06', 'cotes', 'cotes', 'Côtes longues 6x300m — Résistance aérobie', 70, 8,
  '25 min progressif à 65-72% VMA, terminer par 4 lignes droites 80m',
@@ -538,7 +538,7 @@ INSERT INTO public.session_library (code, type, category, name, duration_min, in
  'Descente en trottinant très lentement — récupération active',
  '10 min footing très lent à 60-63% VMA',
  'Trois cents mètres en montée, c''est long. La gestion de l''effort est cruciale. Pars conservateur sur les 3 premières pour finir fort sur les 3 dernières.',
- ARRAY['semi', 'marathon'], 'running'),
+ ARRAY['semi', 'marathon'], 'running', false),
 
 -- ── Côtes mixtes et créatives ─────────────────────────────────
 ('CO-07', 'cotes', 'cotes', 'Côtes en escalade 3x(80m+150m+250m) — Pyramide montante', 70, 9,
@@ -547,7 +547,7 @@ INSERT INTO public.session_library (code, type, category, name, duration_min, in
  'Descente trot très lent entre chaque montée / 4min footing lent entre séries',
  '10 min footing très lent à 60-63% VMA',
  'La séance côtes qui fait tout en même temps : explosivité, résistance et endurance. Les 250m finaux de chaque série arrivent quand tu es déjà chargé. Séance qui fait peur, qui tient ses promesses.',
- ARRAY['10km', 'semi', 'marathon'], 'running'),
+ ARRAY['10km', 'semi', 'marathon'], 'running', false),
 
 ('CO-08', 'cotes', 'cotes', 'Côtes en récup courte 10x100m — Accumulation de fatigue', 65, 9,
  '25 min progressif à 65-72% VMA, terminer par 4 lignes droites 80m',
@@ -555,7 +555,7 @@ INSERT INTO public.session_library (code, type, category, name, duration_min, in
  '45'' descente rapide entre chaque montée (récup volontairement incomplète)',
  '10 min footing très lent à 60-63% VMA',
  'La récup courte est volontaire — tu dois courir en état de fatigue partielle, comme en fin de course. Séance mentalement dure. Ne l''anticipe pas trop.',
- ARRAY['10km', 'semi', 'marathon'], 'running'),
+ ARRAY['10km', 'semi', 'marathon'], 'running', false),
 
 ('CO-09', 'cotes', 'cotes', 'Côtes trail 3x(5min montée continue) — Simulation trail', 65, 8,
  '25 min progressif à 65-72% VMA, terminer par 4 lignes droites 80m',
