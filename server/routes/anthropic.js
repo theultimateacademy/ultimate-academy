@@ -1481,12 +1481,17 @@ router.post('/plans/adapt-injury', async (req, res) => {
     }
 
     function adaptSessionForInjury(s) {
-      const t = (s.type || '').toLowerCase();
+      const t     = (s.type  || '').toLowerCase();
+      const titre = (s.titre || '').toLowerCase();
+      const code  = (s.id_seance || '').toLowerCase();
+      const isNat  = t.includes('natation') || titre.includes('natation') || code.startsWith('nat-');
+      const isVelo = t.includes('vélo') || t.includes('velo') || titre.includes('vélo') || titre.includes('velo') || code.startsWith('vel-');
+      const isBri  = t.includes('brique') || titre.includes('brique') || code.startsWith('bri-');
       if (t.includes('renforcement')) return s;
       if (s.est_course) return s;
 
       // ── Natation : parfait cross-training running injury, garder ──────────────
-      if (t.includes('natation')) {
+      if (isNat) {
         return {
           ...s,
           titre:          (s.titre || s.type) + ' — Cross-training 🩹',
@@ -1500,7 +1505,7 @@ router.post('/plans/adapt-injury', async (req, res) => {
       }
 
       // ── Vélo : bon cross-training aussi, garder ───────────────────────────────
-      if (t.includes('vélo') || t.includes('velo')) {
+      if (isVelo) {
         return {
           ...s,
           titre:          (s.titre || s.type) + ' — Cross-training 🩹',
@@ -1514,7 +1519,7 @@ router.post('/plans/adapt-injury', async (req, res) => {
       }
 
       // ── Brique : supprimer la partie course, garder natation/vélo seulement ───
-      if (t.includes('brique')) {
+      if (isBri) {
         return {
           ...s,
           type:           'Natation endurance',
@@ -1606,14 +1611,20 @@ router.post('/plans/fatigue-adapt', async (req, res) => {
     const lightDurations = [30, 35, 40, 45];
     let lightIdx = 0;
     currentWeek.seances = currentWeek.seances.map(s => {
-      const t = (s.type || '').toLowerCase();
+      const t     = (s.type || '').toLowerCase();
+      const titre = (s.titre || '').toLowerCase();
+      const code  = (s.id_seance || '').toLowerCase();
+      // Détection discipline multi-source (type + titre + code séance)
+      const isNat  = t.includes('natation') || titre.includes('natation') || code.startsWith('nat-');
+      const isVelo = t.includes('vélo') || t.includes('velo') || titre.includes('vélo') || titre.includes('velo') || code.startsWith('vel-');
+      const isBri  = t.includes('brique') || titre.includes('brique') || code.startsWith('bri-');
       // Repos, renforcement et courses restent intacts
       if (t.includes('renforcement') || t.includes('repos') || s.est_course) return s;
 
       const dur = lightDurations[lightIdx++ % lightDurations.length];
 
       // ── Natation : garder la natation, juste alléger ──────────────────────────
-      if (t.includes('natation')) {
+      if (isNat) {
         return {
           ...s,
           type:           'Natation endurance',
@@ -1628,7 +1639,7 @@ router.post('/plans/fatigue-adapt', async (req, res) => {
       }
 
       // ── Vélo : garder le vélo, juste alléger ─────────────────────────────────
-      if (t.includes('vélo') || t.includes('velo')) {
+      if (isVelo) {
         return {
           ...s,
           type:           'Vélo endurance',
@@ -1642,22 +1653,18 @@ router.post('/plans/fatigue-adapt', async (req, res) => {
         };
       }
 
-      // ── Brique : simplifier en footing léger (cumul trop chargé en fatigue) ──
-      if (t.includes('brique')) {
+      // ── Brique : alléger mais garder les deux disciplines, pas de conversion running ──
+      if (isBri) {
+        const shortDur = Math.max(30, Math.round((s.duree_min || 60) * 0.65));
         return {
           ...s,
-          type:            'Endurance fondamentale',
-          titre:           'Footing récupération 😴',
-          duree_min:       30,
+          titre:           (s.titre || 'Brique') + ' — allégée 😴',
+          duree_min:       shortDur,
           intensite:       'très facile',
-          echauffement:    '',
-          corps:           `30 min à 65-72% VMA (${calcPace(vma, 0.65)}/km à ${calcPace(vma, 0.72)}/km) — allure au ressenti. Séance de récupération active.`,
-          retour_au_calme: '',
-          allures: [
-            { zone: 'Min (65% VMA)', pourcentage_vma: 65, vitesse_kmh: parseFloat((vma * 0.65).toFixed(1)), allure_min_km: calcPace(vma, 0.65) + '/km' },
-            { zone: 'Max (72% VMA)', pourcentage_vma: 72, vitesse_kmh: parseFloat((vma * 0.72).toFixed(1)), allure_min_km: calcPace(vma, 0.72) + '/km' },
-          ],
-          notes_coach:    'Ton corps a besoin de récupérer — on simplifie avec un footing léger à la place de la brique.',
+          corps:           s.corps
+            ? `${s.corps}\n\n(Séance allégée — durée réduite de 35%, intensité très facile. Écoute ton corps.)`
+            : `Brique légère ${shortDur} min — allure endurance confortable, aucun effort intense.`,
+          notes_coach:    'Ton corps a besoin de souffler. On réduit la durée et l\'intensité de la brique, mais on garde les deux disciplines.',
           rpe_cible:      3,
           est_seance_cle: false,
         };

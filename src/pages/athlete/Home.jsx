@@ -455,8 +455,14 @@ export default function AthleteHome() {
             setWeekProgress({ done: doneIdxs.size, total: rawSeances.length, statuses: sessionStatuses, seances: seancesWithIdx, avgRpe })
             setCurrentWeekNum(weeksElapsed)
 
-            // Bilan de la semaine PRÉCÉDENTE — s'affiche dès la semaine 2+, tant qu'il n'est pas rempli
-            const prevWeekNum = weeksElapsed - 1
+            // Bilan — disponible dès le dimanche de la semaine en cours (ou semaine 2+)
+            // Dimanche = dernier jour de la semaine courante en cours (weekStart + 6 jours)
+            const todayForBilan = new Date(); todayForBilan.setHours(0,0,0,0)
+            const sundayOfCurrentWeek = new Date(weekStart); sundayOfCurrentWeek.setDate(weekStart.getDate() + 6)
+            sundayOfCurrentWeek.setHours(0,0,0,0)
+            const isSundayOrLater = todayForBilan >= sundayOfCurrentWeek
+
+            const prevWeekNum = isSundayOrLater ? weeksElapsed : weeksElapsed - 1
             if (prevWeekNum >= 1) {
               setBilanWeekNum(prevWeekNum)
               supabase
@@ -601,7 +607,6 @@ export default function AthleteHome() {
           <span style={{ fontSize: '1.2rem' }}>✅</span>
           <div>
             <div style={{ fontWeight: 700, fontSize: '.88rem', color: '#6EE7B7' }}>Bilan de la semaine {bilanWeekNum} envoyé !</div>
-            <div style={{ fontSize: '.78rem', color: 'rgba(255,255,255,.4)' }}>Merci pour ton retour — je l'ai bien reçu.</div>
           </div>
         </div>
       )}
