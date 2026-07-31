@@ -176,7 +176,7 @@ body { font-family: 'Poppins', sans-serif; color: #fff; -webkit-print-color-adju
 .page-intro{font-size:10pt;color:rgba(255,255,255,.72);line-height:1.6;text-align:justify;flex-shrink:0;}
 
 /* ── blessures ── */
-.blessure-grid{display:grid;grid-template-columns:1fr 1fr;gap:7px;align-content:start;align-items:start;}
+.blessure-grid{display:grid;grid-template-columns:1fr 1fr;gap:7px;align-content:space-between;align-items:start;flex:1;min-height:0;}
 .blessure-card{border-radius:10px;padding:8px 10px;display:flex;flex-direction:column;gap:3px;border:1px solid;overflow:hidden;}
 .bl-header{display:flex;align-items:center;gap:7px;flex-shrink:0;}
 .bl-icon{width:30px;height:30px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0;}
@@ -201,7 +201,7 @@ body { font-family: 'Poppins', sans-serif; color: #fff; -webkit-print-color-adju
 .exo-tip{font-size:9pt;color:rgba(255,255,255,.38);font-style:italic;margin-top:2px;}
 
 /* ── étirements ── */
-.etir-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:7px;align-content:start;align-items:start;}
+.etir-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:7px;align-content:space-between;align-items:start;flex:1;min-height:0;}
 .etir-card{border-radius:10px;padding:8px 10px;display:flex;flex-direction:column;gap:3px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);overflow:hidden;}
 .etir-header{display:flex;align-items:center;gap:8px;flex-shrink:0;}
 .etir-icon{font-size:22px;flex-shrink:0;}
@@ -503,13 +503,14 @@ function pageIntro() {
     <div class="page-intro">
       Courir est l'une des activités les plus naturelles qui soit. Pourtant ${hl('65% des coureurs se blessent chaque année')}, souvent pour des raisons évitables avec un peu de méthode et de régularité dans la prévention.
     </div>
-    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px;flex-shrink:0">
+    <div style="flex:1;display:flex;flex-direction:column;justify-content:space-between;min-height:0">
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px;flex-shrink:0;align-items:start">
       ${stats.map(s=>`<div style="border-radius:9px;padding:9px 8px;text-align:center;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07)">
         <div style="font-size:18pt;font-weight:900;background:linear-gradient(135deg,${s.color},#E8237A);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;line-height:1.1">${s.n}</div>
         <div style="font-size:9pt;color:rgba(255,255,255,.58);line-height:1.4;margin-top:3px">${s.label}</div>
       </div>`).join('')}
     </div>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;flex-shrink:0">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;flex-shrink:0;align-items:start">
       ${causes.map(c=>`<div style="border-radius:9px;padding:9px 11px;background:${c.color};border:1px solid ${c.border}">
         <div style="display:flex;align-items:center;gap:7px;margin-bottom:4px">
           <span style="font-size:17px;flex-shrink:0">${c.icon}</span>
@@ -531,6 +532,7 @@ function pageIntro() {
       <div style="font-size:9.5pt;color:rgba(255,255,255,.7);line-height:1.6;text-align:justify">
         Ce guide est le fruit d'années d'expérience avec des coureurs de tous niveaux. Les protocoles sont issus des ${hl('dernières recherches en médecine du sport')}. Utilise-le comme référence : consulte la fiche blessure dès les premiers signaux, avant que la douleur ne s'installe.
       </div>
+    </div>
     </div>
     ${pageNum('3')}
   </div>`
@@ -691,7 +693,8 @@ function pageCharge() {
     <div class="page-intro">
       La ${hl('surcharge chronique')} est la première cause de blessure. Le corps s'adapte si on lui laisse le temps. Règle d'or : n'augmenter qu'un seul paramètre à la fois.
     </div>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;flex-shrink:0">
+    <div style="flex:1;display:flex;flex-direction:column;justify-content:space-between;min-height:0">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;flex-shrink:0;align-items:start">
       ${infoCards.map(c=>`<div style="border-radius:9px;padding:8px 11px;background:${c.color};border:1px solid ${c.border}">
         <div style="display:flex;align-items:center;gap:7px;margin-bottom:3px">
           <span style="font-size:17px;flex-shrink:0">${c.icon}</span>
@@ -711,7 +714,7 @@ function pageCharge() {
         </div>`).join('')}
       </div>
     </div>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;flex-shrink:0">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;flex-shrink:0;align-items:start">
       <div style="border-radius:9px;padding:8px 11px;background:linear-gradient(135deg,rgba(139,47,201,.12),rgba(232,35,122,.08));border:1px solid rgba(139,47,201,.22)">
         <div style="font-size:10pt;font-weight:800;margin-bottom:3px">Comment lire ce tableau ?</div>
         <div style="font-size:9.5pt;color:rgba(255,255,255,.72);line-height:1.5;text-align:justify">Les % représentent l\'importance relative de chaque variable. ${hl('Ne modifie jamais deux variables simultanément')} : volume OU intensité, pas les deux en même temps.</div>
@@ -724,6 +727,7 @@ function pageCharge() {
           <div style="display:flex;align-items:center;gap:7px"><span style="font-size:13px">🔁</span><div style="font-size:9.5pt;color:rgba(255,255,255,.75)">Répéter avec un nouveau palier supérieur</div></div>
         </div>
       </div>
+    </div>
     </div>
     ${pageNum('9')}
   </div>`
