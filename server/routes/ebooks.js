@@ -80,21 +80,16 @@ async function sendEbookEmail(email, ebook, pdfPathOverride) {
   const body = {
     from: 'The Ultimate Academy <noreply@theultimateacademy.fr>',
     to:   [email],
-    subject: `Ton ebook The Ultimate Academy 📚`,
+    subject: ebook.title,
     html: `
       <div style="font-family:sans-serif;max-width:560px;margin:0 auto;color:#1a1a2e">
         <div style="background:linear-gradient(135deg,#8B2FC9,#E8237A);padding:32px 24px;border-radius:12px 12px 0 0;text-align:center">
           <h1 style="color:#fff;margin:0;font-size:22px">The Ultimate Academy</h1>
         </div>
         <div style="background:#fff;padding:32px 24px;border-radius:0 0 12px 12px;border:1px solid #e5e7eb;border-top:none">
-          <p style="font-size:16px;margin:0 0 16px">Merci pour ton achat !</p>
-          <p style="color:#374151;margin:0 0 16px">Tu trouveras ton plan d'entraînement <strong>${ebook.title}</strong> en pièce jointe.</p>
-          <div style="background:#f5f3ff;border-left:4px solid #8B2FC9;padding:16px;border-radius:4px;margin:24px 0">
-            <p style="margin:0;font-size:14px;color:#5B21B6">
-              💡 <strong>Calcule tes allures personnalisées</strong> avec notre calculateur VMA gratuit :<br>
-              <a href="https://theultimateacademy.fr/calculateur/vma" style="color:#8B2FC9">theultimateacademy.fr/calculateur/vma</a>
-            </p>
-          </div>
+          <p style="font-size:16px;margin:0 0 16px">Merci pour ton achat, et bienvenue dans l'aventure The Ultimate Academy ! 🙏</p>
+          <p style="color:#374151;margin:0 0 16px">Tu trouveras ton plan <strong>${ebook.title}</strong> en pièce jointe de cet email, au format PDF.</p>
+          <p style="color:#374151;margin:0 0 16px">Si jamais tu n'arrives pas à ouvrir le fichier, envoie-moi un mail à <a href="mailto:theultimateacademy.ua@gmail.com" style="color:#8B2FC9">theultimateacademy.ua@gmail.com</a> ou contacte-moi directement sur Instagram <a href="https://instagram.com/the.ultimate.academy" style="color:#8B2FC9">@the.ultimate.academy</a>, je te renverrai ça au plus vite.</p>
           <p style="color:#374151;margin:0 0 8px">Bon entraînement !</p>
           <p style="color:#6b7280;font-size:14px;margin:0">Alexis — The Ultimate Academy</p>
         </div>
