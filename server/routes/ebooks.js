@@ -279,6 +279,24 @@ router.post('/webhook', async (req, res) => {
 
 // ─── Admin routes ──────────────────────────────────────────────────────────────
 
+// TEMPORAIRE — route de test manuel de l'envoi d'email (à retirer après usage)
+router.post('/admin/test-email', requireAdmin, async (req, res) => {
+  const { slug, email, vma, seances } = req.body;
+  if (!slug || !email) return res.status(400).json({ error: 'slug et email requis' });
+
+  try {
+    const { data: ebook, error } = await supabase.from('ebooks').select('*').eq('slug', slug).single();
+    if (error || !ebook) return res.status(404).json({ error: 'Ebook introuvable' });
+
+    const pdfPathOverride = (vma && seances) ? variantPdfPath(ebook.slug, vma, seances) : null;
+    await sendEbookEmail(email, ebook, pdfPathOverride);
+    res.json({ ok: true, sent_to: email, ebook: ebook.title });
+  } catch (err) {
+    console.error('[Ebooks] test-email error:', err.message);
+    res.status(500).json({ error: err.message });
+  }
+});
+
 router.get('/admin/purchases', requireAdmin, async (req, res) => {
   try {
     const { data, error } = await supabase
