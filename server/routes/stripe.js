@@ -6,6 +6,10 @@ const router  = express.Router();
 const stripe  = new Stripe(process.env.STRIPE_SECRET_KEY);
 const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_KEY);
 
+const _rawClientUrl = process.env.CLIENT_URL || 'https://theultimateacademy.fr';
+const CLIENT_URL = _rawClientUrl.startsWith('http') ? _rawClientUrl.replace(/\/$/, '') : `https://${_rawClientUrl.replace(/\/$/, '')}`;
+if (!CLIENT_URL.startsWith('https://')) console.warn('[Stripe] CLIENT_URL ne commence pas par https://', CLIENT_URL);
+
 // POST /api/stripe/create-checkout
 router.post('/create-checkout', async (req, res) => {
   const { userId, email, firstName, lastName, sport } = req.body;
@@ -50,8 +54,8 @@ router.post('/create-checkout', async (req, res) => {
       mode: 'subscription',
       payment_method_types: ['card'],
       line_items: [{ price: priceId, quantity: 1 }],
-      success_url: `${process.env.CLIENT_URL}/welcome?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url:  `${process.env.CLIENT_URL}/register`,
+      success_url: `${CLIENT_URL}/welcome?session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url:  `${CLIENT_URL}/register`,
       metadata: { userId },
       locale: 'fr',
       ...(trialEligible && { subscription_data: { trial_period_days: 14 } }),
