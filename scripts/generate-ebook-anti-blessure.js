@@ -264,7 +264,7 @@ const BLESSURES_P1 = [
     title:'Syndrome de l\'essuie-glace', sub:'Bandelette ilio-tibiale (BIT)',
     symptomes:'Douleur vive face externe du genou après 20 à 30 min d\'effort continu.',
     prevention:hl('Renforcement des fessiers')+' et abducteurs. Foam roller BIT. Cadence 175+ pas/min.',
-    soins:'Arrêt dès la douleur. AINS si besoin. Kiné pour bilan biomécanique.',
+    soins:'Arrêt dès la douleur. Anti-inflammatoires non stéroïdiens si besoin. Kiné pour bilan biomécanique.',
     tag:'Longue distance', tagColor:'rgba(168,85,247,.18)', tagBorder:'rgba(168,85,247,.4)',
   },
   {
@@ -361,6 +361,24 @@ const ETIREMENTS = [
     title:'Fascia plantaire', muscle:'Voûte plantaire · talon', dose:'60 sec × 2',
     desc:'Assis, tirer les orteils vers le tibia, tenir 30 sec. Masser ensuite la voûte avec une balle de tennis ou de golf.',
     coach:'À faire dès le réveil avant le premier pas au sol.',
+  },
+  {
+    emoji:'🧎', color:'rgba(59,130,246,.15)', border:'rgba(59,130,246,.35)',
+    title:'Fléchisseurs de hanche', muscle:'Psoas · avant de la hanche', dose:'30 sec × 3',
+    desc:'Fente avant, genou arrière au sol, bascule le bassin vers l\'avant en gardant le buste droit. L\'étirement se sent à l\'avant de la hanche arrière.',
+    coach:'Essentiel après une journée assise au bureau avant de courir.',
+  },
+  {
+    emoji:'🤸', color:'rgba(234,179,8,.15)', border:'rgba(234,179,8,.35)',
+    title:'Adducteurs', muscle:'Intérieur de cuisse', dose:'30 sec × 3',
+    desc:'Assis, plantes de pieds jointes, genoux relâchés vers l\'extérieur. Penche le buste vers l\'avant en gardant le dos droit.',
+    coach:'Souvent négligés, pourtant sollicités à chaque appui en course.',
+  },
+  {
+    emoji:'🌀', color:'rgba(244,63,94,.15)', border:'rgba(244,63,94,.35)',
+    title:'Bas du dos', muscle:'Lombaires · para-vertébraux', dose:'30 sec × 3',
+    desc:'Allongé sur le dos, ramène les deux genoux vers la poitrine. Arrondis doucement le bas du dos, respire profondément sans forcer.',
+    coach:'Soulage les tensions accumulées par les longues sorties.',
   },
 ]
 

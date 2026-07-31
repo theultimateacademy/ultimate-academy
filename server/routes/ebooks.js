@@ -140,6 +140,7 @@ router.get('/admin/pdf/:slug', requireAdmin, async (req, res) => {
   if (!fs.existsSync(pdfPath)) return res.status(404).json({ error: 'Fichier PDF introuvable sur le serveur' });
   res.setHeader('Content-Type', 'application/pdf');
   res.setHeader('Content-Disposition', `inline; filename="${slug}.pdf"`);
+  res.setHeader('Cache-Control', 'no-store');
   fs.createReadStream(pdfPath).pipe(res);
 });
 
