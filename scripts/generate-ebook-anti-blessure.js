@@ -138,7 +138,7 @@ body { font-family: 'Poppins', sans-serif; color: #fff; -webkit-print-color-adju
 .page {
   width: 210mm; height: 297mm;
   overflow: hidden;
-  padding: 9mm 12mm 14mm;
+  padding: 9mm 12mm 20mm;
   background: #0C0A18;
   page-break-after: always; break-after: page;
   position: relative;
@@ -176,7 +176,7 @@ body { font-family: 'Poppins', sans-serif; color: #fff; -webkit-print-color-adju
 .page-intro{font-size:10pt;color:rgba(255,255,255,.72);line-height:1.6;text-align:justify;flex-shrink:0;}
 
 /* ── blessures ── */
-.blessure-grid{display:grid;grid-template-columns:1fr 1fr;gap:7px;align-content:start;}
+.blessure-grid{display:grid;grid-template-columns:1fr 1fr;gap:7px;align-content:start;align-items:start;}
 .blessure-card{border-radius:10px;padding:8px 10px;display:flex;flex-direction:column;gap:3px;border:1px solid;overflow:hidden;}
 .bl-header{display:flex;align-items:center;gap:7px;flex-shrink:0;}
 .bl-icon{width:30px;height:30px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0;}
@@ -188,8 +188,8 @@ body { font-family: 'Poppins', sans-serif; color: #fff; -webkit-print-color-adju
 .bl-tag{display:inline-flex;align-items:center;font-size:8.5pt;font-weight:700;border-radius:8px;padding:2px 8px;margin-top:3px;flex-shrink:0;align-self:flex-start;}
 
 /* ── exercices ── */
-.exo-list{flex:1;display:flex;flex-direction:column;gap:6px;min-height:0;}
-.exo-row{flex:1;display:flex;gap:0;align-items:stretch;border-radius:10px;overflow:hidden;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);}
+.exo-list{flex:1;display:flex;flex-direction:column;gap:6px;min-height:0;justify-content:space-between;}
+.exo-row{display:flex;gap:0;align-items:stretch;border-radius:10px;overflow:hidden;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);flex-shrink:0;}
 .exo-content{flex:1;padding:7px 11px;display:flex;flex-direction:column;gap:3px;}
 .exo-header{display:flex;align-items:center;gap:7px;flex-shrink:0;}
 .exo-title{font-size:10.5pt;font-weight:800;line-height:1.2;}
@@ -201,7 +201,7 @@ body { font-family: 'Poppins', sans-serif; color: #fff; -webkit-print-color-adju
 .exo-tip{font-size:9pt;color:rgba(255,255,255,.38);font-style:italic;margin-top:2px;}
 
 /* ── étirements ── */
-.etir-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:7px;align-content:start;}
+.etir-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:7px;align-content:start;align-items:start;}
 .etir-card{border-radius:10px;padding:8px 10px;display:flex;flex-direction:column;gap:3px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);overflow:hidden;}
 .etir-header{display:flex;align-items:center;gap:8px;flex-shrink:0;}
 .etir-icon{font-size:22px;flex-shrink:0;}
@@ -224,8 +224,8 @@ body { font-family: 'Poppins', sans-serif; color: #fff; -webkit-print-color-adju
 .charge-note{font-size:9pt;color:rgba(255,255,255,.4);width:185px;text-align:right;flex-shrink:0;}
 
 /* ── PEACE & LOVE ── */
-.peace-grid{flex:1;display:flex;flex-direction:column;gap:5px;min-height:0;}
-.peace-row{flex:1;display:flex;align-items:stretch;border-radius:10px;overflow:hidden;}
+.peace-grid{flex:1;display:flex;flex-direction:column;gap:5px;min-height:0;justify-content:space-between;}
+.peace-row{display:flex;align-items:stretch;border-radius:10px;overflow:hidden;flex-shrink:0;}
 .peace-letter-block{width:46px;flex-shrink:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.15);}
 .peace-letter{font-size:22pt;font-weight:900;line-height:1;}
 .peace-divider{width:1px;flex-shrink:0;}
@@ -234,8 +234,8 @@ body { font-family: 'Poppins', sans-serif; color: #fff; -webkit-print-color-adju
 .peace-desc{font-size:9.5pt;color:rgba(255,255,255,.72);line-height:1.5;text-align:justify;}
 
 /* ── chaussures ── */
-.shoe-cards{flex:1;display:flex;flex-direction:column;gap:8px;min-height:0;}
-.shoe-card{flex:1;border-radius:10px;padding:8px 13px;display:flex;gap:11px;align-items:center;border:1px solid;overflow:hidden;}
+.shoe-cards{flex:1;display:flex;flex-direction:column;gap:8px;min-height:0;justify-content:space-between;}
+.shoe-card{border-radius:10px;padding:8px 13px;display:flex;gap:11px;align-items:center;border:1px solid;overflow:hidden;flex-shrink:0;}
 .shoe-icon{font-size:26px;flex-shrink:0;}
 .shoe-title{font-size:10.5pt;font-weight:800;margin-bottom:2px;line-height:1.2;}
 .shoe-desc{font-size:9.5pt;color:rgba(255,255,255,.75);line-height:1.5;text-align:justify;}
