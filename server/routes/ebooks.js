@@ -111,7 +111,6 @@ async function sendEbookEmail(email, ebook, pdfPathOverride) {
     const err = await res.text();
     throw new Error(`Resend error: ${err}`);
   }
-  return res.json();
 }
 
 // ─── GET /api/ebooks — liste publique ────────────────────────────────────────
@@ -279,37 +278,6 @@ router.post('/webhook', async (req, res) => {
 });
 
 // ─── Admin routes ──────────────────────────────────────────────────────────────
-
-// TEMPORAIRE — route de test manuel de l'envoi d'email (à retirer après usage)
-router.post('/admin/test-email', requireAdmin, async (req, res) => {
-  const { slug, email, vma, seances } = req.body;
-  if (!slug || !email) return res.status(400).json({ error: 'slug et email requis' });
-
-  try {
-    const { data: ebook, error } = await supabase.from('ebooks').select('*').eq('slug', slug).single();
-    if (error || !ebook) return res.status(404).json({ error: 'Ebook introuvable' });
-
-    const pdfPathOverride = (vma && seances) ? variantPdfPath(ebook.slug, vma, seances) : null;
-    const resendResult = await sendEbookEmail(email, ebook, pdfPathOverride);
-    res.json({ ok: true, sent_to: email, ebook: ebook.title, resend_id: resendResult?.id });
-  } catch (err) {
-    console.error('[Ebooks] test-email error:', err.message);
-    res.status(500).json({ error: err.message });
-  }
-});
-
-// TEMPORAIRE — vérifie le statut de délivrance d'un email Resend (à retirer après usage)
-router.get('/admin/test-email/:id', requireAdmin, async (req, res) => {
-  try {
-    const r = await fetch(`https://api.resend.com/emails/${req.params.id}`, {
-      headers: { 'Authorization': `Bearer ${process.env.RESEND_API_KEY}` },
-    });
-    const data = await r.json();
-    res.status(r.status).json(data);
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
-});
 
 router.get('/admin/purchases', requireAdmin, async (req, res) => {
   try {
