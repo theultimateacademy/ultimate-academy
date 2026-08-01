@@ -1004,8 +1004,15 @@ function AthleteDetailPanel({ athlete, onClose, onUpdated, onAlertDismissed }) {
       const [{ data: c }, { data: p }, { data: al }] = await Promise.all([
         supabase.from('session_completions').select('*').eq('user_id', athlete.id)
           .order('completed_at', { ascending: false }),
-        supabase.from('training_plans').select('*').eq('user_id', athlete.id)
-          .in('status', ['active','pending']).order('created_at', { ascending: false }).limit(1).single(),
+        // Priorité au plan actif — sinon un brouillon "pending" plus récent (généré mais
+        // pas encore validé) masquerait le plan en cours réellement suivi par l'athlète.
+        (async () => {
+          const { data: active } = await supabase.from('training_plans').select('*').eq('user_id', athlete.id)
+            .eq('status', 'active').order('created_at', { ascending: false }).limit(1).maybeSingle()
+          if (active) return { data: active }
+          return supabase.from('training_plans').select('*').eq('user_id', athlete.id)
+            .eq('status', 'pending').order('created_at', { ascending: false }).limit(1).maybeSingle()
+        })(),
         supabase.from('messages').select('*').eq('user_id', athlete.id)
           .like('content', '⚠️ [PROFIL]%').order('created_at', { ascending: false }).limit(30),
       ])
