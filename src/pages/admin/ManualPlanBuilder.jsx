@@ -28,14 +28,15 @@ function sessionColor(s) {
   return SESSION_TYPE_COLORS[s.type] || SPORT_BASE_COLORS[s.sport] || '#8B2FC9'
 }
 
-function firstMondayOfNextMonth() {
-  const now   = new Date()
-  const first = new Date(now.getFullYear(), now.getMonth() + 1, 1)
-  const day   = first.getDay()
-  const diff  = day === 1 ? 0 : day === 0 ? 1 : 8 - day
-  first.setDate(first.getDate() + diff)
-  first.setHours(0, 0, 0, 0)
-  return first
+function nextMonday() {
+  const d   = new Date()
+  const dow = d.getDay() // 0=dim 1=lun … 6=sam
+  if (dow !== 1) {
+    const toMonday = dow === 0 ? 1 : 8 - dow
+    d.setDate(d.getDate() + toMonday)
+  }
+  d.setHours(0, 0, 0, 0)
+  return d
 }
 
 function addDays(date, n) {
@@ -88,7 +89,7 @@ export default function ManualPlanBuilder() {
   const [sportFilter,     setSportFilter]     = useState('all')
   const [loadingSessions, setLoadingSessions] = useState(true)
 
-  const [startMonday, setStartMonday] = useState(() => firstMondayOfNextMonth())
+  const [startMonday, setStartMonday] = useState(() => nextMonday())
   const [plan,        setPlan]        = useState(() => Array.from({ length: 4 }, () => Array.from({ length: 7 }, () => [])))
 
   const [dragging,   setDragging]   = useState(null)
@@ -160,7 +161,7 @@ export default function ManualPlanBuilder() {
 
   function newPlan() {
     setLoadedPlanId(null)
-    setStartMonday(firstMondayOfNextMonth())
+    setStartMonday(nextMonday())
     setPlan(Array.from({ length: 4 }, () => Array.from({ length: 7 }, () => [])))
   }
 
