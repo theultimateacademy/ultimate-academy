@@ -14,12 +14,12 @@ const TOOLS = [
 
 const FEATURES = [
   { icon: '🎯', title: 'Plan sur-mesure', desc: "Ton programme est construit à partir de zéro : ton niveau actuel, ton historique de blessures, le temps que tu as chaque semaine et ton objectif précis. Aucun plan copié-collé, chaque séance a une raison d'être." },
-  { icon: '⚡', title: 'Adapté en continu', desc: "Chaque semaine, j'analyse tes séances Strava, tes ressentis et ta charge réelle. Si quelque chose ne colle pas (fatigue, manque de temps, séance ratée), j'ajuste immédiatement. Ton plan est vivant, pas figé." },
+  { icon: '⚡', title: 'Adapté en continu', desc: "Chaque semaine, j'analyse tes séances, tes ressentis et ta charge réelle. Si quelque chose ne colle pas (fatigue, manque de temps, séance ratée), j'ajuste immédiatement. Ton plan est vivant, pas figé." },
   { icon: '💬', title: 'Coaching direct', desc: "Tu as une question sur une séance, un doute sur une douleur ou besoin d'un retour ? Tu m'écris directement depuis l'app. Je réponds sous 24h, souvent bien moins. Pas de formulaire, pas d'intermédiaire." },
   { icon: '🌡️', title: 'Adaptation fatigue & météo', desc: "Semaine chargée au boulot, mauvaise nuit ou 38°C dehors ? Je tiens compte de tout ça. Pas question de te faire exploser sur une sortie longue quand les conditions ne le permettent pas. Savoir doser, c'est aussi s'entraîner intelligemment." },
   { icon: '💪', title: 'Renforcement musculaire', desc: "Une séance de renforcement spécifique est intégrée chaque semaine : gainage, fessiers, chaîne postérieure. Moins de blessures, une foulée plus économique et une meilleure puissance en côte. Le renfo, c'est pas en option." },
   { icon: '🥗', title: 'Nutrition du sportif', desc: "Hydratation, ravitaillement en course, nutrition avant une sortie longue : je t'accompagne sur les bases concrètes qui font la différence au moment où ça compte. Pas de régime, juste ce qui te permet de performer et de récupérer." },
-  { icon: '📊', title: 'Suivi de progression', desc: "Tes données Strava sont analysées chaque semaine : allures, fréquence cardiaque, volume accumulé. Tu vois noir sur blanc d'où tu es parti et jusqu'où tu es allé. La progression se mesure, et quand elle se mesure, elle motive." },
+  { icon: '📊', title: 'Suivi de progression', desc: "Tes données d'entraînement sont analysées chaque semaine : allures, fréquence cardiaque, volume accumulé. Tu vois noir sur blanc d'où tu es parti et jusqu'où tu es allé. La progression se mesure, et quand elle se mesure, elle motive." },
   { icon: '🌸', title: 'Suivi cycle féminin', desc: "Le cycle menstruel impacte directement les performances, la récupération et le moral. Ton plan s'adapte selon les phases pour que tu t'entraînes avec ton corps, pas contre lui. Moins de frustration, plus d'efficacité." },
   { icon: '🏆', title: 'Stratégie de course', desc: "Avant chaque objectif, je te prépare une fiche race day complète : échauffement, stratégie d'allure, gestion de l'effort et points de vigilance. Tu arrives prêt à tout donner, pas juste entraîné." },
 ]
@@ -44,7 +44,6 @@ const FAQ = [
   { q: "Puis-je annuler mon abonnement à tout moment ?",     a: "Oui, sans préavis ni justification. Tu annules depuis ton espace, l'abonnement reste actif jusqu'à la fin de la période en cours, puis s'arrête. Aucun frais caché, aucune fidélisation forcée." },
   { q: "Que se passe-t-il si je me blesse ou dois m'arrêter ?", a: "On adapte immédiatement. Une blessure n'est pas une raison d'abandonner le suivi : on travaille ensemble sur la récupération, le maintien de la condition et la reprise progressive. Tu n'es pas livré à toi-même." },
   { q: "Combien de temps d'entraînement faut-il prévoir par semaine ?", a: "De 2 à 6 séances selon tes disponibilités et ton objectif. Je construis le plan autour de ton emploi du temps réel, pas d'un idéal théorique. 3 séances bien faites valent mieux que 6 séances bâclées." },
-  { q: "La connexion Strava est-elle obligatoire ?",         a: "Non, elle n'est pas obligatoire. Si tu n'utilises pas Strava, tu peux simplement me partager tes données manuellement via la messagerie. L'important c'est l'information, pas l'outil." },
 ]
 
 const PARTICLES = Array.from({ length: 20 }, (_, i) => ({
@@ -618,7 +617,7 @@ export default function Landing() {
                 {[
                   "Plan d'entraînement 100% personnalisé",
                   'Adaptation hebdomadaire du programme',
-                  'Connexion Strava intégrée',
+                  'Suivi de tes séances et de ta progression',
                   'Programme de renforcement musculaire',
                   'Messagerie directe avec moi',
                   'Analyse continue de ta progression',
@@ -668,7 +667,7 @@ export default function Landing() {
                 {[
                   'Plan triathlon 100% personnalisé',
                   'Périodisation sprint, olympique, longue distance',
-                  'Connexion Strava intégrée',
+                  'Suivi de tes séances et de ta progression',
                   'Programme de renforcement musculaire',
                   'Messagerie directe avec moi',
                   'Analyse continue de ta progression',

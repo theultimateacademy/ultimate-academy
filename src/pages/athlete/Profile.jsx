@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react'
-import { useSearchParams } from 'react-router-dom'
 import { useAuth } from '../../contexts/AuthContext'
 import { supabase } from '../../lib/supabase'
 import { api } from '../../lib/api'
@@ -8,12 +7,8 @@ import LoadingSpinner from '../../components/UI/LoadingSpinner'
 
 export default function AthleteProfile() {
   const { profile, refreshProfile, updateProfile } = useAuth()
-  const [searchParams] = useSearchParams()
   const [stats,          setStats]          = useState({ sessions: 0, avgRpe: 0 })
   const [loading,        setLoading]        = useState(true)
-  const [stravaLoading,  setStravaLoading]  = useState(false)
-  const [stravaStatus,   setStravaStatus]   = useState('')
-  const [importing,      setImporting]      = useState(false)
   const [uploading,      setUploading]      = useState(false)
   // Adaptations
   const [heatLoading,    setHeatLoading]    = useState(false)
@@ -80,14 +75,8 @@ export default function AthleteProfile() {
   }
 
   useEffect(() => {
-    const strava  = searchParams.get('strava')
-    if (strava)  setStravaStatus(strava)
     loadStats()
   }, [])
-
-  useEffect(() => {
-    if (stravaStatus === 'connected') refreshProfile()
-  }, [stravaStatus])
 
   useEffect(() => {
     if (!profile?.intermediate_race_date) return
@@ -178,33 +167,6 @@ export default function AthleteProfile() {
       }
     } finally {
       setLoading(false)
-    }
-  }
-
-  async function connectStrava() {
-    setStravaLoading(true)
-    window.location.href = api.stravaConnect(profile.id)
-  }
-
-  async function disconnectStrava() {
-    if (!confirm('Déconnecter Strava ?')) return
-    setStravaLoading(true)
-    try {
-      await api.stravaDisconnect({ userId: profile.id })
-      await refreshProfile()
-      setStravaStatus('disconnected')
-    } finally {
-      setStravaLoading(false)
-    }
-  }
-
-  async function importStrava() {
-    setImporting(true)
-    try {
-      const { imported } = await api.stravaImport({ userId: profile.id })
-      setStravaStatus(`imported_${imported}`)
-    } finally {
-      setImporting(false)
     }
   }
 
@@ -399,21 +361,6 @@ export default function AthleteProfile() {
 
   if (loading) return <LoadingSpinner fullPage />
 
-  // ── Brand logo with fallback ──────────────────────────────────────────────
-  function BrandLogo({ src, bg, fallback }) {
-    const [ok, setOk] = useState(true)
-    return (
-      <div style={{ width:40, height:40, background: bg, borderRadius:8, overflow:'hidden',
-        display:'flex', alignItems:'center', justifyContent:'center',
-        fontSize:'.9rem', fontWeight:800, color:'#fff', flexShrink:0 }}>
-        {ok
-          ? <img src={src} alt="" style={{ width:28, height:28, objectFit:'contain' }}
-              onError={() => setOk(false)} />
-          : fallback}
-      </div>
-    )
-  }
-
   // ── Service row sub-component ──────────────────────────────────────────────
   function ServiceRow({ icon, name, connected, badge, children }) {
     return (
@@ -511,10 +458,6 @@ export default function AthleteProfile() {
       )}
 
       <h2 className="page-heading" style={{ marginBottom: '1.5rem' }}>Mon profil</h2>
-
-      {stravaStatus === 'connected' && <div className="alert alert-success" style={{ marginBottom:'1rem' }}>✅ Strava connecté avec succès !</div>}
-      {stravaStatus === 'error'     && <div className="alert alert-error"   style={{ marginBottom:'1rem' }}>⚠️ La connexion Strava a échoué.</div>}
-      {String(stravaStatus).startsWith('imported_') && <div className="alert alert-success" style={{ marginBottom:'1rem' }}>✅ {stravaStatus.split('_')[1]} activités importées depuis Strava.</div>}
 
       {/* Profile info */}
       <div className="card" style={{ marginBottom: '1.25rem' }}>
@@ -1105,53 +1048,12 @@ export default function AthleteProfile() {
         </div>
       </div>
 
-      {/* Services connectés */}
+      {/* Suivi de mes séances */}
       <div className="card" style={{ marginBottom: '1.25rem' }}>
-        <h4 style={{ marginBottom: '.4rem' }}>Mes services connectés</h4>
-        <p style={{ fontSize: '.82rem', color: 'var(--text-muted)', marginBottom: '1.25rem', lineHeight: 1.5 }}>
-          Connecte tes montres et applications pour synchroniser tes séances automatiquement.
+        <h4 style={{ marginBottom: '.4rem' }}>Suivi de mes séances</h4>
+        <p style={{ fontSize: '.82rem', color: 'var(--text-muted)', lineHeight: 1.5 }}>
+          Partage tes ressentis et tes données d'entraînement directement via la messagerie — ton coach les prend en compte chaque semaine pour ajuster ton plan.
         </p>
-
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '.75rem' }}>
-
-          {/* Strava */}
-          <div style={{
-            borderRadius: 14,
-            border: `1.5px solid ${profile?.strava_connected ? 'rgba(252,76,2,.6)' : 'rgba(252,76,2,.25)'}`,
-            background: profile?.strava_connected ? 'rgba(252,76,2,.08)' : 'rgba(252,76,2,.03)',
-            padding: '1rem 1.125rem',
-          }}>
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '1rem', marginBottom: profile?.strava_connected ? '.875rem' : 0 }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '.75rem' }}>
-                <BrandLogo src="https://logo.clearbit.com/strava.com" bg="#FC4C02" fallback="🔶" />
-                <div>
-                  <div style={{ fontWeight: 700, fontSize: '.9rem', color: '#FC4C02' }}>Strava</div>
-                  <div style={{ fontSize: '.75rem', color: 'var(--text-muted)' }}>
-                    {profile?.strava_connected ? '● Connecté' : 'Synchronise ta montre GPS'}
-                  </div>
-                </div>
-              </div>
-              {profile?.strava_connected ? (
-                <div style={{ display: 'flex', gap: '.5rem', flexShrink: 0 }}>
-                  <button className="btn btn-sm" onClick={importStrava} disabled={importing}
-                    style={{ background: 'rgba(252,76,2,.15)', border: '1px solid rgba(252,76,2,.3)', color: '#FC4C02', fontFamily: 'inherit', fontSize: '.78rem' }}>
-                    {importing ? '…' : '🔄 Synchro'}
-                  </button>
-                  <button className="btn btn-sm" onClick={disconnectStrava} disabled={stravaLoading}
-                    style={{ background: 'transparent', border: '1px solid var(--border)', color: 'var(--text-muted)', fontFamily: 'inherit', fontSize: '.78rem' }}>
-                    Déconnecter
-                  </button>
-                </div>
-              ) : (
-                <button className="btn btn-sm" onClick={connectStrava} disabled={stravaLoading}
-                  style={{ flexShrink: 0, background: 'rgba(252,76,2,.15)', border: '1px solid rgba(252,76,2,.4)', color: '#FC4C02', fontFamily: 'inherit', fontWeight: 700, fontSize: '.8rem' }}>
-                  {stravaLoading ? '…' : 'Connecter'}
-                </button>
-              )}
-            </div>
-          </div>
-
-        </div>
       </div>
 
       {/* Adapter mon plan */}

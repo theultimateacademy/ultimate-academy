@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom'
 const FEATURES = [
   "Plan d'entraînement 100% personnalisé",
   'Adaptation hebdomadaire du programme',
-  'Connexion Strava intégrée',
+  'Suivi de tes séances et de ta progression',
   'Programme de renforcement musculaire',
   'Messagerie directe avec moi',
   'Analyse continue de ta progression',

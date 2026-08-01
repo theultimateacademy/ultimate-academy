@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react'
 import { useAuth } from '../../contexts/AuthContext'
 import { supabase } from '../../lib/supabase'
-import { parseAllutesPace, fmtDistance, fmtDuration, SESSION_TYPE_COLORS, getPlanStartMonday, getPlanWeeksElapsed } from '../../lib/utils'
+import { parseAllutesPace, SESSION_TYPE_COLORS, getPlanStartMonday, getPlanWeeksElapsed } from '../../lib/utils'
 import { api } from '../../lib/api'
 import LoadingSpinner from '../../components/UI/LoadingSpinner'
 import PostSessionFlow from '../../components/PostSessionFlow'
@@ -9,21 +9,11 @@ import PostSessionFlow from '../../components/PostSessionFlow'
 function SessionDetailPage({ session, weekNum, sessionIdx, planId, vma, onClose, onDone, onStartFlow, onReschedule }) {
   const { profile } = useAuth()
   const [isDone,        setIsDone]        = useState(session._isDone || false)
-  const [stravaAct,     setStravaAct]     = useState(null)
   const [showDayPicker, setShowDayPicker] = useState(false)
 
   useEffect(() => {
     document.body.style.overflow = 'hidden'
     return () => { document.body.style.overflow = '' }
-  }, [])
-
-  useEffect(() => {
-    if (profile?.strava_connected) {
-      const today = new Date().toISOString().split('T')[0]
-      supabase.from('strava_activities').select('*').eq('user_id', profile.id)
-        .gte('start_date', today + 'T00:00:00Z').lte('start_date', today + 'T23:59:59Z').limit(1)
-        .then(({ data }) => { if (data?.[0]) setStravaAct(data[0]) })
-    }
   }, [])
 
   // Helpers
@@ -429,27 +419,6 @@ function SessionDetailPage({ session, weekNum, sessionIdx, planId, vma, onClose,
                 <div style={{ fontWeight: 700, fontSize: '.75rem', marginBottom: '.4rem', color: '#C084FC', textTransform: 'uppercase', letterSpacing: '.06em' }}>Ma note</div>
                 <p style={{ fontSize: '.875rem', lineHeight: 1.7, fontStyle: 'italic', color: 'rgba(255,255,255,.82)' }}>"{session.notes_coach}"</p>
               </div>
-            </div>
-          </div>
-        )}
-
-        {/* Données Strava */}
-        {stravaAct && (
-          <div className="detail-card" style={{ background: 'var(--surface)', borderRadius: 20, padding: '1rem 1.125rem', border: '1.5px solid rgba(252,76,2,.3)' }}>
-            <div style={{ fontWeight: 700, marginBottom: '.75rem', color: '#FC4C02', display: 'flex', alignItems: 'center', gap: '.4rem', fontSize: '.82rem', textTransform: 'uppercase', letterSpacing: '.06em' }}>
-              🔶 Données Strava
-            </div>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(80px, 1fr))', gap: '.5rem' }}>
-              {[
-                { v: fmtDistance(stravaAct.distance),    l: 'Distance' },
-                { v: fmtDuration(stravaAct.moving_time), l: 'Durée' },
-                { v: stravaAct.average_heartrate ? `${Math.round(stravaAct.average_heartrate)} bpm` : '—', l: 'FC moy.' },
-              ].map(({ v, l }) => (
-                <div key={l} style={{ textAlign: 'center', background: 'var(--surface-2)', borderRadius: 12, padding: '.625rem .5rem' }}>
-                  <div style={{ fontWeight: 700, fontSize: '.95rem' }}>{v}</div>
-                  <div style={{ fontSize: '.7rem', color: 'var(--text-muted)', marginTop: '.15rem' }}>{l}</div>
-                </div>
-              ))}
             </div>
           </div>
         )}

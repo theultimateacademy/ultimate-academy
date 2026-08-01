@@ -28,12 +28,11 @@ export default function Cookies() {
         </SubSection>
 
         <SubSection title="Cookies tiers (soumis à consentement)">
-          <p>Lors de la connexion aux services sportifs tiers, des cookies propres à ces plateformes peuvent être déposés :</p>
+          <p>Lors du processus de paiement, des cookies propres à notre prestataire peuvent être déposés :</p>
           <ul>
-            <li><strong>Strava</strong> — lors de l'autorisation OAuth pour l'import de vos activités</li>
             <li><strong>Stripe</strong> — lors du processus de paiement (sécurité, détection de fraude)</li>
           </ul>
-          <p>Ces cookies sont soumis aux politiques de confidentialité respectives de Strava et Stripe.</p>
+          <p>Ces cookies sont soumis à la politique de confidentialité de Stripe.</p>
         </SubSection>
 
       </Section>

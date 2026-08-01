@@ -8,7 +8,7 @@ const API   = import.meta.env.VITE_API_URL || 'http://localhost:3001'
 const FEATURES_RUNNING_TRAIL = [
   "Plan d'entraînement 100% personnalisé",
   'Adaptation hebdomadaire du programme',
-  'Connexion Strava intégrée',
+  'Suivi de tes séances et de ta progression',
   'Programme de renforcement musculaire',
   'Messagerie directe avec le coach',
 ]
@@ -17,7 +17,7 @@ const FEATURES_TRIATHLON = [
   'Plan triathlon 100% personnalisé',
   'Adaptation hebdomadaire du programme',
   'Périodisation natation · vélo · course',
-  'Connexion Strava intégrée',
+  'Suivi de tes séances et de ta progression',
   'Programme de renforcement musculaire',
   'Messagerie directe avec le coach',
 ]

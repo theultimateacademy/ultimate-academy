@@ -27,7 +27,7 @@ export default function Privacy() {
             <li>VMA (vitesse maximale aérobie), niveau sportif, objectifs de course</li>
             <li>Fréquence cardiaque, RPE (effort perçu), commentaires de séance</li>
             <li>Historique de blessures, jours d'entraînement disponibles</li>
-            <li>Données Strava/Garmin importées avec le consentement explicite de l'athlète</li>
+            <li>Données Garmin importées avec le consentement explicite de l'athlète</li>
             <li>Données du cycle menstruel (uniquement si l'athlète active cette option de son plein gré)</li>
           </ul>
         </SubSection>
@@ -58,7 +58,7 @@ export default function Privacy() {
       <Section title="4. Base légale">
         <ul>
           <li><strong>Exécution du contrat</strong> — traitement nécessaire pour fournir le service d'entraînement personnalisé</li>
-          <li><strong>Consentement explicite</strong> — pour les données de santé sensibles (cycle menstruel, blessures) et la connexion aux services tiers (Strava, Garmin)</li>
+          <li><strong>Consentement explicite</strong> — pour les données de santé sensibles (cycle menstruel, blessures) et la connexion aux services tiers (Garmin)</li>
           <li><strong>Intérêt légitime</strong> — amélioration du service et sécurité de la plateforme</li>
         </ul>
       </Section>
@@ -79,7 +79,7 @@ export default function Privacy() {
           <li><strong>Vercel</strong> — hébergement de l'application (serveurs en Europe)</li>
           <li><strong>Stripe</strong> — traitement des paiements (certifié PCI DSS)</li>
           <li><strong>Anthropic</strong> — génération IA des plans et analyses (données anonymisées)</li>
-          <li><strong>Strava / Garmin</strong> — uniquement si connexion explicitement autorisée par l'athlète</li>
+          <li><strong>Garmin</strong> — uniquement si connexion explicitement autorisée par l'athlète</li>
         </ul>
         <p>Aucune donnée n'est vendue ni partagée à des fins commerciales.</p>
       </Section>
