@@ -24,29 +24,101 @@ const SPORT_BASE_COLORS = {
   brique:   '#8B5CF6',
 }
 
-function sessionColor(s) {
-  return SESSION_TYPE_COLORS[s.type] || SPORT_BASE_COLORS[s.sport] || '#8B2FC9'
+// session_library.type est en snake_case interne — on le traduit vers le libellé
+// français utilisé partout ailleurs (couleurs, affichage athlète, génération IA).
+const SESSION_TYPE_LABELS = {
+  endurance_fondamentale: 'Endurance fondamentale',
+  footing_progressif:     'Footing progressif',
+  footing_recuperation:   'Récupération active',
+  sortie_longue:          'Sortie longue',
+  fractionne_court:       'Fractionné court',
+  fractionne_long:        'Fractionné long',
+  tempo_seuil:            'Tempo / Seuil',
+  cotes:                  'Côtes',
+  specifique:             'Spécifique',
+  renforcement:           'Renforcement',
+  natation:               'Natation',
+  velo:                   'Vélo',
+  brique:                 'Brique',
+  trail:                  'Trail endurance',
 }
 
+function sessionColor(s) {
+  const label = SESSION_TYPE_LABELS[s.type] || s.type
+  return SESSION_TYPE_COLORS[label] || SPORT_BASE_COLORS[s.sport] || '#8B2FC9'
+}
+
+// Allure = vitesse*fraction VMA → min'sec/km. Même formule que server/routes/anthropic.js (calcPace).
+function calcPace(vma, fraction) {
+  const speed   = vma * fraction
+  const paceMin = 60 / speed
+  const m = Math.floor(paceMin)
+  const s = Math.round((paceMin - m) * 60)
+  return `${m}'${String(s).padStart(2, '0')}`
+}
+
+// Remplace "X-Y% VMA" / "X% VMA" par l'allure calculée, comme subsPaces() côté serveur.
+function subsPaces(text, vma) {
+  if (!text || !vma) return text || ''
+  return text.replace(/(\d{2,3})-(\d{2,3})%\s*VMA|(\d{2,3})%\s*VMA/g, (match, lo, hi, single) => {
+    if (lo && hi) return `${calcPace(vma, lo / 100)}/km – ${calcPace(vma, hi / 100)}/km (${lo}-${hi}% VMA)`
+    return `${calcPace(vma, single / 100)}/km (${single}% VMA)`
+  })
+}
+
+// Construit un tableau d'allures structuré à partir des % VMA trouvés dans les champs texte
+// d'une séance de la bibliothèque (échauffement/corps/récupération/retour au calme).
+function buildAllures(libSession, vma) {
+  if (!vma) return []
+  const zones = []
+  const re = /(\d{2,3})-(\d{2,3})%\s*VMA|(\d{2,3})%\s*VMA/g
+  const pushFromText = (text, label) => {
+    if (!text) return
+    let m
+    re.lastIndex = 0
+    while ((m = re.exec(text))) {
+      const [, lo, hi, single] = m
+      if (lo && hi) {
+        zones.push({ zone: `${label} min`, vitesse_kmh: Math.round(vma * lo / 100 * 100) / 100, allure_min_km: `${calcPace(vma, lo / 100)}/km`, pourcentage_vma: Number(lo) })
+        zones.push({ zone: `${label} max`, vitesse_kmh: Math.round(vma * hi / 100 * 100) / 100, allure_min_km: `${calcPace(vma, hi / 100)}/km`, pourcentage_vma: Number(hi) })
+      } else if (single) {
+        zones.push({ zone: label, vitesse_kmh: Math.round(vma * single / 100 * 100) / 100, allure_min_km: `${calcPace(vma, single / 100)}/km`, pourcentage_vma: Number(single) })
+      }
+    }
+  }
+  pushFromText(libSession.warmup, 'Échauffement')
+  pushFromText(libSession.main_set, 'Corps')
+  pushFromText(libSession.recovery, 'Récupération')
+  pushFromText(libSession.cooldown, 'Retour au calme')
+  return zones
+}
+
+// Toutes les dates sont manipulées en UTC pur (jamais setHours/local) pour éviter
+// le décalage d'un jour au moment du toISOString() côté fuseaux horaires UTC+.
 function nextMonday() {
-  const d   = new Date()
-  const dow = d.getDay() // 0=dim 1=lun … 6=sam
+  const now = new Date()
+  const d   = new Date(Date.UTC(now.getFullYear(), now.getMonth(), now.getDate()))
+  const dow = d.getUTCDay() // 0=dim 1=lun … 6=sam
   if (dow !== 1) {
     const toMonday = dow === 0 ? 1 : 8 - dow
-    d.setDate(d.getDate() + toMonday)
+    d.setUTCDate(d.getUTCDate() + toMonday)
   }
-  d.setHours(0, 0, 0, 0)
   return d
 }
 
 function addDays(date, n) {
   const d = new Date(date)
-  d.setDate(d.getDate() + n)
+  d.setUTCDate(d.getUTCDate() + n)
   return d
 }
 
+// Parse une date 'YYYY-MM-DD' en minuit UTC — jamais via setHours (dépend du fuseau local).
+function parseDateOnly(dateStr) {
+  return new Date(dateStr + 'T00:00:00Z')
+}
+
 function fmtDay(date) {
-  return date.toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' })
+  return date.toLocaleDateString('fr-FR', { day: 'numeric', month: 'short', timeZone: 'UTC' })
 }
 
 function fmtWeekRange(monday) {
@@ -61,14 +133,24 @@ function planDataToGrid(plan_data) {
       const di = DAY_NAMES.indexOf(s.jour)
       if (di < 0) return
       grid[wi][di].push({
-        code:        s.id_seance || s.titre,
-        name:        s.titre,
-        type:        s.type,
-        sport:       s.sport || 'running',
-        main_set:    s.corps || '',
-        coach_notes: s.notes_coach || '',
-        duration_min: s.duree_min || null,
-        _uid:        Date.now() + Math.random(),
+        code:            s.id_seance || s.titre,
+        titre:           s.titre,
+        type:            s.type,
+        sport:           s.sport || 'running',
+        corps:           s.corps || '',
+        echauffement:    s.echauffement || '',
+        retour_au_calme: s.retour_au_calme || '',
+        notes_coach:     s.notes_coach || '',
+        duree_min:       s.duree_min || null,
+        // Champs riches préservés tels quels : sinon toute édition d'une séance de la
+        // semaine efface les allures/distance/intensité déjà calculées des autres séances.
+        distance_km:     s.distance_km ?? null,
+        intensite:       s.intensite ?? '',
+        rpe_cible:       s.rpe_cible ?? null,
+        allures:         s.allures ?? [],
+        recuperation:    s.recuperation ?? null,
+        est_seance_cle:  s.est_seance_cle ?? false,
+        _uid:            Date.now() + Math.random(),
       })
     })
   })
@@ -127,7 +209,7 @@ export default function ManualPlanBuilder() {
             setLoadedPlanId(found.id)
             setPlan(planDataToGrid(found.plan_data))
             const firstDate = found.plan_data?.semaines?.[0]?.date_debut
-            if (firstDate) { const d = new Date(firstDate); d.setHours(0,0,0,0); setStartMonday(d) }
+            if (firstDate) setStartMonday(parseDateOnly(firstDate))
           }
         }
       })
@@ -153,10 +235,7 @@ export default function ManualPlanBuilder() {
     setPlan(grid)
     // Essaie d'utiliser la vraie date de début du plan
     const firstDateStr = found.plan_data?.semaines?.[0]?.date_debut
-    if (firstDateStr) {
-      const d = new Date(firstDateStr)
-      if (!isNaN(d)) { d.setHours(0,0,0,0); setStartMonday(d) }
-    }
+    if (firstDateStr) setStartMonday(parseDateOnly(firstDateStr))
   }
 
   function newPlan() {
@@ -180,9 +259,31 @@ export default function ManualPlanBuilder() {
   function onDrop(e, week, day) {
     e.preventDefault()
     if (!dragging) return
+    const vma = athlete?.vma
+    // dragging = ligne brute session_library (main_set/warmup/cooldown avec "% VMA" en texte).
+    // On calcule tout de suite les vraies allures pour l'athlète sélectionné, sinon la séance
+    // reste avec des pourcentages bruts et un tableau d'allures vide.
+    const item = {
+      code:            dragging.code,
+      titre:           dragging.name,
+      type:            SESSION_TYPE_LABELS[dragging.type] || dragging.type,
+      sport:           dragging.sport || 'running',
+      corps:           subsPaces(dragging.main_set, vma) || dragging.main_set || '',
+      echauffement:    subsPaces(dragging.warmup, vma) || dragging.warmup || '',
+      retour_au_calme: subsPaces(dragging.cooldown, vma) || dragging.cooldown || '',
+      notes_coach:     dragging.coach_notes || '',
+      duree_min:       dragging.duration_min || null,
+      distance_km:     null,
+      intensite:       dragging.intensity_rpe >= 7 ? 'dur' : dragging.intensity_rpe <= 4 ? 'facile' : 'modere',
+      rpe_cible:       dragging.intensity_rpe ?? null,
+      allures:         buildAllures(dragging, vma),
+      recuperation:    dragging.recovery ? { type: 'récupération', description: subsPaces(dragging.recovery, vma) || dragging.recovery, duree_secondes: null } : null,
+      est_seance_cle:  false,
+      _uid:            Date.now() + Math.random(),
+    }
     setPlan(prev => {
       const next = prev.map(w => w.map(d => [...d]))
-      next[week][day] = [...next[week][day], { ...dragging, _uid: Date.now() + Math.random() }]
+      next[week][day] = [...next[week][day], item]
       return next
     })
     setDragging(null)
@@ -209,17 +310,20 @@ export default function ManualPlanBuilder() {
           daySessions.forEach(s => {
             seances.push({
               jour:            DAY_NAMES[di],
-              type:            s.type || s.sport || 'Endurance fondamentale',
-              titre:           s.name || s.code,
-              duree_min:       s.duration_min || 0,
-              distance_km:     s.distance_km || null,
-              intensite:       s.intensity || '',
-              echauffement:    s.warmup || '',
-              corps:           s.main_set || '',
-              retour_au_calme: s.cooldown || '',
-              notes_coach:     s.coach_notes || '',
-              rpe_cible:       s.rpe_target || null,
-              allures:         s.paces || [],
+              date:            addDays(monday, di).toISOString().split('T')[0],
+              type:            s.type || 'Endurance fondamentale',
+              titre:           s.titre || s.code,
+              duree_min:       s.duree_min || 0,
+              distance_km:     s.distance_km ?? null,
+              intensite:       s.intensite || '',
+              echauffement:    s.echauffement || '',
+              corps:           s.corps || '',
+              retour_au_calme: s.retour_au_calme || '',
+              notes_coach:     s.notes_coach || '',
+              rpe_cible:       s.rpe_cible ?? null,
+              allures:         s.allures || [],
+              recuperation:    s.recuperation ?? null,
+              est_seance_cle:  s.est_seance_cle ?? false,
               id_seance:       s.code,
             })
           })
@@ -398,7 +502,7 @@ export default function ManualPlanBuilder() {
                                   {s.code}
                                 </div>
                                 <div style={{ fontSize: '.62rem', lineHeight: 1.2, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                                  {s.name}
+                                  {s.titre}
                                 </div>
                               </div>
                               <button onClick={() => removeSession(wi, di, si)}
