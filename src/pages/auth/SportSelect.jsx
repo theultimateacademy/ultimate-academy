@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { Link, useNavigate, useSearchParams } from 'react-router-dom'
 
 const grad = 'linear-gradient(135deg,#8B2FC9,#E8237A)'
 const gText = { background: grad, WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text' }
@@ -28,7 +28,10 @@ function Check() {
 
 export default function SportSelect() {
   const navigate = useNavigate()
-  const [showSubChoice, setShowSubChoice] = useState(false)
+  const [searchParams] = useSearchParams()
+  // Depuis la carte "Course à pied · Trail" de la landing page : on saute directement
+  // au choix Course à pied / Trail, sans repasser par le choix Triathlon vs Course-à-pied.
+  const [showSubChoice, setShowSubChoice] = useState(searchParams.get('type') === 'running-trail')
   const [quotaFull,     setQuotaFull]     = useState(false)
   const [quotaLoading,  setQuotaLoading]  = useState(true)
 

@@ -278,6 +278,10 @@ export default function Landing() {
     if (!user) { navigate('/choisir-sport'); return }
     navigate(isCoach ? '/admin' : '/app/home')
   }
+  const handleRunningTrailCTA = () => {
+    if (!user) { navigate('/choisir-sport?type=running-trail'); return }
+    navigate(isCoach ? '/admin' : '/app/home')
+  }
   const handleTriathlonCTA = () => {
     if (!user) { localStorage.setItem('sport_type', 'triathlon'); navigate('/register?sport=triathlon'); return }
     navigate(isCoach ? '/admin' : '/app/home')
@@ -627,7 +631,7 @@ export default function Landing() {
                   </div>
                 ))}
               </div>
-              <button onClick={handleCTA} style={{
+              <button onClick={handleRunningTrailCTA} style={{
                 position: 'absolute', bottom: '4.5rem', left: '2rem', right: '2rem',
                 padding: '1rem 1.5rem', borderRadius: 99, border: 'none', cursor: 'pointer', boxSizing: 'border-box',
                 fontWeight: 800, fontSize: '1rem', fontFamily: 'inherit', color: '#fff',
