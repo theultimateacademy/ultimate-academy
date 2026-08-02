@@ -24,6 +24,7 @@ import Calculator     from './pages/Calculator'
 import Contact        from './pages/Contact'
 import CalculateurHub from './pages/CalculateurHub'
 import Ebooks         from './pages/Ebooks'
+import CoachingProgram from './pages/CoachingProgram'
 import EbookDetail    from './pages/EbookDetail'
 import EbookMerci     from './pages/EbookMerci'
 import VMACalculator  from './pages/calculators/VMA'
@@ -105,6 +106,7 @@ function AppRoutes() {
       <Route path="/privacy"      element={<Privacy />} />
       <Route path="/terms"        element={<Terms />} />
       <Route path="/cookies"      element={<Cookies />} />
+      <Route path="/coaching/:slug"   element={<CoachingProgram />} />
       <Route path="/ebooks"           element={<Ebooks />} />
       <Route path="/ebooks/merci"     element={<EbookMerci />} />
       <Route path="/ebooks/:slug"     element={<EbookDetail />} />

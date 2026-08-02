@@ -39,19 +39,29 @@ const mobileStyle = `
 
 
 const SECTIONS = [
-  { label: 'Programme',  id: 'features' },
   { label: 'Mon coach',  id: 'coach' },
   { label: 'Tarifs',     id: 'tarifs' },
   { label: 'Résultats',  id: 'resultats' },
   { label: 'FAQ',        id: 'faq' },
 ]
 
+const PROGRAM_LINKS = [
+  { label: '5km',            slug: '5km' },
+  { label: '10km',           slug: '10km' },
+  { label: 'Semi-marathon',  slug: 'semi-marathon' },
+  { label: 'Marathon',       slug: 'marathon' },
+  { label: 'Trail',          slug: 'trail' },
+  { label: 'Triathlon',      slug: 'triathlon' },
+]
+
 export default function Nav() {
   const { } = useAuth()
   const navigate = useNavigate()
   const location = useLocation()
-  const [mobileMenu,   setMobileMenu]   = useState(false)
+  const [mobileMenu,    setMobileMenu]    = useState(false)
   const [activeSection, setActiveSection] = useState(null)
+  const [programOpen,   setProgramOpen]   = useState(false)
+  const [programMobileOpen, setProgramMobileOpen] = useState(false)
   const isHome = location.pathname === '/'
 
 
@@ -109,6 +119,39 @@ export default function Nav() {
 
         {/* Desktop centre links — in scroll order */}
         <div className="landing-nav-links">
+          <div
+            style={{ position: 'relative' }}
+            onMouseEnter={() => setProgramOpen(true)}
+            onMouseLeave={() => setProgramOpen(false)}
+          >
+            <button className="landing-nav-link" onClick={() => goToSection('features')}
+              style={{ display: 'flex', alignItems: 'center', gap: '.3rem',
+                color: activeSection === 'features' || programOpen ? '#C084FC' : undefined,
+                fontWeight: activeSection === 'features' ? 600 : undefined }}>
+              Programme
+              <svg width="9" height="9" viewBox="0 0 9 9" style={{ transform: programOpen ? 'rotate(180deg)' : 'none', transition: 'transform .15s' }}>
+                <path d="M1 3l3.5 3L8 3" stroke="currentColor" strokeWidth="1.4" fill="none" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+            </button>
+            {programOpen && (
+              <div style={{
+                position: 'absolute', top: '100%', left: '50%', transform: 'translateX(-50%)',
+                marginTop: '.5rem', background: 'rgba(10,10,14,.98)', backdropFilter: 'blur(20px)',
+                border: '1px solid rgba(255,255,255,.1)', borderRadius: 14, padding: '.5rem',
+                display: 'flex', flexDirection: 'column', minWidth: 180, boxShadow: '0 12px 32px rgba(0,0,0,.5)', zIndex: 50,
+              }}>
+                {PROGRAM_LINKS.map(({ label, slug }) => (
+                  <Link key={slug} to={`/coaching/${slug}`} style={{
+                    padding: '.6rem .9rem', borderRadius: 9, fontSize: '.88rem', textDecoration: 'none',
+                    color: location.pathname === `/coaching/${slug}` ? '#C084FC' : 'rgba(255,255,255,.75)',
+                    fontWeight: location.pathname === `/coaching/${slug}` ? 600 : 500,
+                  }}>
+                    {label}
+                  </Link>
+                ))}
+              </div>
+            )}
+          </div>
           {SECTIONS.map(({ label, id }) => (
             <button key={id} className="landing-nav-link" onClick={() => goToSection(id)}
               style={{ color: activeSection === id ? '#C084FC' : undefined, fontWeight: activeSection === id ? 600 : undefined }}>
@@ -158,6 +201,20 @@ export default function Nav() {
       {/* Mobile dropdown — same order always */}
       {mobileMenu && (
         <div className="nav-mobile-menu">
+          <button className="nav-mobile-link" onClick={() => setProgramMobileOpen(v => !v)}
+            style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+            Programme
+            <svg width="10" height="10" viewBox="0 0 9 9" style={{ transform: programMobileOpen ? 'rotate(180deg)' : 'none', transition: 'transform .15s' }}>
+              <path d="M1 3l3.5 3L8 3" stroke="currentColor" strokeWidth="1.4" fill="none" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
+          </button>
+          {programMobileOpen && (
+            <div className="nav-mobile-sub">
+              {PROGRAM_LINKS.map(({ label, slug }) => (
+                <Link key={slug} to={`/coaching/${slug}`} onClick={() => setMobileMenu(false)}>{label}</Link>
+              ))}
+            </div>
+          )}
           {SECTIONS.map(({ label, id }) => (
             <button key={id} className="nav-mobile-link" onClick={() => goToSection(id)}>{label}</button>
           ))}
