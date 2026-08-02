@@ -4,6 +4,7 @@ import { OBJECTIVE_LABELS, LEVEL_LABELS, SESSION_TYPE_COLORS } from '../../lib/u
 import { api } from '../../lib/api'
 import { adminFetch } from '../../lib/adminFetch'
 import LoadingSpinner from '../../components/UI/LoadingSpinner'
+import WeeklyVolumeChart from '../../components/WeeklyVolumeChart'
 
 // ─── Coach Plan View — isolated component so crashes don't black the whole panel ──
 function PlanView({ plan, completions, coachWeekIdx, setCoachWeekIdx, currentWeekNum, onSessionClick, onDeleteSession, onRescheduleSession, objective }) {
@@ -1705,6 +1706,8 @@ function AthleteDetailPanel({ athlete, onClose, onUpdated, onAlertDismissed }) {
                       <div className="stat-label">RPE semaine {currentWeekNum}</div>
                     </div>
                   </div>
+
+                  <WeeklyVolumeChart userId={athlete.id} />
 
                   {/* ── Onglets semaine ── */}
                   {allWeeks.length > 0 && (

@@ -6,6 +6,7 @@ import { api } from '../../lib/api'
 import { daysUntil, OBJECTIVE_LABELS, getPlanStartMonday, getPlanWeeksElapsed } from '../../lib/utils'
 import LoadingSpinner from '../../components/UI/LoadingSpinner'
 import BilanHebdo from '../../components/BilanHebdo'
+import WeeklyVolumeChart from '../../components/WeeklyVolumeChart'
 
 // ── Helpers visuels ────────────────────────────────────────────────────────────
 const rpeColor = r => !r ? 'rgba(255,255,255,.3)' : r >= 8 ? '#EF4444' : r >= 6 ? '#F59E0B' : '#10B981'
@@ -587,6 +588,8 @@ export default function AthleteHome() {
           )}
         </div>
       )}
+
+      <WeeklyVolumeChart userId={profile.id} />
 
       {/* Bilan hebdomadaire semaine précédente — s'affiche tant qu'il n'est pas rempli */}
       {plan && bilanWeekNum && !bilanSubmitted && (

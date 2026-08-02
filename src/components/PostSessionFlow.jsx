@@ -52,48 +52,67 @@ function timeToSplit(min, sec, distM, per100 = false) {
   const pSec = Math.round(paceSec % 60)
   return { time: `${pMin}'${String(pSec).padStart(2, '0')}"`, unit: per100 ? '/100m' : '/km' }
 }
-function timeToPace(min, sec, distM) {
-  const s = timeToSplit(min, sec, distM, false)
-  return s ? s.time : null
-}
 
-// Detect ALL N×M interval blocs — returns array of {reps, label, blocHeader}
-function detectAllBlocs(corps) {
+const RECOVERY_RE = /r[ée]cup|transition|repos/i
+const REPS_RE = /(\d+)\s*[×x×]\s*(\d+(?:[.,]\d+)?)\s*(m\b|km\b|min\b)/i
+
+// Detect EVERY meaningful "BLOC ..." section in the corps text (reps-based or continuous),
+// skipping pure recovery/transition sections which never need a real-pace input.
+function detectAllSections(corps) {
   if (!corps) return []
-  const RE = /(\d+)\s*[×x×]\s*(\d+(?:[.,]\d+)?)\s*(m\b|km\b|min\b)/i
-  const results = []
+  const lines = corps.split('\n')
+  const raw = []
+  let current = null
 
-  // Priority: BLOC headers with N×M patterns
-  for (const line of corps.split('\n')) {
+  for (const line of lines) {
     const t = line.trim()
-    if (!/^BLOC\b/i.test(t)) continue
-    const m = t.match(RE)
-    if (m) {
-      const reps = parseInt(m[1])
-      if (reps >= 2 && reps <= 25)
-        results.push({ reps, label: `${m[1]}×${m[2]}${m[3]}`, blocHeader: t })
+    if (!t) continue
+    if (/^BLOC\b/i.test(t)) {
+      if (current) raw.push(current)
+      current = { header: t, bullets: [] }
+    } else if (t.startsWith('•') && current) {
+      current.bullets.push(t.slice(1).trim())
     }
   }
+  if (current) raw.push(current)
+  if (raw.length === 0) return []
 
-  // Fallback: first bullet line with N×M pattern
-  if (results.length === 0) {
-    for (const line of corps.split('\n')) {
-      const t = line.trim()
-      if (!t.startsWith('•')) continue
-      const m = t.match(RE)
-      if (m) {
-        const reps = parseInt(m[1])
-        if (reps >= 2 && reps <= 25) { results.push({ reps, label: `${m[1]}×${m[2]}${m[3]}`, blocHeader: null }); break }
+  return raw
+    .filter(s => !RECOVERY_RE.test(s.header))
+    .map(s => {
+      const text = s.bullets.join(' ')
+      const m = text.match(REPS_RE)
+      const reps = m ? parseInt(m[1]) : 0
+      const hasReps = reps >= 2 && reps <= 25
+      return {
+        header: s.header,
+        label: hasReps ? `${m[1]}×${m[2]}${m[3]}` : null,
+        reps: hasReps ? reps : 0,
+        text,
       }
-    }
-  }
-  return results
+    })
 }
 
-// Backward-compat wrapper — returns first bloc or null
-function detectIntervals(corps) {
-  const blocs = detectAllBlocs(corps)
-  return blocs.length > 0 ? blocs[0] : null
+function extractDistM(label) {
+  if (!label) return null
+  const m = label.match(/[×x]\s*(\d+(?:[.,]\d+)?)\s*(m|km)/i)
+  if (!m) return null
+  const val = parseFloat(m[1].replace(',', '.'))
+  return m[2].toLowerCase() === 'km' ? val * 1000 : val
+}
+
+function inferSport(type) {
+  const t = (type || '').toLowerCase()
+  if (t.includes('vélo') || t.includes('velo')) return 'velo'
+  if (t.includes('natation')) return 'natation'
+  if (t.includes('brique')) return 'brique'
+  if (t.includes('renforcement')) return 'renforcement'
+  return 'course'
+}
+
+// Friendly label for a section header, e.g. "BLOC Blocs tempo / Allure spécifique" → "Blocs tempo / Allure spécifique"
+function sectionTitle(header) {
+  return header.replace(/^BLOC\s*/i, '').trim() || 'Bloc'
 }
 
 // Get target allure for a phase from session.allures array
@@ -236,6 +255,26 @@ function PaceInput({ label, minVal, onMinChange, secVal, onSecChange }) {
   )
 }
 
+// Simple numeric field (distance / duration)
+function NumberField({ label, value, onChange, placeholder, step, unit }) {
+  return (
+    <div style={{ flex: 1 }}>
+      <div style={{ fontSize: '.7rem', textTransform: 'uppercase', letterSpacing: '.08em',
+        color: 'rgba(26,26,46,.4)', marginBottom: '.5rem', fontWeight: 700 }}>
+        {label}
+      </div>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '.4rem' }}>
+        <input type="number" min="0" step={step || '1'} placeholder={placeholder} value={value}
+          onChange={e => onChange(e.target.value)}
+          style={{ padding: '.6rem .7rem', borderRadius: 10, fontSize: '1.05rem', fontWeight: 700,
+            border: '2px solid rgba(139,47,201,.18)', background: '#fff', outline: 'none',
+            color: '#1a1a2e', width: '100%', boxSizing: 'border-box' }} />
+        {unit && <span style={{ fontSize: '.8rem', color: 'rgba(26,26,46,.35)', flexShrink: 0 }}>{unit}</span>}
+      </div>
+    </div>
+  )
+}
+
 // "Skip pace" link
 function SkipLink({ label = "Je n'ai pas mesuré →", onSkip }) {
   return (
@@ -263,72 +302,42 @@ export default function PostSessionFlow({
   const [rpe,           setRpe]           = useState(6)
   const [wuPaceMin,     setWuPaceMin]     = useState('')
   const [wuPaceSec,     setWuPaceSec]     = useState('')
-  const [mainPaceMin,   setMainPaceMin]   = useState('')
-  const [mainPaceSec,   setMainPaceSec]   = useState('')
-  const [repPaces,      setRepPaces]      = useState([]) // [{min:'', sec:''}] — allure mode bloc 1
-  const [repTimes,      setRepTimes]      = useState([]) // [{min:'', sec:''}] — temps/distance mode bloc 1
-  const [repPaces2,     setRepPaces2]     = useState([]) // idem bloc 2
-  const [repTimes2,     setRepTimes2]     = useState([]) // idem bloc 2
-  const [repWatts,      setRepWatts]      = useState([]) // [string] — watts par bloc vélo
-  const [repMode,       setRepMode]       = useState('time') // 'time' | 'pace'
+  // Per-section state, keyed by section index — replaces the old fixed bloc1/bloc2 pair
+  const [sectionReps,   setSectionReps]   = useState({}) // { [i]: [{min,sec}] } — reps mode: temps par répétition
+  const [sectionPaces,  setSectionPaces]  = useState({}) // { [i]: [{min,sec}] } — reps mode: allure par répétition
+  const [sectionWatts,  setSectionWatts]  = useState({}) // { [i]: [string] } — vélo, watts par répétition
+  const [sectionSingle, setSectionSingle] = useState({}) // { [i]: {min,sec} } — phase continue (pas de répétitions)
+  const [repMode,       setRepMode]       = useState('time') // 'time' | 'pace' (partagé entre sections à reps)
   const [cdPaceMin,     setCdPaceMin]     = useState('')
   const [cdPaceSec,     setCdPaceSec]     = useState('')
   const [avgHr,         setAvgHr]         = useState('')
   const [maxHr,         setMaxHr]         = useState('')
+  const [distKm,        setDistKm]        = useState('')
+  const [distKmBike,    setDistKmBike]    = useState('') // brique uniquement
+  const [durMin,        setDurMin]        = useState('')
+  const [durBikeMin,    setDurBikeMin]    = useState('') // brique uniquement
   const [comment,       setComment]       = useState('')
 
   const typeColor      = SESSION_TYPE_COLORS[session.type] || '#10B981'
   const sessionTypeL   = (session.type || '').toLowerCase()
   const isNatation     = sessionTypeL.includes('natation')
   const isVelo         = sessionTypeL.includes('vélo') || sessionTypeL.includes('velo')
-  const isNonRunning   = isNatation || isVelo ||
-    sessionTypeL.includes('brique') || sessionTypeL.includes('renforcement')
+  const isBrique       = sessionTypeL.includes('brique')
+  const isRenfo        = sessionTypeL.includes('renforcement')
+  const isNonRunning   = isNatation || isVelo || isBrique || isRenfo
 
-  // Detect ALL interval blocs
-  const allBlocs  = useMemo(() => detectAllBlocs(session.corps), [session.corps])
-  const intervals = allBlocs[0] || null   // first bloc (backward compat)
-  const intervals2 = allBlocs[1] || null  // second bloc (e.g. 6×70m côtes)
-  const numReps   = intervals?.reps || 0
-  const numReps2  = intervals2?.reps || 0
-  const hasBlocs  = numReps > 0
+  // Detect every meaningful section (reps-based or continuous phase)
+  const sections = useMemo(() => detectAllSections(session.corps), [session.corps])
+  const hasBlocs = sections.length > 0
 
-  function extractDistM(label) {
-    if (!label) return null
-    const m = label.match(/[×x]\s*(\d+(?:[.,]\d+)?)\s*(m|km)/i)
-    if (!m) return null
-    const val = parseFloat(m[1].replace(',', '.'))
-    return m[2].toLowerCase() === 'km' ? val * 1000 : val
+  // Effective per-section arrays (grow dynamically as the athlete types)
+  function effectiveReps(i, n)  { return Array.from({ length: n }, (_, j) => (sectionReps[i]  || [])[j] || { min: '', sec: '' }) }
+  function effectivePaces(i, n) { return Array.from({ length: n }, (_, j) => (sectionPaces[i] || [])[j] || { min: '', sec: '' }) }
+  function effectiveWatts(i, n) { return Array.from({ length: n }, (_, j) => (sectionWatts[i] || [])[j] || '') }
+  function singleFor(i) { return sectionSingle[i] || { min: '', sec: '' } }
+  function setSingleFor(i, patch) {
+    setSectionSingle(prev => ({ ...prev, [i]: { ...singleFor(i), ...patch } }))
   }
-
-  // Extract distance in metres from intervals.label (e.g. "6×300m" → 300, "3×20min" → null)
-  const distM  = useMemo(() => extractDistM(intervals?.label),  [intervals?.label])
-  const distM2 = useMemo(() => extractDistM(intervals2?.label), [intervals2?.label])
-
-  // Effective rep paces (grows dynamically as user edits)
-  const effectiveRepPaces = useMemo(() => {
-    if (numReps === 0) return []
-    return Array.from({ length: numReps }, (_, i) => repPaces[i] || { min: '', sec: '' })
-  }, [numReps, repPaces])
-
-  const effectiveRepTimes = useMemo(() => {
-    if (numReps === 0) return []
-    return Array.from({ length: numReps }, (_, i) => repTimes[i] || { min: '', sec: '' })
-  }, [numReps, repTimes])
-
-  const effectiveRepWatts = useMemo(() => {
-    if (numReps === 0) return []
-    return Array.from({ length: numReps }, (_, i) => repWatts[i] || '')
-  }, [numReps, repWatts])
-
-  const effectiveRepTimes2 = useMemo(() => {
-    if (numReps2 === 0) return []
-    return Array.from({ length: numReps2 }, (_, i) => repTimes2[i] || { min: '', sec: '' })
-  }, [numReps2, repTimes2])
-
-  const effectiveRepPaces2 = useMemo(() => {
-    if (numReps2 === 0) return []
-    return Array.from({ length: numReps2 }, (_, i) => repPaces2[i] || { min: '', sec: '' })
-  }, [numReps2, repPaces2])
 
   const wuAllure   = getPhaseAllure(session.allures, 'warmup')
   const mainAllure = getPhaseAllure(session.allures, 'main')
@@ -336,7 +345,7 @@ export default function PostSessionFlow({
 
   const pasTermine  = ressenti === 'pas_termine'
   const hasWarmup   = !!session.echauffement && !isNonRunning
-  // mainset shown for running OR any session with detectable blocs
+  // mainset shown for running OR any session with detectable sections
   const hasMainSet  = !!session.corps && (!isNonRunning || hasBlocs)
   const hasCooldown = !!session.retour_au_calme && !isNonRunning
 
@@ -353,7 +362,7 @@ export default function PostSessionFlow({
       }
       s.push('fc')
     }
-    s.push('comment', 'summary')
+    s.push('metrics', 'comment', 'summary')
     return s
   }
 
@@ -377,43 +386,34 @@ export default function PostSessionFlow({
       if (wuPaceMin || wuPaceSec)
         parts.push(`[Ech: ${wuPaceMin||'0'}'${String(wuPaceSec||'0').padStart(2,'0')}"]`)
     }
-    // Blocs data — for ALL session types with detectable intervals
-    if (hasBlocs) {
-      if (isVelo) {
-        const repsStr = effectiveRepWatts.map((w, i) => w ? `bloc${i+1}:${w}W` : null).filter(Boolean).join(' | ')
-        if (repsStr) parts.push(`[Blocs: ${repsStr}]`)
-      } else {
-        const useTimeMode = repMode === 'time' && distM
-        const arr = useTimeMode ? effectiveRepTimes : effectiveRepPaces
-        const repsStr = arr.map((t, i) => {
-          if (!t.min && !t.sec) return null
-          const timeStr = `${t.min||'0'}'${String(t.sec||'0').padStart(2,'0')}"`
-          if (useTimeMode) {
-            const split = timeToSplit(t.min, t.sec, distM, isNatation)
-            return split ? `${i+1}:${timeStr}(${split.time}${split.unit})` : `${i+1}:${timeStr}`
-          }
-          return `${i+1}:${timeStr}/km`
-        }).filter(Boolean).join(' | ')
-        if (repsStr) parts.push(`[Blocs ${intervals?.label}: ${repsStr}]`)
-        // Second bloc (e.g. côtes 6×70m)
-        if (intervals2 && numReps2 > 0) {
-          const useTimeMode2 = repMode === 'time' && distM2
-          const arr2 = useTimeMode2 ? effectiveRepTimes2 : effectiveRepPaces2
-          const repsStr2 = arr2.map((t, i) => {
+    // Every detected section — reps-based (per-rep times/paces/watts) or continuous (single pace)
+    sections.forEach((sec, i) => {
+      const distM = extractDistM(sec.label)
+      const title = sectionTitle(sec.header)
+      if (sec.reps > 0) {
+        if (isVelo) {
+          const watts = effectiveWatts(i, sec.reps)
+          const str = watts.map((w, j) => w ? `bloc${j+1}:${w}W` : null).filter(Boolean).join(' | ')
+          if (str) parts.push(`[${title}: ${str}]`)
+        } else {
+          const useTimeMode = repMode === 'time' && distM
+          const arr = useTimeMode ? effectiveReps(i, sec.reps) : effectivePaces(i, sec.reps)
+          const str = arr.map((t, j) => {
             if (!t.min && !t.sec) return null
             const timeStr = `${t.min||'0'}'${String(t.sec||'0').padStart(2,'0')}"`
-            if (useTimeMode2) {
-              const split = timeToSplit(t.min, t.sec, distM2, isNatation)
-              return split ? `${i+1}:${timeStr}(${split.time}${split.unit})` : `${i+1}:${timeStr}`
+            if (useTimeMode) {
+              const split = timeToSplit(t.min, t.sec, distM, isNatation)
+              return split ? `${j+1}:${timeStr}(${split.time}${split.unit})` : `${j+1}:${timeStr}`
             }
-            return `${i+1}:${timeStr}/km`
+            return `${j+1}:${timeStr}/km`
           }).filter(Boolean).join(' | ')
-          if (repsStr2) parts.push(`[Blocs ${intervals2?.label}: ${repsStr2}]`)
+          if (str) parts.push(`[${sec.label} — ${title}: ${str}]`)
         }
+      } else if (!isVelo) {
+        const p = singleFor(i)
+        if (p.min || p.sec) parts.push(`[${title}: ${p.min||'0'}'${String(p.sec||'0').padStart(2,'0')}"/km]`)
       }
-    } else if (!isNonRunning && (mainPaceMin || mainPaceSec)) {
-      parts.push(`[Corps: ${mainPaceMin||'0'}'${String(mainPaceSec||'0').padStart(2,'0')}"/km]`)
-    }
+    })
     if (!isNonRunning) {
       if (cdPaceMin || cdPaceSec)
         parts.push(`[RAC: ${cdPaceMin||'0'}'${String(cdPaceSec||'0').padStart(2,'0')}"]`)
@@ -429,14 +429,19 @@ export default function PostSessionFlow({
     try {
       const fullComment = buildComment()
       await supabase.from('session_completions').upsert({
-        user_id:       profile.id,
-        plan_id:       planId,
-        week_number:   weekNum,
-        session_index: sessionIdx,
-        rpe:           parseInt(rpe),
-        comment:       fullComment || null,
-        avg_hr:        avgHr ? parseInt(avgHr) : null,
-        completed_at:  new Date().toISOString(),
+        user_id:           profile.id,
+        plan_id:           planId,
+        week_number:       weekNum,
+        session_index:     sessionIdx,
+        rpe:                parseInt(rpe),
+        comment:            fullComment || null,
+        avg_hr:             avgHr ? parseInt(avgHr) : null,
+        distance_km:        distKm ? parseFloat(distKm) : null,
+        distance_km_bike:   isBrique && distKmBike ? parseFloat(distKmBike) : null,
+        duree_reelle_min:   durMin ? parseInt(durMin) : null,
+        duree_bike_min:     isBrique && durBikeMin ? parseInt(durBikeMin) : null,
+        sport:              inferSport(session.type),
+        completed_at:       new Date().toISOString(),
       }, { onConflict: 'plan_id,week_number,session_index' })
 
       setSaved(true)
@@ -623,231 +628,168 @@ export default function PostSessionFlow({
             </>
           )}
 
-          {/* ── PAGE 4 : Corps de séance / Blocs ── */}
-          {step === 'mainset' && (() => {
-            // Determine entry mode for this session type
-            const isVeloBloc  = isVelo && hasBlocs
-            const useTimeMode = repMode === 'time' && distM
-            const setter      = useTimeMode ? setRepTimes : setRepPaces
-            const arr         = useTimeMode ? effectiveRepTimes : effectiveRepPaces
+          {/* ── PAGE 4 : Corps de séance / Sections ── */}
+          {step === 'mainset' && (
+            <>
+              <h3 style={{ fontSize: '1.25rem', fontWeight: 900, lineHeight: 1.2, marginBottom: '.4rem' }}>
+                {hasBlocs ? '⚡ Tes allures réelles' : '⚡ Corps de séance'}
+              </h3>
+              <p style={{ fontSize: '.85rem', color: 'rgba(26,26,46,.5)', marginBottom: '1.25rem', lineHeight: 1.65 }}>
+                {hasBlocs
+                  ? "Renseigne ce que tu as vraiment tenu sur chaque partie de la séance."
+                  : 'Quelle allure moyenne sur le corps de la séance ?'}
+              </p>
 
-            const blocEmoji = isNatation ? '🏊' : isVelo ? '🚴' : '⚡'
-            const blocLabel = hasBlocs
-              ? distM
-                ? `${blocEmoji} Tes ${numReps} répétitions`
-                : `${blocEmoji} Tes ${numReps} blocs`
-              : '⚡ Corps de séance'
-            const blocDesc = hasBlocs
-              ? isVeloBloc
-                ? `Entre la puissance développée (en watts) sur chaque bloc.`
-                : distM
-                  ? `Entre le temps réalisé sur chaque ${distM >= 1000 ? `${distM/1000}km` : `${distM}m`}.`
-                  : `Entre l'allure pour chaque bloc.`
-              : 'Quelle allure moyenne sur le corps de la séance ?'
+              <PrevuCard color={typeColor} icon={isNatation ? '🏊' : isVelo ? '🚴' : '⚡'}>
+                <div style={{ fontWeight: 700, fontSize: '.88rem', marginBottom: '.5rem', color: '#1a1a2e' }}>
+                  {session.titre}
+                </div>
+                <CorpsPreview corps={session.corps} typeColor={typeColor} />
+                {!hasBlocs && <AllureChip allure={mainAllure} color={typeColor} />}
+              </PrevuCard>
 
-            return (
-              <>
-                <h3 style={{ fontSize: '1.25rem', fontWeight: 900, lineHeight: 1.2, marginBottom: '.4rem' }}>
-                  {blocLabel}
-                </h3>
-                <p style={{ fontSize: '.85rem', color: 'rgba(26,26,46,.5)', marginBottom: '1.25rem', lineHeight: 1.65 }}>
-                  {blocDesc}
-                </p>
-
-                <PrevuCard color={typeColor} icon={blocEmoji}>
-                  <div style={{ fontWeight: 700, fontSize: '.88rem', marginBottom: '.5rem', color: '#1a1a2e' }}>
-                    {session.titre}
-                  </div>
-                  <CorpsPreview corps={session.corps} typeColor={typeColor} />
-                  {!hasBlocs && <AllureChip allure={mainAllure} color={typeColor} />}
-                </PrevuCard>
-
-                {hasBlocs ? (
-                  <>
-                    {/* Mode toggle — running with distance only */}
-                    {distM && !isNonRunning && (
-                      <div style={{ display: 'flex', gap: '.35rem', marginBottom: '.875rem',
-                        background: 'rgba(139,47,201,.06)', borderRadius: 12, padding: '.3rem' }}>
-                        {[
-                          { v: 'time', l: `⏱ Temps / ${distM >= 1000 ? `${distM/1000}km` : `${distM}m`}` },
-                          { v: 'pace', l: '⚡ Allure /km' },
-                        ].map(m => (
-                          <button key={m.v} onClick={() => setRepMode(m.v)} style={{
-                            flex: 1, padding: '.4rem', borderRadius: 9, border: 'none', cursor: 'pointer',
-                            fontFamily: 'inherit', fontWeight: 700, fontSize: '.8rem',
-                            background: repMode === m.v ? C.purple : 'transparent',
-                            color: repMode === m.v ? '#fff' : 'rgba(26,26,46,.4)',
-                            transition: 'all .15s',
-                          }}>{m.l}</button>
-                        ))}
-                      </div>
-                    )}
-
-                    {isVeloBloc ? (
-                      /* Vélo — watts input per bloc */
-                      <div style={{ display: 'flex', flexDirection: 'column', gap: '.5rem' }}>
-                        {effectiveRepWatts.map((w, i) => (
-                          <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '.75rem',
-                            background: 'rgba(139,47,201,.04)', borderRadius: 12,
-                            padding: '.6rem .875rem', border: '1px solid rgba(139,47,201,.1)' }}>
-                            <span style={{ fontSize: '.78rem', fontWeight: 800, color: C.purple,
-                              minWidth: 22, textAlign: 'center' }}>
-                              {i + 1}
-                            </span>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '.4rem', flex: 1 }}>
-                              <input
-                                type="number" min="0" max="9999" placeholder="Ex: 245" value={w}
-                                onChange={e => setRepWatts(prev => {
-                                  const next = Array.from({ length: numReps }, (_, j) => prev[j] || '')
-                                  next[i] = e.target.value
-                                  return next
-                                })}
-                                style={{ width: 90, padding: '.4rem .5rem', borderRadius: 8, fontSize: '.95rem',
-                                  fontWeight: 700, border: '2px solid rgba(139,47,201,.18)', background: '#fff',
-                                  textAlign: 'center', outline: 'none', color: '#1a1a2e' }} />
-                              <span style={{ fontSize: '.85rem', fontWeight: 700, color: 'rgba(26,26,46,.45)' }}>W</span>
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    ) : (
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '.5rem' }}>
-                      {arr.map((rp, i) => {
-                        const split = (useTimeMode && distM)
-                          ? timeToSplit(rp.min, rp.sec, distM, isNatation)
-                          : null
-                        const unitLabel = distM ? (isNatation ? `/100m` : '/km') : '/km'
-                        return (
-                          <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '.75rem',
-                            background: 'rgba(139,47,201,.04)', borderRadius: 12,
-                            padding: '.6rem .875rem', border: '1px solid rgba(139,47,201,.1)' }}>
-                            <span style={{ fontSize: '.78rem', fontWeight: 800, color: C.purple,
-                              minWidth: 22, textAlign: 'center' }}>
-                              {i + 1}
-                            </span>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '.3rem', flex: 1 }}>
-                              <input
-                                type="number" min="0" max="99" placeholder="MM" value={rp.min || ''}
-                                onChange={e => setter(prev => {
-                                  const next = Array.from({ length: numReps }, (_, j) => prev[j] || { min: '', sec: '' })
-                                  next[i] = { ...next[i], min: e.target.value }
-                                  return next
-                                })}
-                                style={{ width: 50, padding: '.4rem .3rem', borderRadius: 8, fontSize: '.95rem',
-                                  fontWeight: 700, border: '2px solid rgba(139,47,201,.18)', background: '#fff',
-                                  textAlign: 'center', outline: 'none', color: '#1a1a2e' }} />
-                              <span style={{ color: 'rgba(26,26,46,.25)', fontSize: '1rem' }}>:</span>
-                              <input
-                                type="number" min="0" max="59" placeholder="SS" value={rp.sec || ''}
-                                onChange={e => setter(prev => {
-                                  const next = Array.from({ length: numReps }, (_, j) => prev[j] || { min: '', sec: '' })
-                                  next[i] = { ...next[i], sec: e.target.value }
-                                  return next
-                                })}
-                                style={{ width: 50, padding: '.4rem .3rem', borderRadius: 8, fontSize: '.95rem',
-                                  fontWeight: 700, border: '2px solid rgba(139,47,201,.18)', background: '#fff',
-                                  textAlign: 'center', outline: 'none', color: '#1a1a2e' }} />
-                              {!split && <span style={{ fontSize: '.75rem', color: 'rgba(26,26,46,.35)' }}>{unitLabel}</span>}
-                            </div>
-                            {/* Calculated split shown live */}
-                            {split && (
-                              <span style={{ fontSize: '.8rem', fontWeight: 800, color: C.purple,
-                                flexShrink: 0, whiteSpace: 'nowrap' }}>
-                                = {split.time}<span style={{ fontSize: '.68rem', fontWeight: 400, opacity: .6 }}>{split.unit}</span>
-                              </span>
-                            )}
-                            {/* Pace display in pace mode */}
-                            {!useTimeMode && (rp.min || rp.sec) && (
-                              <span style={{ fontSize: '.75rem', fontWeight: 800, color: C.purple, flexShrink: 0 }}>
-                                {rp.min || '0'}'{String(rp.sec || '0').padStart(2,'0')}"
-                              </span>
-                            )}
-                          </div>
-                        )
-                      })}
+              {hasBlocs ? (
+                <>
+                  {/* Mode toggle — running sections with a known distance */}
+                  {sections.some(sec => sec.reps > 0 && extractDistM(sec.label)) && !isNonRunning && (
+                    <div style={{ display: 'flex', gap: '.35rem', marginBottom: '.875rem',
+                      background: 'rgba(139,47,201,.06)', borderRadius: 12, padding: '.3rem' }}>
+                      {[
+                        { v: 'time', l: '⏱ Temps / distance' },
+                        { v: 'pace', l: '⚡ Allure /km' },
+                      ].map(m => (
+                        <button key={m.v} onClick={() => setRepMode(m.v)} style={{
+                          flex: 1, padding: '.4rem', borderRadius: 9, border: 'none', cursor: 'pointer',
+                          fontFamily: 'inherit', fontWeight: 700, fontSize: '.8rem',
+                          background: repMode === m.v ? C.purple : 'transparent',
+                          color: repMode === m.v ? '#fff' : 'rgba(26,26,46,.4)',
+                          transition: 'all .15s',
+                        }}>{m.l}</button>
+                      ))}
                     </div>
-                    )}
-                  </>
-                ) : (
-                  <PaceInput
-                    label="Allure moyenne corps de séance"
-                    minVal={mainPaceMin} onMinChange={setMainPaceMin}
-                    secVal={mainPaceSec} onSecChange={setMainPaceSec}
-                  />
-                )}
+                  )}
 
-                {/* ── Second bloc (e.g. côtes 6×70m) ── */}
-                {intervals2 && numReps2 > 0 && !isVelo && (() => {
-                  const useTimeMode2 = repMode === 'time' && distM2
-                  const setter2      = useTimeMode2 ? setRepTimes2 : setRepPaces2
-                  const arr2         = useTimeMode2 ? effectiveRepTimes2 : effectiveRepPaces2
-                  return (
-                    <>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '.5rem', margin: '1.25rem 0 .875rem' }}>
-                        <div style={{ flex: 1, height: 1, background: typeColor + '30' }} />
-                        <span style={{ fontSize: '.65rem', fontWeight: 800, letterSpacing: '.1em', color: typeColor,
-                          textTransform: 'uppercase', background: typeColor + '15', borderRadius: 99,
-                          padding: '.2rem .65rem', border: `1px solid ${typeColor}30` }}>
-                          {intervals2.blocHeader || intervals2.label}
-                        </span>
-                        <div style={{ flex: 1, height: 1, background: typeColor + '30' }} />
-                      </div>
-                      <div style={{ fontSize: '.8rem', color: 'rgba(26,26,46,.45)', marginBottom: '.65rem' }}>
-                        {distM2 ? `Entre le temps réalisé sur chaque ${distM2}m.` : `Entre l'allure pour chaque répétition.`}
-                      </div>
-                      <div style={{ display: 'flex', flexDirection: 'column', gap: '.5rem' }}>
-                        {arr2.map((rp, i) => {
-                          const split2 = (useTimeMode2 && distM2)
-                            ? timeToSplit(rp.min, rp.sec, distM2, isNatation)
-                            : null
-                          return (
-                            <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '.75rem',
-                              background: 'rgba(139,47,201,.04)', borderRadius: 12,
-                              padding: '.6rem .875rem', border: '1px solid rgba(139,47,201,.1)' }}>
-                              <span style={{ fontSize: '.78rem', fontWeight: 800, color: typeColor,
-                                minWidth: 22, textAlign: 'center' }}>{i + 1}</span>
-                              <div style={{ display: 'flex', alignItems: 'center', gap: '.3rem', flex: 1 }}>
-                                <input
-                                  type="number" min="0" max="99" placeholder="MM" value={rp.min || ''}
-                                  onChange={e => setter2(prev => {
-                                    const next = Array.from({ length: numReps2 }, (_, j) => prev[j] || { min: '', sec: '' })
-                                    next[i] = { ...next[i], min: e.target.value }
-                                    return next
-                                  })}
-                                  style={{ width: 50, padding: '.4rem .3rem', borderRadius: 8, fontSize: '.95rem',
-                                    fontWeight: 700, border: '2px solid rgba(139,47,201,.18)', background: '#fff',
-                                    textAlign: 'center', outline: 'none', color: '#1a1a2e' }} />
-                                <span style={{ color: 'rgba(26,26,46,.25)', fontSize: '1rem' }}>:</span>
-                                <input
-                                  type="number" min="0" max="59" placeholder="SS" value={rp.sec || ''}
-                                  onChange={e => setter2(prev => {
-                                    const next = Array.from({ length: numReps2 }, (_, j) => prev[j] || { min: '', sec: '' })
-                                    next[i] = { ...next[i], sec: e.target.value }
-                                    return next
-                                  })}
-                                  style={{ width: 50, padding: '.4rem .3rem', borderRadius: 8, fontSize: '.95rem',
-                                    fontWeight: 700, border: '2px solid rgba(139,47,201,.18)', background: '#fff',
-                                    textAlign: 'center', outline: 'none', color: '#1a1a2e' }} />
-                                {!split2 && <span style={{ fontSize: '.75rem', color: 'rgba(26,26,46,.35)' }}>/km</span>}
+                  {sections.map((sec, i) => {
+                    const distM = extractDistM(sec.label)
+                    const title = sectionTitle(sec.header)
+                    const isVeloBloc = isVelo && sec.reps > 0
+
+                    return (
+                      <div key={i} style={{ marginBottom: i < sections.length - 1 ? '1.25rem' : 0 }}>
+                        {sections.length > 1 && (
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '.5rem', margin: `${i > 0 ? '1.25rem' : '0'} 0 .65rem` }}>
+                            <div style={{ flex: 1, height: 1, background: typeColor + '30' }} />
+                            <span style={{ fontSize: '.65rem', fontWeight: 800, letterSpacing: '.1em', color: typeColor,
+                              textTransform: 'uppercase', background: typeColor + '15', borderRadius: 99,
+                              padding: '.2rem .65rem', border: `1px solid ${typeColor}30`, textAlign: 'center' }}>
+                              {sec.label ? `${sec.label} — ${title}` : title}
+                            </span>
+                            <div style={{ flex: 1, height: 1, background: typeColor + '30' }} />
+                          </div>
+                        )}
+
+                        {sec.reps === 0 ? (
+                          // Continuous phase (no reps) — one pace input for the whole section
+                          <PaceInput
+                            label={sections.length > 1 ? undefined : `Allure — ${title}`}
+                            minVal={singleFor(i).min} onMinChange={v => setSingleFor(i, { min: v })}
+                            secVal={singleFor(i).sec} onSecChange={v => setSingleFor(i, { sec: v })}
+                          />
+                        ) : isVeloBloc ? (
+                          // Vélo — watts input per rep
+                          <div style={{ display: 'flex', flexDirection: 'column', gap: '.5rem' }}>
+                            {effectiveWatts(i, sec.reps).map((w, j) => (
+                              <div key={j} style={{ display: 'flex', alignItems: 'center', gap: '.75rem',
+                                background: 'rgba(139,47,201,.04)', borderRadius: 12,
+                                padding: '.6rem .875rem', border: '1px solid rgba(139,47,201,.1)' }}>
+                                <span style={{ fontSize: '.78rem', fontWeight: 800, color: C.purple,
+                                  minWidth: 22, textAlign: 'center' }}>{j + 1}</span>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '.4rem', flex: 1 }}>
+                                  <input
+                                    type="number" min="0" max="9999" placeholder="Ex: 245" value={w}
+                                    onChange={e => setSectionWatts(prev => {
+                                      const next = effectiveWatts(i, sec.reps)
+                                      next[j] = e.target.value
+                                      return { ...prev, [i]: next }
+                                    })}
+                                    style={{ width: 90, padding: '.4rem .5rem', borderRadius: 8, fontSize: '.95rem',
+                                      fontWeight: 700, border: '2px solid rgba(139,47,201,.18)', background: '#fff',
+                                      textAlign: 'center', outline: 'none', color: '#1a1a2e' }} />
+                                  <span style={{ fontSize: '.85rem', fontWeight: 700, color: 'rgba(26,26,46,.45)' }}>W</span>
+                                </div>
                               </div>
-                              {split2 && (
-                                <span style={{ fontSize: '.8rem', fontWeight: 800, color: typeColor,
-                                  flexShrink: 0, whiteSpace: 'nowrap' }}>
-                                  = {split2.time}<span style={{ fontSize: '.68rem', fontWeight: 400, opacity: .6 }}>{split2.unit}</span>
-                                </span>
-                              )}
+                            ))}
+                          </div>
+                        ) : (() => {
+                          const useTimeMode = repMode === 'time' && distM
+                          const arr = useTimeMode ? effectiveReps(i, sec.reps) : effectivePaces(i, sec.reps)
+                          const setter = (j, field, val) => {
+                            const bucket = useTimeMode ? sectionReps : sectionPaces
+                            const setBucket = useTimeMode ? setSectionReps : setSectionPaces
+                            const arrEff = useTimeMode ? effectiveReps(i, sec.reps) : effectivePaces(i, sec.reps)
+                            const next = arrEff.map(x => ({ ...x }))
+                            next[j] = { ...next[j], [field]: val }
+                            setBucket(prev => ({ ...prev, [i]: next }))
+                          }
+                          const unitLabel = distM ? (isNatation ? '/100m' : '/km') : '/km'
+                          return (
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '.5rem' }}>
+                              {arr.map((rp, j) => {
+                                const split = (useTimeMode && distM) ? timeToSplit(rp.min, rp.sec, distM, isNatation) : null
+                                return (
+                                  <div key={j} style={{ display: 'flex', alignItems: 'center', gap: '.75rem',
+                                    background: 'rgba(139,47,201,.04)', borderRadius: 12,
+                                    padding: '.6rem .875rem', border: '1px solid rgba(139,47,201,.1)' }}>
+                                    <span style={{ fontSize: '.78rem', fontWeight: 800, color: C.purple,
+                                      minWidth: 22, textAlign: 'center' }}>{j + 1}</span>
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: '.3rem', flex: 1 }}>
+                                      <input
+                                        type="number" min="0" max="99" placeholder="MM" value={rp.min || ''}
+                                        onChange={e => setter(j, 'min', e.target.value)}
+                                        style={{ width: 50, padding: '.4rem .3rem', borderRadius: 8, fontSize: '.95rem',
+                                          fontWeight: 700, border: '2px solid rgba(139,47,201,.18)', background: '#fff',
+                                          textAlign: 'center', outline: 'none', color: '#1a1a2e' }} />
+                                      <span style={{ color: 'rgba(26,26,46,.25)', fontSize: '1rem' }}>:</span>
+                                      <input
+                                        type="number" min="0" max="59" placeholder="SS" value={rp.sec || ''}
+                                        onChange={e => setter(j, 'sec', e.target.value)}
+                                        style={{ width: 50, padding: '.4rem .3rem', borderRadius: 8, fontSize: '.95rem',
+                                          fontWeight: 700, border: '2px solid rgba(139,47,201,.18)', background: '#fff',
+                                          textAlign: 'center', outline: 'none', color: '#1a1a2e' }} />
+                                      {!split && <span style={{ fontSize: '.75rem', color: 'rgba(26,26,46,.35)' }}>{unitLabel}</span>}
+                                    </div>
+                                    {split && (
+                                      <span style={{ fontSize: '.8rem', fontWeight: 800, color: C.purple,
+                                        flexShrink: 0, whiteSpace: 'nowrap' }}>
+                                        = {split.time}<span style={{ fontSize: '.68rem', fontWeight: 400, opacity: .6 }}>{split.unit}</span>
+                                      </span>
+                                    )}
+                                    {!useTimeMode && (rp.min || rp.sec) && (
+                                      <span style={{ fontSize: '.75rem', fontWeight: 800, color: C.purple, flexShrink: 0 }}>
+                                        {rp.min || '0'}'{String(rp.sec || '0').padStart(2,'0')}"
+                                      </span>
+                                    )}
+                                  </div>
+                                )
+                              })}
                             </div>
                           )
-                        })}
+                        })()}
                       </div>
-                    </>
-                  )
-                })()}
+                    )
+                  })}
+                </>
+              ) : (
+                <PaceInput
+                  label="Allure moyenne corps de séance"
+                  minVal={singleFor(0).min} onMinChange={v => setSingleFor(0, { min: v })}
+                  secVal={singleFor(0).sec} onSecChange={v => setSingleFor(0, { sec: v })}
+                />
+              )}
 
-                <SkipLink onSkip={skipToNext} />
-              </>
-            )
-          })()}
+              <SkipLink onSkip={skipToNext} />
+            </>
+          )}
 
           {/* ── PAGE 5 : Retour au calme ── */}
           {step === 'cooldown' && (
@@ -910,6 +852,52 @@ export default function PostSessionFlow({
             </>
           )}
 
+          {/* ── PAGE Métriques : distance et durée réelles ── */}
+          {step === 'metrics' && (
+            <>
+              <h3 style={{ fontSize: '1.25rem', fontWeight: 900, lineHeight: 1.2, marginBottom: '.4rem' }}>
+                📏 Distance et durée
+              </h3>
+              <p style={{ fontSize: '.85rem', color: 'rgba(26,26,46,.5)', marginBottom: '1.5rem', lineHeight: 1.65 }}>
+                {isBrique
+                  ? 'Renseigne le détail vélo et course de ta brique.'
+                  : isRenfo
+                    ? 'Combien de temps a duré ta séance ?'
+                    : 'Distance parcourue et durée réelle de la séance.'}
+              </p>
+
+              {isBrique ? (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+                  <div>
+                    <div style={{ fontSize: '.72rem', fontWeight: 800, textTransform: 'uppercase',
+                      letterSpacing: '.1em', color: '#F97316', marginBottom: '.65rem' }}>🚴 Vélo</div>
+                    <div style={{ display: 'flex', gap: '.75rem' }}>
+                      <NumberField label="Distance (km)" value={distKmBike} onChange={setDistKmBike} placeholder="Ex : 45" step="0.1" />
+                      <NumberField label="Durée (min)" value={durBikeMin} onChange={setDurBikeMin} placeholder="Ex : 90" />
+                    </div>
+                  </div>
+                  <div>
+                    <div style={{ fontSize: '.72rem', fontWeight: 800, textTransform: 'uppercase',
+                      letterSpacing: '.1em', color: '#10B981', marginBottom: '.65rem' }}>🏃 Course</div>
+                    <div style={{ display: 'flex', gap: '.75rem' }}>
+                      <NumberField label="Distance (km)" value={distKm} onChange={setDistKm} placeholder="Ex : 10" step="0.1" />
+                      <NumberField label="Durée (min)" value={durMin} onChange={setDurMin} placeholder="Ex : 45" />
+                    </div>
+                  </div>
+                </div>
+              ) : isRenfo ? (
+                <NumberField label="Durée (min)" value={durMin} onChange={setDurMin} placeholder="Ex : 30" />
+              ) : (
+                <div style={{ display: 'flex', gap: '.75rem' }}>
+                  <NumberField label="Distance (km)" value={distKm} onChange={setDistKm} placeholder="Ex : 10" step="0.1" />
+                  <NumberField label="Durée (min)" value={durMin} onChange={setDurMin} placeholder="Ex : 50" />
+                </div>
+              )}
+
+              <SkipLink onSkip={skipToNext} />
+            </>
+          )}
+
           {/* ── PAGE Commentaire ── */}
           {step === 'comment' && (
             <>
@@ -953,6 +941,35 @@ export default function PostSessionFlow({
                 ))}
               </div>
 
+              {/* Distance / durée recap */}
+              {(distKm || distKmBike || durMin || durBikeMin) && (
+                <div style={{ background: 'rgba(16,185,129,.07)', border: '1px solid rgba(16,185,129,.2)',
+                  borderRadius: 14, padding: '.875rem', marginBottom: '1.5rem' }}>
+                  <div style={{ fontSize: '.68rem', fontWeight: 700, textTransform: 'uppercase',
+                    letterSpacing: '.1em', color: '#10B981', marginBottom: '.6rem' }}>📏 Distance &amp; durée</div>
+                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: '.75rem' }}>
+                    {isBrique ? (
+                      <>
+                        {(distKmBike || durBikeMin) && (
+                          <span style={{ fontSize: '.85rem', color: 'rgba(26,26,46,.7)' }}>
+                            🚴 {distKmBike ? `${distKmBike} km` : ''}{distKmBike && durBikeMin ? ' · ' : ''}{durBikeMin ? `${durBikeMin} min` : ''}
+                          </span>
+                        )}
+                        {(distKm || durMin) && (
+                          <span style={{ fontSize: '.85rem', color: 'rgba(26,26,46,.7)' }}>
+                            🏃 {distKm ? `${distKm} km` : ''}{distKm && durMin ? ' · ' : ''}{durMin ? `${durMin} min` : ''}
+                          </span>
+                        )}
+                      </>
+                    ) : (
+                      <span style={{ fontSize: '.85rem', color: 'rgba(26,26,46,.7)' }}>
+                        {distKm ? `${distKm} km` : ''}{distKm && durMin ? ' · ' : ''}{durMin ? `${durMin} min` : ''}
+                      </span>
+                    )}
+                  </div>
+                </div>
+              )}
+
               {/* Paces/Blocs recap */}
               {(() => {
                 const lines = []
@@ -960,16 +977,26 @@ export default function PostSessionFlow({
                   if (wuPaceMin || wuPaceSec) lines.push({ icon: '🔥', label: 'Ech.', val: fmtPace(wuPaceMin, wuPaceSec) })
                 }
                 if (hasBlocs) {
-                  if (isVelo) {
-                    const count = effectiveRepWatts.filter(w => w).length
-                    if (count > 0) lines.push({ icon: '🚴', label: `${count} blocs`, val: 'watts enregistrés' })
-                  } else {
-                    const arr = (repMode === 'time' && distM) ? effectiveRepTimes : effectiveRepPaces
-                    const count = arr.filter(p => p.min || p.sec).length
-                    if (count > 0) lines.push({ icon: isNatation ? '🏊' : '⚡', label: `${count} blocs`, val: 'enregistrés' })
-                  }
+                  sections.forEach((sec, i) => {
+                    const title = sectionTitle(sec.header)
+                    if (sec.reps > 0) {
+                      if (isVelo) {
+                        const count = effectiveWatts(i, sec.reps).filter(w => w).length
+                        if (count > 0) lines.push({ icon: '🚴', label: title, val: `${count} blocs` })
+                      } else {
+                        const distM = extractDistM(sec.label)
+                        const arr = (repMode === 'time' && distM) ? effectiveReps(i, sec.reps) : effectivePaces(i, sec.reps)
+                        const count = arr.filter(p => p.min || p.sec).length
+                        if (count > 0) lines.push({ icon: isNatation ? '🏊' : '⚡', label: title, val: `${count} blocs` })
+                      }
+                    } else {
+                      const p = singleFor(i)
+                      if (p.min || p.sec) lines.push({ icon: '⚡', label: title, val: fmtPace(p.min, p.sec) })
+                    }
+                  })
                 } else if (!isNonRunning) {
-                  if (mainPaceMin || mainPaceSec) lines.push({ icon: '⚡', label: 'Corps', val: fmtPace(mainPaceMin, mainPaceSec) })
+                  const p = singleFor(0)
+                  if (p.min || p.sec) lines.push({ icon: '⚡', label: 'Corps', val: fmtPace(p.min, p.sec) })
                 }
                 if (!isNonRunning) {
                   if (cdPaceMin || cdPaceSec) lines.push({ icon: '❄️', label: 'RAC', val: fmtPace(cdPaceMin, cdPaceSec) })
@@ -981,8 +1008,8 @@ export default function PostSessionFlow({
                     <div style={{ fontSize: '.68rem', fontWeight: 700, textTransform: 'uppercase',
                       letterSpacing: '.1em', color: typeColor, marginBottom: '.6rem' }}>Allures</div>
                     <div style={{ display: 'flex', flexWrap: 'wrap', gap: '.75rem' }}>
-                      {lines.map(pl => (
-                        <div key={pl.label} style={{ display: 'flex', alignItems: 'center', gap: '.3rem' }}>
+                      {lines.map((pl, i) => (
+                        <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '.3rem' }}>
                           <span style={{ fontSize: '.82rem' }}>{pl.icon}</span>
                           <span style={{ fontSize: '.75rem', color: 'rgba(26,26,46,.5)' }}>{pl.label}</span>
                           <span style={{ fontSize: '.85rem', fontWeight: 800, color: C.purple }}>{pl.val}</span>
