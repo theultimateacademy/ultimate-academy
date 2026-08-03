@@ -34,11 +34,12 @@ export default function SportSelect() {
   const [showSubChoice, setShowSubChoice] = useState(searchParams.get('type') === 'running-trail')
   const [quotaFull,     setQuotaFull]     = useState(false)
   const [quotaLoading,  setQuotaLoading]  = useState(true)
+  const [quota,         setQuota]         = useState(null) // { quota, current }
 
   useEffect(() => {
     fetch(`${API}/api/admin/quota`)
       .then(r => r.json())
-      .then(d => setQuotaFull(d.full === true))
+      .then(d => { setQuotaFull(d.full === true); setQuota(d) })
       .catch(() => {})
       .finally(() => setQuotaLoading(false))
   }, [])
@@ -104,9 +105,18 @@ export default function SportSelect() {
         <h1 style={{ fontSize: 'clamp(1.8rem,5vw,2.6rem)', fontWeight: 800, letterSpacing: '-0.03em', marginBottom: '.6rem', textAlign: 'center' }}>
           Choisis ta <span style={gText}>discipline</span>
         </h1>
-        <p style={{ color: 'rgba(255,255,255,.5)', fontSize: '.95rem', marginBottom: '3rem', textAlign: 'center' }}>
+        <p style={{ color: 'rgba(255,255,255,.5)', fontSize: '.95rem', marginBottom: '1.25rem', textAlign: 'center' }}>
           14 jours gratuits · sans engagement · annulable à tout moment
         </p>
+
+        <div style={{ display: 'inline-flex', alignItems: 'center', gap: '.5rem', marginBottom: '3rem',
+          background: 'rgba(139,47,201,.12)', border: '1px solid rgba(139,47,201,.3)', borderRadius: 99,
+          padding: '.5rem 1.1rem', textAlign: 'center' }}>
+          <span style={{ fontSize: '.95rem' }}>🎯</span>
+          <span style={{ fontSize: '.82rem', color: 'rgba(255,255,255,.75)', fontWeight: 600 }}>
+            Limité à 20 athlètes maximum{quota?.current != null ? ` · ${quota.current}/${quota.quota} places prises` : ''} — pour garder un suivi de qualité
+          </span>
+        </div>
 
         {!showSubChoice ? (
           <div style={{ display: 'flex', gap: '1.25rem', width: '100%', maxWidth: 680, alignItems: 'stretch', flexWrap: 'wrap' }}>
