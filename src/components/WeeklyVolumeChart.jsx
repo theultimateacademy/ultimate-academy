@@ -4,6 +4,7 @@ import { supabase } from '../lib/supabase'
 const COLORS = { course: '#10B981', natation: '#3B82F6', velo: '#F97316' }
 const LABELS = { course: 'Course', natation: 'Natation', velo: 'Vélo' }
 const ORDER  = ['course', 'natation', 'velo']
+const WEEKS_COUNT = 20
 
 function mondayOf(date) {
   const d = new Date(date)
@@ -17,7 +18,18 @@ function fmtDay(d) {
   return d.toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' })
 }
 
-// Graphique de volume hebdomadaire (12 dernières semaines) par discipline,
+// "3-9 août" si même mois, "28 juil. - 3 août" sinon
+function fmtRange(monday) {
+  const sunday = new Date(monday)
+  sunday.setDate(sunday.getDate() + 6)
+  if (monday.getMonth() === sunday.getMonth()) {
+    const month = sunday.toLocaleDateString('fr-FR', { month: 'short' })
+    return `${monday.getDate()}-${sunday.getDate()} ${month}`
+  }
+  return `${fmtDay(monday)} - ${fmtDay(sunday)}`
+}
+
+// Graphique de volume hebdomadaire (20 dernières semaines) par discipline,
 // à partir des distances réelles saisies en fin de séance (session_completions).
 // Une brique répartit sa distance vélo (distance_km_bike) et course (distance_km).
 export default function WeeklyVolumeChart({ userId }) {
@@ -30,7 +42,7 @@ export default function WeeklyVolumeChart({ userId }) {
     ;(async () => {
       const thisMonday = mondayOf(new Date())
       const startMonday = new Date(thisMonday)
-      startMonday.setDate(startMonday.getDate() - 11 * 7) // 12 semaines au total, incluse la semaine en cours
+      startMonday.setDate(startMonday.getDate() - (WEEKS_COUNT - 1) * 7) // WEEKS_COUNT semaines au total, incluse la semaine en cours
 
       const { data } = await supabase
         .from('session_completions')
@@ -40,7 +52,7 @@ export default function WeeklyVolumeChart({ userId }) {
 
       if (cancelled) return
 
-      const buckets = Array.from({ length: 12 }, (_, i) => {
+      const buckets = Array.from({ length: WEEKS_COUNT }, (_, i) => {
         const monday = new Date(startMonday)
         monday.setDate(monday.getDate() + i * 7)
         return { monday, course: 0, natation: 0, velo: 0 }
@@ -49,7 +61,7 @@ export default function WeeklyVolumeChart({ userId }) {
       ;(data || []).forEach(c => {
         const d = new Date(c.completed_at)
         const idx = Math.floor((d - startMonday) / (7 * 24 * 3600 * 1000))
-        if (idx < 0 || idx > 11) return
+        if (idx < 0 || idx > WEEKS_COUNT - 1) return
         const bucket = buckets[idx]
         if (c.sport === 'natation') {
           bucket.natation += Number(c.distance_km) || 0
@@ -77,7 +89,7 @@ export default function WeeklyVolumeChart({ userId }) {
     <div className="card" style={{ padding: '1.25rem', marginBottom: '1.5rem' }}>
       <h4 style={{ marginBottom: '.25rem' }}>📊 Volume hebdomadaire</h4>
       <p style={{ fontSize: '.78rem', color: 'var(--text-muted)', marginBottom: hasAnyData ? '1.5rem' : '0' }}>
-        12 dernières semaines, par discipline
+        20 dernières semaines, par discipline
       </p>
 
       {!hasAnyData ? (
@@ -86,21 +98,21 @@ export default function WeeklyVolumeChart({ userId }) {
         </p>
       ) : (
         <>
-          <div style={{ display: 'flex', alignItems: 'flex-end', gap: '.6rem', height: 150, overflowX: 'auto', paddingBottom: '.25rem' }}>
+          <div style={{ display: 'flex', alignItems: 'flex-end', gap: '.5rem', height: 165, overflowX: 'auto', paddingBottom: '.25rem' }}>
             {weeks.map((w, i) => (
-              <div key={i} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '.4rem', flexShrink: 0, minWidth: 44 }}>
+              <div key={i} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '.4rem', flexShrink: 0, minWidth: 58 }}>
                 <div style={{ display: 'flex', alignItems: 'flex-end', gap: 3, height: 112 }}>
                   {ORDER.map(k => {
                     const h = w[k] > 0 ? Math.max(3, (w[k] / maxVal) * 112) : 2
                     return (
-                      <div key={k} title={`${LABELS[k]} — semaine du ${fmtDay(w.monday)} : ${w[k].toFixed(1)} km`}
+                      <div key={k} title={`${LABELS[k]} — semaine du ${fmtRange(w.monday)} : ${w[k].toFixed(1)} km`}
                         style={{ width: 10, height: h, borderRadius: '3px 3px 0 0',
                           background: COLORS[k], opacity: w[k] > 0 ? 1 : .15,
                           transition: 'height .3s ease' }} />
                     )
                   })}
                 </div>
-                <span style={{ fontSize: '.6rem', color: 'var(--text-muted)', whiteSpace: 'nowrap' }}>{fmtDay(w.monday)}</span>
+                <span style={{ fontSize: '.58rem', color: 'var(--text-muted)', textAlign: 'center', lineHeight: 1.3, maxWidth: 58 }}>{fmtRange(w.monday)}</span>
               </div>
             ))}
           </div>
