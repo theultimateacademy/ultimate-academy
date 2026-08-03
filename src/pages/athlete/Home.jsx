@@ -351,7 +351,6 @@ export default function AthleteHome() {
   const [plan,          setPlan]          = useState(null)
   const [nextSession,   setNextSession]   = useState(null)
   const [weekProgress,  setWeekProgress]  = useState({ done: 0, total: 0 })
-  const [lastMessage,   setLastMessage]   = useState(null)
   const [loading,       setLoading]       = useState(true)
   const [analysis,         setAnalysis]         = useState(null)
   const [analysisOpen,     setAnalysisOpen]     = useState(false)
@@ -380,10 +379,9 @@ export default function AthleteHome() {
 
       const basePromises = [
         supabase.from('training_plans').select('*').eq('user_id', profile.id).eq('status', 'active').single(),
-        supabase.from('messages').select('*').eq('user_id', profile.id).eq('sender', 'coach').order('created_at', { ascending: false }).limit(1),
         supabase.from('weekly_analyses').select('*').eq('user_id', profile.id).eq('status', 'sent').order('created_at', { ascending: false }).limit(3)
       ]
-      const [{ data: plans }, { data: msgs }, { data: analyses }] = await Promise.all(basePromises)
+      const [{ data: plans }, { data: analyses }] = await Promise.all(basePromises)
 
       // Pre-race analysis: load when 1-7 days before race
       if (rawD !== null && rawD >= 1 && rawD <= 7) {
@@ -400,7 +398,6 @@ export default function AthleteHome() {
       }
 
       setPlan(plans)
-      setLastMessage(msgs?.[0] || null)
       const weeklyA   = (analyses || []).find(a => !a.analysis_data?.is_monthly)
       const monthlyA  = (analyses || []).find(a =>  a.analysis_data?.is_monthly)
       setAnalysis(weeklyA || null)
@@ -849,54 +846,6 @@ export default function AthleteHome() {
       {/* Modale analyse mensuelle */}
       {monthlyOpen && monthlyAnalysis && (
         <MonthlyAnalysisModal analysis={monthlyAnalysis} onClose={() => setMonthlyOpen(false)} />
-      )}
-
-      {/* Monthly message from coach (from plan_data) */}
-      {plan?.plan_data?.message_du_mois && (
-        <div style={{ marginBottom: '1.5rem' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '.75rem' }}>
-            <h3>Message du mois</h3>
-            <button className="btn btn-ghost btn-sm" onClick={() => navigate('/app/messages')}>
-              Messages →
-            </button>
-          </div>
-          <div className="card" style={{
-            background: 'linear-gradient(135deg, rgba(139,47,201,.12), rgba(190,24,93,.08))',
-            border: '1px solid rgba(139,47,201,.25)',
-          }}>
-            <div style={{ display: 'flex', gap: '.75rem', alignItems: 'flex-start' }}>
-              <img src="/Coach.JPG" alt="Alexis" style={{ width: 40, height: 40, borderRadius: '50%', objectFit: 'cover', flexShrink: 0, border: '2px solid rgba(139,47,201,.4)' }} />
-              <div>
-                <div style={{ fontWeight: 700, fontSize: '.875rem', marginBottom: '.375rem', color: 'var(--primary)' }}>Alexis · Message du mois</div>
-                <p style={{ fontSize: '.9375rem', lineHeight: 1.65, fontStyle: 'italic' }}>{plan.plan_data.message_du_mois}</p>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Last message from coach (fallback when no monthly message) */}
-      {!plan?.plan_data?.message_du_mois && lastMessage && (
-        <div style={{ marginBottom: '1.5rem' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '.75rem' }}>
-            <h3>Message de ton coach</h3>
-            <button className="btn btn-ghost btn-sm" onClick={() => navigate('/app/messages')}>
-              Voir tout →
-            </button>
-          </div>
-          <div className="card">
-            <div style={{ display: 'flex', gap: '.75rem', alignItems: 'flex-start' }}>
-              <img src="/Coach.JPG" alt="Alexis" style={{ width: 32, height: 32, borderRadius: '50%', objectFit: 'cover', flexShrink: 0 }} />
-              <div>
-                <div style={{ fontWeight: 600, fontSize: '.875rem', marginBottom: '.25rem' }}>Alexis</div>
-                <p style={{ fontSize: '.9375rem', lineHeight: 1.6 }}>{lastMessage.content}</p>
-                <div style={{ fontSize: '.75rem', color: 'var(--text-muted)', marginTop: '.35rem' }}>
-                  {new Date(lastMessage.created_at).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long' })}
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
       )}
 
       {!plan && !loading && (

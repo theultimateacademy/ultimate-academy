@@ -48,7 +48,7 @@ export const api = {
   getProfile:               (userId) => request(`/api/profile/${userId}`),
   updateProfile:            (body)   => request('/api/profile/update',               { method: 'POST', body }),
   weeklyFeedback:    (body)   => request('/api/admin/weekly-feedback',        { method: 'POST', body }),
-  periodAlert:       (body)   => request('/api/admin/period-alert',           { method: 'POST', body }),
+  periodAlert:       (body)   => request('/api/plans/period-alert',           { method: 'POST', body }),
   stravaConnect:     (userId) => `${API_URL}/auth/strava?userId=${userId}`,
   stravaImport:      (body)   => request('/api/strava/import',                { method: 'POST', body }),
   stravaDisconnect:  (body)   => request('/api/strava/disconnect',            { method: 'POST', body }),

@@ -4,7 +4,7 @@ import { supabase } from '../lib/supabase'
 const COLORS = { course: '#10B981', natation: '#3B82F6', velo: '#F97316' }
 const LABELS = { course: 'Course', natation: 'Natation', velo: 'Vélo' }
 const ORDER  = ['course', 'natation', 'velo']
-const WEEKS_COUNT = 20
+const WEEKS_COUNT = 16
 
 function mondayOf(date) {
   const d = new Date(date)
@@ -89,7 +89,7 @@ export default function WeeklyVolumeChart({ userId }) {
     <div className="card" style={{ padding: '1.25rem', marginBottom: '1.5rem' }}>
       <h4 style={{ marginBottom: '.25rem' }}>📊 Volume hebdomadaire</h4>
       <p style={{ fontSize: '.78rem', color: 'var(--text-muted)', marginBottom: hasAnyData ? '1.5rem' : '0' }}>
-        20 dernières semaines, par discipline
+        16 dernières semaines, par discipline
       </p>
 
       {!hasAnyData ? (
@@ -112,7 +112,9 @@ export default function WeeklyVolumeChart({ userId }) {
                     )
                   })}
                 </div>
-                <span style={{ fontSize: '.58rem', color: 'var(--text-muted)', textAlign: 'center', lineHeight: 1.3, maxWidth: 58 }}>{fmtRange(w.monday)}</span>
+                <div style={{ height: 28, display: 'flex', alignItems: 'flex-start', justifyContent: 'center' }}>
+                  <span style={{ fontSize: '.58rem', color: 'var(--text-muted)', textAlign: 'center', lineHeight: 1.3, maxWidth: 58 }}>{fmtRange(w.monday)}</span>
+                </div>
               </div>
             ))}
           </div>
