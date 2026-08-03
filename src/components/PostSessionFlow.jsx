@@ -414,6 +414,11 @@ export default function PostSessionFlow({
         if (p.min || p.sec) parts.push(`[${title}: ${p.min||'0'}'${String(p.sec||'0').padStart(2,'0')}"/km]`)
       }
     })
+    // Séance sans BLOC détecté (footing, EF simple…) — allure moyenne saisie via le champ de secours
+    if (!hasBlocs) {
+      const p = singleFor(0)
+      if (p.min || p.sec) parts.push(`[Allure moyenne: ${p.min||'0'}'${String(p.sec||'0').padStart(2,'0')}"/km]`)
+    }
     if (!isNonRunning) {
       if (cdPaceMin || cdPaceSec)
         parts.push(`[RAC: ${cdPaceMin||'0'}'${String(cdPaceSec||'0').padStart(2,'0')}"]`)
