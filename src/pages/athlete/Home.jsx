@@ -361,6 +361,7 @@ export default function AthleteHome() {
   const [hasPostRace,      setHasPostRace]      = useState(false)
   const [bilanSubmitted,   setBilanSubmitted]   = useState(false)
   const [bilanWeekNum,     setBilanWeekNum]     = useState(null)  // semaine dont le bilan est à remplir (semaine précédente)
+  const [bilanPlanId,      setBilanPlanId]      = useState(null)  // plan auquel se rattache ce bilan (peut être l'ancien plan tout juste terminé)
   const [currentWeekNum,   setCurrentWeekNum]   = useState(null)
 
   useEffect(() => {
@@ -465,6 +466,7 @@ export default function AthleteHome() {
 
             const prevWeekNum = isSundayOrLater ? weeksElapsed : weeksElapsed - 1
             if (prevWeekNum >= 1) {
+              setBilanPlanId(plans.id)
               setBilanWeekNum(prevWeekNum)
               supabase
                 .from('weekly_bilans')
@@ -476,6 +478,36 @@ export default function AthleteHome() {
                 .then(({ data: existingBilan }) => {
                   if (existingBilan) setBilanSubmitted(true)
                 })
+            } else {
+              // Le plan actif vient de démarrer (semaine 1) — pas de "semaine précédente" dans CE plan,
+              // mais le plan qui vient de se terminer peut encore avoir un bilan de sa dernière semaine
+              // jamais rempli. On ne veut pas le faire disparaître juste parce qu'un nouveau plan a démarré.
+              const { data: prevPlan } = await supabase
+                .from('training_plans')
+                .select('id, plan_data')
+                .eq('user_id', profile.id)
+                .eq('status', 'completed')
+                .order('created_at', { ascending: false })
+                .limit(1)
+                .maybeSingle()
+
+              if (prevPlan) {
+                const prevWeeks = prevPlan.plan_data?.semaines || []
+                const lastWeekNum = prevWeeks.length ? Math.max(...prevWeeks.map(w => w.numero)) : null
+                if (lastWeekNum) {
+                  const { data: existingBilan } = await supabase
+                    .from('weekly_bilans')
+                    .select('id')
+                    .eq('user_id', profile.id)
+                    .eq('plan_id', prevPlan.id)
+                    .eq('week_number', lastWeekNum)
+                    .maybeSingle()
+                  if (!existingBilan) {
+                    setBilanPlanId(prevPlan.id)
+                    setBilanWeekNum(lastWeekNum)
+                  }
+                }
+              }
             }
 
             const next = seancesWithIdx.find(s => !doneIdxs.has(s._origIdx))
@@ -592,16 +624,16 @@ export default function AthleteHome() {
       <WeeklyVolumeChart userId={profile.id} />
 
       {/* Bilan hebdomadaire semaine précédente — s'affiche tant qu'il n'est pas rempli */}
-      {plan && bilanWeekNum && !bilanSubmitted && (
+      {bilanPlanId && bilanWeekNum && !bilanSubmitted && (
         <BilanHebdo
-          planId={plan.id}
+          planId={bilanPlanId}
           weekNumber={bilanWeekNum}
           onSubmitted={() => setBilanSubmitted(true)}
         />
       )}
 
       {/* Confirmation bilan soumis */}
-      {plan && bilanWeekNum && bilanSubmitted && (
+      {bilanPlanId && bilanWeekNum && bilanSubmitted && (
         <div style={{
           background: 'rgba(16,185,129,.08)', border: '1px solid rgba(16,185,129,.25)',
           borderRadius: 14, padding: '.875rem 1.25rem', marginBottom: '1.5rem',
