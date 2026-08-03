@@ -417,7 +417,7 @@ export default function PostSessionFlow({
     // Séance sans BLOC détecté (footing, EF simple…) — allure moyenne saisie via le champ de secours
     if (!hasBlocs) {
       const p = singleFor(0)
-      if (p.min || p.sec) parts.push(`[Allure moyenne: ${p.min||'0'}'${String(p.sec||'0').padStart(2,'0')}"/km]`)
+      if (p.min || p.sec) parts.push(`[Corps: ${p.min||'0'}'${String(p.sec||'0').padStart(2,'0')}"/km]`)
     }
     if (!isNonRunning) {
       if (cdPaceMin || cdPaceSec)

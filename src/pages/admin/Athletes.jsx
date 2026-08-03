@@ -300,25 +300,56 @@ function getSessionColor(type) {
   return '#10B981'
 }
 
+// Parse générique de toutes les balises [Label: valeur] du commentaire — plutôt que de
+// coder en dur le texte exact de chaque label (fragile dès que buildComment() évolue,
+// ex: "[6×500m — Intervalles: ...]" pour un bloc à répétitions), on capture tout groupe
+// entre crochets et on classe les labels connus (Ressenti/Ech/RAC/FC/Corps) ; tout le
+// reste est traité comme un bloc/section réalisé (fractionné, côtes, tempo, allure
+// spécifique de sortie longue, etc.), quel que soit son intitulé exact.
 function parseRetourComment(comment) {
   if (!comment) return {}
-  const r = {}
-  const match = (re) => { const m = comment.match(re); return m ? m[1].trim() : null }
-  r.ressenti = match(/\[Ressenti:\s*([^\]]+)\]/)
-  r.ech      = match(/\[Ech:\s*([^\]]+)\]/)
-  // Format: [Blocs: ...] (old) ou [Blocs 7×300m: ...] (nouveau avec label)
-  const blocsAll = [...comment.matchAll(/\[Blocs([^\]:]*):\s*([^\]]+)\]/g)]
-  r.blocsData = blocsAll.map(m => ({
-    label: m[1].trim(),
-    items: m[2].split('|').map(b => b.trim()).filter(Boolean),
-  }))
+  const r = { blocsData: [] }
+  const groups = [...comment.matchAll(/\[([^\]]+)\]/g)].map(m => m[1])
+  for (const g of groups) {
+    const idx = g.indexOf(':')
+    if (idx === -1) continue
+    const label = g.slice(0, idx).trim()
+    const value = g.slice(idx + 1).trim()
+    const key   = label.toLowerCase()
+    if (key === 'ressenti')      r.ressenti = value
+    else if (key === 'ech')      r.ech = value
+    else if (key === 'rac')      r.rac = value
+    else if (key === 'fc moy')   r.fcMoy = value
+    else if (key === 'fc max')   r.fcMax = value
+    else if (key === 'corps')    r.corps = value
+    else r.blocsData.push({ label, items: value.split('|').map(b => b.trim()).filter(Boolean) })
+  }
   r.blocs = r.blocsData.flatMap(b => b.items)
-  r.corps  = match(/\[Corps:\s*([^\]]+)\]/)
-  r.rac    = match(/\[RAC:\s*([^\]]+)\]/)
-  r.fcMoy  = match(/\[FC moy:\s*([^\]]+)\]/)
-  r.fcMax  = match(/\[FC max:\s*([^\]]+)\]/)
-  r.text   = comment.replace(/\[[^\]]*\]/g, '').trim()
+  r.text  = comment.replace(/\[[^\]]*\]/g, '').trim()
   return r
+}
+
+// Durée en minutes → "1h25" ou "45 min"
+function fmtCompletionDuration(min) {
+  if (!min) return null
+  const h = Math.floor(min / 60)
+  const m = Math.round(min % 60)
+  if (h === 0) return `${m} min`
+  return m === 0 ? `${h}h` : `${h}h${String(m).padStart(2, '0')}`
+}
+
+// Allure/vitesse moyenne réelle à partir de la distance et de la durée saisies
+function fmtCompletionPace(sport, km, durMin) {
+  if (!km || !durMin) return null
+  if (sport === 'natation') {
+    const paceSec = (durMin * 60) / (km * 10)
+    const m = Math.floor(paceSec / 60), s = Math.round(paceSec % 60)
+    return `${m}'${String(s).padStart(2, '0')}"/100m`
+  }
+  if (sport === 'velo') return `${(km / (durMin / 60)).toFixed(1)} km/h`
+  const paceSec = (durMin * 60) / km
+  const m = Math.floor(paceSec / 60), s = Math.round(paceSec % 60)
+  return `${m}'${String(s).padStart(2, '0')}"/km`
 }
 
 const TYPE_COLORS = {
@@ -2369,6 +2400,61 @@ CREATE POLICY "Athletes read own" ON public.weekly_bilans
                         <div style={{ height:'100%', width:`${rpe*10}%`,
                           background:`linear-gradient(90deg, ${rc}99, ${rc})`, borderRadius:99 }} />
                       </div>
+                    </div>
+                  )}
+
+                  {/* Volume réalisé — distance/durée réelles saisies en fin de séance */}
+                  {(c.distance_km || c.distance_km_bike || c.duree_reelle_min || c.duree_bike_min) && (
+                    <div style={{ marginBottom:'.85rem' }}>
+                      <div style={{ fontSize:'.58rem', fontWeight:800, textTransform:'uppercase',
+                        letterSpacing:'.08em', color:`${rc}cc`, marginBottom:'.4rem' }}>Volume réalisé</div>
+                      {c.sport === 'brique' ? (
+                        <div style={{ display:'flex', flexDirection:'column', gap:'.4rem' }}>
+                          {(c.distance_km_bike || c.duree_bike_min) && (
+                            <div style={{ display:'flex', alignItems:'center', gap:'.5rem', background:'rgba(249,115,22,.1)',
+                              border:'1px solid rgba(249,115,22,.25)', borderRadius:10, padding:'.5rem .7rem' }}>
+                              <span style={{ fontSize:'.85rem' }}>🚴</span>
+                              <span style={{ fontSize:'.85rem', fontWeight:800, color:'#fff' }}>
+                                {c.distance_km_bike ? `${c.distance_km_bike} km` : ''}
+                                {c.distance_km_bike && c.duree_bike_min ? ' · ' : ''}
+                                {c.duree_bike_min ? fmtCompletionDuration(c.duree_bike_min) : ''}
+                              </span>
+                              {fmtCompletionPace('velo', c.distance_km_bike, c.duree_bike_min) && (
+                                <span style={{ marginLeft:'auto', fontSize:'.75rem', fontWeight:700, color:'#FDBA74' }}>
+                                  {fmtCompletionPace('velo', c.distance_km_bike, c.duree_bike_min)}
+                                </span>
+                              )}
+                            </div>
+                          )}
+                          {(c.distance_km || c.duree_reelle_min) && (
+                            <div style={{ display:'flex', alignItems:'center', gap:'.5rem', background:'rgba(16,185,129,.1)',
+                              border:'1px solid rgba(16,185,129,.25)', borderRadius:10, padding:'.5rem .7rem' }}>
+                              <span style={{ fontSize:'.85rem' }}>🏃</span>
+                              <span style={{ fontSize:'.85rem', fontWeight:800, color:'#fff' }}>
+                                {c.distance_km ? `${c.distance_km} km` : ''}
+                                {c.distance_km && c.duree_reelle_min ? ' · ' : ''}
+                                {c.duree_reelle_min ? fmtCompletionDuration(c.duree_reelle_min) : ''}
+                              </span>
+                              {fmtCompletionPace('course', c.distance_km, c.duree_reelle_min) && (
+                                <span style={{ marginLeft:'auto', fontSize:'.75rem', fontWeight:700, color:'#6EE7B7' }}>
+                                  {fmtCompletionPace('course', c.distance_km, c.duree_reelle_min)}
+                                </span>
+                              )}
+                            </div>
+                          )}
+                        </div>
+                      ) : (
+                        <div style={{ display:'flex', alignItems:'center', gap:'.6rem', flexWrap:'wrap', background:`${rc}12`,
+                          border:`1px solid ${rc}30`, borderRadius:10, padding:'.5rem .7rem' }}>
+                          {c.distance_km != null && <span style={{ fontSize:'.85rem', fontWeight:800, color:'#fff' }}>📍 {c.distance_km} km</span>}
+                          {c.duree_reelle_min != null && <span style={{ fontSize:'.85rem', fontWeight:800, color:'#fff' }}>⏱ {fmtCompletionDuration(c.duree_reelle_min)}</span>}
+                          {fmtCompletionPace(c.sport, c.distance_km, c.duree_reelle_min) && (
+                            <span style={{ marginLeft:'auto', fontSize:'.75rem', fontWeight:700, color:rc }}>
+                              {fmtCompletionPace(c.sport, c.distance_km, c.duree_reelle_min)}
+                            </span>
+                          )}
+                        </div>
+                      )}
                     </div>
                   )}
 
