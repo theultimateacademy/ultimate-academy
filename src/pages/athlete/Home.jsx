@@ -544,6 +544,53 @@ export default function AthleteHome() {
         )}
       </div>
 
+      {/* Analyse — trigger compact */}
+      {analysis && (() => {
+        const d    = analysis.analysis_data || {}
+        const mood = d.mood || 'good'
+        const MOOD = { fire: { icon: '🔥', color: '#F97316' }, good: { icon: '💪', color: '#10B981' }, ok: { icon: '👌', color: '#3B82F6' }, attention: { icon: '⚠️', color: '#F59E0B' } }
+        const m    = MOOD[mood] || MOOD.good
+        const sessions   = d.sessions || d.sessions_comments || []
+        const doneReal   = sessions.filter(s => s.done).length
+        const totalCount = sessions.length
+        return (
+          <div style={{ marginBottom: '1.5rem' }}>
+            <button
+              onClick={() => setAnalysisOpen(true)}
+              style={{
+                width: '100%', background: 'none', border: 'none', padding: 0, cursor: 'pointer', fontFamily: 'inherit', textAlign: 'left',
+              }}>
+              <div style={{
+                display: 'flex', alignItems: 'center', gap: '.875rem',
+                background: `linear-gradient(135deg, ${m.color}14, rgba(255,255,255,.02))`,
+                border: `1px solid ${m.color}35`, borderRadius: 14,
+                padding: '.875rem 1.1rem',
+                transition: 'transform .15s, box-shadow .15s',
+              }}
+                onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-1px)'; e.currentTarget.style.boxShadow = `0 6px 24px ${m.color}22` }}
+                onMouseLeave={e => { e.currentTarget.style.transform = ''; e.currentTarget.style.boxShadow = '' }}>
+                <div style={{ fontSize: '1.6rem', lineHeight: 1, flexShrink: 0 }}>{m.icon}</div>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{ fontWeight: 800, fontSize: '.88rem', color: '#fff', marginBottom: '.15rem' }}>
+                    Analyse de la semaine {analysis.week_number}
+                  </div>
+                  <div style={{ fontSize: '.75rem', color: 'rgba(255,255,255,.4)' }}>
+                    {doneReal}/{totalCount} séances effectuées
+                  </div>
+                </div>
+                {d.rpe_moyen && (
+                  <div style={{ textAlign: 'center', flexShrink: 0, background: rpeBg(d.rpe_moyen), border: `1px solid ${rpeColor(d.rpe_moyen)}30`, borderRadius: 8, padding: '.3rem .6rem' }}>
+                    <div style={{ fontSize: '1rem', fontWeight: 900, color: rpeColor(d.rpe_moyen), lineHeight: 1 }}>{d.rpe_moyen}</div>
+                    <div style={{ fontSize: '.58rem', color: 'rgba(255,255,255,.3)' }}>RPE</div>
+                  </div>
+                )}
+                <div style={{ color: m.color, fontSize: '1rem', flexShrink: 0 }}>›</div>
+              </div>
+            </button>
+          </div>
+        )
+      })()}
+
       {/* Stats row */}
       {plan && (
         <div className="grid-3 stat-cards-3" style={{ marginBottom: '1.5rem' }}>
@@ -757,53 +804,6 @@ export default function AthleteHome() {
           </div>
         </div>
       )}
-
-      {/* Analyse — trigger compact */}
-      {analysis && (() => {
-        const d    = analysis.analysis_data || {}
-        const mood = d.mood || 'good'
-        const MOOD = { fire: { icon: '🔥', color: '#F97316' }, good: { icon: '💪', color: '#10B981' }, ok: { icon: '👌', color: '#3B82F6' }, attention: { icon: '⚠️', color: '#F59E0B' } }
-        const m    = MOOD[mood] || MOOD.good
-        const sessions   = d.sessions || d.sessions_comments || []
-        const doneReal   = sessions.filter(s => s.done).length
-        const totalCount = sessions.length
-        return (
-          <div style={{ marginBottom: '1.5rem' }}>
-            <button
-              onClick={() => setAnalysisOpen(true)}
-              style={{
-                width: '100%', background: 'none', border: 'none', padding: 0, cursor: 'pointer', fontFamily: 'inherit', textAlign: 'left',
-              }}>
-              <div style={{
-                display: 'flex', alignItems: 'center', gap: '.875rem',
-                background: `linear-gradient(135deg, ${m.color}14, rgba(255,255,255,.02))`,
-                border: `1px solid ${m.color}35`, borderRadius: 14,
-                padding: '.875rem 1.1rem',
-                transition: 'transform .15s, box-shadow .15s',
-              }}
-                onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-1px)'; e.currentTarget.style.boxShadow = `0 6px 24px ${m.color}22` }}
-                onMouseLeave={e => { e.currentTarget.style.transform = ''; e.currentTarget.style.boxShadow = '' }}>
-                <div style={{ fontSize: '1.6rem', lineHeight: 1, flexShrink: 0 }}>{m.icon}</div>
-                <div style={{ flex: 1, minWidth: 0 }}>
-                  <div style={{ fontWeight: 800, fontSize: '.88rem', color: '#fff', marginBottom: '.15rem' }}>
-                    Analyse de la semaine {analysis.week_number}
-                  </div>
-                  <div style={{ fontSize: '.75rem', color: 'rgba(255,255,255,.4)' }}>
-                    {doneReal}/{totalCount} séances effectuées
-                  </div>
-                </div>
-                {d.rpe_moyen && (
-                  <div style={{ textAlign: 'center', flexShrink: 0, background: rpeBg(d.rpe_moyen), border: `1px solid ${rpeColor(d.rpe_moyen)}30`, borderRadius: 8, padding: '.3rem .6rem' }}>
-                    <div style={{ fontSize: '1rem', fontWeight: 900, color: rpeColor(d.rpe_moyen), lineHeight: 1 }}>{d.rpe_moyen}</div>
-                    <div style={{ fontSize: '.58rem', color: 'rgba(255,255,255,.3)' }}>RPE</div>
-                  </div>
-                )}
-                <div style={{ color: m.color, fontSize: '1rem', flexShrink: 0 }}>›</div>
-              </div>
-            </button>
-          </div>
-        )
-      })()}
 
       {/* Modale analyse immersive */}
       {analysisOpen && analysis && (
