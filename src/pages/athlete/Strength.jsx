@@ -3949,11 +3949,6 @@ const CATEGORIES = [
   { id: 'full_body_cat',          name: 'Full Body',                    emoji: '🔥', color: '#F97316', sessionIds: ['full_body', 'full_body_hiit', 'full_body_force', 'circuit_metabolique', 'full_body_poids_corps', 'full_body_kettlebell', 'cross_training'] },
 ]
 
-/* ─── Flat exercise list for search ─────────────────────────────────── */
-const ALL_EXERCISES_FLAT = SESSIONS.flatMap(s =>
-  s.exercises.map(ex => ({ ...ex, sessionColor: s.color, sessionName: s.name }))
-)
-
 /* ─── Page ──────────────────────────────────────────────────────────── */
 export default function AthleteStrength() {
   const [activeCategory,    setActiveCategory]    = useState(null)
@@ -3983,13 +3978,18 @@ export default function AthleteStrength() {
   const searchQuery = search.trim().toLowerCase()
   const searchResults = useMemo(() => {
     if (!searchQuery) return []
-    return ALL_EXERCISES_FLAT.filter(ex =>
-      ex.name.toLowerCase().includes(searchQuery) ||
-      ex.type.toLowerCase().includes(searchQuery) ||
-      ex.muscles?.some(m => m.toLowerCase().includes(searchQuery)) ||
-      ex.sessionName.toLowerCase().includes(searchQuery)
+    return SESSIONS.filter(s =>
+      s.name.toLowerCase().includes(searchQuery) ||
+      s.subtitle.toLowerCase().includes(searchQuery)
     )
   }, [searchQuery])
+
+  function selectSessionFromSearch(sessionId) {
+    const category = CATEGORIES.find(c => c.sessionIds.includes(sessionId))
+    if (category) setActiveCategory(category.id)
+    setActiveSession(sessionId)
+    setSearch('')
+  }
 
   return (
     <div className="page">
@@ -4019,13 +4019,13 @@ export default function AthleteStrength() {
             fontSize: '1rem', pointerEvents: 'none' }}>🔍</span>
           <input
             type="text"
-            placeholder="Rechercher un exercice, un muscle, un type…"
+            placeholder="Rechercher une séance (ex : Gainage & Stabilité)…"
             value={search}
             onChange={e => setSearch(e.target.value)}
             style={{
               width: '100%', padding: '.65rem .875rem .65rem 2.5rem',
               borderRadius: 'var(--radius)', border: '1.5px solid var(--border)',
-              background: 'var(--surface)', fontFamily: 'inherit', fontSize: '.9rem',
+              background: 'var(--surface)', color: 'var(--text)', fontFamily: 'inherit', fontSize: '.9rem',
               outline: 'none', boxSizing: 'border-box',
             }}
             onFocus={e => e.target.style.borderColor = 'var(--primary)'}
@@ -4047,27 +4047,50 @@ export default function AthleteStrength() {
           {searchResults.length === 0 ? (
             <div style={{ padding: '1.5rem', textAlign: 'center', color: 'var(--text-muted)',
               background: 'var(--surface-2)', borderRadius: 'var(--radius)', fontSize: '.9rem' }}>
-              Aucun exercice trouvé pour "{search}"
+              Aucune séance trouvée pour "{search}"
             </div>
           ) : (
             <>
               <div style={{ fontSize: '.8rem', color: 'var(--text-muted)', marginBottom: '.75rem' }}>
-                {searchResults.length} exercice{searchResults.length > 1 ? 's' : ''}
+                {searchResults.length} séance{searchResults.length > 1 ? 's' : ''}
               </div>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '.75rem' }}>
-                {searchResults.map((ex, i) => (
-                  <div key={i}>
-                    <div style={{ fontSize: '.72rem', fontWeight: 700, color: ex.sessionColor,
-                      marginBottom: '.3rem', textTransform: 'uppercase', letterSpacing: '.04em' }}>
-                      {ex.sessionName}
+                {searchResults.map(s => {
+                  const done = completedSessions.includes(s.id)
+                  return (
+                    <div key={s.id} className="card"
+                      style={{
+                        display: 'flex', alignItems: 'center', gap: '1rem',
+                        cursor: 'pointer', borderLeft: `4px solid ${s.color}`,
+                        opacity: done ? .75 : 1,
+                        transition: 'transform .15s, box-shadow .15s'
+                      }}
+                      onClick={() => selectSessionFromSearch(s.id)}
+                      onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.boxShadow = 'var(--shadow-lg)' }}
+                      onMouseLeave={e => { e.currentTarget.style.transform = ''; e.currentTarget.style.boxShadow = '' }}>
+                      <div style={{
+                        width: 60, height: 60, borderRadius: 16, flexShrink: 0,
+                        background: `linear-gradient(135deg, ${s.color}18, ${s.color}38)`,
+                        display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.75rem'
+                      }}>
+                        {s.emoji}
+                      </div>
+                      <div style={{ flex: 1, minWidth: 0 }}>
+                        <div style={{ fontWeight: 700, marginBottom: '.2rem' }}>{s.name}</div>
+                        <div style={{ fontSize: '.8rem', color: 'var(--text-muted)', marginBottom: '.3rem' }}>
+                          {s.subtitle}
+                        </div>
+                        <div style={{ fontSize: '.75rem', fontWeight: 600, color: s.color }}>
+                          ⏱ {s.duration} · {s.exercises.length} exercices
+                        </div>
+                      </div>
+                      <div style={{ flexShrink: 0, display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '.3rem' }}>
+                        {done && <span className="badge badge-success">✅</span>}
+                        <span style={{ color: 'var(--text-muted)' }}>›</span>
+                      </div>
                     </div>
-                    <ExerciseCard
-                      exercise={ex}
-                      sessionColor={ex.sessionColor}
-                      onSelect={e => { setSelectedExColor(ex.sessionColor); setSelectedExercise(e) }}
-                    />
-                  </div>
-                ))}
+                  )
+                })}
               </div>
             </>
           )}
