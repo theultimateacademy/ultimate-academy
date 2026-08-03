@@ -1200,6 +1200,17 @@ const SESSIONS = [
   },
 ]
 
+/* ─── Grandes catégories (groupes musculaires) ───────────────────────── */
+const CATEGORIES = [
+  { id: 'abdos_gainage',          name: 'Abdos & Gainage',              emoji: '🎯', color: '#8B2FC9', sessionIds: ['core_abdo', 'gainage', 'pilates'] },
+  { id: 'fessiers_ischio',        name: 'Fessiers & Ischio-jambiers',   emoji: '🍑', color: '#10B981', sessionIds: ['fessiers', 'excentrique'] },
+  { id: 'jambes_genoux',          name: 'Jambes & Genoux',              emoji: '🦵', color: '#E8237A', sessionIds: ['force', 'quadriceps'] },
+  { id: 'haut_corps_cat',         name: 'Haut du Corps',                emoji: '💪', color: '#0EA5E9', sessionIds: ['haut_corps'] },
+  { id: 'explosivite_equilibre',  name: 'Explosivité & Équilibre',      emoji: '⚡', color: '#F59E0B', sessionIds: ['explosivite', 'proprioception'] },
+  { id: 'mobilite_cat',           name: 'Mobilité & Récupération',      emoji: '🌊', color: '#6B7280', sessionIds: ['mobilite'] },
+  { id: 'full_body_cat',          name: 'Full Body',                    emoji: '🔥', color: '#F97316', sessionIds: ['full_body'] },
+]
+
 /* ─── Flat exercise list for search ─────────────────────────────────── */
 const ALL_EXERCISES_FLAT = SESSIONS.flatMap(s =>
   s.exercises.map(ex => ({ ...ex, sessionColor: s.color, sessionName: s.name }))
@@ -1207,6 +1218,7 @@ const ALL_EXERCISES_FLAT = SESSIONS.flatMap(s =>
 
 /* ─── Page ──────────────────────────────────────────────────────────── */
 export default function AthleteStrength() {
+  const [activeCategory,    setActiveCategory]    = useState(null)
   const [activeSession,     setActiveSession]     = useState(null)
   const [completedSessions, setCompletedSessions] = useState([])
   const [selectedExercise,  setSelectedExercise]  = useState(null)
@@ -1247,7 +1259,7 @@ export default function AthleteStrength() {
         <div>
           <h2 className="page-heading">Renforcement musculaire</h2>
           <p className="text-muted text-sm" style={{ marginTop: '.25rem' }}>
-            Clique sur une séance puis sur un exercice pour les détails.
+            Clique sur une catégorie, puis sur une séance et un exercice pour les détails.
           </p>
         </div>
         <button
@@ -1324,47 +1336,101 @@ export default function AthleteStrength() {
         </div>
       )}
 
-      {/* Session type cards */}
-      {!activeSession && !searchQuery && (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '.875rem' }}>
-          {SESSIONS.map(s => {
-            const done = completedSessions.includes(s.id)
+      {/* Category tiles (grandes catégories) */}
+      {!activeCategory && !activeSession && !searchQuery && (
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(135px, 1fr))', gap: '.875rem' }}>
+          {CATEGORIES.map(cat => {
+            const sessions = SESSIONS.filter(s => cat.sessionIds.includes(s.id))
+            const totalEx  = sessions.reduce((sum, s) => sum + s.exercises.length, 0)
+            const allDone  = sessions.length > 0 && sessions.every(s => completedSessions.includes(s.id))
             return (
-              <div key={s.id} className="card"
+              <div key={cat.id}
+                onClick={() => setActiveCategory(cat.id)}
                 style={{
-                  display: 'flex', alignItems: 'center', gap: '1rem',
-                  cursor: 'pointer', borderLeft: `4px solid ${s.color}`,
-                  opacity: done ? .75 : 1,
-                  transition: 'transform .15s, box-shadow .15s'
+                  aspectRatio: '1', display: 'flex', flexDirection: 'column', alignItems: 'center',
+                  justifyContent: 'center', gap: '.5rem', padding: '1rem', textAlign: 'center',
+                  cursor: 'pointer', background: 'var(--surface)', border: '1.5px solid var(--border)',
+                  borderRadius: 18, position: 'relative',
+                  transition: 'transform .15s, box-shadow .15s, border-color .15s',
                 }}
-                onClick={() => setActiveSession(s.id)}
-                onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.boxShadow = 'var(--shadow-lg)' }}
-                onMouseLeave={e => { e.currentTarget.style.transform = ''; e.currentTarget.style.boxShadow = '' }}>
+                onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.boxShadow = 'var(--shadow-lg)'; e.currentTarget.style.borderColor = cat.color + '60' }}
+                onMouseLeave={e => { e.currentTarget.style.transform = ''; e.currentTarget.style.boxShadow = ''; e.currentTarget.style.borderColor = 'var(--border)' }}>
+                {allDone && (
+                  <span style={{ position: 'absolute', top: 8, right: 8, fontSize: '.85rem' }}>✅</span>
+                )}
                 <div style={{
-                  width: 60, height: 60, borderRadius: 16, flexShrink: 0,
-                  background: `linear-gradient(135deg, ${s.color}18, ${s.color}38)`,
-                  display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.75rem'
+                  width: 52, height: 52, borderRadius: 14,
+                  background: `linear-gradient(135deg, ${cat.color}18, ${cat.color}38)`,
+                  display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.5rem'
                 }}>
-                  {s.emoji}
+                  {cat.emoji}
                 </div>
-                <div style={{ flex: 1, minWidth: 0 }}>
-                  <div style={{ fontWeight: 700, marginBottom: '.2rem' }}>{s.name}</div>
-                  <div style={{ fontSize: '.8rem', color: 'var(--text-muted)', marginBottom: '.3rem' }}>
-                    {s.subtitle}
-                  </div>
-                  <div style={{ fontSize: '.75rem', fontWeight: 600, color: s.color }}>
-                    ⏱ {s.duration} · {s.exercises.length} exercices
-                  </div>
-                </div>
-                <div style={{ flexShrink: 0, display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '.3rem' }}>
-                  {done && <span className="badge badge-success">✅</span>}
-                  <span style={{ color: 'var(--text-muted)' }}>›</span>
+                <div style={{ fontWeight: 700, fontSize: '.85rem', lineHeight: 1.25 }}>{cat.name}</div>
+                <div style={{ fontSize: '.68rem', color: 'var(--text-muted)' }}>
+                  {sessions.length} séance{sessions.length > 1 ? 's' : ''} · {totalEx} exercices
                 </div>
               </div>
             )
           })}
         </div>
       )}
+
+      {/* Session list within a category */}
+      {activeCategory && !activeSession && !searchQuery && (() => {
+        const category = CATEGORIES.find(c => c.id === activeCategory)
+        const sessions  = SESSIONS.filter(s => category?.sessionIds.includes(s.id))
+        return (
+          <>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '.75rem', marginBottom: '1.25rem' }}>
+              <button onClick={() => setActiveCategory(null)}
+                style={{ padding: '.4rem .8rem', borderRadius: 99, border: '1.5px solid var(--border)',
+                  background: 'var(--surface)', cursor: 'pointer', fontFamily: 'inherit',
+                  fontSize: '.85rem', fontWeight: 600, color: 'var(--text-muted)' }}>
+                ← Catégories
+              </button>
+              <div style={{ fontWeight: 700, fontSize: '.95rem' }}>{category?.emoji} {category?.name}</div>
+            </div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '.875rem' }}>
+              {sessions.map(s => {
+                const done = completedSessions.includes(s.id)
+                return (
+                  <div key={s.id} className="card"
+                    style={{
+                      display: 'flex', alignItems: 'center', gap: '1rem',
+                      cursor: 'pointer', borderLeft: `4px solid ${s.color}`,
+                      opacity: done ? .75 : 1,
+                      transition: 'transform .15s, box-shadow .15s'
+                    }}
+                    onClick={() => setActiveSession(s.id)}
+                    onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.boxShadow = 'var(--shadow-lg)' }}
+                    onMouseLeave={e => { e.currentTarget.style.transform = ''; e.currentTarget.style.boxShadow = '' }}>
+                    <div style={{
+                      width: 60, height: 60, borderRadius: 16, flexShrink: 0,
+                      background: `linear-gradient(135deg, ${s.color}18, ${s.color}38)`,
+                      display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.75rem'
+                    }}>
+                      {s.emoji}
+                    </div>
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <div style={{ fontWeight: 700, marginBottom: '.2rem' }}>{s.name}</div>
+                      <div style={{ fontSize: '.8rem', color: 'var(--text-muted)', marginBottom: '.3rem' }}>
+                        {s.subtitle}
+                      </div>
+                      <div style={{ fontSize: '.75rem', fontWeight: 600, color: s.color }}>
+                        ⏱ {s.duration} · {s.exercises.length} exercices
+                      </div>
+                    </div>
+                    <div style={{ flexShrink: 0, display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '.3rem' }}>
+                      {done && <span className="badge badge-success">✅</span>}
+                      <span style={{ color: 'var(--text-muted)' }}>›</span>
+                    </div>
+                  </div>
+                )
+              })}
+            </div>
+          </>
+        )
+      })()}
 
       {/* Session detail */}
       {activeSession && currentSession && (
