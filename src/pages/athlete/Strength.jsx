@@ -1198,14 +1198,1494 @@ const SESSIONS = [
       },
     ],
   },
+
+  /* ── 13. Gainage Dynamique ────────────────────────────────────────── */
+  {
+    id: 'gainage_dynamique', name: 'Gainage Dynamique', emoji: '🌪️', duration: '25–35 min',
+    subtitle: 'Anti-rotation · core en mouvement · transfert de force',
+    color: '#6366F1',
+    exercises: [
+      {
+        name: 'Renegade Row', emoji: '🏋️', type: 'Isométrique',
+        muscles: ['Core', 'Dos', 'Épaules'],
+        sets: '3', reps: '8 / côté',
+        shortDesc: 'En planche haute mains sur haltères, tirer un haltère vers la hanche sans faire pivoter le bassin',
+        technique: [
+          'Pieds écartés pour une base stable, poids répartis sur les deux mains au sol',
+          'Tirer l\'haltère en gardant les hanches parfaitement carrées, face au sol',
+          'Reposer l\'haltère avec contrôle avant de changer de côté',
+        ],
+        runnerTip: 'Travaille le core en anti-rotation exactement comme il doit stabiliser le bassin contre la rotation du buste à chaque foulée.',
+        progression: 'Augmenter le poids des haltères ou ralentir la phase de repose (3 sec).',
+      },
+      {
+        name: 'Plank to Push-up', emoji: '🤸', type: 'Neuromusculaire',
+        muscles: ['Core', 'Épaules', 'Triceps'],
+        sets: '3', reps: '10',
+        shortDesc: 'Passer de la planche avant-bras à la planche haute bras tendus, sans balancer les hanches',
+        technique: [
+          'Un bras à la fois se pose puis se relève, hanches immobiles tout le mouvement',
+          'Ne jamais laisser le bassin tourner ou s\'affaisser pendant la transition',
+          'Alterner le bras qui commence à chaque répétition',
+        ],
+        runnerTip: 'Renforce le core en résistance à la rotation, un vrai test de stabilité anti-rotation sous charge changeante.',
+        progression: 'Ajouter un temps de maintien de 2 sec en planche haute avant de redescendre.',
+      },
+      {
+        name: 'Windshield Wipers', emoji: '🌀', type: 'Concentrique',
+        muscles: ['Obliques', 'Core', 'Fléchisseurs de hanche'],
+        sets: '3', reps: '10 / côté',
+        shortDesc: 'Sur le dos, jambes tendues en l\'air, les faire basculer de chaque côté sans toucher le sol',
+        technique: [
+          'Bras en croix pour stabiliser le haut du corps, épaules au sol en permanence',
+          'Descendre les jambes le plus loin possible sans les laisser toucher le sol',
+          'Contrôler le retour au centre avec les obliques, pas l\'élan',
+        ],
+        runnerTip: 'Cible les obliques dans un mouvement de rotation contrôlée — utile pour absorber la rotation du bassin en fin de course fatiguée.',
+        progression: 'Jambes fléchies pour débuter, jambes tendues pour progresser, puis ajouter un léger poids entre les pieds.',
+      },
+      {
+        name: 'Pallof Press', emoji: '🎗️', type: 'Isométrique',
+        muscles: ['Core', 'Obliques', 'Épaules'],
+        sets: '3', reps: '12 / côté',
+        shortDesc: 'Élastique fixé sur le côté, pousser les mains devant soi en résistant à la rotation',
+        technique: [
+          'Se placer perpendiculaire au point d\'ancrage, tension de l\'élastique dès le départ',
+          'Pousser droit devant sans laisser le buste tourner vers l\'élastique',
+          'Tenir 2 sec en extension complète avant de revenir lentement',
+        ],
+        runnerTip: 'L\'exercice anti-rotation de référence — exactement la fonction que le core doit remplir à chaque appui pour stabiliser le tronc.',
+        progression: 'Augmenter la résistance de l\'élastique ou faire l\'exercice à genoux pour plus d\'instabilité.',
+      },
+      {
+        name: 'Suitcase Carry', emoji: '🧳', type: 'Isométrique',
+        muscles: ['Obliques', 'Core', 'Avant-bras'],
+        sets: '3', reps: '30 m / côté',
+        shortDesc: 'Marcher en portant une charge lourde d\'un seul côté, buste bien droit',
+        technique: [
+          'Épaules alignées horizontalement, ne pas se pencher du côté de la charge',
+          'Pas courts et contrôlés, core gainé en permanence',
+          'Respirer normalement sans relâcher la tension abdominale',
+        ],
+        runnerTip: 'Renforce la résistance à la flexion latérale du tronc — un core capable de rester droit malgré un déséquilibre limite le tangage à la course.',
+        progression: 'Augmenter la charge progressivement ou allonger la distance de marche.',
+      },
+    ],
+  },
+
+  /* ── 14. Abdos & Obliques Intenses ────────────────────────────────── */
+  {
+    id: 'abdos_obliques', name: 'Abdos & Obliques Intenses', emoji: '🔥', duration: '25–30 min',
+    subtitle: 'Rectus abdominis · obliques · rotation du tronc',
+    color: '#8B2FC9',
+    exercises: [
+      {
+        name: 'Russian Twist', emoji: '🌀', type: 'Concentrique',
+        muscles: ['Obliques', 'Core', 'Fléchisseurs de hanche'],
+        sets: '3', reps: '20 alternés',
+        shortDesc: 'Assis en équilibre sur les ischions, pieds décollés, faire pivoter un poids d\'un côté à l\'autre',
+        technique: [
+          'Buste incliné à 45°, dos droit, ne pas s\'arrondir',
+          'Rotation complète du buste, le poids touche le sol de chaque côté',
+          'Pieds décollés pour la version avancée, au sol pour débuter',
+        ],
+        runnerTip: 'Renforce les obliques dans le plan de rotation, directement transférable à la gestion du balancement du buste en course.',
+        progression: 'Ajouter du poids (médecine-ball, disque) ou décoller davantage les pieds du sol.',
+      },
+      {
+        name: 'Side Plank Rotation', emoji: '📐', type: 'Concentrique',
+        muscles: ['Obliques', 'Core', 'Épaules'],
+        sets: '3', reps: '10 / côté',
+        shortDesc: 'En planche latérale, passer le bras libre sous le corps puis le ramener vers le plafond',
+        technique: [
+          'Hanches levées et stables pendant toute la rotation',
+          'Le bras passe sous le buste (thread the needle) puis remonte en extension complète',
+          'Tempo lent, pas d\'élan pour effectuer la rotation',
+        ],
+        runnerTip: 'Combine gainage latéral et rotation contrôlée — travaille les obliques dans deux fonctions essentielles à la stabilité du buste.',
+        progression: 'Tenir 2 sec en position haute de rotation, ou ajouter un léger poids en main.',
+      },
+      {
+        name: 'Woodchopper élastique', emoji: '🪓', type: 'Concentrique',
+        muscles: ['Obliques', 'Core', 'Épaules'],
+        sets: '3', reps: '12 / côté',
+        shortDesc: 'Élastique fixé en hauteur, tirer en diagonale d\'un côté à la hanche opposée',
+        technique: [
+          'Rotation initiée par les hanches et le tronc, pas seulement les bras',
+          'Jambes légèrement fléchies pour transférer la force du bas vers le haut',
+          'Contrôler le retour à la position de départ sans relâcher brutalement',
+        ],
+        runnerTip: 'Reproduit un schéma de rotation diagonale proche du mouvement combiné bras-tronc de la course rapide.',
+        progression: 'Augmenter la résistance de l\'élastique ou ralentir la phase de retour.',
+      },
+      {
+        name: 'Hanging Knee Raise', emoji: '🦵', type: 'Concentrique',
+        muscles: ['Fléchisseurs de hanche', 'Rectus abdominis', 'Avant-bras'],
+        sets: '3', reps: '12–15',
+        shortDesc: 'Suspendu à une barre, remonter les genoux vers la poitrine sans se balancer',
+        technique: [
+          'Départ en suspension complète, épaules engagées (pas relâchées)',
+          'Remonter les genoux en enroulant le bassin, pas juste en fléchissant les hanches',
+          'Descente contrôlée, éviter le balancement du corps',
+        ],
+        runnerTip: 'Renforce les fléchisseurs de hanche et le bas des abdominaux en résistant à la gravité — utile pour la phase de relevé du genou en course.',
+        progression: 'Jambes tendues au lieu de fléchies (Hanging Leg Raise) quand la version fléchie est maîtrisée sans élan.',
+      },
+      {
+        name: 'V-Up', emoji: '📐', type: 'Concentrique',
+        muscles: ['Rectus abdominis', 'Fléchisseurs de hanche', 'Ischio-jambiers'],
+        sets: '3', reps: '12',
+        shortDesc: 'Allongé, lever simultanément buste et jambes tendues pour former un V',
+        technique: [
+          'Bras tendus vers les pieds, jambes tendues, décoller les deux en même temps',
+          'Chercher à toucher les pieds avec les mains en haut du mouvement',
+          'Redescendre lentement sans laisser les lombaires se cambrer',
+        ],
+        runnerTip: 'Exercice complet qui synchronise le travail du haut et du bas des abdominaux — utile pour la coordination du tronc à haute intensité.',
+        progression: 'Jambes fléchies pour débuter (moins de bras de levier), jambes tendues pour progresser.',
+      },
+    ],
+  },
+
+  /* ── 15. Core Stabilité Avancée ───────────────────────────────────── */
+  {
+    id: 'core_stabilite_avancee', name: 'Core Stabilité Avancée', emoji: '🛡️', duration: '25–35 min',
+    subtitle: 'Gainage évolué · anti-extension · contrôle profond',
+    color: '#EC4899',
+    exercises: [
+      {
+        name: 'Stir the Pot', emoji: '🥣', type: 'Isométrique',
+        muscles: ['Core', 'Transverse', 'Épaules'],
+        sets: '3', reps: '8 cercles / sens',
+        shortDesc: 'Avant-bras sur un ballon de gym en planche, tracer de larges cercles avec le ballon',
+        technique: [
+          'Corps rigide de la tête aux talons, hanches stables pendant tout le cercle',
+          'Cercles amples et lents dans les deux sens',
+          'Ne jamais laisser le bassin suivre le mouvement du ballon',
+        ],
+        runnerTip: 'L\'instabilité du ballon force un recrutement profond et continu du core — un excellent test de gainage réactif.',
+        progression: 'Agrandir le diamètre des cercles ou ralentir encore le tempo.',
+      },
+      {
+        name: 'Copenhagen Plank', emoji: '🩰', type: 'Isométrique',
+        muscles: ['Adducteurs', 'Core', 'Obliques'],
+        sets: '3', reps: '20–30 sec / côté',
+        shortDesc: 'Planche latérale avec la jambe supérieure posée sur un banc, jambe inférieure levée',
+        technique: [
+          'Jambe du haut sur le banc, jambe du bas maintenue en l\'air tout le long',
+          'Hanches alignées, ne jamais les laisser tomber vers le sol',
+          'Respirer normalement en maintenant la contraction des adducteurs',
+        ],
+        runnerTip: 'Renforce les adducteurs souvent négligés — leur faiblesse est associée à un risque accru de pubalgie chez les coureurs à haut volume.',
+        progression: 'Commencer genou fléchi (version facilitée) puis passer à la jambe tendue.',
+      },
+      {
+        name: 'Hollow Body Hold', emoji: '🛶', type: 'Isométrique',
+        muscles: ['Core', 'Fléchisseurs de hanche', 'Rectus abdominis'],
+        sets: '3', reps: '20–40 sec',
+        shortDesc: 'Sur le dos, bras et jambes tendus légèrement décollés, bas du dos plaqué au sol',
+        technique: [
+          'Bas du dos collé au sol en permanence — c\'est le critère de réussite',
+          'Bras derrière la tête, jambes tendues, angle bas pour plus de difficulté',
+          'Respiration régulière sans perdre la position',
+        ],
+        runnerTip: 'Position fondamentale de la gymnastique qui développe un contrôle abdominal complet, transférable à la posture de course sous fatigue.',
+        progression: 'Abaisser progressivement bras et jambes vers le sol pour augmenter le bras de levier.',
+      },
+      {
+        name: 'Plank Reach-Under', emoji: '🤲', type: 'Concentrique',
+        muscles: ['Core', 'Obliques', 'Épaules'],
+        sets: '3', reps: '10 / côté',
+        shortDesc: 'En planche haute, passer une main sous le corps vers l\'extérieur opposé puis revenir',
+        technique: [
+          'Hanches immobiles pendant tout le mouvement de reach',
+          'Rotation minimale du bassin, le mouvement vient du bras et des épaules',
+          'Revenir en position de planche stable avant l\'autre côté',
+        ],
+        runnerTip: 'Sollicite le core en anti-rotation dynamique, un pont entre le gainage statique et les mouvements réels de course.',
+        progression: 'Ralentir le tempo ou ajouter un contact main-sol plus éloigné pour plus d\'amplitude.',
+      },
+      {
+        name: 'Pallof Press à genoux', emoji: '🎗️', type: 'Isométrique',
+        muscles: ['Core', 'Obliques', 'Fessiers'],
+        sets: '3', reps: '10 / côté',
+        shortDesc: 'Version à genoux du Pallof Press, base d\'appui réduite pour plus d\'instabilité',
+        technique: [
+          'Un genou au sol, l\'autre pied à plat, hanches stables et carrées',
+          'Pousser l\'élastique droit devant sans rotation du buste',
+          'Contracter les fessiers pour stabiliser le bassin pendant la poussée',
+        ],
+        runnerTip: 'La base réduite exige davantage de stabilisation du core que la version debout — utile en progression avancée.',
+        progression: 'Augmenter la résistance de l\'élastique ou allonger le temps de maintien en extension.',
+      },
+    ],
+  },
+
+  /* ── 16. Respiration & Posture ────────────────────────────────────── */
+  {
+    id: 'respiration_posture', name: 'Respiration & Posture', emoji: '🌬️', duration: '20–30 min',
+    subtitle: 'Respiration diaphragmatique · alignement · gainage profond',
+    color: '#6B7280',
+    exercises: [
+      {
+        name: 'Respiration 90/90', emoji: '🌬️', type: 'Mobilité',
+        muscles: ['Diaphragme', 'Transverse', 'Core profond'],
+        sets: '3', reps: '8–10 respirations',
+        shortDesc: 'Jambes surélevées à 90°/90°, respirer profondément en gonflant les côtes plutôt que le ventre',
+        technique: [
+          'Bas du dos plaqué au sol, jambes posées sur une chaise ou un ballon',
+          'Inspirer par le nez en élargissant les côtes sur les côtés, pas juste le ventre',
+          'Expirer longuement par la bouche en relâchant toute tension du haut du corps',
+        ],
+        runnerTip: 'Une respiration diaphragmatique efficace améliore l\'oxygénation et réduit la tension parasite dans les épaules et le cou pendant l\'effort.',
+        progression: 'Allonger progressivement le temps d\'expiration (ratio 1:2 inspiration/expiration).',
+      },
+      {
+        name: 'Wall Posture Reset', emoji: '🧱', type: 'Isométrique',
+        muscles: ['Érecteurs', 'Trapèzes', 'Core'],
+        sets: '3', reps: '45–60 sec',
+        shortDesc: 'Dos contre un mur, talons, fessiers, omoplates et tête en contact, maintenir l\'alignement',
+        technique: [
+          'Rentrer légèrement le menton pour aligner la tête sur la colonne',
+          'Coller le bas du dos au mur en contractant légèrement le transverse',
+          'Respirer sans perdre le contact des quatre points d\'appui',
+        ],
+        runnerTip: 'Réinitialise la posture de référence — un repère utile à retrouver mentalement pendant les longues sorties quand la fatigue installe le dos rond.',
+        progression: 'Fermer les yeux pour renforcer la conscience posturale sans repère visuel.',
+      },
+      {
+        name: 'Thoracic Rotation assise', emoji: '🔄', type: 'Mobilité',
+        muscles: ['Colonne thoracique', 'Obliques', 'Épaules'],
+        sets: '2', reps: '10 / côté',
+        shortDesc: 'Assis, bras croisés sur la poitrine, tourner le buste d\'un côté puis de l\'autre',
+        technique: [
+          'Bassin fixe, immobile — toute la rotation vient du haut du dos',
+          'Expirer en tournant pour faciliter l\'amplitude',
+          'Mouvement lent et contrôlé, pas de rebond en fin de rotation',
+        ],
+        runnerTip: 'Une bonne mobilité thoracique permet un balancement des bras plus ample et plus économique en course.',
+        progression: 'Ajouter un léger bâton tenu horizontalement pour guider et amplifier la rotation.',
+      },
+      {
+        name: 'Standing March contrôlée', emoji: '🚶', type: 'Concentrique',
+        muscles: ['Core', 'Fléchisseurs de hanche', 'Fessiers'],
+        sets: '3', reps: '10 / côté',
+        shortDesc: 'Debout, monter un genou à 90° en expirant fort, sans perdre l\'équilibre du bassin',
+        technique: [
+          'Expirer complètement au sommet du mouvement pour engager le transverse',
+          'Bassin parfaitement stable, pas d\'inclinaison lors de la montée du genou',
+          'Reposer le pied avec contrôle, pas de chute brusque',
+        ],
+        runnerTip: 'Associe respiration et stabilité unipodale — un pont direct vers le contrôle postural requis à chaque appui de course.',
+        progression: 'Fermer les yeux ou ajouter une résistance élastique autour des chevilles.',
+      },
+      {
+        name: 'Bracing Drill chargé', emoji: '🎒', type: 'Isométrique',
+        muscles: ['Transverse', 'Core', 'Érecteurs'],
+        sets: '3', reps: '30 m de marche',
+        shortDesc: 'Marcher avec une charge modérée sur les épaules en maintenant un gainage abdominal actif',
+        technique: [
+          'Contracter le transverse comme pour se préparer à un léger coup dans le ventre',
+          'Maintenir cette contraction légère en respirant normalement pendant toute la marche',
+          'Buste droit, pas de compensation en cambrure lombaire',
+        ],
+        runnerTip: 'Entraîne le gainage réflexe sous charge et en mouvement — la compétence recherchée pour stabiliser le tronc sur les longues distances.',
+        progression: 'Augmenter la charge portée ou allonger la distance de marche.',
+      },
+    ],
+  },
+
+  /* ── 17. Fessiers Unilatéral ───────────────────────────────────────── */
+  {
+    id: 'fessiers_unilateral', name: 'Fessiers Unilatéral', emoji: '🦵', duration: '30–40 min',
+    subtitle: 'Grand fessier · asymétries · stabilité de hanche',
+    color: '#10B981',
+    exercises: [
+      {
+        name: 'Single Leg Hip Thrust', emoji: '🍑', type: 'Concentrique',
+        muscles: ['Grand fessier', 'Ischio-jambiers', 'Core'],
+        sets: '3', reps: '12 / côté',
+        shortDesc: 'Dos sur un banc, une jambe tendue en l\'air, pousser le bassin vers le haut sur l\'autre jambe',
+        technique: [
+          'Jambe libre tendue, ne pas la laisser retomber pendant le mouvement',
+          'Extension complète du bassin, contraction maximale du fessier en haut',
+          'Descente contrôlée sans laisser le bassin partir en rotation',
+        ],
+        runnerTip: 'Isole totalement le fessier d\'un côté — l\'exercice de référence pour corriger une faiblesse unilatérale identifiée.',
+        progression: 'Ajouter une charge sur les hanches ou surélever le pied d\'appui.',
+      },
+      {
+        name: 'Curtsy Lunge', emoji: '🩰', type: 'Concentrique',
+        muscles: ['Moyen fessier', 'Grand fessier', 'Quadriceps'],
+        sets: '3', reps: '10 / côté',
+        shortDesc: 'Croiser une jambe en arrière en diagonale et descendre en fente',
+        technique: [
+          'Jambe arrière croise derrière la jambe d\'appui en diagonale',
+          'Genou avant dans l\'axe du pied, buste droit',
+          'Pousser fort sur le talon avant pour remonter',
+        ],
+        runnerTip: 'Sollicite le moyen fessier dans un plan de mouvement latéral, complémentaire au travail sagittal habituel de la course.',
+        progression: 'Ajouter des haltères ou augmenter la profondeur de la fente.',
+      },
+      {
+        name: 'Abduction de hanche debout élastique', emoji: '🎗️', type: 'Concentrique',
+        muscles: ['Moyen fessier', 'Petit fessier'],
+        sets: '3', reps: '15 / côté',
+        shortDesc: 'Élastique aux chevilles, lever la jambe sur le côté en gardant le buste droit',
+        technique: [
+          'Jambe d\'appui légèrement fléchie, bassin stable',
+          'Lever la jambe latéralement sans pencher le buste du côté opposé',
+          'Redescendre avec contrôle sans relâcher la tension de l\'élastique',
+        ],
+        runnerTip: 'Le moyen fessier stabilise le bassin à chaque appui — un renforcement ciblé réduit le risque de bandelette ilio-tibiale.',
+        progression: 'Augmenter la résistance de l\'élastique ou ralentir la phase de retour.',
+      },
+      {
+        name: 'Single Leg RDL to Row', emoji: '🔱', type: 'Polyarticulaire',
+        muscles: ['Ischio-jambiers', 'Grand fessier', 'Dos'],
+        sets: '3', reps: '10 / côté',
+        shortDesc: 'Sur un pied, basculer le buste en avant et tirer un haltère vers la hanche',
+        technique: [
+          'Corps en T stable avant d\'initier le rowing',
+          'Tirer l\'haltère en gardant le dos plat, coude proche du corps',
+          'Revenir à la verticale avec contrôle sur la jambe d\'appui',
+        ],
+        runnerTip: 'Combine équilibre unipodal et renforcement du dos — utile pour la coordination globale du haut et du bas du corps en course.',
+        progression: 'Augmenter le poids de l\'haltère ou fermer les yeux pour plus de difficulté d\'équilibre.',
+      },
+      {
+        name: 'Step Down excentrique', emoji: '🪜', type: 'Excentrique',
+        muscles: ['Grand fessier', 'Quadriceps', 'Stabilisateurs'],
+        sets: '3', reps: '10 / côté',
+        shortDesc: 'Debout sur un step, descendre lentement l\'autre pied vers le sol sans y poser le poids',
+        technique: [
+          'Descente ultra-contrôlée en 3–4 sec, genou dans l\'axe du pied',
+          'Toucher le sol légèrement du talon sans transférer le poids',
+          'Remonter en poussant avec la jambe sur le step',
+        ],
+        runnerTip: 'Le contrôle excentrique de la descente reproduit la phase d\'amortissement de chaque appui, en particulier en descente de côte.',
+        progression: 'Augmenter la hauteur du step ou ajouter une charge légère.',
+      },
+    ],
+  },
+
+  /* ── 18. Ischio-jambiers Force ────────────────────────────────────── */
+  {
+    id: 'ischio_force', name: 'Ischio-jambiers Force', emoji: '💪', duration: '30–40 min',
+    subtitle: 'Force maximale · prévention des déchirures',
+    color: '#0EA5E9',
+    exercises: [
+      {
+        name: 'Nordic Curl assisté élastique', emoji: '🦵', type: 'Excentrique',
+        muscles: ['Ischio-jambiers', 'Mollets'],
+        sets: '3', reps: '8–10',
+        shortDesc: 'Nordic Curl avec un élastique fixé devant pour assister la remontée',
+        technique: [
+          'Chevilles fixées, corps rigide de la tête aux genoux',
+          'Descente lente et contrôlée, l\'élastique aide à revenir en position haute',
+          'Réduire progressivement l\'assistance de l\'élastique avec les semaines',
+        ],
+        runnerTip: 'Version accessible du Nordic Curl pour progresser vers la version complète sans se décourager par des courbatures excessives.',
+        progression: 'Réduire la tension de l\'élastique semaine après semaine jusqu\'au Nordic Curl sans assistance.',
+      },
+      {
+        name: 'Swiss Ball Hamstring Curl', emoji: '⚽', type: 'Concentrique',
+        muscles: ['Ischio-jambiers', 'Fessiers', 'Core'],
+        sets: '3', reps: '12–15',
+        shortDesc: 'Sur le dos, talons sur un ballon, pousser le bassin en l\'air puis ramener le ballon vers les fessiers',
+        technique: [
+          'Bassin haut et stable pendant tout le mouvement de flexion du genou',
+          'Ramener le ballon le plus près possible des fessiers',
+          'Revenir en contrôlant, ne pas laisser le bassin retomber',
+        ],
+        runnerTip: 'Sollicite les ischio-jambiers en position de hanche étendue, condition proche de la phase de poussée en course.',
+        progression: 'Passer en unilatéral (une jambe sur le ballon) pour augmenter la difficulté.',
+      },
+      {
+        name: 'Soulevé de terre jambes tendues', emoji: '🔱', type: 'Excentrique',
+        muscles: ['Ischio-jambiers', 'Grand fessier', 'Érecteurs'],
+        sets: '3', reps: '10',
+        shortDesc: 'Barre ou haltères, jambes quasi tendues, descendre en poussant les hanches en arrière',
+        technique: [
+          'Genoux à peine fléchis et fixes tout le mouvement',
+          'Descendre jusqu\'à sentir l\'étirement maximal des ischio-jambiers, sans arrondir le dos',
+          'Remonter en contractant fessiers et ischio-jambiers, pas le bas du dos',
+        ],
+        runnerTip: 'Charge les ischio-jambiers en position longue — la zone la plus souvent lésée lors des sprints ou fractionnés rapides.',
+        progression: 'Augmenter la charge progressivement ou passer en unilatéral.',
+      },
+      {
+        name: 'Single Leg Hamstring Bridge', emoji: '🌉', type: 'Concentrique',
+        muscles: ['Ischio-jambiers', 'Grand fessier'],
+        sets: '3', reps: '12 / côté',
+        shortDesc: 'Sur le dos, un talon au sol, pousser le bassin vers le haut sur une seule jambe',
+        technique: [
+          'Talon d\'appui bien ancré, jambe libre tendue et immobile',
+          'Extension complète de la hanche, alignement genou-hanche-épaule en haut',
+          'Descente contrôlée, pas de chute brutale du bassin',
+        ],
+        runnerTip: 'Version unilatérale qui révèle et corrige les déficits de force entre les deux jambes.',
+        progression: 'Ajouter une charge sur le bassin ou surélever le talon d\'appui.',
+      },
+      {
+        name: 'Sliding Leg Curl', emoji: '🧊', type: 'Excentrique',
+        muscles: ['Ischio-jambiers', 'Core', 'Fessiers'],
+        sets: '3', reps: '10–12',
+        shortDesc: 'Sur le dos, pieds sur des patins glissants, fléchir et tendre les jambes en gardant le bassin haut',
+        technique: [
+          'Bassin maintenu en extension pendant tout le mouvement',
+          'Ramener les talons vers les fessiers en glissant, puis retendre lentement',
+          'Ne jamais laisser le bassin s\'affaisser entre les répétitions',
+        ],
+        runnerTip: 'Combine travail concentrique et excentrique des ischio-jambiers en un seul mouvement fluide, très proche du cycle de la foulée.',
+        progression: 'Ralentir la phase d\'extension des jambes (3–4 sec) pour plus de travail excentrique.',
+      },
+    ],
+  },
+
+  /* ── 19. Chaîne Postérieure Complète ──────────────────────────────── */
+  {
+    id: 'chaine_posterieure', name: 'Chaîne Postérieure Complète', emoji: '⛓️', duration: '35–45 min',
+    subtitle: 'Dos · fessiers · ischio-jambiers · force globale',
+    color: '#6366F1',
+    exercises: [
+      {
+        name: 'Soulevé de terre conventionnel', emoji: '🏋️', type: 'Polyarticulaire',
+        muscles: ['Ischio-jambiers', 'Grand fessier', 'Érecteurs', 'Dos'],
+        sets: '4', reps: '8',
+        shortDesc: 'Barre au sol, pieds largeur de hanches, se relever en gardant le dos plat',
+        technique: [
+          'Barre proche des tibias, dos plat, poitrine sortie avant de tirer',
+          'Pousser le sol avec les jambes avant de tirer avec le dos',
+          'Extension complète des hanches en haut, sans hyperextension lombaire',
+        ],
+        runnerTip: 'Le mouvement de force fondamental de toute la chaîne postérieure — développe la puissance globale nécessaire à la propulsion.',
+        progression: 'Augmenter la charge progressivement en respectant strictement la technique.',
+      },
+      {
+        name: 'Trap Bar Deadlift', emoji: '🔺', type: 'Polyarticulaire',
+        muscles: ['Quadriceps', 'Grand fessier', 'Ischio-jambiers'],
+        sets: '4', reps: '10',
+        shortDesc: 'Barre hexagonale, position plus proche du squat, tirer en se tenant debout',
+        technique: [
+          'Barre alignée avec le centre de gravité, dos neutre',
+          'Descente en poussant les hanches en arrière et en fléchissant les genoux',
+          'Remontée en poussant fort dans le sol des deux pieds',
+        ],
+        runnerTip: 'Plus accessible techniquement que le deadlift classique, cible fessiers et quadriceps en synergie.',
+        progression: 'Augmenter la charge ou passer à une version déficit (surélevé) pour plus d\'amplitude.',
+      },
+      {
+        name: 'Back Extension', emoji: '🌅', type: 'Concentrique',
+        muscles: ['Érecteurs', 'Grand fessier', 'Ischio-jambiers'],
+        sets: '3', reps: '15',
+        shortDesc: 'Sur un banc à hyperextension, descendre le buste puis remonter à l\'horizontale',
+        technique: [
+          'Ne pas dépasser l\'horizontale en haut du mouvement (pas d\'hyperextension)',
+          'Contracter fessiers et ischio-jambiers pour initier la remontée, pas le bas du dos',
+          'Descente contrôlée jusqu\'à sentir l\'étirement des ischio-jambiers',
+        ],
+        runnerTip: 'Renforce les érecteurs du rachis en soutien de la posture de course, particulièrement utile en fin de longue distance.',
+        progression: 'Ajouter un poids tenu contre la poitrine.',
+      },
+      {
+        name: 'Soulevé de terre sumo', emoji: '🔱', type: 'Polyarticulaire',
+        muscles: ['Adducteurs', 'Grand fessier', 'Quadriceps'],
+        sets: '3', reps: '10',
+        shortDesc: 'Pieds très écartés, orteils ouverts, tirer la barre en position sumo',
+        technique: [
+          'Pieds plus larges que les épaules, genoux dans l\'axe des orteils',
+          'Buste plus vertical que le deadlift conventionnel',
+          'Pousser les genoux vers l\'extérieur en tirant',
+        ],
+        runnerTip: 'Sollicite davantage les adducteurs et les quadriceps que le deadlift classique — utile pour une chaîne postérieure complète.',
+        progression: 'Augmenter la charge progressivement en maîtrisant l\'ouverture des genoux.',
+      },
+      {
+        name: 'Reverse Hyperextension', emoji: '🔄', type: 'Concentrique',
+        muscles: ['Grand fessier', 'Érecteurs', 'Ischio-jambiers'],
+        sets: '3', reps: '15',
+        shortDesc: 'Buste fixé sur un banc, jambes dans le vide, les lever à l\'horizontale',
+        technique: [
+          'Buste stable et fixé, tout le mouvement vient des hanches',
+          'Lever les jambes jusqu\'à l\'horizontale sans cambrer excessivement',
+          'Redescendre avec contrôle, jambes tendues',
+        ],
+        runnerTip: 'Décompresse la colonne lombaire tout en renforçant la chaîne postérieure — utile en complément d\'un gros volume de course.',
+        progression: 'Ajouter un poids léger entre les chevilles.',
+      },
+    ],
+  },
+
+  /* ── 20. Fessiers Élastique & Activation ──────────────────────────── */
+  {
+    id: 'fessiers_elastique', name: 'Fessiers Élastique & Activation', emoji: '🎗️', duration: '20–30 min',
+    subtitle: 'Activation · échauffement · moyen fessier',
+    color: '#EC4899',
+    exercises: [
+      {
+        name: 'Monster Walk', emoji: '👣', type: 'Concentrique',
+        muscles: ['Moyen fessier', 'Grand fessier'],
+        sets: '3', reps: '15 pas / sens',
+        shortDesc: 'Élastique aux genoux, pas larges en diagonale avant-arrière',
+        technique: [
+          'Genoux légèrement fléchis, buste droit tout le mouvement',
+          'Grands pas en diagonale en maintenant la tension de l\'élastique',
+          'Ne jamais laisser les genoux se rapprocher entre les pas',
+        ],
+        runnerTip: 'Excellent exercice d\'activation avant course ou séance — réveille le moyen fessier souvent inhibé après une position assise prolongée.',
+        progression: 'Élastique plus résistant ou pas plus larges.',
+      },
+      {
+        name: 'Banded Hip Thrust', emoji: '🍑', type: 'Concentrique',
+        muscles: ['Grand fessier', 'Moyen fessier'],
+        sets: '3', reps: '15',
+        shortDesc: 'Hip Thrust classique avec un élastique placé au-dessus des genoux',
+        technique: [
+          'Pousser les genoux vers l\'extérieur contre l\'élastique en montant',
+          'Extension complète du bassin, contraction maximale en haut',
+          'Descente contrôlée sans relâcher la tension latérale',
+        ],
+        runnerTip: 'L\'élastique ajoute un travail d\'abduction qui recrute davantage le moyen fessier, stabilisateur clé du bassin en course.',
+        progression: 'Augmenter la résistance de l\'élastique ou passer en unilatéral.',
+      },
+      {
+        name: 'Fire Hydrant', emoji: '🐕', type: 'Concentrique',
+        muscles: ['Moyen fessier', 'Rotateurs externes'],
+        sets: '3', reps: '15 / côté',
+        shortDesc: 'À quatre pattes, lever un genou sur le côté comme un chien lève la patte',
+        technique: [
+          'Genou fléchi à 90° tout le mouvement, hanches stables',
+          'Lever le plus haut possible sans faire tourner le bassin',
+          'Redescendre avec contrôle sans reposer le genou brutalement',
+        ],
+        runnerTip: 'Cible spécifiquement les rotateurs externes de hanche, essentiels pour éviter le valgus du genou (genoux qui rentrent) en course.',
+        progression: 'Ajouter un élastique au-dessus du genou.',
+      },
+      {
+        name: 'Donkey Kick', emoji: '🦵', type: 'Concentrique',
+        muscles: ['Grand fessier'],
+        sets: '3', reps: '15 / côté',
+        shortDesc: 'À quatre pattes, pousser un pied vers le plafond, genou fléchi à 90°',
+        technique: [
+          'Genou fléchi à 90° maintenu tout le mouvement, pied à plat vers le plafond',
+          'Contraction maximale du fessier en haut, pas de cambrure lombaire',
+          'Redescendre lentement sans reposer le genou au sol entre les reps',
+        ],
+        runnerTip: 'Isole le grand fessier en pure extension de hanche, idéal en activation avant une séance de côtes ou de fractionné.',
+        progression: 'Ajouter un élastique derrière le genou ou une cheville lestée.',
+      },
+      {
+        name: 'Standing Band Kickback', emoji: '🎗️', type: 'Concentrique',
+        muscles: ['Grand fessier', 'Ischio-jambiers'],
+        sets: '3', reps: '15 / côté',
+        shortDesc: 'Debout, élastique à la cheville, pousser la jambe en arrière en extension de hanche',
+        technique: [
+          'Buste légèrement incliné en avant, dos droit',
+          'Extension de hanche complète sans cambrer le bas du dos',
+          'Retour contrôlé sans laisser l\'élastique tirer brutalement la jambe',
+        ],
+        runnerTip: 'Reproduit le mouvement d\'extension de hanche de la propulsion en course dans une version d\'activation légère.',
+        progression: 'Augmenter la résistance de l\'élastique ou ajouter un temps de maintien en fin d\'extension.',
+      },
+    ],
+  },
+
+  /* ── 21. Postérieur Puissance ──────────────────────────────────────── */
+  {
+    id: 'posterieur_puissance', name: 'Postérieur Puissance', emoji: '⚡', duration: '30–40 min',
+    subtitle: 'Explosivité · chaîne postérieure · propulsion',
+    color: '#F59E0B',
+    exercises: [
+      {
+        name: 'Broad Jump', emoji: '🦘', type: 'Plyométrique',
+        muscles: ['Grand fessier', 'Ischio-jambiers', 'Quadriceps'],
+        sets: '4', reps: '5',
+        shortDesc: 'Saut en longueur depuis un départ arrêté, réception stable et contrôlée',
+        technique: [
+          'Contre-mouvement des bras et des hanches avant l\'impulsion',
+          'Extension complète des hanches à l\'envol, recherche de distance maximale',
+          'Réception genoux fléchis, stabiliser 1 sec avant de recommencer',
+        ],
+        runnerTip: 'Développe la puissance d\'extension de hanche en une seule impulsion maximale — transférable à la puissance de propulsion en côte.',
+        progression: 'Enchaîner plusieurs bonds successifs (broad jump répétés) sans pause complète.',
+      },
+      {
+        name: 'Single Leg Bound', emoji: '🦵', type: 'Plyométrique',
+        muscles: ['Grand fessier', 'Ischio-jambiers', 'Mollets'],
+        sets: '3', reps: '5 / côté',
+        shortDesc: 'Bond unilatéral vers l\'avant, réception et stabilisation sur la même jambe',
+        technique: [
+          'Impulsion complète sur une jambe, bras actifs pour l\'équilibre',
+          'Réception souple sur la même jambe, genou fléchi pour amortir',
+          'Stabiliser complètement avant de refaire un bond',
+        ],
+        runnerTip: 'Le bond unipodal est la forme plyométrique la plus spécifique à la foulée de course — puissance et absorption sur une seule jambe.',
+        progression: 'Enchaîner 3 bonds d\'affilée sur la même jambe avant de changer de côté.',
+      },
+      {
+        name: 'Hip Thrust explosif', emoji: '🍑', type: 'Plyométrique',
+        muscles: ['Grand fessier', 'Ischio-jambiers'],
+        sets: '4', reps: '8',
+        shortDesc: 'Hip Thrust avec une phase de poussée la plus rapide possible',
+        technique: [
+          'Descente contrôlée normale, puis explosion maximale à la remontée',
+          'Chercher à décoller légèrement le bassin du poids en haut (sans le lâcher)',
+          'Atterrissage souple avant d\'enchaîner la répétition suivante',
+        ],
+        runnerTip: 'Entraîne le fessier à produire de la force rapidement — la qualité clé pour l\'accélération et le sprint final.',
+        progression: 'Utiliser une charge plus légère pour maximiser la vitesse d\'exécution.',
+      },
+      {
+        name: 'Traîneau (Sled Push)', emoji: '🛷', type: 'Polyarticulaire',
+        muscles: ['Quadriceps', 'Grand fessier', 'Mollets'],
+        sets: '4', reps: '20 m',
+        shortDesc: 'Pousser un traîneau chargé sur une distance courte, foulées puissantes',
+        technique: [
+          'Buste incliné en avant, bras tendus sur les poignées',
+          'Poussée puissante et complète à chaque appui, pas de petits pas traînants',
+          'Respiration régulière malgré l\'intensité',
+        ],
+        runnerTip: 'Développe la force de poussée horizontale sans le risque d\'impact du sprint — idéal pour construire la puissance en toute sécurité.',
+        progression: 'Augmenter la charge du traîneau ou la distance parcourue.',
+      },
+      {
+        name: 'Depth Jump to Sprint', emoji: '💥', type: 'Plyométrique',
+        muscles: ['Grand fessier', 'Mollets', 'Quadriceps'],
+        sets: '4', reps: '3',
+        shortDesc: 'Descendre d\'une petite caisse, rebondir immédiatement puis sprinter 10 m',
+        technique: [
+          'Descente simple, pas de saut au départ de la caisse',
+          'Réception la plus courte possible au sol avant de rebondir vers l\'avant',
+          'Enchaîner directement en sprint sur 10 mètres',
+        ],
+        runnerTip: 'Combine réactivité tendineuse et transfert direct en vitesse de course — un exercice avancé réservé aux coureurs déjà solides.',
+        progression: 'Augmenter légèrement la hauteur de la caisse une fois la technique maîtrisée.',
+      },
+    ],
+  },
+
+  /* ── 22. Jambes Unilatéral ─────────────────────────────────────────── */
+  {
+    id: 'jambes_unilateral', name: 'Jambes Unilatéral', emoji: '🦿', duration: '30–40 min',
+    subtitle: 'Équilibre gauche/droite · stabilité de genou',
+    color: '#E8237A',
+    exercises: [
+      {
+        name: 'Pistol Squat assisté', emoji: '🍸', type: 'Concentrique',
+        muscles: ['Quadriceps', 'Fessiers', 'Équilibre'],
+        sets: '3', reps: '6–8 / côté',
+        shortDesc: 'Squat complet sur une jambe, l\'autre tendue devant, en se tenant à un support léger',
+        technique: [
+          'Se tenir légèrement à un poteau ou un TRX pour l\'équilibre au début',
+          'Descendre le plus bas possible en gardant le talon au sol',
+          'Remonter en poussant fort dans le talon, sans à-coup',
+        ],
+        runnerTip: 'Exercice unilatéral exigeant qui développe force et contrôle du genou en amplitude complète, l\'une des meilleures préparations contre les asymétries.',
+        progression: 'Réduire progressivement l\'aide du support jusqu\'au pistol squat libre.',
+      },
+      {
+        name: 'Fente arrière (Reverse Lunge)', emoji: '🚶', type: 'Concentrique',
+        muscles: ['Quadriceps', 'Fessiers', 'Ischio-jambiers'],
+        sets: '3', reps: '10 / côté',
+        shortDesc: 'Reculer une jambe et descendre en fente, revenir en position debout',
+        technique: [
+          'Grand pas en arrière, genou avant dans l\'axe du pied',
+          'Descendre jusqu\'à ce que le genou arrière frôle le sol',
+          'Pousser sur le talon avant pour revenir à la position de départ',
+        ],
+        runnerTip: 'Moins traumatisant pour le genou que la fente avant — un bon point d\'entrée pour le travail unilatéral des jambes.',
+        progression: 'Ajouter des haltères ou passer en fente marchée.',
+      },
+      {
+        name: 'Step Down contrôlé', emoji: '🪜', type: 'Excentrique',
+        muscles: ['Quadriceps', 'Fessiers', 'Stabilisateurs genou'],
+        sets: '3', reps: '10 / côté',
+        shortDesc: 'Debout sur un step, descendre lentement l\'autre jambe jusqu\'à toucher le sol',
+        technique: [
+          'Genou d\'appui aligné avec les orteils tout le mouvement',
+          'Descente en 3–4 sec, contrôle total, pas de chute',
+          'Toucher le sol du talon libre puis remonter en poussant sur la jambe d\'appui',
+        ],
+        runnerTip: 'Reproduit précisément l\'absorption d\'impact de chaque appui de course, particulièrement utile pour la prévention du genou du coureur.',
+        progression: 'Augmenter la hauteur du step ou ralentir davantage la descente.',
+      },
+      {
+        name: 'Skater Squat', emoji: '⛸️', type: 'Concentrique',
+        muscles: ['Quadriceps', 'Fessiers', 'Équilibre'],
+        sets: '3', reps: '8 / côté',
+        shortDesc: 'Squat unilatéral avec la jambe libre tendue en arrière, touchant légèrement le sol',
+        technique: [
+          'Buste légèrement incliné en avant pour garder l\'équilibre',
+          'Descendre jusqu\'à ce que le genou libre touche presque le sol',
+          'Remonter en poussant fort sur la jambe d\'appui',
+        ],
+        runnerTip: 'Combine force unilatérale et équilibre dynamique, une transition idéale vers le pistol squat complet.',
+        progression: 'Toucher un support de plus en plus bas puis retirer le support complètement.',
+      },
+      {
+        name: 'Fente latérale', emoji: '↔️', type: 'Concentrique',
+        muscles: ['Adducteurs', 'Quadriceps', 'Fessiers'],
+        sets: '3', reps: '10 / côté',
+        shortDesc: 'Grand pas sur le côté, plier la jambe qui reçoit le poids, l\'autre reste tendue',
+        technique: [
+          'Pied qui reçoit le poids reste bien à plat, genou dans l\'axe du pied',
+          'Jambe opposée tendue, sentir l\'étirement de l\'intérieur de cuisse',
+          'Pousser fort pour revenir au centre',
+        ],
+        runnerTip: 'Renforce dans le plan latéral, complémentaire du travail sagittal de la course — utile pour les changements de direction en trail.',
+        progression: 'Ajouter des haltères ou augmenter l\'amplitude du pas latéral.',
+      },
+    ],
+  },
+
+  /* ── 23. Genou & Prévention ────────────────────────────────────────── */
+  {
+    id: 'quad_genou_prevention', name: 'Genou & Prévention', emoji: '🦵', duration: '25–35 min',
+    subtitle: 'Syndrome fémoro-patellaire · tendon rotulien',
+    color: '#0EA5E9',
+    exercises: [
+      {
+        name: 'Spanish Squat', emoji: '🎗️', type: 'Isométrique',
+        muscles: ['Quadriceps', 'Tendon rotulien'],
+        sets: '3', reps: '30–45 sec',
+        shortDesc: 'Élastique fixé derrière les genoux et attaché à un point bas, s\'asseoir en squat sans basculer le buste',
+        technique: [
+          'Élastique tendu derrière les genoux, aide à garder le buste vertical',
+          'Descendre en squat en gardant le tibia le plus vertical possible',
+          'Maintenir la position isométrique en respirant normalement',
+        ],
+        runnerTip: 'Protocole clinique de référence pour la tendinopathie rotulienne — charge le tendon sans excès de stress sur l\'articulation.',
+        progression: 'Ajouter une charge tenue contre la poitrine ou allonger le temps de maintien.',
+      },
+      {
+        name: 'Sissy Squat', emoji: '🦵', type: 'Excentrique',
+        muscles: ['Quadriceps', 'Tendon rotulien'],
+        sets: '3', reps: '8–10',
+        shortDesc: 'Talons fixés, basculer le corps en arrière en fléchissant seulement les genoux',
+        technique: [
+          'Se tenir à un support pour l\'équilibre, talons ancrés au sol',
+          'Basculer en arrière en gardant les hanches tendues, flexion pure du genou',
+          'Remonter en contractant fort le quadriceps',
+        ],
+        runnerTip: 'Isole le quadriceps en étirement maximal, un renforcement puissant pour le tendon rotulien en prévention.',
+        progression: 'Réduire l\'aide du support ou ajouter une légère charge.',
+      },
+      {
+        name: 'Reverse Nordic', emoji: '🦿', type: 'Excentrique',
+        muscles: ['Quadriceps', 'Tendon rotulien'],
+        sets: '3', reps: '8',
+        shortDesc: 'À genoux, buste droit, basculer en arrière en fléchissant seulement les genoux',
+        technique: [
+          'Genoux au sol, buste et hanches parfaitement alignés',
+          'Basculer en arrière le plus loin possible en contrôlant avec les quadriceps',
+          'Se rattraper avec les mains si nécessaire, remonter en poussant sur les cuisses',
+        ],
+        runnerTip: 'L\'équivalent du Nordic Curl mais pour le quadriceps — renforce excentriquement le muscle le plus sollicité à la réception de chaque foulée.',
+        progression: 'Augmenter l\'amplitude de la bascule arrière avant de se rattraper.',
+      },
+      {
+        name: 'Wall Sit unilatéral', emoji: '🧱', type: 'Isométrique',
+        muscles: ['Quadriceps', 'Fessiers'],
+        sets: '3', reps: '20–30 sec / côté',
+        shortDesc: 'Wall sit classique puis lever une jambe pour transférer tout le poids sur l\'autre',
+        technique: [
+          'Dos plaqué au mur, genou d\'appui à 90° ou légèrement plus',
+          'Lever la jambe libre sans perdre l\'angle du genou d\'appui',
+          'Respirer normalement en maintenant la contraction',
+        ],
+        runnerTip: 'Isole le travail isométrique sur une seule jambe — utile pour identifier et corriger un déficit de force entre les deux côtés.',
+        progression: 'Augmenter le temps de maintien progressivement.',
+      },
+      {
+        name: 'Squat sur boîte tempo', emoji: '📦', type: 'Excentrique',
+        muscles: ['Quadriceps', 'Fessiers', 'Genoux'],
+        sets: '3', reps: '10',
+        shortDesc: 'Squat en descendant très lentement jusqu\'à toucher légèrement une boîte, sans s\'asseoir dessus',
+        technique: [
+          'Descente en 5 sec, contrôle total du genou dans l\'axe des orteils',
+          'Toucher légèrement la boîte sans y transférer le poids',
+          'Remonter à vitesse normale en poussant sur les talons',
+        ],
+        runnerTip: 'La lenteur de la descente maximise le temps sous tension du quadriceps, un stimulus efficace pour renforcer sans lourde charge.',
+        progression: 'Augmenter le temps de descente à 6–8 sec ou ajouter une charge légère.',
+      },
+    ],
+  },
+
+  /* ── 24. Jambes Charge Lourde ──────────────────────────────────────── */
+  {
+    id: 'jambes_charge_lourde', name: 'Jambes Charge Lourde', emoji: '🏋️', duration: '35–45 min',
+    subtitle: 'Force maximale · base de puissance',
+    color: '#8B2FC9',
+    exercises: [
+      {
+        name: 'Squat arrière (Back Squat)', emoji: '🏋️', type: 'Polyarticulaire',
+        muscles: ['Quadriceps', 'Fessiers', 'Core'],
+        sets: '4', reps: '6–8',
+        shortDesc: 'Barre sur le haut du dos, descendre en squat profond puis remonter',
+        technique: [
+          'Barre positionnée sur les trapèzes, pieds largeur d\'épaules',
+          'Descendre jusqu\'aux cuisses parallèles minimum, genoux dans l\'axe des pieds',
+          'Remonter en poussant le sol, buste droit tout le mouvement',
+        ],
+        runnerTip: 'Le mouvement de force fondamental pour développer la puissance des jambes — base de toute progression en charge lourde.',
+        progression: 'Augmenter la charge progressivement sur plusieurs semaines (5–10% quand la technique est solide).',
+      },
+      {
+        name: 'Squat avant (Front Squat)', emoji: '🏋️', type: 'Polyarticulaire',
+        muscles: ['Quadriceps', 'Core', 'Fessiers'],
+        sets: '4', reps: '6–8',
+        shortDesc: 'Barre posée devant sur les épaules, descendre en gardant le buste très droit',
+        technique: [
+          'Coudes hauts pour maintenir la barre stable sur les épaules',
+          'Buste plus vertical que le back squat, sollicite davantage les quadriceps',
+          'Remonter en gardant les coudes levés jusqu\'en haut',
+        ],
+        runnerTip: 'Cible davantage les quadriceps que le squat arrière tout en exigeant un core très engagé pour stabiliser la barre.',
+        progression: 'Augmenter la charge progressivement en priorisant la mobilité des poignets et des épaules.',
+      },
+      {
+        name: 'Presse à cuisses (Leg Press)', emoji: '🦵', type: 'Polyarticulaire',
+        muscles: ['Quadriceps', 'Fessiers', 'Ischio-jambiers'],
+        sets: '4', reps: '10–12',
+        shortDesc: 'Assis sur la machine, pousser la plateforme en extension complète des jambes',
+        technique: [
+          'Pieds largeur d\'épaules sur la plateforme, dos bien calé contre le dossier',
+          'Descendre jusqu\'à 90° de flexion de genou sans décoller le bas du dos',
+          'Ne jamais verrouiller complètement les genoux en haut',
+        ],
+        runnerTip: 'Permet de charger lourd les jambes sans le stress de stabilisation du squat libre — utile en complément ou en fin de bloc de charge.',
+        progression: 'Augmenter la charge ou passer en unilatéral pour plus de spécificité.',
+      },
+      {
+        name: 'Hack Squat', emoji: '⚙️', type: 'Polyarticulaire',
+        muscles: ['Quadriceps', 'Fessiers'],
+        sets: '3', reps: '10',
+        shortDesc: 'Sur la machine hack squat, descendre en squat guidé puis remonter',
+        technique: [
+          'Dos et épaules bien calés contre le support de la machine',
+          'Descente contrôlée jusqu\'à 90° minimum, genoux dans l\'axe',
+          'Poussée complète en remontant sans verrouiller brutalement',
+        ],
+        runnerTip: 'Le guidage de la machine permet de charger lourd le quadriceps en toute sécurité, utile pour progresser sans risque technique.',
+        progression: 'Augmenter la charge progressivement chaque semaine.',
+      },
+      {
+        name: 'Fente marchée chargée', emoji: '🚶', type: 'Polyarticulaire',
+        muscles: ['Quadriceps', 'Fessiers', 'Ischio-jambiers'],
+        sets: '3', reps: '10 / jambe',
+        shortDesc: 'Fentes marchées avec haltères ou barre, sur une distance de 15–20 mètres',
+        technique: [
+          'Grand pas, genou avant dans l\'axe, genou arrière frôle le sol',
+          'Buste droit tout le mouvement, pas de bascule vers l\'avant',
+          'Pousser fort sur le talon avant pour enchaîner le pas suivant',
+        ],
+        runnerTip: 'Combine force et transfert de charge d\'une jambe à l\'autre, très proche du schéma moteur de la foulée.',
+        progression: 'Augmenter la charge portée ou la distance parcourue.',
+      },
+    ],
+  },
+
+  /* ── 25. Jambes Endurance Musculaire ───────────────────────────────── */
+  {
+    id: 'jambes_endurance_muscu', name: 'Jambes Endurance Musculaire', emoji: '🔄', duration: '30–40 min',
+    subtitle: 'Résistance à la fatigue · haut volume de répétitions',
+    color: '#F97316',
+    exercises: [
+      {
+        name: 'Squat tempo lent', emoji: '⏱️', type: 'Isométrique',
+        muscles: ['Quadriceps', 'Fessiers'],
+        sets: '3', reps: '20',
+        shortDesc: 'Squat au poids du corps avec un tempo très lent (3 sec descente, 3 sec montée)',
+        technique: [
+          'Compter mentalement 3 sec à la descente et 3 sec à la remontée',
+          'Amplitude complète, cuisses parallèles au sol minimum',
+          'Respiration régulière malgré la brûlure musculaire progressive',
+        ],
+        runnerTip: 'Développe l\'endurance musculaire locale des quadriceps — la capacité à répéter un effort sans perte de force, clé sur marathon.',
+        progression: 'Ajouter un léger poids tenu contre la poitrine.',
+      },
+      {
+        name: 'Chair Squat Hold', emoji: '🪑', type: 'Isométrique',
+        muscles: ['Quadriceps', 'Fessiers'],
+        sets: '3', reps: '45–60 sec',
+        shortDesc: 'Position assise imaginaire sans chaise, cuisses parallèles au sol, maintenir',
+        technique: [
+          'Dos droit, genoux à 90°, poids réparti sur tout le pied',
+          'Bras tendus devant pour l\'équilibre',
+          'Respirer régulièrement, ne pas bloquer sa respiration',
+        ],
+        runnerTip: 'Simule la fatigue musculaire des derniers kilomètres — un excellent test de résistance mentale et musculaire combinée.',
+        progression: 'Allonger le temps de maintien de 10 sec chaque semaine.',
+      },
+      {
+        name: 'Fentes enchaînées 100 reps', emoji: '🚶', type: 'Concentrique',
+        muscles: ['Quadriceps', 'Fessiers', 'Ischio-jambiers'],
+        sets: '2', reps: '50 / côté',
+        shortDesc: 'Enchaîner des fentes classiques au poids du corps jusqu\'à 100 répétitions au total',
+        technique: [
+          'Technique irréprochable maintenue même en fin de série malgré la fatigue',
+          'Rythme régulier, pas de précipitation qui dégraderait la forme',
+          'Pauses courtes autorisées si nécessaire, sans interrompre longtemps',
+        ],
+        runnerTip: 'Un gros volume de répétitions légères développe la résistance musculaire locale, complémentaire au travail de force lourde.',
+        progression: 'Réduire le nombre de pauses nécessaires pour compléter les 100 répétitions.',
+      },
+      {
+        name: 'Step-ups cadence rapide', emoji: '🪜', type: 'Concentrique',
+        muscles: ['Quadriceps', 'Fessiers', 'Mollets'],
+        sets: '3', reps: '30 sec rapide / côté',
+        shortDesc: 'Monter et descendre d\'un step le plus vite possible en gardant la technique',
+        technique: [
+          'Pied entier posé sur le step à chaque montée, pas juste les orteils',
+          'Rythme rapide mais contrôlé, pas de mouvement brouillon',
+          'Alterner les jambes ou rester sur la même selon la variante choisie',
+        ],
+        runnerTip: 'Développe l\'endurance musculaire en cadence rapide, un stimulus proche de la fréquence de foulée en course.',
+        progression: 'Augmenter la durée de l\'effort à 45 sec puis 60 sec.',
+      },
+      {
+        name: 'Squat Pulse', emoji: '🔽', type: 'Concentrique',
+        muscles: ['Quadriceps', 'Fessiers'],
+        sets: '3', reps: '20 pulses',
+        shortDesc: 'En position basse de squat, faire de petits mouvements de pulsation sans remonter complètement',
+        technique: [
+          'Rester dans le tiers bas du mouvement pendant toute la série',
+          'Petites amplitudes rapides et contrôlées',
+          'Ne remonter en position debout qu\'à la fin de la série complète',
+        ],
+        runnerTip: 'Maintient une tension constante sur le quadriceps sans repos — développe la tolérance à la fatigue musculaire locale.',
+        progression: 'Allonger la série à 30 pulses ou enchaîner deux séries sans pause.',
+      },
+    ],
+  },
+
+  /* ── 26. Bas du Corps Complet ──────────────────────────────────────── */
+  {
+    id: 'bas_corps_complet', name: 'Bas du Corps Complet', emoji: '🦵', duration: '35–45 min',
+    subtitle: 'Séance complète · quadriceps · fessiers · ischio-jambiers',
+    color: '#10B981',
+    exercises: [
+      {
+        name: 'Goblet Squat + Calf Raise', emoji: '🏋️', type: 'Polyarticulaire',
+        muscles: ['Quadriceps', 'Fessiers', 'Mollets'],
+        sets: '3', reps: '12',
+        shortDesc: 'Squat goblet classique, puis monter sur la pointe des pieds en position haute',
+        technique: [
+          'Descendre en squat complet, poids contre la poitrine',
+          'En remontant, continuer le mouvement en montant sur la pointe des pieds',
+          'Redescendre les talons puis enchaîner la répétition suivante',
+        ],
+        runnerTip: 'Combine deux mouvements clés de la propulsion en course en un seul exercice efficace en temps.',
+        progression: 'Augmenter le poids du goblet ou ralentir la phase de montée sur pointe.',
+      },
+      {
+        name: 'Soulevé de terre + Rowing', emoji: '🔱', type: 'Polyarticulaire',
+        muscles: ['Ischio-jambiers', 'Grand fessier', 'Dos'],
+        sets: '3', reps: '10',
+        shortDesc: 'Soulevé de terre roumain, puis tirer les haltères vers la poitrine en position basse',
+        technique: [
+          'Descendre en hip hinge jusqu\'à sentir l\'étirement des ischio-jambiers',
+          'En position basse, tirer les haltères vers les côtes',
+          'Reposer puis remonter en position debout',
+        ],
+        runnerTip: 'Associe chaîne postérieure et dos dans un mouvement fonctionnel complet, économe en temps d\'entraînement.',
+        progression: 'Augmenter la charge des haltères progressivement.',
+      },
+      {
+        name: 'Matrice de fentes multidirectionnelles', emoji: '🧭', type: 'Concentrique',
+        muscles: ['Quadriceps', 'Fessiers', 'Adducteurs'],
+        sets: '3', reps: '1 tour complet / côté',
+        shortDesc: 'Enchaîner fente avant, latérale et arrière sur la même jambe sans reposer l\'autre',
+        technique: [
+          'Revenir au centre entre chaque direction sans poser l\'autre pied',
+          'Genou toujours dans l\'axe du pied quelle que soit la direction',
+          'Terminer les 3 directions avant de changer de jambe',
+        ],
+        runnerTip: 'Prépare les jambes à absorber des forces dans tous les plans, utile en trail sur terrain irrégulier.',
+        progression: 'Ajouter des haltères légers ou augmenter l\'amplitude de chaque fente.',
+      },
+      {
+        name: 'Step-up chargé', emoji: '🪜', type: 'Concentrique',
+        muscles: ['Quadriceps', 'Fessiers', 'Ischio-jambiers'],
+        sets: '3', reps: '10 / côté',
+        shortDesc: 'Step-up sur une boîte haute avec haltères, sans élan de la jambe arrière',
+        technique: [
+          'Toute la force vient de la jambe posée sur la boîte',
+          'Monter en poussant le talon, pas les orteils',
+          'Descendre avec contrôle sans se laisser tomber',
+        ],
+        runnerTip: 'Reproduit fidèlement le pattern de montée de côte en charge, un transfert direct pour le trail et les dénivelés.',
+        progression: 'Augmenter la hauteur de la boîte ou la charge portée.',
+      },
+      {
+        name: 'Wall Ball', emoji: '⚽', type: 'Polyarticulaire',
+        muscles: ['Quadriceps', 'Fessiers', 'Épaules'],
+        sets: '3', reps: '15',
+        shortDesc: 'Squat avec un ballon lesté, le lancer contre un mur puis le rattraper',
+        technique: [
+          'Descendre en squat complet, ballon tenu devant la poitrine',
+          'Enchaîner l\'extension des jambes avec la poussée du ballon vers le haut',
+          'Rattraper le ballon en amortissant directement dans le squat suivant',
+        ],
+        runnerTip: 'Combine force des jambes et travail cardio-musculaire en un mouvement dynamique et fonctionnel complet.',
+        progression: 'Augmenter le poids du ballon ou la hauteur de la cible.',
+      },
+    ],
+  },
+
+  /* ── 27. Épaules & Stabilité ───────────────────────────────────────── */
+  {
+    id: 'epaules_stabilite', name: 'Épaules & Stabilité', emoji: '🎯', duration: '25–35 min',
+    subtitle: 'Coiffe des rotateurs · posture · stabilité scapulaire',
+    color: '#0EA5E9',
+    exercises: [
+      {
+        name: 'Y-T-W Raises', emoji: '🤸', type: 'Concentrique',
+        muscles: ['Deltoïdes postérieurs', 'Trapèzes', 'Rhomboïdes'],
+        sets: '3', reps: '10 chaque lettre',
+        shortDesc: 'Allongé sur le ventre, lever les bras en formant successivement un Y, un T et un W',
+        technique: [
+          'Lever les bras légèrement du sol à chaque position, pouces vers le ciel',
+          'Contraction maximale des omoplates en position haute',
+          'Mouvement lent et contrôlé, pas d\'élan',
+        ],
+        runnerTip: 'Renforce l\'ensemble des muscles stabilisateurs de l\'omoplate — une posture d\'épaule solide améliore l\'efficacité du balancement des bras.',
+        progression: 'Ajouter de très légers haltères (0,5–1 kg) une fois le mouvement maîtrisé.',
+      },
+      {
+        name: 'Landmine Press', emoji: '🚀', type: 'Polyarticulaire',
+        muscles: ['Épaules', 'Triceps', 'Core'],
+        sets: '3', reps: '10 / côté',
+        shortDesc: 'Barre coincée dans un coin, pousser l\'extrémité libre vers le haut en diagonale',
+        technique: [
+          'Position légèrement décalée, une main pousse la barre en diagonale',
+          'Core engagé pour stabiliser le tronc pendant la poussée',
+          'Redescendre avec contrôle jusqu\'à l\'épaule',
+        ],
+        runnerTip: 'Trajectoire naturelle qui ménage l\'articulation de l\'épaule tout en développant la force de poussée verticale.',
+        progression: 'Augmenter la charge ou faire l\'exercice en position debout sur un pied.',
+      },
+      {
+        name: 'Scapular Wall Slide', emoji: '🧱', type: 'Mobilité',
+        muscles: ['Trapèzes', 'Dentelé antérieur', 'Deltoïdes'],
+        sets: '3', reps: '12',
+        shortDesc: 'Dos au mur, bras en position de \'chandelier\', les faire glisser vers le haut en gardant le contact',
+        technique: [
+          'Bas du dos, tête et coudes en contact avec le mur tout le mouvement',
+          'Glisser les bras vers le haut sans décoller les coudes du mur',
+          'Redescendre lentement en gardant le contact permanent',
+        ],
+        runnerTip: 'Corrige la position d\'épaules enroulées vers l\'avant, fréquente chez les coureurs à haut volume assis le reste de la journée.',
+        progression: 'Ajouter une légère résistance élastique entre les mains.',
+      },
+      {
+        name: 'Turkish Get-up partiel', emoji: '🏋️', type: 'Neuromusculaire',
+        muscles: ['Épaules', 'Core', 'Stabilisateurs'],
+        sets: '3', reps: '5 / côté',
+        shortDesc: 'Sur le dos, kettlebell tendu au-dessus d\'une épaule, se redresser jusqu\'en position assise',
+        technique: [
+          'Bras tendu vers le plafond en permanence, regard sur le poids',
+          'Se redresser en s\'appuyant sur le coude puis la main opposée',
+          'Revenir en contrôlant la descente jusqu\'au sol',
+        ],
+        runnerTip: 'Développe la stabilité de l\'épaule sous charge dans un mouvement multi-articulaire complexe et exigeant en coordination.',
+        progression: 'Compléter le mouvement jusqu\'en position debout complète (Turkish Get-up intégral).',
+      },
+      {
+        name: 'Arm Bar', emoji: '📏', type: 'Isométrique',
+        muscles: ['Épaules', 'Core', 'Coiffe des rotateurs'],
+        sets: '3', reps: '30 sec / côté',
+        shortDesc: 'Sur le dos, léger poids tenu bras tendu vers le plafond, faire rouler le corps sur le côté',
+        technique: [
+          'Bras toujours parfaitement vertical, ne jamais le laisser dévier',
+          'Rouler lentement le buste et les hanches vers le côté opposé',
+          'Maintenir la position stable avant de revenir au centre',
+        ],
+        runnerTip: 'Renforce le contrôle fin de l\'épaule en position instable — utile pour prévenir les tensions cervicales liées à un mauvais alignement postural.',
+        progression: 'Augmenter légèrement le poids tenu ou ralentir le tempo du roulé.',
+      },
+    ],
+  },
+
+  /* ── 28. Dos & Posture ─────────────────────────────────────────────── */
+  {
+    id: 'dos_posture', name: 'Dos & Posture', emoji: '🧍', duration: '30–40 min',
+    subtitle: 'Grand dorsal · érecteurs · alignement vertical',
+    color: '#6366F1',
+    exercises: [
+      {
+        name: 'Tirage assisté / Pull-up', emoji: '🧗', type: 'Polyarticulaire',
+        muscles: ['Grand dorsal', 'Biceps', 'Trapèzes'],
+        sets: '3', reps: '6–10',
+        shortDesc: 'Traction à la barre, assistée par élastique si nécessaire, jusqu\'au menton au-dessus de la barre',
+        technique: [
+          'Départ en suspension complète, omoplates engagées avant de tirer',
+          'Tirer jusqu\'à ce que le menton dépasse la barre',
+          'Descente contrôlée jusqu\'à l\'extension complète des bras',
+        ],
+        runnerTip: 'Développe la force du dos qui contre-équilibre le buste et maintient la posture droite en fin de longue distance.',
+        progression: 'Réduire l\'assistance de l\'élastique progressivement jusqu\'à la traction complète.',
+      },
+      {
+        name: 'Rowing haltère unilatéral', emoji: '🏋️', type: 'Concentrique',
+        muscles: ['Grand dorsal', 'Rhomboïdes', 'Biceps'],
+        sets: '3', reps: '12 / côté',
+        shortDesc: 'Un genou et une main sur un banc, tirer un haltère vers la hanche',
+        technique: [
+          'Dos parfaitement plat et parallèle au sol',
+          'Tirer le coude vers le plafond en serrant l\'omoplate',
+          'Descendre l\'haltère avec contrôle jusqu\'à l\'extension complète',
+        ],
+        runnerTip: 'Le rowing unilatéral corrige les asymétries de force du dos et renforce la posture droite nécessaire en fin de course.',
+        progression: 'Augmenter la charge de l\'haltère progressivement.',
+      },
+      {
+        name: 'Superman', emoji: '🦸', type: 'Isométrique',
+        muscles: ['Érecteurs', 'Fessiers', 'Épaules'],
+        sets: '3', reps: '10 × maintien 3 sec',
+        shortDesc: 'À plat ventre, lever bras et jambes simultanément et maintenir',
+        technique: [
+          'Lever en contractant d\'abord les fessiers puis les dorsaux',
+          'Regard vers le sol, cou en position neutre',
+          'Maintenir 3 sec en contraction maximale avant de redescendre',
+        ],
+        runnerTip: 'Renforce toute la chaîne postérieure du dos, essentielle pour maintenir une posture haute et efficace sur la durée.',
+        progression: 'Alterner bras et jambe opposés pour plus d\'instabilité et de coordination.',
+      },
+      {
+        name: 'Reverse Fly élastique', emoji: '🦅', type: 'Concentrique',
+        muscles: ['Deltoïdes postérieurs', 'Rhomboïdes', 'Trapèzes'],
+        sets: '3', reps: '15',
+        shortDesc: 'Élastique tenu à deux mains, écarter les bras en arrière en serrant les omoplates',
+        technique: [
+          'Buste légèrement penché en avant, dos droit',
+          'Écarter les bras en gardant une légère flexion du coude',
+          'Contraction maximale des omoplates en fin de mouvement',
+        ],
+        runnerTip: 'Corrige le déséquilibre entre pectoraux (souvent forts) et deltoïdes postérieurs (souvent faibles) chez les coureurs.',
+        progression: 'Augmenter la résistance de l\'élastique ou ralentir le tempo.',
+      },
+      {
+        name: 'Band Pull-Apart', emoji: '🎗️', type: 'Concentrique',
+        muscles: ['Deltoïdes postérieurs', 'Rhomboïdes'],
+        sets: '3', reps: '20',
+        shortDesc: 'Élastique tenu bras tendus devant soi, l\'écarter jusqu\'à toucher la poitrine',
+        technique: [
+          'Bras tendus à hauteur d\'épaule pendant tout le mouvement',
+          'Écarter en serrant les omoplates, pas seulement en écartant les bras',
+          'Retour contrôlé sans relâcher brutalement la tension',
+        ],
+        runnerTip: 'Exercice d\'activation simple et rapide, idéal en échauffement pour réveiller les muscles du haut du dos avant une séance.',
+        progression: 'Augmenter la résistance de l\'élastique ou le nombre de répétitions.',
+      },
+    ],
+  },
+
+  /* ── 29. Bras & Avant-bras ─────────────────────────────────────────── */
+  {
+    id: 'bras_avantbras', name: 'Bras & Avant-bras', emoji: '💪', duration: '25–30 min',
+    subtitle: 'Biceps · triceps · grip · endurance de préhension',
+    color: '#E8237A',
+    exercises: [
+      {
+        name: 'Curl marteau', emoji: '🔨', type: 'Concentrique',
+        muscles: ['Biceps', 'Brachial', 'Avant-bras'],
+        sets: '3', reps: '12 / côté',
+        shortDesc: 'Haltères en prise neutre (paumes face à face), fléchir le coude',
+        technique: [
+          'Coude fixe contre le flanc pendant tout le mouvement',
+          'Prise neutre maintenue du début à la fin',
+          'Descente lente et contrôlée sur 3 secondes',
+        ],
+        runnerTip: 'Renforce le brachial et l\'avant-bras, utiles pour maintenir une flexion de coude stable et économique en course.',
+        progression: 'Augmenter le poids ou réaliser l\'exercice assis pour éliminer tout élan.',
+      },
+      {
+        name: 'Extension triceps au-dessus de la tête', emoji: '💪', type: 'Concentrique',
+        muscles: ['Triceps'],
+        sets: '3', reps: '12',
+        shortDesc: 'Haltère tenu à deux mains derrière la tête, étendre les bras vers le plafond',
+        technique: [
+          'Coudes proches de la tête et fixes tout le mouvement',
+          'Descendre jusqu\'à sentir l\'étirement complet du triceps',
+          'Remonter en extension complète sans verrouiller brutalement',
+        ],
+        runnerTip: 'Des triceps forts stabilisent l\'action du bras lors du balancement rapide en fin de sprint ou de côte.',
+        progression: 'Augmenter le poids de l\'haltère progressivement.',
+      },
+      {
+        name: 'Dead Hang', emoji: '🪢', type: 'Isométrique',
+        muscles: ['Avant-bras', 'Grand dorsal', 'Épaules'],
+        sets: '3', reps: '30–45 sec',
+        shortDesc: 'Suspendu à une barre, bras tendus, maintenir la position sans bouger',
+        technique: [
+          'Épaules légèrement engagées, pas totalement relâchées',
+          'Respiration régulière malgré la fatigue de l\'avant-bras',
+          'Descendre avec contrôle en fin de série, pas de lâcher brutal',
+        ],
+        runnerTip: 'Développe l\'endurance de préhension et décompresse la colonne — un excellent complément après les longues sorties.',
+        progression: 'Allonger le temps de maintien progressivement de 5 sec par semaine.',
+      },
+      {
+        name: 'Wrist Curl', emoji: '🖐️', type: 'Concentrique',
+        muscles: ['Avant-bras', 'Fléchisseurs du poignet'],
+        sets: '3', reps: '15',
+        shortDesc: 'Avant-bras posé sur une cuisse, fléchir et tendre le poignet avec un haltère léger',
+        technique: [
+          'Avant-bras stable, seul le poignet bouge',
+          'Amplitude complète, flexion puis extension du poignet',
+          'Mouvement lent, pas de rebond',
+        ],
+        runnerTip: 'Un avant-bras résistant limite la fatigue de préhension lors des longues sorties avec bâtons en trail.',
+        progression: 'Augmenter le poids ou le nombre de répétitions.',
+      },
+      {
+        name: 'Pompes diamant', emoji: '🔷', type: 'Polyarticulaire',
+        muscles: ['Triceps', 'Pectoraux', 'Épaules'],
+        sets: '3', reps: '10–15',
+        shortDesc: 'Pompes avec les mains rapprochées formant un losange sous la poitrine',
+        technique: [
+          'Mains rapprochées, pouces et index qui se touchent',
+          'Coudes proches du corps pendant toute la descente',
+          'Corps rigide de la tête aux talons',
+        ],
+        runnerTip: 'Sollicite intensément les triceps en chaîne fermée — un renforcement complet du bras sans matériel.',
+        progression: 'Pieds surélevés pour augmenter la difficulté.',
+      },
+    ],
+  },
+
+  /* ── 30. Haut du Corps Poids du Corps ──────────────────────────────── */
+  {
+    id: 'haut_corps_poids_corps', name: 'Haut du Corps Poids du Corps', emoji: '🤸', duration: '30–40 min',
+    subtitle: 'Sans matériel · force fonctionnelle',
+    color: '#F59E0B',
+    exercises: [
+      {
+        name: 'Pompes archer', emoji: '🏹', type: 'Polyarticulaire',
+        muscles: ['Pectoraux', 'Triceps', 'Épaules'],
+        sets: '3', reps: '8 / côté',
+        shortDesc: 'Pompes en décalant le poids vers une main, l\'autre bras tendu sur le côté',
+        technique: [
+          'Bras tendu sur le côté reste quasiment droit pendant la descente',
+          'Le poids du corps se déplace vers le bras qui travaille',
+          'Alterner les côtés à chaque répétition',
+        ],
+        runnerTip: 'Version unilatérale des pompes qui développe une force asymétrique utile pour corriger les déséquilibres du haut du corps.',
+        progression: 'Descendre davantage vers le bras tendu pour augmenter la charge.',
+      },
+      {
+        name: 'Dips sur banc', emoji: '💺', type: 'Polyarticulaire',
+        muscles: ['Triceps', 'Pectoraux', 'Épaules'],
+        sets: '3', reps: '12–15',
+        shortDesc: 'Mains sur un banc derrière soi, descendre le bassin puis remonter en poussant sur les bras',
+        technique: [
+          'Coudes qui se plient vers l\'arrière, pas vers l\'extérieur',
+          'Descendre jusqu\'à un angle de coude de 90°',
+          'Remonter en poussant fort sans verrouiller brutalement',
+        ],
+        runnerTip: 'Renforce les triceps et les épaules en chaîne fermée, un bon complément aux pompes pour un haut du corps équilibré.',
+        progression: 'Ajouter un poids sur les cuisses ou surélever les pieds sur un second banc.',
+      },
+      {
+        name: 'Pike Push-up', emoji: '🔺', type: 'Polyarticulaire',
+        muscles: ['Épaules', 'Triceps'],
+        sets: '3', reps: '10',
+        shortDesc: 'Fesses hautes en forme de V inversé, descendre la tête vers le sol comme une pompe verticale',
+        technique: [
+          'Hanches hautes, jambes quasi tendues, poids sur les mains',
+          'Descendre la tête entre les mains en fléchissant les coudes',
+          'Remonter en poussant fort sur les épaules',
+        ],
+        runnerTip: 'Prépare les épaules à un travail vertical de poussée, complémentaire aux mouvements horizontaux classiques.',
+        progression: 'Surélever les pieds pour augmenter l\'angle et la difficulté.',
+      },
+      {
+        name: 'Rowing inversé (Inverted Row)', emoji: '🎽', type: 'Polyarticulaire',
+        muscles: ['Grand dorsal', 'Biceps', 'Core'],
+        sets: '3', reps: '12',
+        shortDesc: 'Sous une barre basse ou une table solide, tirer le corps vers le haut en gardant le corps rigide',
+        technique: [
+          'Corps rigide de la tête aux talons, comme une planche inclinée',
+          'Tirer la poitrine vers la barre en serrant les omoplates',
+          'Descendre avec contrôle jusqu\'à l\'extension complète des bras',
+        ],
+        runnerTip: 'Équivalent du rowing horizontal au poids du corps — développe le dos sans matériel de musculation.',
+        progression: 'Abaisser la barre pour augmenter l\'inclinaison du corps et la difficulté.',
+      },
+      {
+        name: 'Handstand Hold contre le mur', emoji: '🤾', type: 'Isométrique',
+        muscles: ['Épaules', 'Triceps', 'Core'],
+        sets: '3', reps: '20–30 sec',
+        shortDesc: 'Appui tendu renversé contre un mur, maintenir la position',
+        technique: [
+          'Monter progressivement en marchant les pieds sur le mur',
+          'Corps aligné, regard vers les mains, core gainé',
+          'Descendre avec contrôle en fin de série',
+        ],
+        runnerTip: 'Développe une force et une endurance d\'épaule exceptionnelles, utile pour maintenir la posture sous fatigue extrême.',
+        progression: 'Allonger le temps de maintien progressivement.',
+      },
+    ],
+  },
+
+  /* ── 31. Haut du Corps Élastique ───────────────────────────────────── */
+  {
+    id: 'haut_corps_elastique', name: 'Haut du Corps Élastique', emoji: '🎗️', duration: '25–30 min',
+    subtitle: 'Léger · portable · échauffement ou complément',
+    color: '#6B7280',
+    exercises: [
+      {
+        name: 'Tirage élastique vertical', emoji: '🎗️', type: 'Concentrique',
+        muscles: ['Grand dorsal', 'Biceps'],
+        sets: '3', reps: '15',
+        shortDesc: 'Élastique fixé en hauteur, tirer vers le bas comme un tirage poulie classique',
+        technique: [
+          'Buste droit, légère cambrure naturelle du dos',
+          'Tirer en amenant les coudes vers les hanches',
+          'Contrôler la remontée sans relâcher brutalement',
+        ],
+        runnerTip: 'Version portable du tirage vertical — permet de travailler le dos n\'importe où, y compris en voyage ou en stage.',
+        progression: 'Augmenter la résistance de l\'élastique ou ralentir le tempo.',
+      },
+      {
+        name: 'Rotation externe élastique', emoji: '🔄', type: 'Concentrique',
+        muscles: ['Coiffe des rotateurs', 'Deltoïdes postérieurs'],
+        sets: '3', reps: '15 / côté',
+        shortDesc: 'Coude au corps à 90°, tourner l\'avant-bras vers l\'extérieur contre l\'élastique',
+        technique: [
+          'Coude fixe contre les côtes pendant tout le mouvement',
+          'Rotation contrôlée, pas d\'élan du buste pour compenser',
+          'Retour lent sans relâcher la tension',
+        ],
+        runnerTip: 'Renforce la coiffe des rotateurs souvent négligée — protège l\'épaule lors du balancement répété des bras.',
+        progression: 'Augmenter la résistance de l\'élastique.',
+      },
+      {
+        name: 'Développé élastique debout', emoji: '🚀', type: 'Concentrique',
+        muscles: ['Épaules', 'Triceps'],
+        sets: '3', reps: '15',
+        shortDesc: 'Élastique sous les pieds, pousser les poignées vers le haut au-dessus de la tête',
+        technique: [
+          'Core engagé pour éviter de cambrer le dos en poussant',
+          'Extension complète des bras au-dessus de la tête',
+          'Descente contrôlée jusqu\'aux épaules',
+        ],
+        runnerTip: 'Renforce les épaules en poussée verticale, complémentaire à l\'action horizontale du balancement de bras en course.',
+        progression: 'Augmenter la résistance de l\'élastique ou faire l\'exercice en fente.',
+      },
+      {
+        name: 'Extension triceps élastique', emoji: '💪', type: 'Concentrique',
+        muscles: ['Triceps'],
+        sets: '3', reps: '15',
+        shortDesc: 'Élastique fixé en hauteur derrière soi, étendre le bras vers le bas',
+        technique: [
+          'Coude fixe près de la tête pendant tout le mouvement',
+          'Extension complète du bras vers le bas',
+          'Retour contrôlé sans relâcher la tension',
+        ],
+        runnerTip: 'Exercice léger et portable pour maintenir un travail de triceps régulier même en période de charge de course élevée.',
+        progression: 'Augmenter la résistance de l\'élastique.',
+      },
+      {
+        name: 'Élévation frontale élastique', emoji: '⬆️', type: 'Concentrique',
+        muscles: ['Deltoïdes antérieurs'],
+        sets: '3', reps: '15',
+        shortDesc: 'Élastique sous les pieds, lever les bras tendus devant soi jusqu\'à l\'horizontale',
+        technique: [
+          'Légère flexion des coudes maintenue tout le mouvement',
+          'Monter jusqu\'à l\'horizontale sans monter plus haut',
+          'Descente contrôlée sur 2–3 secondes',
+        ],
+        runnerTip: 'Complète le travail des deltoïdes pour un développement équilibré de l\'épaule sur les trois faces.',
+        progression: 'Augmenter la résistance de l\'élastique ou ralentir le tempo.',
+      },
+    ],
+  },
+
+  /* ── 32. Pectoraux & Triceps ───────────────────────────────────────── */
+  {
+    id: 'pectoraux_triceps', name: 'Pectoraux & Triceps', emoji: '🔺', duration: '30–40 min',
+    subtitle: 'Force du haut du corps · stabilité du buste',
+    color: '#8B2FC9',
+    exercises: [
+      {
+        name: 'Développé couché haltères', emoji: '🏋️', type: 'Polyarticulaire',
+        muscles: ['Pectoraux', 'Triceps', 'Épaules'],
+        sets: '4', reps: '10',
+        shortDesc: 'Allongé sur un banc, pousser les haltères vers le plafond depuis la poitrine',
+        technique: [
+          'Omoplates serrées et fixées sur le banc pendant tout le mouvement',
+          'Descendre jusqu\'à sentir l\'étirement des pectoraux',
+          'Pousser en extension complète sans verrouiller brutalement les coudes',
+        ],
+        runnerTip: 'Renforce le haut du corps pour une meilleure posture et un balancement de bras plus stable sur la durée.',
+        progression: 'Augmenter le poids des haltères progressivement.',
+      },
+      {
+        name: 'Dips lestés', emoji: '🔻', type: 'Polyarticulaire',
+        muscles: ['Triceps', 'Pectoraux', 'Épaules'],
+        sets: '3', reps: '10',
+        shortDesc: 'Dips aux barres parallèles avec une charge additionnelle à la ceinture',
+        technique: [
+          'Buste légèrement incliné en avant pour cibler les pectoraux',
+          'Descendre jusqu\'à un angle de coude de 90°',
+          'Remonter en poussant fort sans à-coup',
+        ],
+        runnerTip: 'Développe une force de poussée puissante du haut du corps, utile pour maintenir la posture en fin d\'effort intense.',
+        progression: 'Augmenter progressivement la charge additionnelle.',
+      },
+      {
+        name: 'Écarté couché', emoji: '🦅', type: 'Concentrique',
+        muscles: ['Pectoraux'],
+        sets: '3', reps: '12',
+        shortDesc: 'Allongé, haltères tenus bras légèrement fléchis, les écarter puis les ramener au-dessus de la poitrine',
+        technique: [
+          'Légère flexion des coudes maintenue tout le mouvement',
+          'Descendre jusqu\'à sentir l\'étirement maximal des pectoraux',
+          'Remonter en un arc de cercle, pas en ligne droite',
+        ],
+        runnerTip: 'Isole les pectoraux en étirement, complémentaire aux mouvements de poussée pour un développement complet.',
+        progression: 'Augmenter le poids des haltères progressivement.',
+      },
+      {
+        name: 'Pompes déclinées', emoji: '🔽', type: 'Polyarticulaire',
+        muscles: ['Pectoraux supérieurs', 'Épaules', 'Triceps'],
+        sets: '3', reps: '12–15',
+        shortDesc: 'Pieds surélevés sur une chaise, effectuer des pompes classiques',
+        technique: [
+          'Corps rigide de la tête aux talons malgré l\'inclinaison',
+          'Descendre jusqu\'à 2 cm du sol',
+          'Coudes à 45° du corps',
+        ],
+        runnerTip: 'Sollicite davantage le haut des pectoraux et les épaules que la pompe classique.',
+        progression: 'Augmenter la hauteur de surélévation des pieds.',
+      },
+      {
+        name: 'Extension triceps à la poulie/câble', emoji: '🔗', type: 'Concentrique',
+        muscles: ['Triceps'],
+        sets: '3', reps: '15',
+        shortDesc: 'Face à une poulie haute, pousser la corde ou la barre vers le bas',
+        technique: [
+          'Coudes fixes contre le corps pendant tout le mouvement',
+          'Extension complète en bas avec contraction maximale',
+          'Retour contrôlé jusqu\'à 90° de flexion',
+        ],
+        runnerTip: 'Isole les triceps en fin de séance pour un travail complémentaire après les mouvements polyarticulaires.',
+        progression: 'Augmenter la charge progressivement.',
+      },
+    ],
+  },
 ]
 
 /* ─── Grandes catégories (groupes musculaires) ───────────────────────── */
 const CATEGORIES = [
-  { id: 'abdos_gainage',          name: 'Abdos & Gainage',              emoji: '🎯', color: '#8B2FC9', sessionIds: ['core_abdo', 'gainage', 'pilates'] },
-  { id: 'fessiers_ischio',        name: 'Fessiers & Ischio-jambiers',   emoji: '🍑', color: '#10B981', sessionIds: ['fessiers', 'excentrique'] },
-  { id: 'jambes_genoux',          name: 'Jambes & Genoux',              emoji: '🦵', color: '#E8237A', sessionIds: ['force', 'quadriceps'] },
-  { id: 'haut_corps_cat',         name: 'Haut du Corps',                emoji: '💪', color: '#0EA5E9', sessionIds: ['haut_corps'] },
+  { id: 'abdos_gainage',          name: 'Abdos & Gainage',              emoji: '🎯', color: '#8B2FC9', sessionIds: ['core_abdo', 'gainage', 'pilates', 'gainage_dynamique', 'abdos_obliques', 'core_stabilite_avancee', 'respiration_posture'] },
+  { id: 'fessiers_ischio',        name: 'Fessiers & Ischio-jambiers',   emoji: '🍑', color: '#10B981', sessionIds: ['fessiers', 'excentrique', 'fessiers_unilateral', 'ischio_force', 'chaine_posterieure', 'fessiers_elastique', 'posterieur_puissance'] },
+  { id: 'jambes_genoux',          name: 'Jambes & Genoux',              emoji: '🦵', color: '#E8237A', sessionIds: ['force', 'quadriceps', 'jambes_unilateral', 'quad_genou_prevention', 'jambes_charge_lourde', 'jambes_endurance_muscu', 'bas_corps_complet'] },
+  { id: 'haut_corps_cat',         name: 'Haut du Corps',                emoji: '💪', color: '#0EA5E9', sessionIds: ['haut_corps', 'epaules_stabilite', 'dos_posture', 'bras_avantbras', 'haut_corps_poids_corps', 'haut_corps_elastique', 'pectoraux_triceps'] },
   { id: 'explosivite_equilibre',  name: 'Explosivité & Équilibre',      emoji: '⚡', color: '#F59E0B', sessionIds: ['explosivite', 'proprioception'] },
   { id: 'mobilite_cat',           name: 'Mobilité & Récupération',      emoji: '🌊', color: '#6B7280', sessionIds: ['mobilite'] },
   { id: 'full_body_cat',          name: 'Full Body',                    emoji: '🔥', color: '#F97316', sessionIds: ['full_body'] },
@@ -1338,7 +2818,7 @@ export default function AthleteStrength() {
 
       {/* Category tiles (grandes catégories) */}
       {!activeCategory && !activeSession && !searchQuery && (
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(135px, 1fr))', gap: '.875rem' }}>
+        <div className="strength-cat-grid">
           {CATEGORIES.map(cat => {
             const sessions = SESSIONS.filter(s => cat.sessionIds.includes(s.id))
             const totalEx  = sessions.reduce((sum, s) => sum + s.exercises.length, 0)
@@ -1348,25 +2828,25 @@ export default function AthleteStrength() {
                 onClick={() => setActiveCategory(cat.id)}
                 style={{
                   aspectRatio: '1', display: 'flex', flexDirection: 'column', alignItems: 'center',
-                  justifyContent: 'center', gap: '.5rem', padding: '1rem', textAlign: 'center',
+                  justifyContent: 'center', gap: '.65rem', padding: '1.25rem', textAlign: 'center',
                   cursor: 'pointer', background: 'var(--surface)', border: '1.5px solid var(--border)',
-                  borderRadius: 18, position: 'relative',
+                  borderRadius: 20, position: 'relative', boxSizing: 'border-box',
                   transition: 'transform .15s, box-shadow .15s, border-color .15s',
                 }}
                 onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.boxShadow = 'var(--shadow-lg)'; e.currentTarget.style.borderColor = cat.color + '60' }}
                 onMouseLeave={e => { e.currentTarget.style.transform = ''; e.currentTarget.style.boxShadow = ''; e.currentTarget.style.borderColor = 'var(--border)' }}>
                 {allDone && (
-                  <span style={{ position: 'absolute', top: 8, right: 8, fontSize: '.85rem' }}>✅</span>
+                  <span style={{ position: 'absolute', top: 10, right: 10, fontSize: '.95rem' }}>✅</span>
                 )}
                 <div style={{
-                  width: 52, height: 52, borderRadius: 14,
+                  width: 68, height: 68, borderRadius: 18,
                   background: `linear-gradient(135deg, ${cat.color}18, ${cat.color}38)`,
-                  display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.5rem'
+                  display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '2rem'
                 }}>
                   {cat.emoji}
                 </div>
-                <div style={{ fontWeight: 700, fontSize: '.85rem', lineHeight: 1.25 }}>{cat.name}</div>
-                <div style={{ fontSize: '.68rem', color: 'var(--text-muted)' }}>
+                <div style={{ fontWeight: 700, fontSize: '.95rem', lineHeight: 1.25 }}>{cat.name}</div>
+                <div style={{ fontSize: '.72rem', color: 'var(--text-muted)' }}>
                   {sessions.length} séance{sessions.length > 1 ? 's' : ''} · {totalEx} exercices
                 </div>
               </div>

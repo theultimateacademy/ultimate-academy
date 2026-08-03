@@ -1048,14 +1048,6 @@ export default function AthleteProfile() {
         </div>
       </div>
 
-      {/* Suivi de mes séances */}
-      <div className="card" style={{ marginBottom: '1.25rem' }}>
-        <h4 style={{ marginBottom: '.4rem' }}>Suivi de mes séances</h4>
-        <p style={{ fontSize: '.82rem', color: 'var(--text-muted)', lineHeight: 1.5 }}>
-          Partage tes ressentis et tes données d'entraînement directement via la messagerie — ton coach les prend en compte chaque semaine pour ajuster ton plan.
-        </p>
-      </div>
-
       {/* Adapter mon plan */}
       <div className="card" style={{ marginBottom: '1.25rem' }}>
         <h4 style={{ marginBottom: '.4rem' }}>Adapter mon plan</h4>

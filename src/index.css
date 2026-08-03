@@ -580,6 +580,13 @@ tr:hover td { background: rgba(255,255,255,.04); }
 @media (max-width: 400px) {
   .grid-3 { grid-template-columns: 1fr; }
 }
+.strength-cat-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; }
+@media (min-width: 700px) {
+  .strength-cat-grid { grid-template-columns: repeat(4, 1fr); }
+}
+@media (max-width: 400px) {
+  .strength-cat-grid { grid-template-columns: repeat(2, 1fr); }
+}
 
 /* ── iOS 26 Liquid Glass — base mixin ───────────────────── */
 .glass {
