@@ -34,12 +34,11 @@ export default function SportSelect() {
   const [showSubChoice, setShowSubChoice] = useState(searchParams.get('type') === 'running-trail')
   const [quotaFull,     setQuotaFull]     = useState(false)
   const [quotaLoading,  setQuotaLoading]  = useState(true)
-  const [quota,         setQuota]         = useState(null) // { quota, current }
 
   useEffect(() => {
     fetch(`${API}/api/admin/quota`)
       .then(r => r.json())
-      .then(d => { setQuotaFull(d.full === true); setQuota(d) })
+      .then(d => setQuotaFull(d.full === true))
       .catch(() => {})
       .finally(() => setQuotaLoading(false))
   }, [])
@@ -114,7 +113,7 @@ export default function SportSelect() {
           padding: '.5rem 1.1rem', textAlign: 'center' }}>
           <span style={{ fontSize: '.95rem' }}>🎯</span>
           <span style={{ fontSize: '.82rem', color: 'rgba(255,255,255,.75)', fontWeight: 600 }}>
-            Limité à 20 athlètes maximum{quota?.current != null ? ` · ${quota.current}/${quota.quota} places prises` : ''} — pour garder un suivi de qualité
+            Limité à 20 athlètes maximum — pour garder un suivi de qualité
           </span>
         </div>
 
