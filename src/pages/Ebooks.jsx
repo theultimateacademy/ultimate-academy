@@ -130,7 +130,7 @@ function CardIllustrationRunning({ gid, dist, kmText, kmInline, weeksLabel }) {
       style={{ width: '100%', height: '100%', position: 'absolute', inset: 0 }}>
       <defs>
         <linearGradient id={`${gid}-bg`} x1="0" y1="0" x2="1" y2="1">
-          <stop offset="0%" stopColor="#1A0A2E"/><stop offset="100%" stopColor="#2D0B4E"/>
+          <stop offset="0%" stopColor="#000000"/><stop offset="100%" stopColor="#000000"/>
         </linearGradient>
         <linearGradient id={`${gid}-g`} x1="0" y1="0" x2="1" y2="0">
           <stop offset="0%" stopColor="#8B2FC9"/><stop offset="100%" stopColor="#E8237A"/>
@@ -179,7 +179,7 @@ function CardIllustrationAntiBlessure() {
       style={{ width: '100%', height: '100%', position: 'absolute', inset: 0 }}>
       <defs>
         <linearGradient id="cab-bg" x1="0" y1="0" x2="1" y2="1">
-          <stop offset="0%" stopColor="#1A0A2E"/><stop offset="100%" stopColor="#2D0B4E"/>
+          <stop offset="0%" stopColor="#000000"/><stop offset="100%" stopColor="#000000"/>
         </linearGradient>
         <linearGradient id="cab-g" x1="0" y1="0" x2="1" y2="0">
           <stop offset="0%" stopColor="#8B2FC9"/><stop offset="100%" stopColor="#E8237A"/>
@@ -224,7 +224,7 @@ function EbookCard({ ebook }) {
         onMouseLeave={e => { e.currentTarget.style.transform = ''; e.currentTarget.style.borderColor = 'rgba(255,255,255,.08)' }}>
 
         {/* Couverture */}
-        <div style={{ height: 170, background: 'linear-gradient(135deg,#1A0A2E,#2D0B4E)', position: 'relative', overflow: 'hidden' }}>
+        <div style={{ height: 170, background: '#000000', position: 'relative', overflow: 'hidden' }}>
           {(() => {
             if (ebook.slug === '10km-8sem')      return <CardIllustrationRunning gid="c8"   dist="10" kmInline weeksLabel="8"  />
             if (ebook.slug === '10km-12sem')     return <CardIllustrationRunning gid="c10"  dist="10" kmInline weeksLabel="12" />

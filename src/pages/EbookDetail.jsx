@@ -170,7 +170,7 @@ function IllustrationRunning({ dist, kmText, kmInline, weeksLabel, price }) {
       style={{ width: '100%', height: '100%', position: 'absolute', inset: 0 }}>
       <defs>
         <linearGradient id="il-bg" x1="0" y1="0" x2="1" y2="1">
-          <stop offset="0%" stopColor="#1A0A2E" /><stop offset="100%" stopColor="#2D0B4E" />
+          <stop offset="0%" stopColor="#000000" /><stop offset="100%" stopColor="#000000" />
         </linearGradient>
         <linearGradient id="il-g" x1="0" y1="0" x2="1" y2="0">
           <stop offset="0%" stopColor="#8B2FC9" /><stop offset="100%" stopColor="#E8237A" />
@@ -234,7 +234,7 @@ function IllustrationAntiBlessure({ price }) {
       style={{ width: '100%', height: '100%', position: 'absolute', inset: 0 }}>
       <defs>
         <linearGradient id="il-bg" x1="0" y1="0" x2="1" y2="1">
-          <stop offset="0%" stopColor="#1A0A2E" /><stop offset="100%" stopColor="#2D0B4E" />
+          <stop offset="0%" stopColor="#000000" /><stop offset="100%" stopColor="#000000" />
         </linearGradient>
         <linearGradient id="il-g" x1="0" y1="0" x2="1" y2="0">
           <stop offset="0%" stopColor="#8B2FC9" /><stop offset="100%" stopColor="#E8237A" />
@@ -269,7 +269,7 @@ function IllustrationAntiBlessure({ price }) {
 function IllustrationGeneric({ icon, title }) {
   return (
     <div style={{ width: '100%', height: '100%', position: 'absolute', inset: 0,
-      background: 'linear-gradient(135deg,#1A0A2E,#2D0B4E)',
+      background: '#000000',
       display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
       <div style={{ position: 'absolute', inset: 0, background: grad, opacity: .18 }} />
       <div style={{ fontSize: '3.5rem', position: 'relative', marginBottom: '.5rem' }}>{icon}</div>
@@ -552,7 +552,7 @@ export default function EbookDetail() {
           {/* ── Colonne gauche ── */}
           <div>
             {/* Illustration */}
-            <div className="ebook-detail-illustration" style={{ height: 260, borderRadius: 20, overflow: 'hidden', position: 'relative', marginBottom: '1.5rem', background: '#1A0A2E' }}>
+            <div className="ebook-detail-illustration" style={{ height: 260, borderRadius: 20, overflow: 'hidden', position: 'relative', marginBottom: '1.5rem', background: '#000000' }}>
               {slugIllustration ?? (ebook.cover_image
                 ? <img src={ebook.cover_image} alt={ebook.title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                 : <IllustrationGeneric icon={meta.icon || '📋'} title={ebook.title} />
