@@ -87,6 +87,16 @@ function resolveVma(profile) {
     : LEVEL_VMA[profile.level] || 14;
 }
 
+// Alerte visible dans l'espace coach (onglet Alertes de la fiche athlète) — déclenchée
+// quand l'athlète active/désactive une adaptation de plan (canicule, fatigue, blessure, cycle).
+async function sendCoachAlert(userId, message) {
+  try {
+    await supabase.from('messages').insert({ user_id: userId, sender: 'athlete', content: `⚠️ [PROFIL] ${message}` });
+  } catch (err) {
+    console.error('[CoachAlert]', err.message);
+  }
+}
+
 function computeWeeksUntilRace(raceDate) {
   if (!raceDate) return null;
   const ms = new Date(raceDate).getTime() - Date.now();
@@ -1315,6 +1325,7 @@ router.post('/plans/adjust-heat', async (req, res) => {
       }
       await supabase.from('training_plans').update({ plan_data: updatedPlan }).eq('id', plan.id);
       await supabase.from('profiles').update({ heat_mode: false }).eq('id', userId);
+      sendCoachAlert(userId, `${profile?.first_name || "L'athlète"} a désactivé le mode canicule 🌡️ — retour aux séances normales.`);
       return res.json({ success: true, activated: false, planData: updatedPlan });
     }
 
@@ -1450,6 +1461,7 @@ router.post('/plans/adjust-heat', async (req, res) => {
 
     recalculateDistances(updatedPlan, vma);
     await supabase.from('training_plans').update({ plan_data: updatedPlan }).eq('id', plan.id);
+    sendCoachAlert(userId, `${profile?.first_name || "L'athlète"} a activé le mode canicule 🌡️ — le plan de la semaine a été allégé.`);
     res.json({ success: true, activated: true, planData: updatedPlan });
   } catch (err) {
     console.error('[AdjustHeat]', err.message);
@@ -1572,6 +1584,7 @@ router.post('/plans/adapt-injury', async (req, res) => {
 
     recalculateDistances(updatedPlan, vma);
     await supabase.from('training_plans').update({ plan_data: updatedPlan }).eq('id', plan.id);
+    sendCoachAlert(userId, `${profile?.first_name || "L'athlète"} a signalé une blessure 🩹 — le plan a été adapté en conséquence.`);
     res.json({ success: true, planData: updatedPlan });
   } catch (err) {
     console.error('[AdaptInjury]', err.message);
@@ -1692,6 +1705,7 @@ router.post('/plans/fatigue-adapt', async (req, res) => {
 
     recalculateDistances(updatedPlan, vma);
     await supabase.from('training_plans').update({ plan_data: updatedPlan }).eq('id', plan.id);
+    sendCoachAlert(userId, `${profile?.first_name || "L'athlète"} a signalé de la fatigue 😴 — la semaine a été allégée.`);
     res.json({ success: true, planData: updatedPlan });
   } catch (err) {
     console.error('[FatigueAdapt]', err.message);
@@ -1788,6 +1802,7 @@ router.post('/plans/restore-week', async (req, res) => {
 
       recalculateDistances(updatedPlan, vma);
       await supabase.from('training_plans').update({ plan_data: updatedPlan }).eq('id', plan.id);
+      sendCoachAlert(userId, `${profile?.first_name || "L'athlète"} a désactivé l'adaptation blessure 🩹 — reprise progressive sur 2 semaines.`);
       return res.json({ success: true, planData: updatedPlan });
     }
 
@@ -1819,6 +1834,8 @@ router.post('/plans/restore-week', async (req, res) => {
     }
 
     await supabase.from('training_plans').update({ plan_data: updatedPlan }).eq('id', plan.id);
+    const restoreLabels = { heat: 'canicule 🌡️', cycle: 'cycle menstruel 🌸', fatigue: 'fatigue 😴' };
+    sendCoachAlert(userId, `${profile?.first_name || "L'athlète"} a désactivé l'adaptation ${restoreLabels[adaptedFor] || adaptedFor} — retour aux séances normales.`);
     res.json({ success: true, planData: updatedPlan });
   } catch (err) {
     console.error('[RestoreWeek]', err.message);
@@ -1866,6 +1883,7 @@ router.post('/plans/period-alert', async (req, res) => {
     }
     recalculateDistances(updatedPlan, resolveVma(profile));
     await supabase.from('training_plans').update({ plan_data: updatedPlan }).eq('id', plan.id);
+    sendCoachAlert(userId, `${profile?.first_name || "L'athlète"} a activé l'adaptation cycle menstruel 🌸 — certaines séances ont été remplacées par du repos.`);
     res.json({ success: true, planData: updatedPlan });
   } catch (err) {
     console.error('[PeriodAlert]', err.message);

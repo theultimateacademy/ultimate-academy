@@ -28,8 +28,6 @@ function PlanModal({ plan, athlete, onClose, onActivate }) {
     try {
       await supabase.from('training_plans').update({ status: 'completed' }).eq('user_id', athlete.id).eq('status', 'active')
       await supabase.from('training_plans').update({ status: 'active', activated_at: new Date().toISOString() }).eq('id', plan.id)
-      await supabase.from('messages').insert({ user_id: athlete.id, sender: 'coach',
-        content: `${athlete.first_name} ! 🎉 Ton nouveau plan d'entraînement est prêt, tu peux le consulter dans "Mon plan". Si t'as des questions hésite pas.` })
       onActivate()
     } finally { setActivating(false) }
   }
