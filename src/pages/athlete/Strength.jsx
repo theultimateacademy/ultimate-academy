@@ -3936,6 +3936,524 @@ const SESSIONS = [
       },
     ],
   },
+
+  /* ── 50. Renforcement Cheville ─────────────────────────────────────── */
+  {
+    id: 'cheville_renforcement', name: 'Renforcement Cheville', emoji: '🦶', duration: '20–30 min',
+    subtitle: 'Tibial antérieur · mollets · stabilisateurs de cheville',
+    color: '#0EA5E9',
+    exercises: [
+      {
+        name: 'Montée sur pointe à deux pieds', emoji: '🦶', type: 'Concentrique',
+        muscles: ['Mollets', 'Tendon Achille'],
+        sets: '3', reps: '20',
+        shortDesc: 'Debout, monter sur la pointe des deux pieds puis redescendre avec contrôle',
+        technique: [
+          'Amplitude maximale, monter le plus haut possible sur la pointe',
+          'Descente lente en 2–3 sec, ne pas se laisser tomber',
+          'Garder les jambes tendues, sans fléchir les genoux',
+        ],
+        runnerTip: 'Base du renforcement du mollet et de la cheville — la fondation avant tout travail plus spécifique ou excentrique.',
+        progression: 'Passer sur une marche pour plus d\'amplitude, puis ajouter une charge.',
+      },
+      {
+        name: 'Inversion/éversion élastique', emoji: '🎗️', type: 'Concentrique',
+        muscles: ['Tibial postérieur', 'Péroniers'],
+        sets: '3', reps: '15 / sens / côté',
+        shortDesc: 'Assis, élastique autour du pied, tourner le pied vers l\'intérieur puis vers l\'extérieur contre résistance',
+        technique: [
+          'Jambe stable, seul le pied bouge contre la résistance',
+          'Amplitude complète dans chaque sens, mouvement contrôlé',
+          'Retour lent sans relâcher brutalement la tension',
+        ],
+        runnerTip: 'Renforce les muscles stabilisateurs latéraux de la cheville — clé pour prévenir l\'entorse, la blessure la plus fréquente en trail.',
+        progression: 'Augmenter la résistance de l\'élastique.',
+      },
+      {
+        name: 'Toe Raises (releveurs du pied)', emoji: '⬆️', type: 'Concentrique',
+        muscles: ['Tibial antérieur'],
+        sets: '3', reps: '20',
+        shortDesc: 'Debout, talons au sol, lever la pointe des pieds le plus haut possible',
+        technique: [
+          'Talons ancrés au sol pendant tout le mouvement',
+          'Monter la pointe des pieds au maximum, contraction franche',
+          'Redescendre avec contrôle, pas de chute brutale',
+        ],
+        runnerTip: 'Le tibial antérieur est le premier muscle à fatiguer en côte ou en descente technique — souvent responsable des périostites.',
+        progression: 'Faire l\'exercice sur un talon surélevé ou ajouter une résistance élastique.',
+      },
+      {
+        name: 'Marche sur les talons', emoji: '🚶', type: 'Concentrique',
+        muscles: ['Tibial antérieur', 'Stabilisateurs cheville'],
+        sets: '3', reps: '20 m',
+        shortDesc: 'Marcher sur une distance en gardant la pointe des pieds levée en permanence',
+        technique: [
+          'Pointe des pieds levée au maximum à chaque pas',
+          'Pas courts et contrôlés pour garder l\'équilibre',
+          'Buste droit, regard devant',
+        ],
+        runnerTip: 'Renforce en dynamique le muscle qui contrôle la pose du pied à chaque foulée — prévient le \'foot slap\' en fin de course fatiguée.',
+        progression: 'Augmenter la distance de marche.',
+      },
+      {
+        name: 'Marche sur la pointe des pieds', emoji: '🩰', type: 'Concentrique',
+        muscles: ['Mollets', 'Stabilisateurs cheville'],
+        sets: '3', reps: '20 m',
+        shortDesc: 'Marcher sur une distance en restant sur la pointe des pieds en permanence',
+        technique: [
+          'Rester le plus haut possible sur la pointe tout le trajet',
+          'Pas courts et contrôlés, buste stable',
+          'Éviter de retomber sur les talons entre les pas',
+        ],
+        runnerTip: 'Complète le travail du mollet en dynamique et en charge — transférable directement à la propulsion de la foulée.',
+        progression: 'Augmenter la distance ou ajouter des haltères légers.',
+      },
+    ],
+  },
+
+  /* ── 51. Stabilité de la Voûte Plantaire ──────────────────────────── */
+  {
+    id: 'voute_plantaire', name: 'Stabilité de la Voûte Plantaire', emoji: '🦶', duration: '20–25 min',
+    subtitle: 'Muscles intrinsèques du pied · fasciite plantaire',
+    color: '#10B981',
+    exercises: [
+      {
+        name: 'Short Foot Exercise', emoji: '🦶', type: 'Isométrique',
+        muscles: ['Muscles intrinsèques du pied', 'Voûte plantaire'],
+        sets: '3', reps: '10 × 5 sec',
+        shortDesc: 'Assis ou debout, raccourcir le pied en rapprochant l\'avant-pied du talon sans plier les orteils',
+        technique: [
+          'Les orteils restent longs et détendus, ils ne doivent pas se recroqueviller',
+          'Sentir la voûte plantaire se creuser légèrement sous l\'effet de la contraction',
+          'Tenir 5 sec puis relâcher complètement',
+        ],
+        runnerTip: 'L\'exercice de référence pour activer les muscles intrinsèques du pied — un pied fort réduit la charge sur le fascia plantaire.',
+        progression: 'Réaliser l\'exercice debout puis en appui unipodal une fois maîtrisé assis.',
+      },
+      {
+        name: 'Ramassage de serviette', emoji: '🧻', type: 'Concentrique',
+        muscles: ['Fléchisseurs des orteils', 'Muscles intrinsèques du pied'],
+        sets: '3', reps: '10',
+        shortDesc: 'Assis, pied sur une serviette au sol, la ramasser en la froissant avec les orteils',
+        technique: [
+          'Talon qui reste au sol, tout le travail vient des orteils',
+          'Froisser la serviette progressivement vers soi',
+          'Relâcher et recommencer avec la serviette repositionnée',
+        ],
+        runnerTip: 'Renforce les fléchisseurs des orteils, essentiels pour la phase de propulsion finale de chaque appui au sol.',
+        progression: 'Ajouter un léger poids sur l\'extrémité de la serviette.',
+      },
+      {
+        name: 'Ramassage de billes', emoji: '⚪', type: 'Concentrique',
+        muscles: ['Fléchisseurs des orteils', 'Coordination fine du pied'],
+        sets: '2', reps: '15 billes',
+        shortDesc: 'Ramasser des petits objets au sol avec les orteils et les déposer dans un bol',
+        technique: [
+          'Un orteil à la fois pour saisir chaque objet',
+          'Mouvement précis et contrôlé, pas de précipitation',
+          'Alterner les deux pieds',
+        ],
+        runnerTip: 'Développe la dextérité et la force fine des orteils, souvent complètement négligées alors qu\'elles participent à chaque appui.',
+        progression: 'Utiliser des objets plus petits ou augmenter la vitesse d\'exécution.',
+      },
+      {
+        name: 'Écartement des orteils (Toe Splay)', emoji: '🖐️', type: 'Isométrique',
+        muscles: ['Muscles intrinsèques du pied'],
+        sets: '3', reps: '10 × 5 sec',
+        shortDesc: 'Assis, écarter tous les orteils les uns des autres le plus largement possible',
+        technique: [
+          'Écartement actif, pas juste une ouverture passive',
+          'Tenir 5 sec en écartement maximal',
+          'Relâcher complètement entre chaque répétition',
+        ],
+        runnerTip: 'Renforce les muscles inter-osseux du pied — un pied capable de s\'étaler naturellement absorbe mieux les impacts.',
+        progression: 'Ajouter un élastique à orteils pour plus de résistance.',
+      },
+      {
+        name: 'Équilibre sur voûte activée', emoji: '🦩', type: 'Proprioception',
+        muscles: ['Voûte plantaire', 'Stabilisateurs cheville'],
+        sets: '3', reps: '30 sec / pied',
+        shortDesc: 'Sur un pied, activer le short foot puis maintenir l\'équilibre sans relâcher la voûte',
+        technique: [
+          'Activer la voûte plantaire avant de lever l\'autre pied',
+          'Maintenir la contraction du pied pendant tout l\'équilibre',
+          'Genou de la jambe d\'appui légèrement fléchi',
+        ],
+        runnerTip: 'Combine force du pied et équilibre — exactement la double compétence requise à chaque appui unipodal en course.',
+        progression: 'Fermer les yeux ou ajouter une surface instable.',
+      },
+    ],
+  },
+
+  /* ── 52. Tendon d'Achille — Force & Résilience ────────────────────── */
+  {
+    id: 'tendon_achille', name: 'Tendon d\'Achille — Force & Résilience', emoji: '🦵', duration: '25–35 min',
+    subtitle: 'Prévention et traitement des tendinopathies d\'Achille',
+    color: '#8B2FC9',
+    exercises: [
+      {
+        name: 'Calf Raise Alfredson complet', emoji: '🦶', type: 'Excentrique',
+        muscles: ['Mollets', 'Tendon Achille'],
+        sets: '3', reps: '15 × 2 (genou tendu + fléchi)',
+        shortDesc: 'Protocole complet : montée deux pieds, descente lente sur un pied, genou tendu puis genou fléchi',
+        technique: [
+          'Monter sur les deux pieds, lever l\'autre, descendre en 3 sec sur un seul pied',
+          'Répéter la série genou tendu, puis recommencer genou légèrement fléchi',
+          'Continuer même en cas de gêne légère, s\'arrêter en cas de douleur vive',
+        ],
+        runnerTip: 'Le protocole d\'Alfredson est le traitement de référence de la tendinopathie d\'Achille, validé cliniquement avec un taux de guérison de 80% à 12 semaines.',
+        progression: 'Ajouter du poids (sac à dos) quand les séries sont réalisées sans douleur.',
+      },
+      {
+        name: 'Calf Raise genou fléchi', emoji: '🦵', type: 'Concentrique',
+        muscles: ['Soléaire', 'Tendon Achille'],
+        sets: '3', reps: '15',
+        shortDesc: 'Montée sur pointe genoux légèrement fléchis, pour cibler le soléaire profond',
+        technique: [
+          'Genoux fléchis à environ 20-30° pendant tout le mouvement',
+          'Amplitude complète malgré la flexion du genou',
+          'Descente contrôlée sur 2–3 sec',
+        ],
+        runnerTip: 'Le soléaire est très actif en descente et en trail — souvent sous-travaillé au profit du seul gastrocnémien (jambe tendue).',
+        progression: 'Passer en unilatéral ou ajouter une charge.',
+      },
+      {
+        name: 'Calf Raise genou tendu', emoji: '🦿', type: 'Concentrique',
+        muscles: ['Gastrocnémien', 'Tendon Achille'],
+        sets: '3', reps: '15',
+        shortDesc: 'Montée sur pointe jambes complètement tendues',
+        technique: [
+          'Jambes tendues sans verrouiller brutalement les genoux',
+          'Amplitude maximale en haut et en bas du mouvement',
+          'Rythme contrôlé, pas d\'élan',
+        ],
+        runnerTip: 'Cible le gastrocnémien, le muscle superficiel du mollet le plus sollicité en accélération et en sprint.',
+        progression: 'Passer en unilatéral puis ajouter une charge progressive.',
+      },
+      {
+        name: 'Sauts à la corde légers', emoji: '🪢', type: 'Plyométrique',
+        muscles: ['Mollets', 'Tendon Achille'],
+        sets: '4', reps: '30 sec',
+        shortDesc: 'Petits sauts à la corde, en réintroduisant progressivement l\'impact sur le tendon',
+        technique: [
+          'Petits sauts, quelques centimètres au-dessus du sol',
+          'Réception souple sur l\'avant du pied à chaque saut',
+          'Rythme régulier et modéré, pas maximal',
+        ],
+        runnerTip: 'Étape clé de réintroduction de la charge élastique du tendon après une phase de renforcement pur — prépare au retour à la course.',
+        progression: 'Augmenter progressivement la durée une fois la tolérance confirmée sans douleur le lendemain.',
+      },
+      {
+        name: 'Marche en côte', emoji: '⛰️', type: 'Concentrique',
+        muscles: ['Mollets', 'Tendon Achille'],
+        sets: '3', reps: '5 min',
+        shortDesc: 'Marche rapide en pente pour charger le tendon en dorsiflexion sous tension',
+        technique: [
+          'Pas réguliers, pousser activement avec le mollet à chaque appui',
+          'Buste droit, ne pas se pencher excessivement en avant',
+          'Redescendre en marchant tranquillement pour récupérer',
+        ],
+        runnerTip: 'Charge le tendon d\'Achille en position allongée (dorsiflexion), une sollicitation fonctionnelle proche de la course en côte.',
+        progression: 'Augmenter la pente ou la durée de marche.',
+      },
+    ],
+  },
+
+  /* ── 53. Proprioception Cheville Avancée ──────────────────────────── */
+  {
+    id: 'proprio_cheville_avancee', name: 'Proprioception Cheville Avancée', emoji: '🦩', duration: '25–30 min',
+    subtitle: 'Réactivité · terrain instable · prévention entorse',
+    color: '#EC4899',
+    exercises: [
+      {
+        name: 'Équilibre sur coussin instable', emoji: '🔵', type: 'Proprioception',
+        muscles: ['Stabilisateurs cheville', 'Mollets'],
+        sets: '3', reps: '30–45 sec / pied',
+        shortDesc: 'Sur un coussin de proprioception, maintenir l\'équilibre sur un pied',
+        technique: [
+          'Genou légèrement fléchi, micro-ajustements permanents de la cheville',
+          'Regard fixe sur un point pour aider la stabilité au début',
+          'Progresser vers les yeux fermés quand la position est maîtrisée',
+        ],
+        runnerTip: 'La surface instable multiplie les corrections neuromusculaires nécessaires — un entraînement direct du réflexe de stabilisation de la cheville.',
+        progression: 'Fermer les yeux ou ajouter des lancers de balle contre un mur.',
+      },
+      {
+        name: 'Réception de saut unipodal contrôlée', emoji: '🦘', type: 'Proprioception',
+        muscles: ['Stabilisateurs cheville', 'Quadriceps'],
+        sets: '3', reps: '8 / côté',
+        shortDesc: 'Petit saut latéral, réception sur une jambe et stabilisation complète',
+        technique: [
+          'Saut modéré, l\'objectif est la qualité de la réception, pas la distance',
+          'Réception genou fléchi, cheville qui absorbe activement',
+          'Stabiliser 2 sec avant de recommencer',
+        ],
+        runnerTip: 'Entraîne le contrôle neuromusculaire au moment le plus à risque de l\'entorse — la réception après un appui déséquilibré.',
+        progression: 'Augmenter la distance du saut ou varier la direction.',
+      },
+      {
+        name: 'Équilibre yeux fermés', emoji: '🙈', type: 'Proprioception',
+        muscles: ['Stabilisateurs cheville', 'Système vestibulaire'],
+        sets: '3', reps: '20–30 sec / pied',
+        shortDesc: 'Sur un pied, sol stable, fermer les yeux et maintenir la position',
+        technique: [
+          'Fermer les yeux seulement une fois stable sur un pied',
+          'Rester actif sur la cheville avec des micro-corrections',
+          'Rouvrir les yeux si l\'équilibre est trop compromis',
+        ],
+        runnerTip: 'Sans repère visuel, le système proprioceptif de la cheville doit travailler seul — un entraînement neuromusculaire pur et exigeant.',
+        progression: 'Passer sur une surface instable une fois maîtrisé au sol.',
+      },
+      {
+        name: 'Perturbations externes', emoji: '🤝', type: 'Proprioception',
+        muscles: ['Stabilisateurs cheville', 'Core'],
+        sets: '3', reps: '10 perturbations / pied',
+        shortDesc: 'Sur un pied, un partenaire pousse légèrement et de façon imprévisible pour déséquilibrer',
+        technique: [
+          'Position stable de départ, genou légèrement fléchi',
+          'Réagir à la poussée en stabilisant activement sans reposer l\'autre pied',
+          'Le partenaire varie la direction et l\'intensité des poussées',
+        ],
+        runnerTip: 'Simule les déséquilibres imprévisibles du terrain réel (pierre, racine) — le stade le plus avancé de la rééducation proprioceptive.',
+        progression: 'Augmenter l\'intensité ou la fréquence des perturbations.',
+      },
+      {
+        name: 'Étoile d\'équilibre 4 directions', emoji: '⭐', type: 'Proprioception',
+        muscles: ['Stabilisateurs cheville', 'Fessiers'],
+        sets: '3', reps: '2 tours / pied',
+        shortDesc: 'Sur un pied, toucher le sol dans 4 directions (avant, arrière, et 2 côtés) avec l\'autre pied',
+        technique: [
+          'Toucher le sol le plus loin possible dans chaque direction sans transférer le poids',
+          'Revenir au centre parfaitement stable entre chaque direction',
+          'Genou de la jambe d\'appui toujours dans l\'axe',
+        ],
+        runnerTip: 'Teste et renforce la stabilité dans tous les plans de mouvement — la portée atteinte est aussi un bon indicateur de progression.',
+        progression: 'Augmenter la distance atteinte dans chaque direction au fil des semaines.',
+      },
+    ],
+  },
+
+  /* ── 54. Mobilité & Renforcement Combinés (cheville) ──────────────── */
+  {
+    id: 'cheville_mobilite_force', name: 'Mobilité & Renforcement Combinés', emoji: '🔄', duration: '25–30 min',
+    subtitle: 'Amplitude et force de cheville en un seul enchaînement',
+    color: '#F59E0B',
+    exercises: [
+      {
+        name: 'Fente avec dorsiflexion active', emoji: '🚶', type: 'Mobilité',
+        muscles: ['Cheville', 'Tendon Achille', 'Quadriceps'],
+        sets: '3', reps: '10 / côté',
+        shortDesc: 'Fente avant, pousser activement le genou au-dessus des orteils sans décoller le talon',
+        technique: [
+          'Talon avant ancré au sol pendant toute la poussée du genou',
+          'Pousser le genou le plus loin possible devant les orteils',
+          'Revenir avec contrôle sans perdre l\'alignement',
+        ],
+        runnerTip: 'Combine mobilité de cheville en charge et renforcement du quadriceps — directement transférable à la phase d\'appui de la foulée.',
+        progression: 'Augmenter la distance pied-mur ou ajouter des haltères.',
+      },
+      {
+        name: 'Cercles de cheville résistés', emoji: '🎗️', type: 'Mobilité',
+        muscles: ['Stabilisateurs cheville', 'Mollets'],
+        sets: '2', reps: '8 / sens / côté',
+        shortDesc: 'Élastique autour du pied, tracer des cercles amples contre la résistance',
+        technique: [
+          'Jambe stable, tout le mouvement vient de la cheville',
+          'Cercles les plus amples possibles dans les deux sens',
+          'Résistance constante tout au long du cercle',
+        ],
+        runnerTip: 'Combine mobilité complète de la cheville et renforcement léger — utile en échauffement avant une séance technique.',
+        progression: 'Augmenter la résistance de l\'élastique.',
+      },
+      {
+        name: 'Squat sur surface instable', emoji: '🔵', type: 'Polyarticulaire',
+        muscles: ['Cheville', 'Genou', 'Quadriceps'],
+        sets: '3', reps: '12',
+        shortDesc: 'Squat classique effectué debout sur un coussin ou une surface instable',
+        technique: [
+          'Descente contrôlée, genoux dans l\'axe des orteils',
+          'Corriger activement les déséquilibres de la cheville pendant le mouvement',
+          'Remonter en gardant l\'équilibre sur toute l\'amplitude',
+        ],
+        runnerTip: 'Force la cheville à stabiliser sous charge et en mouvement, une combinaison rarement travaillée mais très fonctionnelle.',
+        progression: 'Fermer les yeux ou ajouter un léger poids.',
+      },
+      {
+        name: 'Marche en fente pointe levée', emoji: '👣', type: 'Concentrique',
+        muscles: ['Tibial antérieur', 'Quadriceps'],
+        sets: '3', reps: '10 / jambe',
+        shortDesc: 'Fentes marchées en gardant la pointe du pied avant levée à chaque pas',
+        technique: [
+          'Pointe du pied avant levée dès la pose du talon',
+          'Descente normale de la fente, genou arrière proche du sol',
+          'Alterner la jambe qui avance à chaque pas',
+        ],
+        runnerTip: 'Combine renforcement du tibial antérieur et des jambes — reproduit la mécanique de la pose de pied en course rapide.',
+        progression: 'Ajouter des haltères ou augmenter la distance.',
+      },
+      {
+        name: 'Élévation talon-orteil alternée', emoji: '⚖️', type: 'Concentrique',
+        muscles: ['Mollets', 'Tibial antérieur'],
+        sets: '3', reps: '15 cycles',
+        shortDesc: 'Alterner rapidement entre monter sur la pointe et basculer sur les talons',
+        technique: [
+          'Transition fluide entre pointe et talons, sans temps d\'arrêt',
+          'Amplitude complète à chaque extrémité du mouvement',
+          'Garder l\'équilibre tout au long de l\'enchaînement',
+        ],
+        runnerTip: 'Travaille les deux groupes musculaires antagonistes de la cheville dans un seul enchaînement dynamique et fonctionnel.',
+        progression: 'Augmenter la vitesse d\'exécution ou le nombre de cycles.',
+      },
+    ],
+  },
+
+  /* ── 55. Pieds Nus & Sensibilité Plantaire ────────────────────────── */
+  {
+    id: 'pieds_nus', name: 'Pieds Nus & Sensibilité Plantaire', emoji: '👣', duration: '20–25 min',
+    subtitle: 'Sensibilité proprioceptive · renforcement naturel du pied',
+    color: '#6B7280',
+    exercises: [
+      {
+        name: 'Marche pieds nus sur surfaces variées', emoji: '👣', type: 'Proprioception',
+        muscles: ['Muscles intrinsèques du pied', 'Stabilisateurs cheville'],
+        sets: '1', reps: '5–10 min',
+        shortDesc: 'Marcher pieds nus successivement sur herbe, sable, gravier fin, tapis',
+        technique: [
+          'Commencer sur des surfaces douces (herbe, tapis) avant les plus texturées',
+          'Rester attentif aux sensations sous le pied à chaque appui',
+          'Arrêter en cas de douleur, ce n\'est pas un exercice de tolérance à la douleur',
+        ],
+        runnerTip: 'La variété de textures stimule les récepteurs sensoriels du pied, souvent atrophiés par l\'usage permanent de chaussures amorties.',
+        progression: 'Augmenter la durée et diversifier les surfaces progressivement.',
+      },
+      {
+        name: 'Roulement de balle sous le pied', emoji: '🎾', type: 'Mobilité',
+        muscles: ['Fascia plantaire', 'Muscles intrinsèques du pied'],
+        sets: '2', reps: '1–2 min / pied',
+        shortDesc: 'Debout ou assis, rouler une balle de tennis sous la voûte plantaire',
+        technique: [
+          'Pression modérée, ajuster selon la sensibilité du jour',
+          'Rouler lentement de l\'avant-pied au talon',
+          'S\'arrêter et insister sur les zones les plus tendues',
+        ],
+        runnerTip: 'Auto-massage simple qui relâche les tensions du fascia plantaire — utile en prévention ou en récupération après une longue sortie.',
+        progression: 'Utiliser une balle plus dure ou une bouteille gelée pour un effet anti-inflammatoire.',
+      },
+      {
+        name: 'Doming renforcé', emoji: '🦶', type: 'Isométrique',
+        muscles: ['Muscles intrinsèques du pied', 'Voûte plantaire'],
+        sets: '3', reps: '10 × 5 sec / pied',
+        shortDesc: 'Version debout et chargée du short foot exercise, tout le poids du corps sur le pied actif',
+        technique: [
+          'Debout sur le pied qui travaille, activer le raccourcissement du pied',
+          'Sentir la voûte se creuser sous le poids du corps',
+          'Maintenir 5 sec sans laisser le pied s\'affaisser',
+        ],
+        runnerTip: 'Version chargée du short foot — renforce la voûte plantaire dans les conditions réelles de mise en charge de la course.',
+        progression: 'Ajouter un léger déséquilibre ou fermer les yeux.',
+      },
+      {
+        name: 'Équilibre pieds nus unipodal', emoji: '🦩', type: 'Proprioception',
+        muscles: ['Muscles intrinsèques du pied', 'Stabilisateurs cheville'],
+        sets: '3', reps: '30 sec / pied',
+        shortDesc: 'Pieds nus, maintenir l\'équilibre sur un pied sur une surface légèrement texturée',
+        technique: [
+          'Orteils détendus et actifs, pas crispés',
+          'Micro-ajustements permanents perceptibles sous le pied nu',
+          'Progresser vers les yeux fermés',
+        ],
+        runnerTip: 'Sans amorti de chaussure, chaque micro-correction est directement ressentie — un feedback sensoriel plus riche qu\'en chaussures.',
+        progression: 'Passer sur une surface plus instable ou irrégulière.',
+      },
+      {
+        name: 'Foulées pieds nus sur herbe', emoji: '🌱', type: 'Neuromusculaire',
+        muscles: ['Muscles intrinsèques du pied', 'Mollets'],
+        sets: '4', reps: '20–30 m',
+        shortDesc: 'Petites foulées légères pieds nus sur herbe courte et régulière',
+        technique: [
+          'Foulées courtes et légères, jamais à pleine vitesse au début',
+          'Pose du pied naturelle, ne pas forcer une technique particulière',
+          'S\'arrêter au moindre signe d\'inconfort ou de douleur',
+        ],
+        runnerTip: 'Réintroduit progressivement la charge naturelle sur le pied, en complément — jamais en remplacement — de l\'entraînement habituel en chaussures.',
+        progression: 'Augmenter très progressivement la distance, sur plusieurs semaines.',
+      },
+    ],
+  },
+
+  /* ── 56. Prévention Entorses ───────────────────────────────────────── */
+  {
+    id: 'prevention_entorses', name: 'Prévention Entorses', emoji: '🛡️', duration: '20–30 min',
+    subtitle: 'Péroniers · stabilité latérale · terrain irrégulier',
+    color: '#EF4444',
+    exercises: [
+      {
+        name: 'Renforcement péroniers élastique', emoji: '🎗️', type: 'Concentrique',
+        muscles: ['Péroniers', 'Stabilisateurs latéraux cheville'],
+        sets: '3', reps: '15 / côté',
+        shortDesc: 'Assis, élastique fixé sur le côté, pousser le pied vers l\'extérieur contre résistance',
+        technique: [
+          'Jambe stable, mouvement isolé de la cheville vers l\'extérieur',
+          'Amplitude complète, contraction franche des péroniers',
+          'Retour lent sans relâcher brutalement la tension',
+        ],
+        runnerTip: 'Les péroniers sont les muscles qui empêchent le pied de partir en inversion excessive — leur faiblesse est le facteur de risque n°1 de l\'entorse.',
+        progression: 'Augmenter la résistance de l\'élastique.',
+      },
+      {
+        name: 'Sauts latéraux contrôlés', emoji: '↔️', type: 'Plyométrique',
+        muscles: ['Péroniers', 'Fessiers', 'Mollets'],
+        sets: '3', reps: '8 / côté',
+        shortDesc: 'Petit saut latéral d\'une jambe à l\'autre, stabilisation complète à chaque réception',
+        technique: [
+          'Impulsion modérée, priorité totale à la qualité de la réception',
+          'Réception genou fléchi, cheville stable, pas de vacillement',
+          'Stabiliser 2 sec avant le saut suivant',
+        ],
+        runnerTip: 'Entraîne le contrôle latéral dynamique du pied — exactement la situation qui précède la majorité des entorses de cheville.',
+        progression: 'Augmenter la distance du saut ou le nombre de répétitions.',
+      },
+      {
+        name: 'Plateau instable multidirectionnel', emoji: '🔵', type: 'Proprioception',
+        muscles: ['Stabilisateurs cheville', 'Péroniers'],
+        sets: '3', reps: '30–40 sec / pied',
+        shortDesc: 'Sur un plateau basculant, maintenir l\'équilibre en contrôlant les mouvements dans toutes les directions',
+        technique: [
+          'Genou légèrement fléchi, cheville active en permanence',
+          'Éviter que le plateau touche le sol d\'un côté ou de l\'autre',
+          'Regard fixe devant pour aider la stabilité',
+        ],
+        runnerTip: 'Le plateau basculant multidirectionnel est l\'outil de référence en rééducation post-entorse pour restaurer le contrôle neuromusculaire complet.',
+        progression: 'Fermer les yeux ou ajouter des lancers de balle.',
+      },
+      {
+        name: 'Marche en huit (Figure-8)', emoji: '➰', type: 'Proprioception',
+        muscles: ['Stabilisateurs cheville', 'Core'],
+        sets: '3', reps: '2 tours',
+        shortDesc: 'Marcher en traçant un huit au sol autour de deux plots, changements de direction fréquents',
+        technique: [
+          'Pas courts et contrôlés dans les virages serrés',
+          'Cheville active pour gérer chaque changement d\'appui',
+          'Accélérer progressivement une fois le tracé maîtrisé',
+        ],
+        runnerTip: 'Les changements de direction fréquents sollicitent la cheville dans des plans variés, proches des sollicitations réelles du trail.',
+        progression: 'Réduire la taille du huit ou augmenter la vitesse.',
+      },
+      {
+        name: 'Réception unipodal après saut latéral', emoji: '🦘', type: 'Proprioception',
+        muscles: ['Péroniers', 'Stabilisateurs cheville', 'Quadriceps'],
+        sets: '3', reps: '6 / côté',
+        shortDesc: 'Saut latéral depuis deux pieds, réception et stabilisation complète sur une seule jambe',
+        technique: [
+          'Saut modéré, l\'objectif est le contrôle à la réception, pas la distance',
+          'Réception sur une jambe, genou fléchi, cheville qui absorbe activement',
+          'Tenir la position stable 2 sec minimum avant de recommencer',
+        ],
+        runnerTip: 'Combine impact latéral et stabilisation unipodale — le scénario exact d\'un appui déséquilibré sur terrain irrégulier.',
+        progression: 'Augmenter la distance du saut latéral.',
+      },
+    ],
+  },
 ]
 
 /* ─── Grandes catégories (groupes musculaires) ───────────────────────── */
@@ -3947,6 +4465,7 @@ const CATEGORIES = [
   { id: 'explosivite_equilibre',  name: 'Explosivité & Équilibre',      emoji: '⚡', color: '#F59E0B', sessionIds: ['explosivite', 'proprioception', 'pliometrie_avancee', 'vitesse_reaction', 'equilibre_dynamique', 'puissance_bondissante', 'coordination_agilite'] },
   { id: 'mobilite_cat',           name: 'Mobilité & Récupération',      emoji: '🌊', color: '#6B7280', sessionIds: ['mobilite', 'mobilite_hanches', 'mobilite_cheville_avancee', 'etirements_chaine_posterieure', 'recuperation_active', 'mobilite_colonne', 'yoga_coureur'] },
   { id: 'full_body_cat',          name: 'Full Body',                    emoji: '🔥', color: '#F97316', sessionIds: ['full_body', 'full_body_hiit', 'full_body_force', 'circuit_metabolique', 'full_body_poids_corps', 'full_body_kettlebell', 'cross_training'] },
+  { id: 'cheville_pied',          name: 'Cheville & Pied',               emoji: '🦶', color: '#0EA5E9', sessionIds: ['cheville_renforcement', 'voute_plantaire', 'tendon_achille', 'proprio_cheville_avancee', 'cheville_mobilite_force', 'pieds_nus', 'prevention_entorses'] },
 ]
 
 /* ─── Page ──────────────────────────────────────────────────────────── */
