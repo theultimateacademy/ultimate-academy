@@ -504,6 +504,9 @@ tr:hover td { background: rgba(255,255,255,.04); }
   .ebooks-table-desktop { display: none !important; }
   .ebooks-mobile-list   { display: flex !important; flex-direction: column; gap: .5rem; }
 
+  /* Admin session library: search bar left-aligned + full width instead of pushed right */
+  .session-lib-search { margin-left: 0 !important; width: 100% !important; min-width: 0 !important; box-sizing: border-box; }
+
   /* Messagerie admin : liste pleine largeur sur mobile */
   .messaging-list { width: 100% !important; }
   .messaging-list .msg-header { padding: 1rem !important; }

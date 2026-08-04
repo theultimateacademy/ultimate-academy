@@ -226,6 +226,7 @@ export default function SessionLibrary() {
         })}
 
         <input
+          className="session-lib-search"
           value={search}
           onChange={e => { setSearch(e.target.value); setExpanded(null) }}
           placeholder="Rechercher…"
