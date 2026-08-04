@@ -187,8 +187,8 @@ export default function AdminEbooks() {
             ))}
           </div>
 
-          {/* Liste des achats */}
-          <div className="card" style={{ padding: 0, overflow: 'hidden' }}>
+          {/* Liste des achats — desktop: table */}
+          <div className="card ebooks-table-desktop" style={{ padding: 0, overflow: 'hidden' }}>
             <div style={{ padding: '1rem 1.25rem', borderBottom: '1px solid var(--border)', fontWeight: 700 }}>
               Derniers achats ({purchases.length})
             </div>
@@ -209,7 +209,7 @@ export default function AdminEbooks() {
                       <td style={{ padding: '.75rem 1rem', fontSize: '.875rem' }}>{p.vma ?? '—'}</td>
                       <td style={{ padding: '.75rem 1rem', fontSize: '.875rem' }}>{p.seances_semaine ?? '—'}</td>
                       <td style={{ padding: '.75rem 1rem' }}>
-                        <span style={{ background: (STATUS_COLORS[p.status] || '#6B7280') + '20', color: STATUS_COLORS[p.status] || '#6B7280', borderRadius: 99, padding: '.2rem .65rem', fontSize: '.72rem', fontWeight: 700 }}>
+                        <span style={{ background: (STATUS_COLORS[p.status] || '#6B7280') + '20', color: STATUS_COLORS[p.status] || '#6B7280', borderRadius: 99, padding: '.2rem .65rem', fontSize: '.72rem', fontWeight: 700, whiteSpace: 'nowrap' }}>
                           {STATUS_LABELS[p.status] || p.status}
                         </span>
                       </td>
@@ -237,49 +237,120 @@ export default function AdminEbooks() {
               </table>
             </div>
           </div>
+
+          {/* Liste des achats — mobile: cards */}
+          <div className="ebooks-mobile-list" style={{ display: 'none' }}>
+            <div style={{ fontWeight: 700, marginBottom: '.25rem' }}>Derniers achats ({purchases.length})</div>
+            {purchases.length === 0 ? (
+              <div className="card" style={{ padding: '2rem', textAlign: 'center', color: 'var(--text-muted)' }}>Aucun achat pour l'instant.</div>
+            ) : purchases.map(p => (
+              <div key={p.id} className="card" style={{ padding: '1rem', display: 'flex', flexDirection: 'column', gap: '.5rem' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '.5rem' }}>
+                  <div style={{ minWidth: 0 }}>
+                    <div style={{ fontWeight: 700, fontSize: '.88rem', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{p.email}</div>
+                    <div style={{ fontSize: '.75rem', color: 'var(--text-muted)', marginTop: '.15rem' }}>{p.ebooks?.title || p.ebook_id}</div>
+                  </div>
+                  <span style={{ flexShrink: 0, background: (STATUS_COLORS[p.status] || '#6B7280') + '20', color: STATUS_COLORS[p.status] || '#6B7280', borderRadius: 99, padding: '.2rem .65rem', fontSize: '.72rem', fontWeight: 700, whiteSpace: 'nowrap' }}>
+                    {STATUS_LABELS[p.status] || p.status}
+                  </span>
+                </div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <div style={{ fontSize: '.78rem', color: 'var(--text-muted)' }}>
+                    VMA {p.vma ?? '—'} · {p.seances_semaine ?? '—'} séances/sem · {new Date(p.created_at).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short', year: 'numeric' })}
+                  </div>
+                  <button
+                    onClick={() => deletePurchase(p.id)}
+                    disabled={deleting === p.id}
+                    title="Supprimer cet achat"
+                    style={{ flexShrink: 0, background: 'none', border: 'none', cursor: 'pointer', fontSize: '1rem', opacity: deleting === p.id ? .4 : .6, padding: '.2rem .4rem', borderRadius: 6 }}
+                  >
+                    🗑️
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
         </>
       )}
 
       {/* ── CATALOGUE ── */}
       {tab === 'catalogue' && (
-        <div className="card" style={{ padding: 0, overflow: 'hidden' }}>
-          <div style={{ overflowX: 'auto' }}>
-          <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: 560 }}>
-            <thead>
-              <tr style={{ borderBottom: '1px solid var(--border)' }}>
-                {['Titre', 'Slug', 'Prix', 'Ventes', 'Statut', ''].map(h => (
-                  <th key={h} style={{ padding: '.75rem 1rem', textAlign: 'left', fontSize: '.78rem', fontWeight: 700, color: 'var(--text-muted)' }}>{h}</th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              {(stats?.ebooks || []).map(e => (
-                <tr key={e.id} style={{ borderBottom: '1px solid var(--border)' }}>
-                  <td style={{ padding: '.75rem 1rem', fontWeight: 600 }}>{e.title}</td>
-                  <td style={{ padding: '.75rem 1rem', fontSize: '.8rem', color: 'var(--text-muted)' }}>{e.slug}</td>
-                  <td style={{ padding: '.75rem 1rem', fontSize: '.875rem' }}>
-                    {PRICE_TIERS[e.slug]
-                      ? `${(Math.min(...Object.values(PRICE_TIERS[e.slug])) / 100).toFixed(2)}€ – ${(Math.max(...Object.values(PRICE_TIERS[e.slug])) / 100).toFixed(2)}€`
-                      : `${(e.price_cents / 100).toFixed(2)}€`}
-                  </td>
-                  <td style={{ padding: '.75rem 1rem', fontWeight: 700, color: e.sales > 0 ? 'var(--primary)' : 'var(--text-muted)' }}>{e.sales}</td>
-                  <td style={{ padding: '.75rem 1rem' }}>
-                    <span style={{ background: e.active ? 'rgba(16,185,129,.15)' : 'rgba(107,114,128,.15)', color: e.active ? '#10B981' : '#6B7280', borderRadius: 99, padding: '.2rem .65rem', fontSize: '.72rem', fontWeight: 700 }}>
-                      {e.active ? 'Actif' : 'Inactif'}
-                    </span>
-                  </td>
-                  <td style={{ padding: '.75rem 1rem' }}>
-                    <button onClick={() => toggleActive(e.id)} disabled={toggling === e.id}
-                      className="btn btn-ghost btn-sm">
-                      {toggling === e.id ? '…' : e.active ? 'Désactiver' : 'Activer'}
-                    </button>
-                  </td>
+        <>
+          {/* Desktop: table */}
+          <div className="card ebooks-table-desktop" style={{ padding: 0, overflow: 'hidden' }}>
+            <div style={{ overflowX: 'auto' }}>
+            <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: 560 }}>
+              <thead>
+                <tr style={{ borderBottom: '1px solid var(--border)' }}>
+                  {['Titre', 'Slug', 'Prix', 'Ventes', 'Statut', ''].map(h => (
+                    <th key={h} style={{ padding: '.75rem 1rem', textAlign: 'left', fontSize: '.78rem', fontWeight: 700, color: 'var(--text-muted)' }}>{h}</th>
+                  ))}
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {(stats?.ebooks || []).map(e => (
+                  <tr key={e.id} style={{ borderBottom: '1px solid var(--border)' }}>
+                    <td style={{ padding: '.75rem 1rem', fontWeight: 600 }}>{e.title}</td>
+                    <td style={{ padding: '.75rem 1rem', fontSize: '.8rem', color: 'var(--text-muted)' }}>{e.slug}</td>
+                    <td style={{ padding: '.75rem 1rem', fontSize: '.875rem' }}>
+                      {PRICE_TIERS[e.slug]
+                        ? `${(Math.min(...Object.values(PRICE_TIERS[e.slug])) / 100).toFixed(2)}€ – ${(Math.max(...Object.values(PRICE_TIERS[e.slug])) / 100).toFixed(2)}€`
+                        : `${(e.price_cents / 100).toFixed(2)}€`}
+                    </td>
+                    <td style={{ padding: '.75rem 1rem', fontWeight: 700, color: e.sales > 0 ? 'var(--primary)' : 'var(--text-muted)' }}>{e.sales}</td>
+                    <td style={{ padding: '.75rem 1rem' }}>
+                      <span style={{ background: e.active ? 'rgba(16,185,129,.15)' : 'rgba(107,114,128,.15)', color: e.active ? '#10B981' : '#6B7280', borderRadius: 99, padding: '.2rem .65rem', fontSize: '.72rem', fontWeight: 700, whiteSpace: 'nowrap' }}>
+                        {e.active ? 'Actif' : 'Inactif'}
+                      </span>
+                    </td>
+                    <td style={{ padding: '.75rem 1rem' }}>
+                      <button onClick={() => toggleActive(e.id)} disabled={toggling === e.id}
+                        className="btn btn-ghost btn-sm">
+                        {toggling === e.id ? '…' : e.active ? 'Désactiver' : 'Activer'}
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+            </div>
           </div>
-        </div>
+
+          {/* Mobile: cards */}
+          <div className="ebooks-mobile-list" style={{ display: 'none' }}>
+            {(stats?.ebooks || []).map(e => (
+              <div key={e.id} className="card" style={{ padding: '1rem', display: 'flex', flexDirection: 'column', gap: '.6rem' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '.5rem' }}>
+                  <div style={{ minWidth: 0 }}>
+                    <div style={{ fontWeight: 700, fontSize: '.92rem' }}>{e.title}</div>
+                    <div style={{ fontSize: '.72rem', color: 'var(--text-muted)', marginTop: '.15rem' }}>{e.slug}</div>
+                  </div>
+                  <span style={{ flexShrink: 0, background: e.active ? 'rgba(16,185,129,.15)' : 'rgba(107,114,128,.15)', color: e.active ? '#10B981' : '#6B7280', borderRadius: 99, padding: '.2rem .65rem', fontSize: '.72rem', fontWeight: 700, whiteSpace: 'nowrap' }}>
+                    {e.active ? 'Actif' : 'Inactif'}
+                  </span>
+                </div>
+                <div style={{ display: 'flex', gap: '1.25rem', fontSize: '.82rem' }}>
+                  <div>
+                    <div style={{ fontSize: '.68rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '.04em' }}>Prix</div>
+                    <div style={{ fontWeight: 600 }}>
+                      {PRICE_TIERS[e.slug]
+                        ? `${(Math.min(...Object.values(PRICE_TIERS[e.slug])) / 100).toFixed(2)}€–${(Math.max(...Object.values(PRICE_TIERS[e.slug])) / 100).toFixed(2)}€`
+                        : `${(e.price_cents / 100).toFixed(2)}€`}
+                    </div>
+                  </div>
+                  <div>
+                    <div style={{ fontSize: '.68rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '.04em' }}>Ventes</div>
+                    <div style={{ fontWeight: 700, color: e.sales > 0 ? 'var(--primary)' : 'var(--text-muted)' }}>{e.sales}</div>
+                  </div>
+                </div>
+                <button onClick={() => toggleActive(e.id)} disabled={toggling === e.id}
+                  className="btn btn-ghost btn-sm" style={{ alignSelf: 'flex-start' }}>
+                  {toggling === e.id ? '…' : e.active ? 'Désactiver' : 'Activer'}
+                </button>
+              </div>
+            ))}
+          </div>
+        </>
       )}
     </div>
   )
