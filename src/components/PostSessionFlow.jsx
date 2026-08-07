@@ -57,11 +57,16 @@ const RECOVERY_RE = /r[ée]cup|transition|repos/i
 const REPS_RE = /(\d+)\s*[×x×]\s*(\d+(?:[.,]\d+)?)\s*(m\b|km\b|min\b)/i
 // Leading distance/duration token at the start of a bullet/segment, e.g. "300m", "20min", "1h20"
 const LEAD_QTY_RE = /^(\d+(?:[.,]\d+)?\s*(?:m\b|km\b|min\b)|\d+\s*h\s*\d*\b)/i
-// A bullet/segment that STARTS with a quantity ("1000m à ...", "3×2km à ...") is a real effort
-// segment even if it mentions "récup" later as a trailing note (ex: "1000m à 87-90% VMA — récup
-// 4'30 entre les blocs") — only segments opening with récup/transition/repos are pure recovery.
-const LEADING_QTY_RE = /^\d+\s*[×x]|^\d+(?:[.,]\d+)?\s*(?:m\b|km\b|min\b|h\b)/i
-function isRecoverySegment(t) { return !LEADING_QTY_RE.test(t) && RECOVERY_RE.test(t) }
+// Recovery mentions are consistently written as a trailing " — ..." note in this corpus
+// (ex: "3 séries de 4x400m à 97-105% VMA — récup 45'' entre les 400m, 4min entre les séries",
+// "1000m à 87-90% VMA — récup 4'30 entre les blocs"). Testing only the text BEFORE the first
+// em-dash avoids misclassifying an effort segment as pure recovery just because it *mentions*
+// récup/transition afterwards — a segment is pure recovery only when récup/transition/repos is
+// part of its actual subject, not a trailing annotation.
+function isRecoverySegment(t) {
+  const mainPart = (t || '').split(/\s*—\s*/)[0]
+  return RECOVERY_RE.test(mainPart)
+}
 
 // Detect EVERY meaningful section in the corps text — real "BLOC ..." headers with bullets,
 // OR (when no BLOC header exists at all) a virtual split on "→"/"puis" for raw multi-segment

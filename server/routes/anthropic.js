@@ -428,21 +428,22 @@ function subsPaces(text, vma) {
 }
 
 const CORPS_RECOVERY_RE = /r[ée]cup|transition|repos/i;
-// A segment that STARTS with a quantity ("1000m à ...", "5min à ...") is a real effort phase
-// even if it mentions "récup" later as a trailing note (ex: "1000m à 87-90% VMA — récup 4'30
-// entre les blocs") — only segments that open with récup/transition/repos are pure recovery.
-const LEADING_QTY_RE = /^\d+\s*[×x]|^\d+(?:[.,]\d+)?\s*(?:m\b|km\b|min\b|h\b)/i;
 
 // Split a raw main_set on "→"/"puis" into BLOC phases, auto-labeling recovery segments
 // ("BLOC Récupération") so the post-session pace-entry UI knows to skip them, and
 // numbering the remaining effort segments sequentially under blocLabel (ex: "3 blocs de :
 // 1000m à 87-90% VMA → récup 1'30 → 500m à 100-105% VMA" → 2 effort phases + 1 recovery phase).
+// Recovery mentions are consistently written as a trailing " — ..." note in this corpus (ex:
+// "3 séries de 4x400m à 97-105% VMA — récup 45'' entre les 400m, 4min entre les séries") — testing
+// only the text before the first em-dash avoids misclassifying an effort segment as pure recovery
+// just because it *mentions* récup afterwards.
 function splitPhasesRecoveryAware(main, blocLabel) {
   const phases = main.split(/\s*(?:→|\bpuis\b)\s*/i);
   let effortIdx = 0;
   return phases.map(p => {
     const trimmed = p.trim();
-    const isRecov = !LEADING_QTY_RE.test(trimmed) && CORPS_RECOVERY_RE.test(trimmed);
+    const mainPart = trimmed.split(/\s*—\s*/)[0];
+    const isRecov = CORPS_RECOVERY_RE.test(mainPart);
     const header = isRecov ? 'BLOC Récupération' : `BLOC ${blocLabel} ${++effortIdx}`;
     return { header, text: trimmed };
   });
