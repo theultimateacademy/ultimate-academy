@@ -55,9 +55,23 @@ function timeToSplit(min, sec, distM, per100 = false) {
 
 const RECOVERY_RE = /r[ée]cup|transition|repos/i
 const REPS_RE = /(\d+)\s*[×x×]\s*(\d+(?:[.,]\d+)?)\s*(m\b|km\b|min\b)/i
+// Leading distance/duration token at the start of a bullet/segment, e.g. "300m", "20min", "1h20"
+const LEAD_QTY_RE = /^(\d+(?:[.,]\d+)?\s*(?:m\b|km\b|min\b)|\d+\s*h\s*\d*\b)/i
+// A bullet/segment that STARTS with a quantity ("1000m à ...", "3×2km à ...") is a real effort
+// segment even if it mentions "récup" later as a trailing note (ex: "1000m à 87-90% VMA — récup
+// 4'30 entre les blocs") — only segments opening with récup/transition/repos are pure recovery.
+const LEADING_QTY_RE = /^\d+\s*[×x]|^\d+(?:[.,]\d+)?\s*(?:m\b|km\b|min\b|h\b)/i
+function isRecoverySegment(t) { return !LEADING_QTY_RE.test(t) && RECOVERY_RE.test(t) }
 
-// Detect EVERY meaningful "BLOC ..." section in the corps text (reps-based or continuous),
-// skipping pure recovery/transition sections which never need a real-pace input.
+// Detect EVERY meaningful section in the corps text — real "BLOC ..." headers with bullets,
+// OR (when no BLOC header exists at all) a virtual split on "→"/"puis" for raw multi-segment
+// templates (ex: "3 blocs de : 1000m à ... → récup 1'30 → 500m à ... → récup 1'30 → 1000m à ...").
+// Each section is classified as:
+//  - 'uniform'    : bullets collectively match a "N×M" pattern → N identical reps, one shared label
+//  - 'pyramid'    : 2+ distinct non-recovery bullets/segments (different distances/durations each,
+//                   e.g. a 300-400-500-400-300m pyramid) → one rep per bullet, individually labeled
+//  - 'continuous' : a single non-recovery bullet/segment → one averaged pace/value input
+// Pure recovery bullets/segments are dropped entirely — they never need an input.
 function detectAllSections(corps) {
   if (!corps) return []
   const lines = corps.split('\n')
@@ -75,27 +89,62 @@ function detectAllSections(corps) {
     }
   }
   if (current) raw.push(current)
-  if (raw.length === 0) return []
+
+  // No BLOC header at all: fall back to a virtual split on arrow-chain multi-segment text
+  // (raw session_library templates not yet restructured into BLOC/bullet form).
+  if (raw.length === 0) {
+    if (/→|\bpuis\b/i.test(corps)) {
+      const segments = corps.split(/\s*(?:→|\bpuis\b)\s*/i).map(s => s.trim()).filter(Boolean)
+      if (segments.length > 1) raw.push({ header: 'BLOC Séance', bullets: segments })
+    }
+    if (raw.length === 0) return []
+  }
 
   return raw
     .filter(s => !RECOVERY_RE.test(s.header))
     .map(s => {
-      const text = s.bullets.join(' ')
-      const m = text.match(REPS_RE)
-      const reps = m ? parseInt(m[1]) : 0
-      const hasReps = reps >= 2 && reps <= 25
-      return {
-        header: s.header,
-        label: hasReps ? `${m[1]}×${m[2]}${m[3]}` : null,
-        reps: hasReps ? reps : 0,
-        text,
+      const bullets = s.bullets.filter(b => !isRecoverySegment(b))
+      if (bullets.length === 0) return null
+
+      const joined = bullets.join(' ')
+      const m = joined.match(REPS_RE)
+      const repsCount = m ? parseInt(m[1]) : 0
+      const isUniform = repsCount >= 2 && repsCount <= 25
+
+      if (isUniform) {
+        return {
+          header: s.header, mode: 'uniform',
+          label: `${m[1]}×${m[2]}${m[3]}`, reps: repsCount, text: joined,
+        }
       }
+
+      if (bullets.length >= 2) {
+        const items = bullets.map((b, j) => {
+          // Prefer a quantity right at the start of the bullet; fall back to the first one
+          // found anywhere (handles a lingering "3 blocs de : 1000m à …" prefix left over
+          // from an arrow-chain split where the distance isn't the very first token).
+          const qty = b.match(LEAD_QTY_RE) || b.match(/\d+(?:[.,]\d+)?\s*(?:m\b|km\b|min\b)/i)
+          return { text: b, label: qty ? qty[0].trim() : `Rep ${j + 1}`, distM: extractLeadDistM(b) }
+        })
+        return { header: s.header, mode: 'pyramid', reps: items.length, items, text: joined }
+      }
+
+      return { header: s.header, mode: 'continuous', reps: 0, text: joined }
     })
+    .filter(Boolean)
 }
 
 function extractDistM(label) {
   if (!label) return null
   const m = label.match(/[×x]\s*(\d+(?:[.,]\d+)?)\s*(m|km)/i)
+  if (!m) return null
+  const val = parseFloat(m[1].replace(',', '.'))
+  return m[2].toLowerCase() === 'km' ? val * 1000 : val
+}
+
+function extractLeadDistM(text) {
+  const t = text || ''
+  const m = t.match(/^(\d+(?:[.,]\d+)?)\s*(m\b|km\b)/i) || t.match(/(\d+(?:[.,]\d+)?)\s*(m\b|km\b)/i)
   if (!m) return null
   const val = parseFloat(m[1].replace(',', '.'))
   return m[2].toLowerCase() === 'km' ? val * 1000 : val
@@ -307,6 +356,7 @@ export default function PostSessionFlow({
   const [sectionPaces,  setSectionPaces]  = useState({}) // { [i]: [{min,sec}] } — reps mode: allure par répétition
   const [sectionWatts,  setSectionWatts]  = useState({}) // { [i]: [string] } — vélo, watts par répétition
   const [sectionSingle, setSectionSingle] = useState({}) // { [i]: {min,sec} } — phase continue (pas de répétitions)
+  const [sectionContWatts, setSectionContWatts] = useState({}) // { [i]: string } — vélo, watts moyens sur phase continue
   const [repMode,       setRepMode]       = useState('time') // 'time' | 'pace' (partagé entre sections à reps)
   const [cdPaceMin,     setCdPaceMin]     = useState('')
   const [cdPaceSec,     setCdPaceSec]     = useState('')
@@ -338,6 +388,7 @@ export default function PostSessionFlow({
   function setSingleFor(i, patch) {
     setSectionSingle(prev => ({ ...prev, [i]: { ...singleFor(i), ...patch } }))
   }
+  function contWattsFor(i) { return sectionContWatts[i] || '' }
 
   const wuAllure   = getPhaseAllure(session.allures, 'warmup')
   const mainAllure = getPhaseAllure(session.allures, 'main')
@@ -345,8 +396,10 @@ export default function PostSessionFlow({
 
   const pasTermine  = ressenti === 'pas_termine'
   const hasWarmup   = !!session.echauffement && !isNonRunning
-  // mainset shown for running OR any session with detectable sections
-  const hasMainSet  = !!session.corps && (!isNonRunning || hasBlocs)
+  // mainset shown for running, natation and vélo always (each has its own continuous input —
+  // pace/km for running/natation, watts for vélo). Brique uses its own dedicated vélo+course
+  // fields in the metrics step instead. Renforcement only if a real bloc was detected (rare).
+  const hasMainSet  = !!session.corps && !isBrique && (isVelo || isNatation || !isNonRunning || hasBlocs)
   const hasCooldown = !!session.retour_au_calme && !isNonRunning
 
   function activeSteps() {
@@ -386,38 +439,49 @@ export default function PostSessionFlow({
       if (wuPaceMin || wuPaceSec)
         parts.push(`[Ech: ${wuPaceMin||'0'}'${String(wuPaceSec||'0').padStart(2,'0')}"]`)
     }
-    // Every detected section — reps-based (per-rep times/paces/watts) or continuous (single pace)
+    // Every detected section — reps-based (per-rep times/paces/watts, uniform or pyramid) or continuous (single value)
     sections.forEach((sec, i) => {
-      const distM = extractDistM(sec.label)
       const title = sectionTitle(sec.header)
+      const repBadge = j => sec.mode === 'pyramid' ? sec.items[j].label : String(j + 1)
+      const repDistM = j => sec.mode === 'pyramid' ? sec.items[j].distM : (sec.mode === 'uniform' ? extractDistM(sec.label) : null)
+
       if (sec.reps > 0) {
         if (isVelo) {
           const watts = effectiveWatts(i, sec.reps)
-          const str = watts.map((w, j) => w ? `bloc${j+1}:${w}W` : null).filter(Boolean).join(' | ')
+          const str = watts.map((w, j) => w ? `${repBadge(j)}:${w}W` : null).filter(Boolean).join(' | ')
           if (str) parts.push(`[${title}: ${str}]`)
         } else {
-          const useTimeMode = repMode === 'time' && distM
-          const arr = useTimeMode ? effectiveReps(i, sec.reps) : effectivePaces(i, sec.reps)
-          const str = arr.map((t, j) => {
+          const str = Array.from({ length: sec.reps }, (_, j) => {
+            const rDistM = repDistM(j)
+            const useTimeMode = repMode === 'time' && rDistM
+            const t = (useTimeMode ? effectiveReps(i, sec.reps) : effectivePaces(i, sec.reps))[j]
             if (!t.min && !t.sec) return null
             const timeStr = `${t.min||'0'}'${String(t.sec||'0').padStart(2,'0')}"`
             if (useTimeMode) {
-              const split = timeToSplit(t.min, t.sec, distM, isNatation)
-              return split ? `${j+1}:${timeStr}(${split.time}${split.unit})` : `${j+1}:${timeStr}`
+              const split = timeToSplit(t.min, t.sec, rDistM, isNatation)
+              return split ? `${repBadge(j)}:${timeStr}(${split.time}${split.unit})` : `${repBadge(j)}:${timeStr}`
             }
-            return `${j+1}:${timeStr}/km`
+            return `${repBadge(j)}:${timeStr}${isNatation ? '/100m' : '/km'}`
           }).filter(Boolean).join(' | ')
-          if (str) parts.push(`[${sec.label} — ${title}: ${str}]`)
+          if (str) parts.push(`[${sec.label ? sec.label + ' — ' : ''}${title}: ${str}]`)
         }
-      } else if (!isVelo) {
+      } else if (isVelo) {
+        const w = contWattsFor(i)
+        if (w) parts.push(`[${title}: ${w}W]`)
+      } else {
         const p = singleFor(i)
-        if (p.min || p.sec) parts.push(`[${title}: ${p.min||'0'}'${String(p.sec||'0').padStart(2,'0')}"/km]`)
+        if (p.min || p.sec) parts.push(`[${title}: ${p.min||'0'}'${String(p.sec||'0').padStart(2,'0')}"${isNatation ? '/100m' : '/km'}]`)
       }
     })
-    // Séance sans BLOC détecté (footing, EF simple…) — allure moyenne saisie via le champ de secours
+    // Séance sans BLOC détecté (footing, EF simple, vélo continu…) — champ de secours
     if (!hasBlocs) {
-      const p = singleFor(0)
-      if (p.min || p.sec) parts.push(`[Corps: ${p.min||'0'}'${String(p.sec||'0').padStart(2,'0')}"/km]`)
+      if (isVelo) {
+        const w = contWattsFor(0)
+        if (w) parts.push(`[Corps: ${w}W]`)
+      } else {
+        const p = singleFor(0)
+        if (p.min || p.sec) parts.push(`[Corps: ${p.min||'0'}'${String(p.sec||'0').padStart(2,'0')}"${isNatation ? '/100m' : '/km'}]`)
+      }
     }
     if (!isNonRunning) {
       if (cdPaceMin || cdPaceSec)
@@ -642,7 +706,9 @@ export default function PostSessionFlow({
               <p style={{ fontSize: '.85rem', color: 'rgba(26,26,46,.5)', marginBottom: '1.25rem', lineHeight: 1.65 }}>
                 {hasBlocs
                   ? "Renseigne ce que tu as vraiment tenu sur chaque partie de la séance."
-                  : 'Quelle allure moyenne sur le corps de la séance ?'}
+                  : isVelo
+                    ? 'Quelle puissance moyenne sur le corps de la séance ?'
+                    : 'Quelle allure moyenne sur le corps de la séance ?'}
               </p>
 
               <PrevuCard color={typeColor} icon={isNatation ? '🏊' : isVelo ? '🚴' : '⚡'}>
@@ -656,7 +722,7 @@ export default function PostSessionFlow({
               {hasBlocs ? (
                 <>
                   {/* Mode toggle — running sections with a known distance */}
-                  {sections.some(sec => sec.reps > 0 && extractDistM(sec.label)) && !isNonRunning && (
+                  {sections.some(sec => (sec.mode === 'uniform' && extractDistM(sec.label)) || (sec.mode === 'pyramid' && sec.items.some(it => it.distM))) && !isNonRunning && (
                     <div style={{ display: 'flex', gap: '.35rem', marginBottom: '.875rem',
                       background: 'rgba(139,47,201,.06)', borderRadius: 12, padding: '.3rem' }}>
                       {[
@@ -675,9 +741,12 @@ export default function PostSessionFlow({
                   )}
 
                   {sections.map((sec, i) => {
-                    const distM = extractDistM(sec.label)
+                    const distM = sec.mode === 'uniform' ? extractDistM(sec.label) : null
                     const title = sectionTitle(sec.header)
                     const isVeloBloc = isVelo && sec.reps > 0
+                    // Badge shown to the left of each rep row: distance/duration label for pyramid mode, index otherwise
+                    const repBadge = j => sec.mode === 'pyramid' ? sec.items[j].label : String(j + 1)
+                    const repDistM = j => sec.mode === 'pyramid' ? sec.items[j].distM : distM
 
                     return (
                       <div key={i} style={{ marginBottom: i < sections.length - 1 ? '1.25rem' : 0 }}>
@@ -693,22 +762,32 @@ export default function PostSessionFlow({
                           </div>
                         )}
 
-                        {sec.reps === 0 ? (
-                          // Continuous phase (no reps) — one pace input for the whole section
-                          <PaceInput
-                            label={sections.length > 1 ? undefined : `Allure — ${title}`}
-                            minVal={singleFor(i).min} onMinChange={v => setSingleFor(i, { min: v })}
-                            secVal={singleFor(i).sec} onSecChange={v => setSingleFor(i, { sec: v })}
-                          />
+                        {sec.mode === 'continuous' ? (
+                          isVelo ? (
+                            // Vélo continu — puissance moyenne (pas d'allure min/km pour un cycliste)
+                            <NumberField
+                              label={`Puissance moyenne — ${title}`}
+                              value={contWattsFor(i)}
+                              onChange={v => setSectionContWatts(prev => ({ ...prev, [i]: v }))}
+                              placeholder="Ex : 180" unit="W"
+                            />
+                          ) : (
+                            // Continuous phase (no reps) — one pace input for the whole section
+                            <PaceInput
+                              label={sections.length > 1 ? undefined : `Allure — ${title}`}
+                              minVal={singleFor(i).min} onMinChange={v => setSingleFor(i, { min: v })}
+                              secVal={singleFor(i).sec} onSecChange={v => setSingleFor(i, { sec: v })}
+                            />
+                          )
                         ) : isVeloBloc ? (
-                          // Vélo — watts input per rep
+                          // Vélo — watts input per rep (uniform reps OR pyramid, badge shows distance/duration when pyramid)
                           <div style={{ display: 'flex', flexDirection: 'column', gap: '.5rem' }}>
                             {effectiveWatts(i, sec.reps).map((w, j) => (
                               <div key={j} style={{ display: 'flex', alignItems: 'center', gap: '.75rem',
                                 background: 'rgba(139,47,201,.04)', borderRadius: 12,
                                 padding: '.6rem .875rem', border: '1px solid rgba(139,47,201,.1)' }}>
-                                <span style={{ fontSize: '.78rem', fontWeight: 800, color: C.purple,
-                                  minWidth: 22, textAlign: 'center' }}>{j + 1}</span>
+                                <span style={{ fontSize: '.72rem', fontWeight: 800, color: C.purple,
+                                  minWidth: sec.mode === 'pyramid' ? 44 : 22, textAlign: 'center' }}>{repBadge(j)}</span>
                                 <div style={{ display: 'flex', alignItems: 'center', gap: '.4rem', flex: 1 }}>
                                   <input
                                     type="number" min="0" max="9999" placeholder="Ex: 245" value={w}
@@ -726,9 +805,9 @@ export default function PostSessionFlow({
                             ))}
                           </div>
                         ) : (() => {
-                          const useTimeMode = repMode === 'time' && distM
-                          const arr = useTimeMode ? effectiveReps(i, sec.reps) : effectivePaces(i, sec.reps)
                           const setter = (j, field, val) => {
+                            const rDistM = repDistM(j)
+                            const useTimeMode = repMode === 'time' && rDistM
                             const bucket = useTimeMode ? sectionReps : sectionPaces
                             const setBucket = useTimeMode ? setSectionReps : setSectionPaces
                             const arrEff = useTimeMode ? effectiveReps(i, sec.reps) : effectivePaces(i, sec.reps)
@@ -736,17 +815,20 @@ export default function PostSessionFlow({
                             next[j] = { ...next[j], [field]: val }
                             setBucket(prev => ({ ...prev, [i]: next }))
                           }
-                          const unitLabel = distM ? (isNatation ? '/100m' : '/km') : '/km'
                           return (
                             <div style={{ display: 'flex', flexDirection: 'column', gap: '.5rem' }}>
-                              {arr.map((rp, j) => {
-                                const split = (useTimeMode && distM) ? timeToSplit(rp.min, rp.sec, distM, isNatation) : null
+                              {Array.from({ length: sec.reps }, (_, j) => {
+                                const rDistM = repDistM(j)
+                                const useTimeMode = repMode === 'time' && rDistM
+                                const rp = (useTimeMode ? effectiveReps(i, sec.reps) : effectivePaces(i, sec.reps))[j]
+                                const unitLabel = rDistM ? (isNatation ? '/100m' : '/km') : '/km'
+                                const split = (useTimeMode && rDistM) ? timeToSplit(rp.min, rp.sec, rDistM, isNatation) : null
                                 return (
                                   <div key={j} style={{ display: 'flex', alignItems: 'center', gap: '.75rem',
                                     background: 'rgba(139,47,201,.04)', borderRadius: 12,
                                     padding: '.6rem .875rem', border: '1px solid rgba(139,47,201,.1)' }}>
-                                    <span style={{ fontSize: '.78rem', fontWeight: 800, color: C.purple,
-                                      minWidth: 22, textAlign: 'center' }}>{j + 1}</span>
+                                    <span style={{ fontSize: '.72rem', fontWeight: 800, color: C.purple,
+                                      minWidth: sec.mode === 'pyramid' ? 44 : 22, textAlign: 'center' }}>{repBadge(j)}</span>
                                     <div style={{ display: 'flex', alignItems: 'center', gap: '.3rem', flex: 1 }}>
                                       <input
                                         type="number" min="0" max="99" placeholder="MM" value={rp.min || ''}
@@ -784,6 +866,13 @@ export default function PostSessionFlow({
                     )
                   })}
                 </>
+              ) : isVelo ? (
+                <NumberField
+                  label="Puissance moyenne corps de séance"
+                  value={contWattsFor(0)}
+                  onChange={v => setSectionContWatts(prev => ({ ...prev, 0: v }))}
+                  placeholder="Ex : 180" unit="W"
+                />
               ) : (
                 <PaceInput
                   label="Allure moyenne corps de séance"
@@ -989,16 +1078,24 @@ export default function PostSessionFlow({
                         const count = effectiveWatts(i, sec.reps).filter(w => w).length
                         if (count > 0) lines.push({ icon: '🚴', label: title, val: `${count} blocs` })
                       } else {
-                        const distM = extractDistM(sec.label)
-                        const arr = (repMode === 'time' && distM) ? effectiveReps(i, sec.reps) : effectivePaces(i, sec.reps)
-                        const count = arr.filter(p => p.min || p.sec).length
+                        const count = Array.from({ length: sec.reps }, (_, j) => {
+                          const rDistM = sec.mode === 'pyramid' ? sec.items[j].distM : (sec.mode === 'uniform' ? extractDistM(sec.label) : null)
+                          const arr = (repMode === 'time' && rDistM) ? effectiveReps(i, sec.reps) : effectivePaces(i, sec.reps)
+                          return arr[j]
+                        }).filter(p => p.min || p.sec).length
                         if (count > 0) lines.push({ icon: isNatation ? '🏊' : '⚡', label: title, val: `${count} blocs` })
                       }
+                    } else if (isVelo) {
+                      const w = contWattsFor(i)
+                      if (w) lines.push({ icon: '🚴', label: title, val: `${w} W` })
                     } else {
                       const p = singleFor(i)
                       if (p.min || p.sec) lines.push({ icon: '⚡', label: title, val: fmtPace(p.min, p.sec) })
                     }
                   })
+                } else if (isVelo) {
+                  const w = contWattsFor(0)
+                  if (w) lines.push({ icon: '🚴', label: 'Corps', val: `${w} W` })
                 } else if (!isNonRunning) {
                   const p = singleFor(0)
                   if (p.min || p.sec) lines.push({ icon: '⚡', label: 'Corps', val: fmtPace(p.min, p.sec) })

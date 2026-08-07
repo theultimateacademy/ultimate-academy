@@ -427,6 +427,27 @@ function subsPaces(text, vma) {
   });
 }
 
+const CORPS_RECOVERY_RE = /r[ée]cup|transition|repos/i;
+// A segment that STARTS with a quantity ("1000m à ...", "5min à ...") is a real effort phase
+// even if it mentions "récup" later as a trailing note (ex: "1000m à 87-90% VMA — récup 4'30
+// entre les blocs") — only segments that open with récup/transition/repos are pure recovery.
+const LEADING_QTY_RE = /^\d+\s*[×x]|^\d+(?:[.,]\d+)?\s*(?:m\b|km\b|min\b|h\b)/i;
+
+// Split a raw main_set on "→"/"puis" into BLOC phases, auto-labeling recovery segments
+// ("BLOC Récupération") so the post-session pace-entry UI knows to skip them, and
+// numbering the remaining effort segments sequentially under blocLabel (ex: "3 blocs de :
+// 1000m à 87-90% VMA → récup 1'30 → 500m à 100-105% VMA" → 2 effort phases + 1 recovery phase).
+function splitPhasesRecoveryAware(main, blocLabel) {
+  const phases = main.split(/\s*(?:→|\bpuis\b)\s*/i);
+  let effortIdx = 0;
+  return phases.map(p => {
+    const trimmed = p.trim();
+    const isRecov = !LEADING_QTY_RE.test(trimmed) && CORPS_RECOVERY_RE.test(trimmed);
+    const header = isRecov ? 'BLOC Récupération' : `BLOC ${blocLabel} ${++effortIdx}`;
+    return { header, text: trimmed };
+  });
+}
+
 function buildCorps(libSession, vma) {
   const main     = libSession.main_set || '';
   const recovery = libSession.recovery || '';
@@ -465,22 +486,17 @@ function buildCorps(libSession, vma) {
     if (type.includes('endurance') || type.includes('recuperation')) {
       return subsPaces(main, vma);
     }
-    // Technique : phases split
-    if (type.includes('technique')) {
-      const phases = main.split(/\s*→\s*/);
-      if (phases.length > 1)
-        return phases.map((p, i) => `BLOC Exercice ${i + 1}\n• ${subsPaces(p.trim(), vma)}`).join('\n\n');
-    }
-    // Pyramide : split sur "→"
-    if (main.includes('→')) {
-      const phases = main.split(/\s*→\s*/);
-      return phases.map((p, i) => `BLOC Phase ${i + 1}\n• ${subsPaces(p.trim(), vma)}`).join('\n\n');
-    }
-    // Intervalles / seuil / tempo / test nage : BLOC + Récupération
+    // Intervalles / seuil / tempo / test / technique / pyramide nage
     const natLabel = type.includes('vitesse') ? 'Intervalles vitesse'
       : type.includes('seuil') || type.includes('tempo') ? 'Tempo / Seuil'
       : type.includes('test') ? 'Test chronométré'
+      : type.includes('technique') ? 'Exercice'
       : 'Séries';
+    // Multi-segment (pyramide, technique, ou tout template avec plusieurs phases séparées par "→")
+    if (main.includes('→') || /\bpuis\b/i.test(main)) {
+      const phases = splitPhasesRecoveryAware(main, natLabel);
+      return phases.map(ph => `${ph.header}\n• ${subsPaces(ph.text, vma)}`).join('\n\n');
+    }
     let corps = `BLOC ${natLabel}\n• ${subsPaces(main, vma)}`;
     if (recovery) corps += `\n\nBLOC Récupération\n• ${subsPaces(recovery, vma)}`;
     return corps;
@@ -492,16 +508,16 @@ function buildCorps(libSession, vma) {
     if (type.includes('endurance') || type.includes('recuperation')) {
       return subsPaces(main, vma);
     }
-    // Tempo / Sweet spot / Intervalles / Côtes : phases ou BLOC
-    if (main.includes('→') || main.includes('puis')) {
-      const phases = main.split(/\s*(?:→|puis)\s*/);
-      return phases.map((p, i) => `BLOC Phase ${i + 1}\n• ${subsPaces(p.trim(), vma)}`).join('\n\n');
-    }
     const velLabel = type.includes('intervalles') ? 'Intervalles FTP'
       : type.includes('tempo') ? 'Tempo / Sweet spot'
       : type.includes('cotes') ? 'Montées répétées'
       : type.includes('test') ? 'Test FTP'
       : 'Effort';
+    // Tempo / Sweet spot / Intervalles / Côtes : phases ou BLOC
+    if (main.includes('→') || /\bpuis\b/i.test(main)) {
+      const phases = splitPhasesRecoveryAware(main, velLabel);
+      return phases.map(ph => `${ph.header}\n• ${subsPaces(ph.text, vma)}`).join('\n\n');
+    }
     let corps = `BLOC ${velLabel}\n• ${subsPaces(main, vma)}`;
     if (recovery) corps += `\n\nBLOC Récupération\n• ${subsPaces(recovery, vma)}`;
     return corps;
@@ -516,14 +532,14 @@ function buildCorps(libSession, vma) {
   // ── Trail ───────────────────────────────────────────────────
   if (cat === 'trail') {
     if (type.includes('endurance') || type.includes('simulation')) return main;
-    if (main.includes('→')) {
-      const phases = main.split(/\s*→\s*/);
-      return phases.map((p, i) => `BLOC Phase ${i + 1}\n• ${subsPaces(p.trim(), vma)}`).join('\n\n');
-    }
     const trailLabel = type.includes('fractionne') ? 'Intervalles côtes'
       : type.includes('technique') ? 'Technique'
       : type.includes('montagne') ? 'Montée'
       : 'Effort';
+    if (main.includes('→') || /\bpuis\b/i.test(main)) {
+      const phases = splitPhasesRecoveryAware(main, trailLabel);
+      return phases.map(ph => `${ph.header}\n• ${subsPaces(ph.text, vma)}`).join('\n\n');
+    }
     let corps = `BLOC ${trailLabel}\n• ${subsPaces(main, vma)}`;
     if (recovery) corps += `\n\nBLOC Récupération\n• ${subsPaces(recovery, vma)}`;
     return corps;
@@ -537,6 +553,16 @@ function buildCorps(libSession, vma) {
     cotes:            'Montées',
     specifique:       'Allure course',
   }[cat] || 'Effort';
+
+  // Templates multi-segments (ex: "3 blocs de : 1000m → récup 1'30 → 500m → récup 1'30 → 1000m")
+  // — on découpe en BLOC individuels au lieu d'empiler tout le texte brut dans une seule puce,
+  // sinon l'athlète ne peut renseigner qu'une seule allure moyenne pour toute la séance.
+  if (main.includes('→') || /\bpuis\b/i.test(main)) {
+    const phases = splitPhasesRecoveryAware(main, blocLabel);
+    let corps = phases.map(ph => `${ph.header}\n• ${subsPaces(ph.text, vma)}`).join('\n\n');
+    if (recovery) corps += `\n\nBLOC Récupération\n• ${subsPaces(recovery, vma)}`;
+    return corps;
+  }
 
   let corps = `BLOC ${blocLabel}\n• ${subsPaces(main, vma)}`;
   if (recovery) {
