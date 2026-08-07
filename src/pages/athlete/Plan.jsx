@@ -87,6 +87,57 @@ function SessionDetailPage({ session, weekNum, sessionIdx, planId, vma, onClose,
       )
     }
 
+    // ── Brique : segments Nage/Vélo/Course affichés séparément ────
+    // (le texte brut "Vélo : 1h20 → transition → Course : 30min" n'a ni BLOC ni bullet —
+    // sans ce cas dédié il tombait dans l'affichage "durée totale + une seule allure",
+    // ce qui mélangeait la durée vélo+course avec l'allure course uniquement)
+    if (type.includes('brique')) {
+      const DISC_META = {
+        nage: { icon: '🏊', color: '#3B82F6', label: 'Nage' },
+        natation: { icon: '🏊', color: '#3B82F6', label: 'Natation' },
+        piscine: { icon: '🏊', color: '#3B82F6', label: 'Piscine' },
+        'vélo': { icon: '🚴', color: '#F97316', label: 'Vélo' },
+        velo: { icon: '🚴', color: '#F97316', label: 'Vélo' },
+        course: { icon: '🏃', color: '#10B981', label: 'Course' },
+      }
+      const segments = mainSet.split(/\s*→\s*/).map(s => s.trim()).filter(Boolean)
+      const nodes = segments.map((seg, i) => {
+        if (/^(t1|t2|transition|r[ée]cup|repos)\b/i.test(seg)) {
+          return (
+            <div key={i} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '.5rem', padding: '.2rem 0' }}>
+              <span style={{ fontSize: '.75rem', color: '#38BDF8' }}>⏸</span>
+              <span style={{ fontSize: '.8rem', color: 'rgba(255,255,255,.4)', fontStyle: 'italic' }}>{seg}</span>
+            </div>
+          )
+        }
+        const labelMatch = seg.match(/^(Nage|Natation|Piscine|Vélo|Velo|Course)\s*:\s*/i)
+        const bodyText   = labelMatch ? seg.slice(labelMatch[0].length).trim() : seg
+        const discKeyMatch = seg.match(/\b(nage|natation|piscine|vélo|velo|course)\b/i)
+        const discKey = discKeyMatch ? discKeyMatch[1].toLowerCase() : ''
+        const meta = DISC_META[discKey] || { icon: '⚡', color: typeColor, label: null }
+        const durMatch = bodyText.match(/(\d+\s*h\s*\d*|\d+(?:[.,]\d+)?\s*(?:min\b|km\b|m\b))/i)
+        return (
+          <div key={i} style={{ background: `${meta.color}0D`, border: `1px solid ${meta.color}2A`, borderRadius: 16, padding: '1rem 1.125rem' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '.4rem', marginBottom: '.4rem' }}>
+              <span style={{ fontSize: '1rem' }}>{meta.icon}</span>
+              <span style={{ fontSize: '.68rem', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '.06em', color: meta.color }}>
+                {meta.label || 'Effort'}
+              </span>
+            </div>
+            {durMatch && (
+              <div style={{ fontSize: '1.6rem', fontWeight: 900, color: '#fff', lineHeight: 1, marginBottom: '.35rem' }}>
+                {durMatch[1].trim()}
+              </div>
+            )}
+            <div style={{ fontSize: '.875rem', lineHeight: 1.6, color: 'rgba(255,255,255,.72)' }}>
+              {bodyText}
+            </div>
+          </div>
+        )
+      })
+      return <div style={{ display: 'flex', flexDirection: 'column', gap: '.625rem' }}>{nodes}</div>
+    }
+
     // ── BLOC / bullet structured session ─────────────────────────
     const hasBloc   = /^BLOC\b/im.test(mainSet)
     const hasBullet = mainSet.includes('•')

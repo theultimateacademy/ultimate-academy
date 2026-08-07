@@ -188,9 +188,55 @@ function getPhaseAllure(allures, phase) {
 }
 
 // BLOC/bullet corps renderer — compact version for the "Prévu" card
-function CorpsPreview({ corps, typeColor }) {
+function CorpsPreview({ corps, typeColor, isBrique }) {
   if (!corps) return null
   const color = typeColor || C.purple
+
+  // Brique : segments Nage/Vélo/Course affichés séparément plutôt qu'en texte brut
+  if (isBrique) {
+    const DISC_META = {
+      nage: { icon: '🏊', color: '#3B82F6', label: 'Nage' },
+      natation: { icon: '🏊', color: '#3B82F6', label: 'Natation' },
+      piscine: { icon: '🏊', color: '#3B82F6', label: 'Piscine' },
+      'vélo': { icon: '🚴', color: '#F97316', label: 'Vélo' },
+      velo: { icon: '🚴', color: '#F97316', label: 'Vélo' },
+      course: { icon: '🏃', color: '#10B981', label: 'Course' },
+    }
+    const segments = corps.split(/\s*→\s*/).map(s => s.trim()).filter(Boolean)
+    return (
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '.4rem' }}>
+        {segments.map((seg, i) => {
+          if (/^(t1|t2|transition|r[ée]cup|repos)\b/i.test(seg)) {
+            return (
+              <div key={i} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '.35rem', padding: '.15rem 0' }}>
+                <span style={{ fontSize: '.68rem', color: '#0EA5E9' }}>⏸</span>
+                <span style={{ fontSize: '.75rem', color: 'rgba(26,26,46,.45)', fontStyle: 'italic' }}>{seg}</span>
+              </div>
+            )
+          }
+          const labelMatch = seg.match(/^(Nage|Natation|Piscine|Vélo|Velo|Course)\s*:\s*/i)
+          const bodyText   = labelMatch ? seg.slice(labelMatch[0].length).trim() : seg
+          const discKeyMatch = seg.match(/\b(nage|natation|piscine|vélo|velo|course)\b/i)
+          const discKey = discKeyMatch ? discKeyMatch[1].toLowerCase() : ''
+          const meta = DISC_META[discKey] || { icon: '⚡', color, label: null }
+          const durMatch = bodyText.match(/(\d+\s*h\s*\d*|\d+(?:[.,]\d+)?\s*(?:min\b|km\b|m\b))/i)
+          return (
+            <div key={i} style={{ background: `${meta.color}0D`, border: `1px solid ${meta.color}25`, borderRadius: 10, padding: '.6rem .75rem' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '.3rem', marginBottom: '.2rem' }}>
+                <span style={{ fontSize: '.85rem' }}>{meta.icon}</span>
+                <span style={{ fontSize: '.62rem', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '.05em', color: meta.color }}>
+                  {meta.label || 'Effort'}
+                </span>
+                {durMatch && <span style={{ fontSize: '.72rem', fontWeight: 800, color: '#1a1a2e', marginLeft: 'auto' }}>{durMatch[1].trim()}</span>}
+              </div>
+              <div style={{ fontSize: '.8rem', lineHeight: 1.5, color: 'rgba(26,26,46,.65)' }}>{bodyText}</div>
+            </div>
+          )
+        })}
+      </div>
+    )
+  }
+
   const hasBloc = /^BLOC\b/im.test(corps) || corps.includes('•')
 
   if (!hasBloc) {
@@ -720,7 +766,7 @@ export default function PostSessionFlow({
                 <div style={{ fontWeight: 700, fontSize: '.88rem', marginBottom: '.5rem', color: '#1a1a2e' }}>
                   {session.titre}
                 </div>
-                <CorpsPreview corps={session.corps} typeColor={typeColor} />
+                <CorpsPreview corps={session.corps} typeColor={typeColor} isBrique={isBrique} />
                 {!hasBlocs && <AllureChip allure={mainAllure} color={typeColor} />}
               </PrevuCard>
 
