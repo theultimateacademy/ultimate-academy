@@ -454,19 +454,20 @@ export default function PostSessionFlow({
   const hasCooldown = !!session.retour_au_calme && !isNonRunning
 
   function activeSteps() {
-    const s = ['ressenti']
-    if (!pasTermine) {
-      s.push('rpe')
-      if (!isNonRunning) {
-        if (hasWarmup)   s.push('warmup')
-      }
-      if (hasMainSet)  s.push('mainset')
-      if (!isNonRunning) {
-        if (hasCooldown) s.push('cooldown')
-      }
-      s.push('fc')
+    // Même "pas pu terminer", l'athlète a fait une partie de la séance et doit pouvoir
+    // renseigner son RPE, ses allures réelles sur ce qu'il a tenu, et sa FC — sinon ce sont
+    // précisément les séances difficiles (chaleur, blessure, fatigue) qui perdent le plus
+    // d'informations alors que ce sont les plus importantes à documenter pour le coach.
+    // Chaque étape reste "passable" individuellement via son SkipLink.
+    const s = ['ressenti', 'rpe']
+    if (!isNonRunning) {
+      if (hasWarmup) s.push('warmup')
     }
-    s.push('metrics', 'comment', 'summary')
+    if (hasMainSet) s.push('mainset')
+    if (!isNonRunning) {
+      if (hasCooldown) s.push('cooldown')
+    }
+    s.push('fc', 'metrics', 'comment', 'summary')
     return s
   }
 
@@ -693,7 +694,9 @@ export default function PostSessionFlow({
                 Donne une note à ton effort
               </h3>
               <p style={{ fontSize: '.85rem', color: 'rgba(26,26,46,.5)', marginBottom: '1.75rem', lineHeight: 1.65 }}>
-                De 1 (très facile) à 10 (effort maximal absolu).
+                {pasTermine
+                  ? "De 1 (très facile) à 10 (effort maximal absolu) — sur la partie que tu as réalisée."
+                  : 'De 1 (très facile) à 10 (effort maximal absolu).'}
               </p>
               <div style={{ textAlign: 'center', marginBottom: '1.5rem' }}>
                 <div style={{ fontSize: '4.5rem', fontWeight: 900, lineHeight: 1, color: rpeColor(rpe), transition: 'color .2s' }}>{rpe}</div>

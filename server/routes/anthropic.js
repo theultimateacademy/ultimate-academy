@@ -2240,8 +2240,13 @@ router.post('/analyses/run-weekly', requireAdminOrInternal, async (req, res) => 
             .join('\n')
         : '  (Dernière semaine du plan — pas de semaine suivante)';
 
-      const sessionsDetailStr = sessionsDetail.map((s, i) =>
-        `  [${i}] ${s.jour} : ${s.titre} (${s.type}, ${s.duree_min || '?'} min) ${s.done ? `✅ RPE ${s.rpe || '?'}${s.comment ? ' | Ressenti athlète: ' + s.comment : ''}` : '❌ non effectuée'}`
+      // IMPORTANT : on affiche s.idx (l'index réel dans le plan, celui attendu dans le JSON
+      // "sessions") et pas la position dans ce tableau trié chronologiquement — sinon, dès que
+      // l'ordre des jours diffère de l'ordre de création des séances (ex: un renfo idx=1 le
+      // vendredi qui tombe après des côtes idx=2 le jeudi), l'IA associe son commentaire au
+      // mauvais idx et les coach_comment se retrouvent inversés entre deux séances.
+      const sessionsDetailStr = sessionsDetail.map(s =>
+        `  [${s.idx}] ${s.jour} : ${s.titre} (${s.type}, ${s.duree_min || '?'} min) ${s.done ? `✅ RPE ${s.rpe || '?'}${s.comment ? ' | Ressenti athlète: ' + s.comment : ''}` : '❌ non effectuée'}`
       ).join('\n');
 
       const sessionsJsonTemplate = sessionsDetail.map(s =>
