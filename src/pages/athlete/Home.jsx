@@ -509,6 +509,23 @@ export default function AthleteHome() {
 
             const next = seancesWithIdx.find(s => !doneIdxs.has(s._origIdx))
             if (next) setNextSession({ ...next, weekNum: currentWeek.numero })
+          } else if (weeks.length > 0) {
+            // Plan actif mais dépassé : weeksElapsed va au-delà de la dernière semaine du plan_data
+            // (le plan touche à sa fin et n'a pas encore été remplacé par le suivant). Cette dernière
+            // semaine est nécessairement terminée — on doit quand même proposer son bilan s'il manque,
+            // sinon il disparaît silencieusement pendant tout le laps de temps avant l'activation du
+            // plan suivant (cas vécu par Anouk : plan d'août fini, plan de septembre pas encore activé).
+            const lastWeekNum = Math.max(...weeks.map(w => w.numero))
+            setBilanPlanId(plans.id)
+            setBilanWeekNum(lastWeekNum)
+            const { data: existingBilan } = await supabase
+              .from('weekly_bilans')
+              .select('id')
+              .eq('user_id', profile.id)
+              .eq('plan_id', plans.id)
+              .eq('week_number', lastWeekNum)
+              .maybeSingle()
+            if (existingBilan) setBilanSubmitted(true)
           }
         }
       }
