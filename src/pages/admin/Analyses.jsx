@@ -10,10 +10,16 @@ function lastMonthLabel() {
   return d.toLocaleDateString('fr-FR', { month: 'long', year: 'numeric' })
 }
 
-const MOOD_OPTIONS = [
+const MOOD_OPTIONS_WEEKLY = [
   { v: 'fire',      icon: '🔥', label: 'En feu !',      color: '#F97316' },
   { v: 'good',      icon: '💪', label: 'Bonne semaine', color: '#10B981' },
   { v: 'ok',        icon: '👌', label: 'Semaine solide', color: '#3B82F6' },
+  { v: 'attention', icon: '⚠️', label: 'À surveiller', color: '#F59E0B' },
+]
+const MOOD_OPTIONS_MONTHLY = [
+  { v: 'fire',      icon: '🔥', label: 'En feu !',    color: '#F97316' },
+  { v: 'good',      icon: '💪', label: 'Bon mois',    color: '#10B981' },
+  { v: 'ok',        icon: '👌', label: 'Mois solide',  color: '#3B82F6' },
   { v: 'attention', icon: '⚠️', label: 'À surveiller', color: '#F59E0B' },
 ]
 
@@ -370,9 +376,11 @@ function AnalysisModal({ analysis, athlete, onClose, onSend }) {
 
           {/* Mood */}
           <div>
-            <label style={{ fontSize: '.72rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '.08em', color: 'rgba(255,255,255,.4)', display: 'block', marginBottom: '.5rem' }}>Ambiance de la semaine</label>
+            <label style={{ fontSize: '.72rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '.08em', color: 'rgba(255,255,255,.4)', display: 'block', marginBottom: '.5rem' }}>
+              {data0.is_monthly ? 'Ambiance du mois' : 'Ambiance de la semaine'}
+            </label>
             <div style={{ display: 'flex', gap: '.5rem', flexWrap: 'wrap' }}>
-              {MOOD_OPTIONS.map(m => (
+              {(data0.is_monthly ? MOOD_OPTIONS_MONTHLY : MOOD_OPTIONS_WEEKLY).map(m => (
                 <button key={m.v} onClick={() => setMood(m.v)} style={{
                   padding: '.35rem .8rem', borderRadius: 8, border: `1px solid ${mood === m.v ? m.color : 'rgba(255,255,255,.12)'}`,
                   background: mood === m.v ? m.color + '20' : 'transparent',
