@@ -608,6 +608,39 @@ export default function AthleteHome() {
         )
       })()}
 
+      {/* Analyse mensuelle — trigger compact */}
+      {monthlyAnalysis && (() => {
+        const d = monthlyAnalysis.analysis_data || {}
+        return (
+          <div style={{ marginBottom: '1.5rem' }}>
+            <button
+              onClick={() => setMonthlyOpen(true)}
+              style={{ width: '100%', background: 'none', border: 'none', padding: 0, cursor: 'pointer', fontFamily: 'inherit', textAlign: 'left' }}>
+              <div style={{
+                display: 'flex', alignItems: 'center', gap: '.875rem',
+                background: 'linear-gradient(135deg, rgba(6,182,212,.12), rgba(255,255,255,.02))',
+                border: '1px solid rgba(6,182,212,.3)', borderRadius: 14,
+                padding: '.875rem 1.1rem',
+                transition: 'transform .15s, box-shadow .15s',
+              }}
+                onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-1px)'; e.currentTarget.style.boxShadow = '0 6px 24px rgba(6,182,212,.18)' }}
+                onMouseLeave={e => { e.currentTarget.style.transform = ''; e.currentTarget.style.boxShadow = '' }}>
+                <div style={{ fontSize: '1.5rem', lineHeight: 1, flexShrink: 0 }}>📅</div>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{ fontWeight: 800, fontSize: '.88rem', color: '#22D3EE', marginBottom: '.15rem' }}>
+                    Analyse du mois de {d.month || ''}
+                  </div>
+                  <div style={{ fontSize: '.75rem', color: 'rgba(255,255,255,.4)' }}>
+                    Analyse mensuelle disponible
+                  </div>
+                </div>
+                <div style={{ color: '#22D3EE', fontSize: '1rem', flexShrink: 0 }}>›</div>
+              </div>
+            </button>
+          </div>
+        )
+      })()}
+
       {/* Stats row */}
       {plan && (
         <div className="grid-3 stat-cards-3" style={{ marginBottom: '1.5rem' }}>
@@ -826,39 +859,6 @@ export default function AthleteHome() {
       {analysisOpen && analysis && (
         <WeeklyAnalysisModal analysis={analysis} onClose={() => setAnalysisOpen(false)} />
       )}
-
-      {/* Analyse mensuelle — trigger compact */}
-      {monthlyAnalysis && (() => {
-        const d = monthlyAnalysis.analysis_data || {}
-        return (
-          <div style={{ marginBottom: '1.5rem' }}>
-            <button
-              onClick={() => setMonthlyOpen(true)}
-              style={{ width: '100%', background: 'none', border: 'none', padding: 0, cursor: 'pointer', fontFamily: 'inherit', textAlign: 'left' }}>
-              <div style={{
-                display: 'flex', alignItems: 'center', gap: '.875rem',
-                background: 'linear-gradient(135deg, rgba(6,182,212,.12), rgba(255,255,255,.02))',
-                border: '1px solid rgba(6,182,212,.3)', borderRadius: 14,
-                padding: '.875rem 1.1rem',
-                transition: 'transform .15s, box-shadow .15s',
-              }}
-                onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-1px)'; e.currentTarget.style.boxShadow = '0 6px 24px rgba(6,182,212,.18)' }}
-                onMouseLeave={e => { e.currentTarget.style.transform = ''; e.currentTarget.style.boxShadow = '' }}>
-                <div style={{ fontSize: '1.5rem', lineHeight: 1, flexShrink: 0 }}>📅</div>
-                <div style={{ flex: 1, minWidth: 0 }}>
-                  <div style={{ fontWeight: 800, fontSize: '.88rem', color: '#22D3EE', marginBottom: '.15rem' }}>
-                    Analyse du mois de {d.month || ''}
-                  </div>
-                  <div style={{ fontSize: '.75rem', color: 'rgba(255,255,255,.4)' }}>
-                    Analyse mensuelle disponible
-                  </div>
-                </div>
-                <div style={{ color: '#22D3EE', fontSize: '1rem', flexShrink: 0 }}>›</div>
-              </div>
-            </button>
-          </div>
-        )
-      })()}
 
       {/* Modale analyse mensuelle */}
       {monthlyOpen && monthlyAnalysis && (

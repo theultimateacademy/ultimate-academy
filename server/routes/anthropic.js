@@ -205,6 +205,45 @@ Zones de référence :
 
 // ─── Recalculate distances from pace + duration ───────────────────────────────
 
+// Une brique combine vélo et course dans un seul texte ("Vélo : 45km ... → transition
+// → Course : 10km ..."). Sa jambe course EST une distance de course comparable aux
+// autres séances (contrairement au vélo, sans FTP connu on ne peut pas la convertir en
+// km) — l'ignorer faisait disparaître tout le volume de course d'une brique du total
+// hebdomadaire d'un triathlète, qui peut représenter la moitié de ses séances de course
+// de la semaine. On extrait la portion "Course" du texte (km explicite, sinon durée
+// convertie via calcPace) ; les briques nage+vélo pures (sans jambe course) restent null.
+function extractBriqueRunDistance(corps, vma) {
+  if (!corps) return null;
+  // "N séries de :" / "N blocs de :" en tête de texte → répéter la portion course N fois
+  const multM = corps.match(/^(\d+)\s*(?:séries|blocs)\s*(?:de\s*)?:/i);
+  const mult = multM ? parseInt(multM[1]) : 1;
+
+  const kmMatches = [...corps.matchAll(/Course\s*:\s*(\d+(?:[.,]\d+)?)\s*km/gi)];
+  if (kmMatches.length > 0) {
+    const totalKm = kmMatches.reduce((s, m) => s + parseFloat(m[1].replace(',', '.')), 0) * mult;
+    return Math.round(totalKm * 10) / 10;
+  }
+
+  // "Xmin course" (répétitions type brique fractionnée, ex: "5min course à 78-83% VMA")
+  const minInlineMatches = [...corps.matchAll(/(\d+(?:[.,]\d+)?)\s*min\s*course\b/gi)];
+  if (minInlineMatches.length > 0) {
+    const totalMin = minInlineMatches.reduce((s, m) => s + parseFloat(m[1].replace(',', '.')), 0) * mult;
+    return Math.round((totalMin / 60) * (vma * 0.67) * 10) / 10;
+  }
+
+  // "Course : Xh", "Course : XhYY" ou "Course : Xmin"
+  const courseTimeMatches = [...corps.matchAll(/Course\s*:\s*(\d+)\s*h\s*(\d+)?|Course\s*:\s*(\d+(?:[.,]\d+)?)\s*min/gi)];
+  if (courseTimeMatches.length > 0) {
+    const totalMin = courseTimeMatches.reduce((s, m) => {
+      if (m[1] !== undefined) return s + parseInt(m[1]) * 60 + (m[2] ? parseInt(m[2]) : 0);
+      return s + parseFloat(m[3].replace(',', '.'));
+    }, 0) * mult;
+    return Math.round((totalMin / 60) * (vma * 0.67) * 10) / 10;
+  }
+
+  return null; // brique nage+vélo sans jambe course (ex: préparation transition T1 seule)
+}
+
 function recalculateDistances(planData, vma) {
   if (!planData?.semaines) return planData;
   for (const sem of planData.semaines) {
@@ -215,8 +254,13 @@ function recalculateDistances(planData, vma) {
         s.distance_km = 0;
         continue;
       }
-      // Natation / vélo / brique : distance non calculable sans CSS/FTP → null (affiché NC)
-      if (type.includes('natation') || type.includes('vélo') || type.includes('velo') || type.includes('brique')) {
+      // Brique : distance = jambe course uniquement (extraite du texte), pas le vélo
+      if (type.includes('brique')) {
+        s.distance_km = extractBriqueRunDistance(s.corps, vma);
+        continue;
+      }
+      // Natation / vélo : distance non calculable sans CSS/FTP → null (affiché NC)
+      if (type.includes('natation') || type.includes('vélo') || type.includes('velo')) {
         s.distance_km = null;
         continue;
       }
@@ -235,11 +279,12 @@ function recalculateDistances(planData, vma) {
       }
       s.distance_km = Math.round((s.duree_min / 60) * avgSpeed * 10) / 10;
     }
-    // volume_total_km = running/trail only; separate NC markers for swim/bike
+    // volume_total_km = course à pied uniquement (y compris la jambe course d'une brique) ;
+    // natation/vélo restent exclus (distance non comparable sans CSS/FTP connu)
     sem.volume_total_km = Math.round(
       (sem.seances || []).reduce((sum, s) => {
         const t = (s.type || '').toLowerCase();
-        if (t.includes('natation') || t.includes('vélo') || t.includes('velo') || t.includes('brique')) return sum;
+        if (t.includes('natation') || t.includes('vélo') || t.includes('velo')) return sum;
         return sum + (s.distance_km || 0);
       }, 0) * 10
     ) / 10;
