@@ -1383,6 +1383,12 @@ router.post('/plans/adjust-heat', async (req, res) => {
 
     const updatedPlan = JSON.parse(JSON.stringify(plan.plan_data));
 
+    // Séances déjà validées par l'athlète (RPE/commentaire déjà soumis) — ne jamais les
+    // réécrire, sinon une adaptation lancée en cours de semaine efface un retour réel.
+    const { data: completions } = await supabase
+      .from('session_completions').select('week_number, session_index').eq('plan_id', plan.id);
+    const validatedKeys = new Set((completions || []).map(c => `${c.week_number}-${c.session_index}`));
+
     if (!activate) {
       // Restore all weeks adapted for heat — always clear flag, restore sessions when backup exists
       for (const week of updatedPlan.semaines) {
@@ -1527,7 +1533,9 @@ router.post('/plans/adjust-heat', async (req, res) => {
         week._original_charge  = week.charge;
       }
       week._adapted_for = 'heat';
-      week.seances      = week.seances.map(adaptSessionHeat);
+      week.seances      = week.seances.map((s, idx) =>
+        validatedKeys.has(`${week.numero}-${idx}`) ? s : adaptSessionHeat(s)
+      );
       week.charge       = 'Canicule — Allégé';
     }
 
@@ -1557,6 +1565,11 @@ router.post('/plans/adapt-injury', async (req, res) => {
 
     const vma         = resolveVma(profile);
     const updatedPlan = JSON.parse(JSON.stringify(plan.plan_data));
+
+    // Séances déjà validées — ne jamais les réécrire (voir adjust-heat pour le détail)
+    const { data: completions } = await supabase
+      .from('session_completions').select('week_number, session_index').eq('plan_id', plan.id);
+    const validatedKeys = new Set((completions || []).map(c => `${c.week_number}-${c.session_index}`));
 
     function isIntensityType(s) {
       const t = (s.type || '').toLowerCase();
@@ -1650,7 +1663,9 @@ router.post('/plans/adapt-injury', async (req, res) => {
         week._original_charge  = week.charge;
       }
       week._adapted_for = 'injury';
-      week.seances      = week.seances.map(adaptSessionForInjury);
+      week.seances      = week.seances.map((s, idx) =>
+        validatedKeys.has(`${week.numero}-${idx}`) ? s : adaptSessionForInjury(s)
+      );
       week.charge       = 'Blessure — Programme adapté';
     }
 
@@ -1685,6 +1700,11 @@ router.post('/plans/fatigue-adapt', async (req, res) => {
     const currentWeek = updatedPlan.semaines.find(s => s.numero === weeksElapsed);
     if (!currentWeek) return res.json({ success: false, reason: 'no_current_week' });
 
+    // Séances déjà validées — ne jamais les réécrire (voir adjust-heat pour le détail)
+    const { data: completions } = await supabase
+      .from('session_completions').select('session_index').eq('plan_id', plan.id).eq('week_number', currentWeek.numero);
+    const validatedIdx = new Set((completions || []).map(c => c.session_index));
+
     if (!currentWeek._original_seances) {
       currentWeek._original_seances = JSON.parse(JSON.stringify(currentWeek.seances));
       currentWeek._original_charge  = currentWeek.charge;
@@ -1695,7 +1715,8 @@ router.post('/plans/fatigue-adapt', async (req, res) => {
     // Semaine fatigue = séances légères dans chaque discipline, pas de conversion running forcée
     const lightDurations = [30, 35, 40, 45];
     let lightIdx = 0;
-    currentWeek.seances = currentWeek.seances.map(s => {
+    currentWeek.seances = currentWeek.seances.map((s, idx) => {
+      if (validatedIdx.has(idx)) return s;
       const t     = (s.type || '').toLowerCase();
       const titre = (s.titre || '').toLowerCase();
       const code  = (s.id_seance || '').toLowerCase();
@@ -1933,6 +1954,11 @@ router.post('/plans/period-alert', async (req, res) => {
     const restSessions = Math.max(1, Math.round(painDays * 2 / 3));
     const currentWeek = updatedPlan.semaines.find(s => s.numero === weeksElapsed);
     if (currentWeek) {
+      // Séances déjà validées — ne jamais les réécrire (voir adjust-heat pour le détail)
+      const { data: completions } = await supabase
+        .from('session_completions').select('session_index').eq('plan_id', plan.id).eq('week_number', currentWeek.numero);
+      const validatedIdx = new Set((completions || []).map(c => c.session_index));
+
       if (!currentWeek._original_seances) {
         currentWeek._original_seances = JSON.parse(JSON.stringify(currentWeek.seances));
         currentWeek._original_charge = currentWeek.charge;
@@ -1941,6 +1967,7 @@ router.post('/plans/period-alert', async (req, res) => {
       let replaced = 0;
       for (let i = 0; i < currentWeek.seances.length; i++) {
         if (replaced >= restSessions) break;
+        if (validatedIdx.has(i)) continue;
         const s = currentWeek.seances[i];
         if ((s.type || '').toLowerCase().includes('renforcement')) continue;
         if (s.type === 'Repos') continue;
