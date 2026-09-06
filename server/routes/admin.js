@@ -201,8 +201,25 @@ router.delete('/plans/:planId/session', async (req, res) => {
     const week = pd.semaines[weekIdx];
     const idx = resolveSessionIdx(week, sessionIdx, sessionId);
     if (idx === -1) return res.status(409).json({ error: 'session_not_found', plan_data: pd });
-    week.seances.splice(idx, 1);
+    // On ne splice PAS le tableau : session_completions référence les autres séances de la
+    // semaine par leur session_index (position dans ce tableau). Retirer un élément décale
+    // tous les index suivants et détache silencieusement leurs validations déjà enregistrées
+    // de la bonne séance. On neutralise donc la séance en place (même convention que
+    // /plans/period-alert pour l'adaptation cycle) : la position — et donc l'alignement avec
+    // les autres validations de la semaine — ne bouge jamais.
+    const s = week.seances[idx];
+    week.seances[idx] = {
+      ...s, type: 'Repos', titre: 'Repos', duree_min: 0, distance_km: 0, intensite: '',
+      echauffement: '', corps: '', retour_au_calme: '', allures: [], notes_coach: '',
+      rpe_cible: null, est_seance_cle: false,
+    };
+    week.volume_total_km = Math.round(week.seances.reduce((s, x) => s + (x.distance_km || 0), 0) * 10) / 10;
     await supabase.from('training_plans').update({ plan_data: pd }).eq('id', planId);
+    // La séance supprimée n'existe plus : sa propre validation (s'il y en avait une) n'a
+    // plus de sens et est supprimée. Celles des AUTRES séances (autres session_index) ne
+    // sont jamais touchées.
+    await supabase.from('session_completions').delete()
+      .eq('plan_id', planId).eq('week_number', week.numero).eq('session_index', idx);
     res.json({ success: true, plan_data: pd });
   } catch (err) {
     res.status(500).json({ error: err.message });
