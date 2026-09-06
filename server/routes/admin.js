@@ -154,17 +154,33 @@ router.delete('/athlete/:id', async (req, res) => {
   }
 });
 
+// Un client peut avoir capturé un sessionIdx périmé (rendu avant qu'une autre
+// suppression/déplacement ne décale le tableau seances). On revalide sa cible via
+// id_seance (fourni par le client) contre les données fraîchement lues en base, et on
+// corrige l'index si besoin plutôt que de muter silencieusement la mauvaise séance.
+function resolveSessionIdx(week, sessionIdx, sessionId) {
+  if (!week?.seances) return -1;
+  const current = week.seances[sessionIdx];
+  if (current && (!sessionId || current.id_seance === sessionId)) return sessionIdx;
+  if (sessionId) return week.seances.findIndex(s => s.id_seance === sessionId);
+  return -1;
+}
+
 // PATCH /api/admin/plans/:planId/session  — update one session (coach, bypasses RLS)
 router.patch('/plans/:planId/session', async (req, res) => {
   const { planId } = req.params;
-  const { weekIdx, sessionIdx, updatedSession } = req.body;
+  const { weekIdx, sessionIdx, updatedSession, sessionId } = req.body;
   if (weekIdx == null || sessionIdx == null || !updatedSession)
     return res.status(400).json({ error: 'Missing params' });
   try {
     const { data: row } = await supabase.from('training_plans').select('plan_data').eq('id', planId).single();
     if (!row) return res.status(404).json({ error: 'Plan not found' });
     const pd = JSON.parse(JSON.stringify(row.plan_data));
-    pd.semaines[weekIdx].seances[sessionIdx] = { ...pd.semaines[weekIdx].seances[sessionIdx], ...updatedSession };
+    const week = pd.semaines[weekIdx];
+    const idx = resolveSessionIdx(week, sessionIdx, sessionId);
+    if (idx === -1) return res.status(409).json({ error: 'session_not_found', plan_data: pd });
+    week.seances[idx] = { ...week.seances[idx], ...updatedSession };
+    week.volume_total_km = Math.round(week.seances.reduce((s, x) => s + (x.distance_km || 0), 0) * 10) / 10;
     await supabase.from('training_plans').update({ plan_data: pd }).eq('id', planId);
     res.json({ success: true, plan_data: pd });
   } catch (err) {
@@ -175,14 +191,17 @@ router.patch('/plans/:planId/session', async (req, res) => {
 // DELETE /api/admin/plans/:planId/session  — delete one session (coach, bypasses RLS)
 router.delete('/plans/:planId/session', async (req, res) => {
   const { planId } = req.params;
-  const { weekIdx, sessionIdx } = req.body;
+  const { weekIdx, sessionIdx, sessionId } = req.body;
   if (weekIdx == null || sessionIdx == null)
     return res.status(400).json({ error: 'Missing params' });
   try {
     const { data: row } = await supabase.from('training_plans').select('plan_data').eq('id', planId).single();
     if (!row) return res.status(404).json({ error: 'Plan not found' });
     const pd = JSON.parse(JSON.stringify(row.plan_data));
-    pd.semaines[weekIdx].seances.splice(sessionIdx, 1);
+    const week = pd.semaines[weekIdx];
+    const idx = resolveSessionIdx(week, sessionIdx, sessionId);
+    if (idx === -1) return res.status(409).json({ error: 'session_not_found', plan_data: pd });
+    week.seances.splice(idx, 1);
     await supabase.from('training_plans').update({ plan_data: pd }).eq('id', planId);
     res.json({ success: true, plan_data: pd });
   } catch (err) {

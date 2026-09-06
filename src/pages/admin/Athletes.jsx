@@ -182,7 +182,7 @@ function PlanView({ plan, completions, coachWeekIdx, setCoachWeekIdx, currentWee
                           </button>
                         )}
                         {onDeleteSession && (
-                          <button onClick={e => { e.stopPropagation(); onDeleteSession(coachWeekIdx, si, session.titre) }}
+                          <button onClick={e => { e.stopPropagation(); onDeleteSession(coachWeekIdx, si, session.titre, session.id_seance) }}
                             style={{ flex:1, padding:'.28rem 0', background:'rgba(239,68,68,.08)',
                               border:'none', borderLeft: onRescheduleSession ? '1px solid rgba(255,255,255,.06)' : 'none',
                               cursor:'pointer', fontSize:'.72rem', color:'#FCA5A5', fontFamily:'inherit' }}>
@@ -201,7 +201,7 @@ function PlanView({ plan, completions, coachWeekIdx, setCoachWeekIdx, currentWee
                           <div style={{ display:'flex', flexWrap:'wrap', gap:'.2rem', justifyContent:'center' }}>
                             {DAY_NAMES.map(d => (
                               <button key={d}
-                                onClick={() => { onRescheduleSession(coachWeekIdx, activeSem.numero, si, d); setRescheduleCell(null) }}
+                                onClick={() => { onRescheduleSession(coachWeekIdx, activeSem.numero, si, d, session.id_seance); setRescheduleCell(null) }}
                                 style={{
                                   padding:'.2rem .35rem', borderRadius:5, fontSize:'.6rem', cursor:'pointer',
                                   fontFamily:'inherit', fontWeight: session.jour === d ? 800 : 500,
@@ -951,7 +951,7 @@ function CoachSessionModal({ session, weekNum, sessionIdx, completion, onClose, 
         ) : (
           <SessionEditForm
             session={session}
-            onSave={updated => { onSave(weekNum, sessionIdx, updated); onClose() }}
+            onSave={updated => { onSave(weekNum, sessionIdx, updated, session.id_seance); onClose() }}
             onCancel={() => setEditing(false)}
             inline={true}
           />
@@ -1194,12 +1194,12 @@ function AthleteDetailPanel({ athlete, onClose, onUpdated, onAlertDismissed }) {
     }
   }
 
-  async function deleteSessionFromPlan(weekIdx, sessionIdx, titre) {
+  async function deleteSessionFromPlan(weekIdx, sessionIdx, titre, sessionId) {
     if (!window.confirm(`Supprimer "${titre}" ?`)) return
     try {
       const body = await adminFetch(`/api/admin/plans/${plan.id}/session`, {
         method: 'DELETE',
-        body: JSON.stringify({ weekIdx, sessionIdx }),
+        body: JSON.stringify({ weekIdx, sessionIdx, sessionId }),
       })
       if (body.plan_data) setPlan(p => ({ ...p, plan_data: body.plan_data }))
     } catch (err) {
@@ -1207,19 +1207,20 @@ function AthleteDetailPanel({ athlete, onClose, onUpdated, onAlertDismissed }) {
     }
   }
 
-  async function saveSession(weekNum, sessionIdx, updatedSession) {
+  // Passe par la route serveur (relit plan_data en base juste avant d'écrire) plutôt que
+  // d'écraser la colonne avec la copie potentiellement périmée de l'état React — évite
+  // qu'une édition en vol referme une suppression/déplacement fait entre-temps ailleurs.
+  async function saveSession(weekNum, sessionIdx, updatedSession, sessionId) {
     if (sessionSaving) return
     setSessionSaving(true)
     try {
-      const updatedPlan = JSON.parse(JSON.stringify(plan.plan_data))
-      const week = updatedPlan.semaines.find(s => s.numero === weekNum)
-      if (week) {
-        week.seances[sessionIdx] = updatedSession
-        week.volume_total_km = Math.round(week.seances.reduce((s, x) => s + (x.distance_km || 0), 0) * 10) / 10
-      }
-      const { error } = await supabase.from('training_plans').update({ plan_data: updatedPlan }).eq('id', plan.id)
-      if (error) throw error
-      setPlan(p => ({ ...p, plan_data: updatedPlan }))
+      const weekIdx = plan.plan_data.semaines.findIndex(s => s.numero === weekNum)
+      if (weekIdx === -1) throw new Error('Semaine introuvable')
+      const body = await adminFetch(`/api/admin/plans/${plan.id}/session`, {
+        method: 'PATCH',
+        body: JSON.stringify({ weekIdx, sessionIdx, updatedSession, sessionId }),
+      })
+      if (body.plan_data) setPlan(p => ({ ...p, plan_data: body.plan_data }))
     } catch (err) {
       alert('Erreur : ' + err.message)
     } finally {
@@ -1227,17 +1228,14 @@ function AthleteDetailPanel({ athlete, onClose, onUpdated, onAlertDismissed }) {
     }
   }
 
-  async function rescheduleSession(weekIdx, weekNum, sessionIdx, newDay) {
+  async function rescheduleSession(weekIdx, weekNum, sessionIdx, newDay, sessionId) {
     try {
-      const updatedPlan = JSON.parse(JSON.stringify(plan.plan_data))
-      const week = updatedPlan.semaines.find(s => s.numero === weekNum)
-      if (week?.seances?.[sessionIdx]) {
-        week.seances[sessionIdx] = { ...week.seances[sessionIdx], jour: newDay }
-        const { error } = await supabase.from('training_plans').update({ plan_data: updatedPlan }).eq('id', plan.id)
-        if (error) throw error
-        setPlan(p => ({ ...p, plan_data: updatedPlan }))
-        showSaveToast(`✓ Séance déplacée au ${newDay}`)
-      }
+      const body = await adminFetch(`/api/admin/plans/${plan.id}/session`, {
+        method: 'PATCH',
+        body: JSON.stringify({ weekIdx, sessionIdx, updatedSession: { jour: newDay }, sessionId }),
+      })
+      if (body.plan_data) setPlan(p => ({ ...p, plan_data: body.plan_data }))
+      showSaveToast(`✓ Séance déplacée au ${newDay}`)
     } catch (err) {
       showSaveToast('✗ ' + err.message, false)
     }
@@ -1733,10 +1731,10 @@ function AthleteDetailPanel({ athlete, onClose, onUpdated, onAlertDismissed }) {
                     currentWeekNum={currentWeekNum}
                     onSessionClick={(session, weekNum, sessionIdx, completion) =>
                       setOpenSession({session, weekNum, sessionIdx, completion})}
-                    onDeleteSession={(weekIdx, sessionIdx, titre) =>
-                      deleteSessionFromPlan(weekIdx, sessionIdx, titre)}
-                    onRescheduleSession={(weekIdx, weekNum, sessionIdx, newDay) =>
-                      rescheduleSession(weekIdx, weekNum, sessionIdx, newDay)}
+                    onDeleteSession={(weekIdx, sessionIdx, titre, sessionId) =>
+                      deleteSessionFromPlan(weekIdx, sessionIdx, titre, sessionId)}
+                    onRescheduleSession={(weekIdx, weekNum, sessionIdx, newDay, sessionId) =>
+                      rescheduleSession(weekIdx, weekNum, sessionIdx, newDay, sessionId)}
                     objective={local.objective}
                   />
                 )}
@@ -2648,7 +2646,7 @@ CREATE POLICY "Athletes read own" ON public.weekly_bilans
           sessionIdx={openSession.sessionIdx}
           completion={openSession.completion}
           onClose={() => setOpenSession(null)}
-          onSave={(wn, si, updated) => { saveSession(wn, si, updated); setOpenSession(null) }}
+          onSave={(wn, si, updated, sid) => { saveSession(wn, si, updated, sid); setOpenSession(null) }}
         />
       )}
     </div>
